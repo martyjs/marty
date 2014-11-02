@@ -1,0 +1,45 @@
+{
+  "name": "marty",
+  "version": "0.0.0",
+  "description": "A React.js/Flux Framework",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jhollingworth/marty.git"
+  },
+  "keywords": [
+    "react",
+    "flux"
+  ],
+  "devDependencies": {
+    "browserify": "^5.12.0",
+    "browserify-shim": "^3.7.0",
+    "chai": "^1.9.1",
+    "chai-as-promised": "^4.1.1",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.0.0",
+    "grunt-cli": "^0.1.13",
+    "grunt-concurrent": "^1.0.0",
+    "jsxcs": "0.0.3",
+    "jsxhint": "^0.4.14",
+    "load-grunt-tasks": "^0.6.0",
+    "mocha": "^1.21.4",
+    "mocha-spec-cov": "0.0.3",
+    "sinon": "^1.10.3",
+    "sinon-chai": "^2.5.0",
+    "reactify": "^0.14.0",
+    "blanket": "^1.1.6"
+  },
+  "author": "James Hollingworth",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jhollingworth/marty/issues"
+  },
+  "homepage": "https://github.com/jhollingworth/marty"
+}
