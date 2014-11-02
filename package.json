@@ -41,5 +41,9 @@
   "bugs": {
     "url": "https://github.com/jhollingworth/marty/issues"
   },
-  "homepage": "https://github.com/jhollingworth/marty"
+  "homepage": "https://github.com/jhollingworth/marty",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "flux": "^2.0.1"
+  }
 }
