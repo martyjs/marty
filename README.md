@@ -49,25 +49,30 @@ var UserAPI = Flux.createHttpAPI({
   }
 });
 
-var Container = Flux.createContainer({
-  stores: [UsersStore],
-  actions: Actions,
-  apis: [UserAPI]
-  routers: Router
+var App = Marty.createApplication({
+  dependencies: [
+    Actions,
+    UserApi
+  ],
+  initialize: function () {
+    this.getStores().forEach(function (store) {
+      store.load();
+    });
+  }
 });
 
-var Insight = React.createClass({
-  mixins: [Container.Mixin({
-    watch: ['users']
-  })],
-  render: function () {
+App.registerDependency(UsersStore);
 
-  },
-  addUser: function (user) {
-    this.actions.addUser(user);
-  },
+var Users = React.createClass({
+  mixins: [App.createMixin({
+    listenTo: ['users']
+  })],
   getState: function () {
-    return this.stores.users.getUser(this.props.id);
+    return {
+      users: this.users.all(),
+    }
+  },
+  render: function () {
   }
 });
 
