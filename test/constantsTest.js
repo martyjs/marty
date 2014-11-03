@@ -1,7 +1,7 @@
-var Marty = require('../index');
 var expect = require('chai').expect;
+var constants = require('../lib/constants');
 
-describe('#createConstants()', function () {
+describe('#constants()', function () {
   describe('when you pass in an array', function () {
     it('should return an object of constants', function () {
       var input = ['foo', 'bar'];
@@ -10,7 +10,7 @@ describe('#createConstants()', function () {
         bar: 'bar'
       };
 
-      expect(Marty.createConstants(input)).to.eql(expectedResult);
+      expect(constants(input)).to.eql(expectedResult);
     });
   });
 
@@ -31,7 +31,7 @@ describe('#createConstants()', function () {
         }
       };
 
-      expect(Marty.createConstants(input)).to.eql(expectedResult);
+      expect(constants(input)).to.eql(expectedResult);
     });
   });
 });
