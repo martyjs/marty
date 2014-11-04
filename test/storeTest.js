@@ -60,6 +60,7 @@ describe('Store', function () {
   });
 
   describe('when a payload is received', function () {
+    var data = {};
 
     describe('when the store does not handle action type', function () {
       beforeEach(function () {
@@ -80,6 +81,10 @@ describe('Store', function () {
       it('should call the action handler', function () {
         expect(store.one).to.have.been.calledOnce;
       });
+
+      it('should pass the payload data to the handler', function () {
+        expect(store.one).to.have.been.calledWith(data);
+      });
     });
 
     describe('when the store has multiple aciton types for a handler', function () {
@@ -91,11 +96,16 @@ describe('Store', function () {
       it('should call the action handler', function () {
         expect(store.multiple).to.have.been.calledTwice;
       });
+
+      it('should pass the payload data to the handler', function () {
+        expect(store.multiple).to.have.been.calledWith(data);
+      });
     });
 
     function handlePayload(actionType) {
       store.handlePayload({
-        actionType: actionType
+        actionType: actionType,
+        data: data
       });
     }
   });
