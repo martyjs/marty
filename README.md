@@ -40,10 +40,10 @@ var Actions = Flux.createActionCreators({
 var UserAPI = Flux.createHttpAPI({
   baseUrl: "http://foo.com",
   getUsers: function () {
-    return this.http.get("/users").thenDispatchResponse(Constants.addUsers);
+    return this.get("/users").thenDispatchResponse(Constants.addUsers);
   },
   getUser: function (id) {
-    return this.http.get("/users/" + id).thenDispatchResponse(Constants.addUser)
+    return this.get("/users/" + id).thenDispatchResponse(Constants.addUser)
   }
 });
 
