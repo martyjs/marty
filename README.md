@@ -48,6 +48,7 @@ var UserAPI = Flux.createHttpAPI({
 });
 
 var UserState = Marty.createStateMixin({
+  required: ['users'],
   listenTo: [UserStore],
   getState: function () {
     return {
