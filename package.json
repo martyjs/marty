@@ -37,11 +37,16 @@
     "blanket": "^1.1.6"
   },
   "author": "James Hollingworth",
-  "license": "MIT",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/jhollingworth/marty/master/LICENSE"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/jhollingworth/marty/issues"
   },
-  "homepage": "https://github.com/jhollingworth/marty",
+  "homepage": "https://martyjs.org",
   "dependencies": {
     "lodash": "^2.4.1",
     "flux": "^2.0.1",

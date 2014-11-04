@@ -1,0 +1,470 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="target-densitydpi=device-dpi" />
+  <meta name="HandheldFriendly" content="true"/>
+  <link rel="canonical" href="http://martyjs.org/" />
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+  <title>marty.js</title>
+  <style>
+    body {
+      font-size: 14px;
+      line-height: 22px;
+      background: #f4f4f4 url(docs/images/background.png);
+      color: #000;
+      font-family: Helvetica Neue, Helvetica, Arial;
+    }
+    .interface {
+      font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif !important;
+    }
+    div#sidebar {
+      background: #fff;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 200px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 15px 0 30px 30px;
+      border-right: 1px solid #bbb;
+      box-shadow: 0 0 20px #ccc; -webkit-box-shadow: 0 0 20px #ccc; -moz-box-shadow: 0 0 20px #ccc;
+    }
+    a.toc_title, a.toc_title:visited {
+      display: block;
+      color: black;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+      a.toc_title:hover {
+        text-decoration: underline;
+      }
+      #sidebar .version {
+        font-size: 10px;
+        font-weight: normal;
+      }
+    ul.toc_section {
+      font-size: 11px;
+      line-height: 14px;
+      margin: 5px 0 0 0;
+      padding-left: 0px;
+      list-style-type: none;
+      font-family: Lucida Grande;
+    }
+      .toc_section li {
+        cursor: pointer;
+        margin: 0 0 3px 0;
+      }
+        .toc_section li a {
+          text-decoration: none;
+          color: black;
+        }
+          .toc_section li a:hover {
+            text-decoration: underline;
+          }
+    div.container {
+      width: 550px;
+      margin: 40px 0 50px 260px;
+    }
+    img#logo {
+      width: 396px;
+      height: 69px;
+    }
+    div.warning {
+      margin-top: 15px;
+      font: bold 11px Arial;
+      color: #770000;
+    }
+    p {
+      margin: 20px 0;
+      width: 550px;
+    }
+    a, a:visited {
+      color: #444;
+    }
+    a:active, a:hover {
+      color: #000;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      padding-top: 20px;
+    }
+      h2 {
+        font-size: 20px;
+      }
+    b.header {
+      font-size: 16px;
+      line-height: 30px;
+    }
+    span.alias {
+      font-size: 14px;
+      font-style: italic;
+      margin-left: 20px;
+    }
+    table, tr, td {
+      margin: 0; padding: 0;
+    }
+      td {
+        padding: 2px 12px 2px 0;
+      }
+      table .rule {
+        height: 1px;
+        background: #ccc;
+        margin: 5px 0;
+      }
+    ul {
+      list-style-type: circle;
+      padding: 0 0 0 20px;
+    }
+      li {
+        margin-bottom: 10px;
+      }
+      code, pre, tt {
+        font-family: Monaco, Consolas, "Lucida Console", monospace;
+        font-size: 12px;
+        line-height: 18px;
+        font-style: normal;
+      }
+        tt {
+          padding: 0px 3px;
+          background: #fff;
+          border: 1px solid #ddd;
+          zoom: 1;
+        }
+        code {
+          margin-left: 20px;
+        }
+        pre {
+          font-size: 12px;
+          padding: 2px 0 2px 15px;
+          border-left: 5px solid #bbb;
+          margin: 0px 0 30px;
+        }
+    @media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (max-width: 640px),
+          only screen and (-o-min-device-pixel-ratio: 3/2) and (max-width: 640px),
+          only screen and (min-device-pixel-ratio: 1.5) and (max-width: 640px) {
+      img {
+        max-width: 100%;
+      }
+      div#sidebar {
+        -webkit-overflow-scrolling: initial;
+        position: relative;
+        width: 90%;
+        height: 120px;
+        left: 0;
+        top: -7px;
+        padding: 10px 0 10px 30px;
+        border: 0;
+      }
+      img#logo {
+        width: auto;
+        height: auto;
+      }
+      div.container {
+        margin: 0;
+        width: 100%;
+      }
+      p, div.container ul {
+        max-width: 98%;
+        overflow-x: scroll;
+      }
+      pre {
+        overflow: scroll;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar" class="interface">
+
+    <a class="toc_title" href="#">
+      Marty.js <span class="version">(0.0.1)</span>
+    </a>
+    <ul class="toc_section">
+      <li>&raquo; <a href="https://github.com/jhollingworth/marty">GitHub Repository</a></li>
+    </ul>
+
+    <a class="toc_title" href="#">
+      Introduction
+    </a>
+
+    <a class="toc_title" href="#stores">
+      Stores
+    </a>
+    <ul class="toc_section">
+      <li>- <a href="#handlers">handlers</a></li>
+      <li>- <a href="#setState">setState</a></li>
+      <li>- <a href="#addChangeListener">addChangeListener</a></li>
+      <li>- <a href="#removeChangeListener">removeChangeListener</a></li>
+      <li>- <a href="#waitFor">waitFor</a></li>
+      <li>- <a href="#hasChanged">hasChanged</a></li>
+    </ul>
+
+    <a class="toc_title" href="#stateMixin">
+      State Mixin
+    </a>
+    <ul class="toc_section">
+      <li>- <a href="#required">required</a></li>
+      <li>- <a href="#listenTo">listenTo</a></li>
+      <li>- <a href="#getState">getState</a></li>
+    </ul>
+
+    <a class="toc_title" href="#actionCreators">
+      Action Creators
+    </a>
+    <ul class="toc_section">
+      <li>- <a href="#dispatch">dispatch</a></li>
+    </ul>
+
+    <a class="toc_title" href="#httpAPIs">
+      Http APIs
+    </a>
+    <ul class="toc_section">
+      <li>- <a href="#get">get</a></li>
+      <li>- <a href="#post">post</a></li>
+      <li>- <a href="#put">put</a></li>
+      <li>- <a href="#request">request</a></li>
+    </ul>
+    
+    <a class="toc_title" href="#dispatcher">
+      Dispatcher
+    </a>
+   
+    <a class="toc_title" href="#constants">
+      Constants
+    </a>
+
+    <a class="toc_title" href="#examples">
+      Examples
+    </a>
+
+    <a class="toc_title" href="#links">
+      Links
+    </a>
+
+    <a class="toc_title" href="#changelog">
+      Change Log
+    </a>
+   
+  </div>
+
+  <div class="container">
+
+    <p id="introduction">
+      <img id="logo" src="docs/images/underscore.png" alt="marty.js" />
+    </p>
+
+    <p>
+      <a href="http://github.com/jashkenas/underscore/">Underscore</a>
+      is a JavaScript library that provides a whole mess of useful functional
+      programming helpers without extending any built-in objects.
+      It&rsquo;s the answer to the question: &ldquo;If I sit down in front of a
+      blank HTML page, and want to start being productive immediately, what do I need?&rdquo;
+      &hellip; and the tie to go along with
+      <a href="http://jquery.com">jQuery</a>'s tux and
+      <a href="http://backbonejs.org">Backbone</a>'s suspenders.
+    </p>
+
+    <p>
+      Underscore provides over 100 functions that support both your favorite
+      workaday functional helpers: <b>map</b>, <b>filter</b>, <b>invoke</b> &mdash;
+      as well as more specialized goodies: function binding, javascript
+      templating, creating quick indexes, deep equality testing, and so on.
+    </p>
+
+    <h2>Installation</h2>
+
+    <ul>
+      <li>
+        <b>Node.js</b> <tt>npm install marty</tt>
+      </li>
+      <li>
+        <b>Bower</b> <tt>bower install marty</tt>
+      </li>
+    </ul>
+
+    <div id="documentation">
+
+      <h2 id="stores">Stores</h2>
+
+      <p id="handlers">
+        <b class="header">handlers</b>
+        <br />
+        .
+      </p>
+      <pre>
+var UserStore = Marty.createStore({
+  handlers: {
+    deleteUser: 'deleteUser',
+    addUser: ['addUsers', 'addUser']
+  },
+  deleteUser: function (user) {
+    this.remove(user);
+  },
+  addUsers: function (users) {
+    this.add(users);
+  }
+});</pre>
+
+
+      <p id="setState">
+        <b class="header">setState</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="setState">
+        <b class="header">setState</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="addChangeListener">
+        <b class="addChangeListener">addChangeListener</b><code>Store.addChangeListener(callback, [context])</code>
+        <br />
+        .
+      </p>
+      <pre>
+function onUsersChanged(users) {
+  console.log('users changed', users);
+}
+UserStore.addChangeListener(onUsersChanged, this);
+</pre>
+
+      <p id="removeChangeListener">
+        <b class="removeChangeListener">removeChangeListener</b><code>Store.removeChangeListener(callback)</code>
+        <br />
+        .
+      </p>
+      <pre>
+UserStore.removeChangeListener(onUsersChanged);
+</pre>
+
+      <p id="waitFor">
+        <b class="header">waitFor</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="hasChanged">
+        <b class="header">hasChanged</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <h2 id="arrays">State Mixin</h2>
+
+      <pre>
+var UserState = Marty.createStateMixin({
+  required: ['users'],
+  listenTo: [UserStore],
+  getState: function () {
+    return {
+      users: UserStore.getAll()
+    }
+  }
+});
+
+var Users = React.createClass({
+  mixins: [UserState],
+  ...
+});
+</pre>
+
+      <p id="required">
+        <b class="header">required</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="listenTo">
+        <b class="header">listenTo</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="getState">
+        <b class="header">getState</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <h2 id="actionCreators">Action Creators</h2>
+
+      <p id="dispatch">
+        <b class="header">dispatch</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <h2 id="httpAPIs">HTTP APIs</h2>
+
+      <p id="get">
+        <b class="header">get</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="post">
+        <b class="header">post</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="put">
+        <b class="header">put</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="request">
+        <b class="header">request</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <h2 id="dispatcher">Dispatcher</h2>
+
+      <h2 id="constants">Constants</h2>
+
+      <h2 id="examples">Examples</h2>
+
+      <h2 id="links">Links</h2>
+
+      <p>
+        The Underscore documentation is also available in
+        <a href="http://learning.github.io/underscore/">Simplified Chinese</a>.
+      </p>
+
+
+      <h2 id="changelog">Change Log</h2>
+
+      <p id="0.0.1">
+        <b class="header">0.0.1</b> &mdash; <small><i>November 4, 2014</i></small><br />
+        <ul>
+          <li>
+            
+          </li>
+        </ul>
+      </p>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
