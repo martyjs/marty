@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 var constants = require('../lib/constants');
 
-describe('#constants()', function () {
+describe('Constants', function () {
   describe('when you pass in an array', function () {
     it('should return an object of constants', function () {
       var input = ['foo', 'bar'];

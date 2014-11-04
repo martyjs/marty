@@ -10,7 +10,6 @@ var Constants = Flux.createConstants({
 });
 
 var UsersStore = Flux.createStore({
-  name: 'users',
   handlers: {
     'addUser' Constants.users.add
   },
@@ -18,7 +17,7 @@ var UsersStore = Flux.createStore({
     this.users = Immutable.Map();
   },
   addUser: function (foos) {
-    this.waitFor('other-store');
+    this.waitFor(OtherStore);
     this.setState()
   },
   getUser: function (id) {
@@ -33,7 +32,6 @@ var UsersStore = Flux.createStore({
 });
 
 var Actions = Flux.createActionCreators({
-  name: 'viewActions',
   getUsers: function (users) {
     UserAPI.getUsers().thenDispatch(Constants.users);
   }
@@ -49,30 +47,19 @@ var UserAPI = Flux.createHttpAPI({
   }
 });
 
-var App = Marty.createApplication({
-  dependencies: [
-    Actions,
-    UserApi
-  ],
-  initialize: function () {
-    this.getStores().forEach(function (store) {
-      store.load();
-    });
+var UserState = Marty.createStateMixin({
+  listenTo: [UserStore],
+  getState: function () {
+    return {
+      users: UserStore.getAll()
+    }
   }
 });
 
-App.registerDependency(UsersStore);
-
 var Users = React.createClass({
-  mixins: [App.createMixin({
-    listenTo: ['users']
-  })],
-  getState: function () {
-    return {
-      users: this.users.all(),
-    }
-  },
+  mixins: [UserState],
   render: function () {
+    return <div className='user'>{this.state.user.name}</div>;
   }
 });
 
