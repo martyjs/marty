@@ -34,7 +34,7 @@ describe('Store', function () {
     expect(dispatcher.register).to.have.been.calledWith(store.handlePayload);
   });
 
-  describe('when you add a change listener', function () {
+  describe('#addChangeListener()', function () {
     var changeListener;
 
     beforeEach(function () {
@@ -47,7 +47,7 @@ describe('Store', function () {
       expect(changeListener).to.have.been.calledOnce;
     });
 
-    describe('when you remove the change listener', function () {
+    describe('#removeChangeListener()', function () {
       beforeEach(function () {
         store.removeChangeListener(changeListener);
         store.hasChanged();
@@ -59,7 +59,11 @@ describe('Store', function () {
     });
   });
 
-  describe('when a payload is received', function () {
+  describe('#waitFor()', function () {
+    it('should wait for the specified stores to complete');
+  });
+
+  describe('#handlePayload()', function () {
     var data = {};
 
     describe('when the store does not handle action type', function () {
