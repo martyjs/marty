@@ -3,47 +3,45 @@
 ## spec
 
 ```
-var Flux = require('flux')
+var Marty = require('marty')
 
-var Constants = Flux.createConstants({
+var Constants = Marty.createConstants({
   users: ["showList", "add"]
 });
 
-var UsersStore = Flux.createStore({
+var UsersStore = Marty.createStore({
+  type: 'set',
+  identity: 'id',
   handlers: {
-    'addUser' Constants.users.add
+    addUser Constants.users.add
   },
   initialize: function() {
     this.users = Immutable.Map();
   },
-  addUser: function (foos) {
-    this.waitFor(OtherStore);
-    this.setState()
+  addUsers: function (users) {
+    this.add(users);
   },
   getUser: function (id) {
-    var user = this.users[id];
+    var user = this.get(id);
 
     if (user) {
       return user;
     }
 
-    this.apis.users.get(id);
+    UserApi.getUsers();
   }
 });
 
-var Actions = Flux.createActionCreators({
-  getUsers: function (users) {
-    UserAPI.getUsers().thenDispatch(Constants.users);
+var Actions = Marty.createActionCreators({
+  addUsers: function (users) {
+    this.dispatch(Constants.users.add, users);
   }
 });
 
-var UserAPI = Flux.createHttpAPI({
+var UserAPI = Marty.createHttpAPI({
   baseUrl: "http://foo.com",
   getUsers: function () {
-    return this.get("/users").thenDispatchResponse(Constants.addUsers);
-  },
-  getUser: function (id) {
-    return this.get("/users/" + id).thenDispatchResponse(Constants.addUser)
+    return this.get("/users").then(Actions.addUsers);
   }
 });
 
