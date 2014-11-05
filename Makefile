@@ -11,13 +11,8 @@ test-watch: lint
 	@$(BIN)/karma start
 
 lint: bootstrap clean
-ifeq ($(ENV),CI)
-	@$(BIN)/jsxcs -r checkstyle $(SRC) > reports/karma-tests.xml;
-	@$(BIN)/jsxhint --reporter checkstyle $(SRC) > reports/stylechecker-results.xml;
-else
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
-endif
 
 release: lint
 	@$(BIN)/browserify --transform reactify --require ./index.js --standalone Marty | $(BIN)/uglifyjs > dist/marty.js

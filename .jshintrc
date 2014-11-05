@@ -13,18 +13,14 @@
   "unused": true,
   "trailing": true,
   "maxcomplexity": 12,
-
   "laxbreak": true,
   "sub": true,
   "expr": true,
-
   "browser": true,
   "node": true,
   "devel": true,
-  
   "indent": 2,
   "maxlen": 120,
-
   "globals": {
     "define": true,
     "require": true,
