@@ -18,15 +18,10 @@
     "flux"
   ],
   "devDependencies": {
-    "blanket": "^1.1.6",
     "browserify": "^5.12.0",
     "browserify-shim": "^3.7.0",
     "chai": "^1.9.1",
     "chai-as-promised": "^4.1.1",
-    "grunt": "^0.4.5",
-    "grunt-browserify": "^3.0.0",
-    "grunt-cli": "^0.1.13",
-    "grunt-concurrent": "^1.0.0",
     "jsxcs": "0.0.3",
     "jsxhint": "^0.4.14",
     "load-grunt-tasks": "^0.6.0",
@@ -35,7 +30,14 @@
     "react": "^0.12.0",
     "reactify": "^0.14.0",
     "sinon": "^1.10.3",
-    "sinon-chai": "^2.5.0"
+    "sinon-chai": "^2.5.0",
+    "karma": "^0.12.24",
+    "karma-mocha": "^0.1.9",
+    "karma-chrome-launcher": "^0.1.5",
+    "karma-bro": "^0.10.0",
+    "karma-spec-reporter": "0.0.13",
+    "karma-cli": "0.0.4",
+    "uglify-js": "^2.4.15"
   },
   "author": "James Hollingworth",
   "licenses": [

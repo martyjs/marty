@@ -375,6 +375,33 @@ var UserState = Marty.createStateMixin({
   }
 });
 
+Marty.createStateMixin(UserStore);
+
+Marty.createStateMixin({
+  users: UserStore,
+  whatever: OtherStore
+});
+
+var UserState = {
+  listenTo: [UserStore],
+  getState: function () {
+    return {
+      user: UserStore.getUser(this.props.id)
+    };
+  }
+};
+
+var OtherState = {
+  listenTo: [OtherStore],
+  getState: function () {
+    return {
+      store: OtherStore.getAll()
+    }
+  }
+};
+
+Marty.createStateMixin(UserState, OtherState)
+
 var Users = React.createClass({
   mixins: [UserState],
   render: function() {

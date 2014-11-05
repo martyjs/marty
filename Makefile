@@ -1,31 +1,31 @@
 BIN = ./node_modules/.bin
-UNIT_TESTS = test/unit
-INTEGRATION_TESTS = test/integration
 
 .PHONY: bootstrap start clean test;
 
-SRC = $(shell find ./lib ./build ./GruntFile.js ./index.js ./test -type f -name '*.js')
-
-start: lint
-	@$(BIN)/grunt serve
+SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
-	@$(BIN)/mocha -R spec
+	@$(BIN)/karma start --single-run
 
-lint: bootstrap
+test-watch: lint
+	@$(BIN)/karma start
+
+lint: bootstrap clean
 ifeq ($(ENV),CI)
 	@$(BIN)/jsxcs -r checkstyle $(SRC) > reports/karma-tests.xml;
 	@$(BIN)/jsxhint --reporter checkstyle $(SRC) > reports/stylechecker-results.xml;
-else 
+else
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 endif
 
-release: test
-	@$(BIN)/grunt release
+release: lint
+	@$(BIN)/browserify --transform reactify --require ./index.js --standalone Marty | $(BIN)/uglifyjs > dist/marty.js
+	@echo "release version available in dist/marty.js"
 
 clean:
-	@rm -rf reports
+	@rm -rf dist
+	@mkdir dist
 
-bootstrap: clean package.json
+bootstrap: package.json
 	@npm install;

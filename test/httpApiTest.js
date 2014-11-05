@@ -2,22 +2,22 @@ var expect = require('chai').expect;
 var HttpAPI = require('../lib/httpAPI');
 
 describe('HttpAPI', function () {
-  var api, username = 'jhollingworth';
+  var api;
 
   beforeEach(function () {
     api = new HttpAPI({
-      baseUrl: 'https://api.github.com',
-      getUser: function (username) {
-        return this.get('/users/' + username);
+      baseUrl: 'http://localhost:9876/base/test/fixtures',
+      getUser: function () {
+        return this.get('/user.json');
       }
     });
   });
 
   describe('#get()', function () {
     it('should be able to get a resource', function (done) {
-      api.getUser(username).end(function (res) {
+      api.getUser().end(function (res) {
         expect(res.ok).to.be.true;
-        expect(res.body.login).to.equal(username);
+        expect(res.body.name).to.equal('foo');
         done();
       });
     });

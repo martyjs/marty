@@ -1,11 +1,10 @@
 var React = require('react');
-var sinon = require('sinon');
 var expect = require('chai').expect;
 var StateMixin = require('../lib/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {
-  var view, mixin, initialState;
+  var View, element, mixin, initialState;
 
   beforeEach(function () {
     initialState = {
@@ -13,17 +12,22 @@ describe('StateMixin', function () {
     };
 
     mixin = new StateMixin({
-      getInitialiState: sinon.stub().returns(initialState)
+      getInitialState: function () {
+        return initialState;
+      }
     });
 
-    view = TestUtils.renderIntoDocument(React.createClass({
+    View = React.createClass({
+      mixins: [mixin],
       render: function () {
         return React.createElement('div', null, this.state.name);
       }
-    }));
+    });
+
+    element = TestUtils.renderIntoDocument(React.createElement(View));
   });
 
-  it.only('should get the initialState from the mixin', function () {
-    expect(view.state).to.eql(initialState);
+  it('should get the initialState from the mixin', function () {
+    expect(element.state).to.eql(initialState);
   });
 });
