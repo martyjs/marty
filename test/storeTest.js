@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var Store = require('../lib/store');
 
 describe('Store', function () {
-  var store, dispatcher, dispatchToken = 'foo';
+  var store, changeListener, dispatcher, dispatchToken = 'foo', initialState = {};
 
   beforeEach(function () {
     dispatcher = {
@@ -18,8 +18,12 @@ describe('Store', function () {
       },
       one: sinon.spy(),
       multiple: sinon.spy(),
-      initialize: sinon.spy()
+      initialize: sinon.spy(),
+      getInitialState: sinon.stub().returns(initialState)
     });
+
+    changeListener = sinon.spy();
+    store.addChangeListener(changeListener);
   });
 
   it('should call initialize once', function () {
@@ -34,12 +38,51 @@ describe('Store', function () {
     expect(dispatcher.register).to.have.been.calledWith(store.handlePayload);
   });
 
+  describe('#getInitialState()', function () {
+    it('should be called once', function () {
+      expect(store.getInitialState).to.have.been.calledOnce;
+    });
+
+    it('should set the stores state to the initial state', function () {
+      expect(store.state).to.equal(initialState);
+    });
+  });
+
+  describe('#state', function () {
+    var newState;
+    beforeEach(function () {
+      newState = {};
+      store.state = newState;
+    });
+
+    it('should update the state', function () {
+      expect(store.state).to.equal(newState);
+    });
+
+    it('should call the change listener with the new state', function () {
+      expect(changeListener).to.have.been.calledWith(newState);
+    });
+  });
+
+  describe('#setState()', function () {
+    var newState;
+    beforeEach(function () {
+      newState = {};
+      store.setState(newState);
+    });
+
+    it('should update the state', function () {
+      expect(store.state).to.equal(newState);
+    });
+
+    it('should call the change listener with the new state', function () {
+      expect(changeListener).to.have.been.calledWith(newState);
+    });
+  });
+
   describe('#addChangeListener()', function () {
-    var changeListener;
 
     beforeEach(function () {
-      changeListener = sinon.spy();
-      store.addChangeListener(changeListener);
       store.hasChanged();
     });
 

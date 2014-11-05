@@ -194,8 +194,10 @@
       Stores
     </a>
     <ul class="toc_section">
-      <li>- <a href="#handlers">handlers</a></li>
+      <li>- <a href="#state">state</a></li>
+      <li>- <a href="#getInitialState">getInitialState</a></li>
       <li>- <a href="#setState">setState</a></li>
+      <li>- <a href="#handlers">handlers</a></li>
       <li>- <a href="#addChangeListener">addChangeListener</a></li>
       <li>- <a href="#removeChangeListener">removeChangeListener</a></li>
       <li>- <a href="#waitFor">waitFor</a></li>
@@ -257,14 +259,9 @@
     </p>
 
     <p>
-      <a href="http://github.com/jashkenas/underscore/">Underscore</a>
-      is a JavaScript library that provides a whole mess of useful functional
-      programming helpers without extending any built-in objects.
-      It&rsquo;s the answer to the question: &ldquo;If I sit down in front of a
-      blank HTML page, and want to start being productive immediately, what do I need?&rdquo;
-      &hellip; and the tie to go along with
-      <a href="http://jquery.com">jQuery</a>'s tux and
-      <a href="http://backbonejs.org">Backbone</a>'s suspenders.
+      <a href="http://github.com/jhollingworth/marty/">Marty</a> helps you build web applications 
+      that follow the <a href="http://facebook.github.io/flux/docs/overview.html">Flux architecture</a>.
+      It makes it easy to create stores, bind them to views and get data from your server.
     </p>
 
     <p>
@@ -289,6 +286,27 @@
 
       <h2 id="stores">Stores</h2>
 
+      <p id="state">
+        <b class="header">state</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="getInitialState">
+        <b class="header">getInitialState</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
+      <p id="setState">
+        <b class="header">setState</b>
+        <br />
+        .
+      </p>
+      <pre></pre>
+
       <p id="handlers">
         <b class="header">handlers</b>
         <br />
@@ -308,20 +326,6 @@ var UserStore = Marty.createStore({
   }
 });</pre>
 
-
-      <p id="setState">
-        <b class="header">setState</b>
-        <br />
-        .
-      </p>
-      <pre></pre>
-
-      <p id="setState">
-        <b class="header">setState</b>
-        <br />
-        .
-      </p>
-      <pre></pre>
 
       <p id="addChangeListener">
         <b class="addChangeListener">addChangeListener</b><code>Store.addChangeListener(callback, [context])</code>
@@ -373,7 +377,9 @@ var UserState = Marty.createStateMixin({
 
 var Users = React.createClass({
   mixins: [UserState],
-  ...
+  render: function() {
+    ...
+  }
 });
 </pre>
 
