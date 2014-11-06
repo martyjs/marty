@@ -20,7 +20,28 @@ describe('StateMixin', function () {
   });
 
   it('should throw an error if you dont pass in an object literal', function () {
-    expect(function () { new StateMixin() }).to.throw(Error);
+    expect(function () { StateMixin(); }).to.throw(Error);
+  });
+
+  describe('when you pass in a store', function () {
+    var newState, store;
+
+    beforeEach(function () {
+      newState = { bim: 'bam' };
+      initialState = { bim: 'bar' };
+      store = createStore(initialState);
+      mixin = new StateMixin(store);
+      element = renderClassWithMixin(mixin);
+    });
+
+    it('should return the stores state in #getInitialState()', function () {
+      expect(element.state).to.eql(initialState);
+    });
+
+    it('should update the elements state when you update the store', function () {
+      store.setState(newState);
+      expect(element.state).to.eql(newState);
+    });
   });
 
   describe('#getState()', function () {
@@ -94,7 +115,7 @@ describe('StateMixin', function () {
             return {
               store1: store1.getState(),
               store2: store2.getState()
-            }
+            };
           }
         });
         element = renderClassWithMixin(mixin);
