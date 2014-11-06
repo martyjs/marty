@@ -65,18 +65,30 @@ describe('Store', function () {
   });
 
   describe('#setState()', function () {
-    var newState;
-    beforeEach(function () {
-      newState = {};
-      store.setState(newState);
+    describe('when the state has changed', function () {
+      var newState;
+      beforeEach(function () {
+        newState = {};
+        store.setState(newState);
+      });
+
+      it('should update the state', function () {
+        expect(store.state).to.equal(newState);
+      });
+
+      it('should call the change listener with the new state', function () {
+        expect(changeListener).to.have.been.calledWith(newState);
+      });
     });
 
-    it('should update the state', function () {
-      expect(store.state).to.equal(newState);
-    });
+    describe('when the state has not changed', function () {
+      beforeEach(function () {
+        store.setState(store.state);
+      });
 
-    it('should call the change listener with the new state', function () {
-      expect(changeListener).to.have.been.calledWith(newState);
+      it('should not call the change linstener', function () {
+        expect(changeListener).to.not.have.been.called;
+      });
     });
   });
 

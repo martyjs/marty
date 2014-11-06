@@ -5,7 +5,7 @@
 ## Quick start
 
 ```
-make test        # lints and tests the code
+make test        # lint & run tests
 make release     # deploys master branch to production
 ```
 
