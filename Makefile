@@ -14,14 +14,15 @@ lint: bootstrap clean
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
-release: lint
-	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
-	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
-	@git add -f dist dist && git commit -m "Add dist for release"
-	@npm version patch
-	@git rm -rf dist && git commit -m "Removing dist"
-	@git checkout gh-pages && git rebase master && git checkout master
-	@git push --all && git push --tags
+release: lint test
+	$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
+	cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
+	git add -f dist && git commit -m "Add dist for release"
+	npm version patch
+	git rm -rf dist && git commit -m "Removing dist"
+	git checkout gh-pages && git rebase master && git checkout master
+	git push --all && git push --tags
+	npm publish
 
 clean:
 	@rm -rf dist
