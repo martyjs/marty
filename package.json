@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A React.js/Flux Framework",
   "main": "index.js",
   "directories": {
@@ -57,7 +57,10 @@
     "LICENSE"
   ],
   "browserify": {
-    "transform": [ "brfs", "reactify" ]
+    "transform": [
+      "brfs",
+      "reactify"
+    ]
   },
   "homepage": "https://martyjs.org",
   "dependencies": {
