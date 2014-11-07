@@ -1,0 +1,22 @@
+{
+  "name": "marty",
+  "main": "dist/marty.js",
+  "version": "0.0.1",
+  "homepage": "martyjs.org",
+  "authors": [
+    "jhollingworth <jamiehollingworth@gmail.com>"
+  ],
+  "description": "A react.js/flux application framework",
+  "keywords": [
+    "react.js",
+    "flux"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

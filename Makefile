@@ -15,8 +15,8 @@ lint: bootstrap clean
 	@$(BIN)/jsxhint $(SRC);
 
 release: lint
-	@$(BIN)/browserify --transform reactify --require ./index.js --standalone Marty | $(BIN)/uglifyjs > dist/marty.js
-	@echo "release version available in dist/marty.js"
+	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
+	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 
 clean:
 	@rm -rf dist

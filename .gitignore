@@ -3,4 +3,3 @@ npm-debug.log
 .DS_STORE
 log/*
 tmp
-dist
