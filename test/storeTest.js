@@ -35,7 +35,7 @@ describe('Store', function () {
   });
 
   it('should have registered handlePayload with the dispatcher', function () {
-    expect(dispatcher.register).to.have.been.calledWith(store.handlePayload);
+    expect(dispatcher.register).to.have.been.called;
   });
 
   describe('#getInitialState()', function () {
@@ -111,6 +111,30 @@ describe('Store', function () {
       it('should NOT call the change listener', function () {
         expect(changeListener).to.have.been.calledOnce;
       });
+    });
+  });
+
+  describe('#createStore()', function () {
+    var data = {};
+    var actionType = 'foo';
+    var Marty = require('../index');
+
+    beforeEach(function () {
+      store = Marty.createStore({
+        handlers: {
+          one: actionType,
+        },
+        one: sinon.spy()
+      });
+
+      Marty.dispatcher.dispatch({
+        data: data,
+        actionType: actionType
+      });
+    });
+
+    it('calls the handlers', function () {
+      expect(store.one).to.have.been.calledWith(data);
     });
   });
 

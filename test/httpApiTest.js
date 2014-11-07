@@ -14,7 +14,7 @@ describe('HttpAPI', function () {
   });
 
   describe('#baseUrl', function () {
-    describe('when the url ends with a / and the path begins with a /');
+    it('when the url ends with a / and the path begins with a /');
   });
 
   describe('#get()', function () {
