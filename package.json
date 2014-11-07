@@ -33,11 +33,11 @@
     "karma-spec-reporter": "0.0.13",
     "mocha": "^1.21.4",
     "mocha-spec-cov": "0.0.3",
-    "react": "^0.12.0",
     "reactify": "^0.14.0",
     "sinon": "^1.10.3",
     "sinon-chai": "^2.5.0",
-    "uglify-js": "^2.4.15"
+    "uglify-js": "^2.4.15",
+    "react": "^0.12.0"
   },
   "author": "James Hollingworth",
   "licenses": [

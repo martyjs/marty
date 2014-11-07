@@ -133,13 +133,56 @@ describe('StateMixin', function () {
     });
   });
 
-  describe('when you pass in multiple object literals', function () {
-    it('will merge all the #getState() results together', function () {
+  describe('when you pass in an object literal of stores', function () {
+    var store1, store2;
+    var store1State = { woo: 'bar' };
+    var newState = { foo: 'bar' };
 
+    beforeEach(function () {
+      store1 = createStore(store1State);
+      store2 = createStore();
+
+      mixin = new StateMixin({
+        store1: store1,
+        store2: store2
+      });
+
+      element = renderClassWithMixin(mixin);
     });
 
-    it('will listen to all stores', function () {
+    it('should called #getState() when any of the stores change', function () {
+      store2.setState(newState);
+      expect(element.state).to.eql({
+        store1: store1State,
+        store2: newState
+      });
+    });
+  });
 
+  describe('when you pass in an object literal of stores', function () {
+    var manualState = { foo: 'bar' };
+    var store, storeState = { bar: 'baz'};
+
+    beforeEach(function () {
+      store = createStore(storeState);
+
+      mixin = new StateMixin({
+        storeState: store,
+        getState: function () {
+          return {
+            manualState: manualState
+          };
+        }
+      });
+
+      element = renderClassWithMixin(mixin);
+    });
+
+    it('should merge store state and #getState()', function () {
+      expect(element.state).to.eql({
+        storeState: storeState,
+        manualState: manualState
+      });
     });
   });
 

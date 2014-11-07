@@ -14,7 +14,7 @@ lint: bootstrap clean
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
-release: lint test
+release: lint 
 	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 	@git add dist && git commit -m "Adding release files"
@@ -24,8 +24,6 @@ release: lint test
 	@npm publish
 
 clean:
-	@rm -rf dist
-	@mkdir dist
 
 bootstrap: package.json
 	@npm install;
