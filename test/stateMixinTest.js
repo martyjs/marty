@@ -133,6 +133,16 @@ describe('StateMixin', function () {
     });
   });
 
+  describe('when you pass in multiple object literals', function () {
+    it('will merge all the #getState() results together', function () {
+
+    });
+
+    it('will listen to all stores', function () {
+
+    });
+  });
+
   function createStore(state) {
     return Marty.createStore({
       getInitialState: function () {
