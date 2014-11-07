@@ -13,6 +13,10 @@ describe('HttpAPI', function () {
     });
   });
 
+  describe('#baseUrl', function () {
+    describe('when the url ends with a / and the path begins with a /');
+  });
+
   describe('#get()', function () {
     it('should be able to get a resource', function (done) {
       api.getUser().end(function (res) {
