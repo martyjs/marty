@@ -1,4 +1,5 @@
-# marty.js
+[![Build Status](https://travis-ci.org/jhollingworth/marty.svg?branch=master)](https://travis-ci.org/jhollingworth/marty)
+
 
 [Marty](http://martyjs.org) helps you build web applications that follow the [Flux architecture](http://facebook.github.io/flux/docs/overview.html).
 
