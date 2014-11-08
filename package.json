@@ -65,6 +65,7 @@
   "dependencies": {
     "lodash": "^2.4.1",
     "flux": "^2.0.1",
-    "superagent": "^0.20.0"
+    "superagent": "^0.20.0",
+    "karma-firefox-launcher": "^0.1.3"
   }
 }

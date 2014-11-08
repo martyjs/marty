@@ -5,7 +5,11 @@ BIN = ./node_modules/.bin
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
+ifeq ($(ENV),CI)
+	@$(BIN)/karma start --browsers Firefox --single-run
+else
 	@$(BIN)/karma start --single-run
+endif
 
 test-watch: lint
 	@$(BIN)/karma start
@@ -14,7 +18,7 @@ lint: bootstrap clean
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
-release: lint 
+release: lint
 	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 	@git add dist && git commit -m "Adding release files"
