@@ -115,9 +115,9 @@ body {
 }
 
 .bs-docs-nav .navbar-nav > li > a:hover,
-.bs-docs-nav .navbar-nav > .active > a,
-.bs-docs-nav .navbar-nav > .active > a:hover {
-  color: #463265;
+.bs-docs-nav .navbar-nav .active > a,
+.bs-docs-nav .navbar-nav .active > a:hover {
+  color: black;
   background-color: #f9f9f9;
 }
 .bs-docs-nav .navbar-toggle .icon-bar {
