@@ -3,8 +3,7 @@ layout: home
 title: Home
 id: home
 ---
-
-<main class="bs-docs-masthead" id="content" role="main">
+<div class="bs-docs-masthead" id="content" role="main">
   <div class="container">
     <h1>marty.js</h1>
     <p class="lead">
@@ -14,7 +13,7 @@ id: home
       <a href="getting-started" class="btn btn-outline-inverse btn-lg">Get started now</a>
     </p>
   </div>
-</main>
+</div>
 <div class="container bs-docs-marketing">
   <div class="row">
     <div class="col-sm-4">
