@@ -16,6 +16,12 @@ make release     # deploys master branch to production
 npm install --save marty
 bower install --save marty
 ```
+
+#Browser Support
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/jhollingworth.svg)](https://saucelabs.com/u/jhollingworth)
+
+
 ## Maintainers
 
 * [James Hollingworth](http://github.com/jhollingworth)

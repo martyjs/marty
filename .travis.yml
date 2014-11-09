@@ -2,11 +2,11 @@ language: node_js
 node_js:
   - '0.10'
 script: make test
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
 env:
   global:
     - ENV="CI"
     - SAUCE_USERNAME="jhollingworth"
     - SAUCE_ACCESS_KEY="4938c9e3-26ce-4661-b09b-785e49f3e892"
-before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
