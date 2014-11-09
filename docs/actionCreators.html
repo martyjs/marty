@@ -7,10 +7,11 @@
   <title>Action Creators | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
 
-  <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
   <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
   <link rel="stylesheet" type="text/css" href="/css/docs.css">
 
   <script type="text/javascript" src="/js/codemirror.js"></script>
@@ -108,6 +109,14 @@
             </ul>
           </li>
         </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/jhollingworth/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
       </nav>
     </div>
   </header>
@@ -121,7 +130,7 @@
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+        <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
   <span class="na">receiveAll</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USERS</span><span class="p">,</span> <span class="nx">users</span><span class="p">);</span>
   <span class="p">}</span>

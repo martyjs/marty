@@ -7,10 +7,11 @@
   <title>Home | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
 
-  <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
   <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
   <link rel="stylesheet" type="text/css" href="/css/docs.css">
 
   <script type="text/javascript" src="/js/codemirror.js"></script>
@@ -108,12 +109,20 @@
             </ul>
           </li>
         </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/jhollingworth/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
       </nav>
     </div>
   </header>
-  <p><main class="bs-docs-masthead" id="content" role="main">
+  <div class="bs-docs-masthead" id="content" role="main">
   <div class="container">
-    <h1>Marty.js</h1>
+    <h1>marty.js</h1>
     <p class="lead">
       Helping you build large, SEO friendly React applications.
     </p>
@@ -121,28 +130,30 @@
       <a href="getting-started" class="btn btn-outline-inverse btn-lg">Get started now</a>
     </p>
   </div>
-</main>
+</div>
+
 <div class="container bs-docs-marketing">
   <div class="row">
     <div class="col-sm-4">
       <h3>Flux</h3>
       <p>
+        <a href="http://facebook.github.io/flux/docs/overview.html">Flux</a> is the application architecture that Facebook uses for building client-side web applications. marty.js gives you everything you need to quickly build a flux application.
       </p>
     </div>
     <div class="col-sm-4">
       <h3>Isomorphic</h3>
       <p>
+        Marty helps you build JS web applications can run both on the client-side and the server-side making them faster and SEO friendly.
       </p>
     </div>
     <div class="col-sm-4">
       <h3>Debugging</h3>
       <p>
-        React implements one-way reactive data flow which reduces boilerplate and is
-        easier to reason about than traditional data binding.
+        We have advanced developer tools that make it easy to under stand what your application is doing at all times.
       </p>
     </div>
   </div>
-</div></p>
+</div>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
