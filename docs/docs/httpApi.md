@@ -1,6 +1,7 @@
 ---
 layout: docs
 title: HTTP API
+description: How you can use Marty to talk to the server
 id: http-api
 group: docs
 order: 5
