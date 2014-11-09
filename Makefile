@@ -1,6 +1,6 @@
 BIN = ./node_modules/.bin
 
-.PHONY: bootstrap start clean test;
+.PHONY: bootstrap start clean test docs;
 
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
@@ -23,7 +23,10 @@ release: lint
 	@git push --all && git push --tags
 	@npm publish
 
-clean:
+docs:
+	@cd docs && bundle exec jekyll serve -w
 
-bootstrap: package.json
-	@npm install;
+bootstrap: package.json docs/Gemfile
+	@npm install
+	@which bundle > /dev/null || gem install bundler
+	@cd docs && bundle install
