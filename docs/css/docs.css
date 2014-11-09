@@ -105,7 +105,7 @@ body {
   display: none;
 }
 .bs-docs-nav .navbar-brand,
-.bs-docs-nav .navbar-nav > li > a {
+.bs-docs-nav .navbar-nav > li  a {
   font-weight: 500;
   color: #2a2a2a;
 }
@@ -130,6 +130,10 @@ body {
 .bs-docs-nav .navbar-header .navbar-toggle:focus {
   background-color: #f9f9f9;
   border-color: #f9f9f9;
+}
+
+.bs-docs-nav .sub-nav a {
+  padding-left: 40px;
 }
 
 
@@ -229,7 +233,7 @@ body {
 }
 .bs-docs-masthead .lead {
   margin: 0 auto 30px;
-  font-size: 20px;
+  font-size: 25px;
   color: #fff;
 }
 .bs-docs-masthead .version {
@@ -243,9 +247,15 @@ body {
   font-size: 20px;
 }
 
-@media (min-width: 480px) {
+@media (min-width: 280px) {
+  .bs-docs-masthead .lead {
+    font-size: 16px;
+  }
   .bs-docs-masthead .btn {
     width: auto;
+  }
+  .bs-docs-masthead h1 {
+    font-size: 50px;
   }
 }
 
@@ -254,7 +264,7 @@ body {
     padding: 80px 0;
   }
   .bs-docs-masthead h1 {
-    font-size: 60px;
+    font-size: 65px;
   }
   .bs-docs-masthead .lead {
     font-size: 24px;
@@ -264,7 +274,7 @@ body {
 @media (min-width: 992px) {
   .bs-docs-masthead .lead {
     width: 80%;
-    font-size: 30px;
+    font-size: 25px;
   }
 }
 

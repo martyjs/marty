@@ -1,6 +1,6 @@
 BIN = ./node_modules/.bin
 
-.PHONY: bootstrap start clean test docs;
+.PHONY: bootstrap start clean test docs release-docs;
 
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
@@ -30,3 +30,6 @@ bootstrap: package.json docs/Gemfile
 	@npm install
 	@which bundle > /dev/null || gem install bundler
 	@cd docs && bundle install
+
+release-docs: bootstrap
+	@cd docs && bundle exec rake release

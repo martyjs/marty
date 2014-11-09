@@ -60,6 +60,7 @@ GEM
     rb-inotify (0.9.5)
       ffi (>= 0.5.0)
     redcarpet (3.2.0)
+    rouge (1.7.2)
     safe_yaml (1.0.4)
     sanitize (2.1.0)
       nokogiri (>= 1.4.4)
@@ -78,4 +79,5 @@ DEPENDENCIES
   json
   rake
   rb-fsevent
+  rouge
   sanitize (~> 2.0)
