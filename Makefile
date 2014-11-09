@@ -14,14 +14,16 @@ lint: bootstrap clean
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
-release: lint
-	@$(BIN)/browserify --require ./index.js --exclude [lodash flux] --standalone Marty > dist/marty.js
-	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
+release: lint test build
 	@git add dist && git commit -m "Adding release files"
 	@npm version patch
 	@git checkout gh-pages && git rebase master && git checkout master
 	@git push --all && git push --tags
 	@npm publish
+
+build: lint
+	@$(BIN)/browserify --require ./index.js --exclude lodash --exclude superagent --exclude flux --standalone Marty > dist/marty.js
+	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 
 docs:
 	@cd docs && bundle exec jekyll serve -w
