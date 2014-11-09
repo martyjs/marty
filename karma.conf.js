@@ -19,12 +19,22 @@ module.exports = function(config) {
         base: 'SauceLabs',
         browserName: 'chrome',
         platform: 'Windows 7',
-        version: '35'
+        version: '38'
       },
       sl_firefox: {
         base: 'SauceLabs',
         browserName: 'firefox',
-        version: '30'
+        version: '33'
+      },
+      sl_safari: {
+        base: 'SauceLabs',
+        browserName: 'safari',
+        version: '5'
+      },
+      sl_opera: {
+        base: 'SauceLabs',
+        browserName: 'opera',
+        version: '12'
       },
       sl_ie_9: {
         base: 'SauceLabs',
