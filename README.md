@@ -17,7 +17,7 @@ npm install --save marty
 bower install --save marty
 ```
 
-#Browser Support
+##Browser Support
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/jhollingworth.svg)](https://saucelabs.com/u/jhollingworth)
 
