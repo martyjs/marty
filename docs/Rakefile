@@ -13,4 +13,5 @@ end
 
 task :release => [:update_version] do
   system "jekyll build -d ../../marty-gh-pages"
+  File.open('../../marty-gh-pages/CNAME', 'w+') { |f| f.write('martyjs.org') }
 end
