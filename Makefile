@@ -15,7 +15,7 @@ lint: bootstrap clean
 	@$(BIN)/jsxhint $(SRC);
 
 release: lint
-	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
+	@$(BIN)/browserify --require ./index.js --exclude [lodash flux] --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 	@git add dist && git commit -m "Adding release files"
 	@npm version patch
