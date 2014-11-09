@@ -123,7 +123,7 @@
   <div class="bs-docs-header" id="content">
   <div class="container">
     <h1>Getting started</h1>
-    <p>An overview of Marty and how to start using it.</p>
+    <p>An overview of how to start using Marty</p>
   </div>
 </div>
 <div class="container bs-docs-container">
@@ -139,6 +139,30 @@
 <p>or <strong>bower</strong></p>
 
 <div class="highlight"><pre><code class="language-bash" data-lang="bash">bower install --save marty</code></pre></div>
+
+<h1 id="module-loaders" class="page-header">Module loaders</h1>
+
+<p>Marty is built using <a href="https://github.com/umdjs/umd">UMD</a>. This means you can use it from <a href="nodejs.org">node.js</a> or <a href="browserify.org">Browserify</a></p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Marty</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="p">...</span>
+<span class="p">})</span></code></pre></div>
+
+<p><a href="requirejs.org">require.js</a></p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">require</span><span class="p">([</span><span class="s1">'marty'</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">Marty</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+    <span class="p">...</span>
+  <span class="p">})</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Or you can access it from the window object</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nb">window</span><span class="p">.</span><span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="p">...</span>
+<span class="p">})</span></code></pre></div>
 
       </div>
     </div>
