@@ -19,7 +19,7 @@ id: home
     <div class="col-sm-4">
       <h3>Flux</h3>
       <p>
-        Flux is the application architecture that Facebook uses for building client-side web applications. marty.js gives you everything you need to quickly build a flux application.
+        <a href="http://facebook.github.io/flux/docs/overview.html">Flux</a> is the application architecture that Facebook uses for building client-side web applications. marty.js gives you everything you need to quickly build a flux application.
       </p>
     </div>
     <div class="col-sm-4">
