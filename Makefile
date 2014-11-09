@@ -5,11 +5,7 @@ BIN = ./node_modules/.bin
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
-ifeq ($(ENV),CI)
-	@$(BIN)/karma start --browsers Firefox --single-run
-else
 	@$(BIN)/karma start --single-run
-endif
 
 test-watch: lint
 	@$(BIN)/karma start
