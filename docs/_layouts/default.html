@@ -35,7 +35,7 @@
           <li{% if page.group == "docs" %} class="active"{% endif %}>
             <a href="/docs">Documentation</a>
 
-            <ul class="nav sub-nav">
+            <ul class="nav sub-nav visible-xs-block">
               {% assign pages_list = site.pages | sort:"order" %}
               {% assign group = 'docs' %}
               {% for node in pages_list %}
