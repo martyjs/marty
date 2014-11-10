@@ -23,6 +23,10 @@ describe('ActionCreators', function () {
     expect(actionCreators.initialize).to.have.been.calledOnce;
   });
 
+  describe('#mixins', function () {
+    it('should allow you to mixin object literals');
+  });
+
   describe('#dispatch()', function () {
     var message = 'Hello World';
 
