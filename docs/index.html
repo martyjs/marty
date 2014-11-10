@@ -123,31 +123,128 @@
   <div class="bs-docs-header" id="content">
   <div class="container">
     <h1>Overview</h1>
-    <p></p>
+    <p>Explaining the core concepts of Marty and how it all fits together</p>
   </div>
 </div>
 <div class="container bs-docs-container">
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <p>Marty gives you 4 things to help you build an application:</p>
+        <p>React&#39;s focus is the view where as Marty focuses on managing the state needed to build those views. </p>
 
-<ol>
-<li><strong><a href="/docs/stores.html">Stores</a></strong> - Responsible for storing and mutating your applications state</li>
-<li><strong><a href="/docs/actionCreators.html">Action Creators</a></strong> - Responsible for handling user and server actions</li>
-<li><strong><a href="/docs/httpApi.html">Http APIs</a></strong> - Responsible for communicating with the server via HTTP</li>
-<li><strong><a href="/docs/stateMixin.html">State Mixin</a></strong> - Responsible for binding stores state to React views.</li>
-</ol>
+<p>It follows the Flux architecture which Facebook and Instagram created to help deal with building ever larger JS web applications. Flux makes your applications easier to understand, debug and test as well as scaling well as your application grows.</p>
 
-<h2>What goes where?</h2>
+<h2>Data flow</h2>
 
-<h2>Who can talk to who?</h2>
+<p>A core concept within Flux is the Flux update cycle which is a <strong>unidirectional data flow</strong> through the application. </p>
 
 <p><center>
-<img src="/img/architecture.png" alt="Marty Architecture"/>
+  <img src="/img/data-flow.png" alt="Data flow"/>
 </center></p>
 
+<p>The flux update cycle starts with some new data from the view or the server. </p>
+
+<p>It gets passed to an <a href="/docs/actionCreators.html">action creator</a> which transforms the data into an action, something that can be interpreted by the rest of the application.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">TodoActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreator</span><span class="p">({</span>
+  <span class="na">createTodoItem</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="s2">"CREATE_TODO"</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">text</span><span class="p">:</span> <span class="nx">text</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">TodoActionCreators</span><span class="p">.</span><span class="nx">createTodo</span><span class="p">(</span><span class="s2">"Learn Flux"</span><span class="p">);</span></code></pre></div>
+
+<p>The <a href="/docs/actionCreators.html">action creator</a> will pass that action to the <a href="/docs/dispatcher.html">dispatcher</a> which is responsible for keeping a track of all <a href="/docs/stores.html">stores</a> and passing on any actions to them.</p>
+
+<p>The <a href="/docs/stores.html">store</a> is where the applications state and logic live for a specific domain. A store could contain a collection of domain entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or could be some specific information about something (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>). </p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">TodoStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addTodo</span><span class="p">:</span> <span class="s2">"CREATE_TODO"</span>
+  <span class="p">},</span>
+  <span class="na">addTodo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">todo</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">},</span>
+  <span class="nx">getInitialState</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[];</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Stores register handlers for actions which are responsible for updating their state. Once they have updated themselves, they emit an event telling anyone listening to it that it has updated. </p>
+
+<p>Finally, you want to update the view with the new state. To bind a stores state to a view you use the <a href="/docs/stateMixin.html">state mixin</a>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Todos</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">(</span><span class="nx">TodoStore</span><span class="p">)],</span>
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"todos"</span><span class="o">&gt;</span>
+        <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="o">&lt;</span><span class="nx">Todo</span> <span class="nx">item</span><span class="o">=</span><span class="p">{</span><span class="nx">todo</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span>        <span class="p">})}</span>
+      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>When the view first loads and any time the stores state changes after that the view&#39;s render function will be called and this.state will be whatever the current state of the store.</p>
+
+<h2>Where should my code go?</h2>
+
+<p>Anything to do with storing and changing your applications state should live in the <strong><a href="/docs/stores.html">stores</a></strong>. Views are allowed to call the <a href="/docs/stores.html">stores</a> directly to get state (but not to write state) and so the <a href="/docs/stores.html">stores</a> should contain all logic for getting data whether that be from an internal cache or from the server.</p>
+
+<p>If you want to write data, that should live within an <strong><a href="/docs/actionCreators.html">action creator</a></strong>. <a href="/docs/actionCreators.html">Action creators</a> are the starting point for data flowing through the system and we want to make sure everyone knows about any state changes. </p>
+
+<p>When you want to communicate with the server, you should use an <strong><a href="/docs/httpApi.html">Http APIs</a></strong>. The response to an http request should be handled by an <a href="/docs/actionCreators.html">action creator</a>.</p>
+
 <h2>How do I handle asynchronous operations?</h2>
+
+<p>Every operation within a Flux application should be asynchronous by default. This allows you to have a consistent API that encapsulates any remote operations. </p>
+
+<p>Within a marty application this means that any get request against a store <em>might</em> not return a result and so you should make sure to guard against it within your views.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">TodoStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addTodo</span><span class="p">:</span> <span class="s2">"CREATE_TODO"</span>
+  <span class="p">},</span>
+  <span class="na">getTodo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">todo</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">todo</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">TodoAPI</span><span class="p">.</span><span class="nx">getTodo</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>    
+  <span class="p">},</span>
+  <span class="nx">addTodo</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">todo</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">todo</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">},</span>
+  <span class="nx">getInitialState</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{};</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">TodoState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+  <span class="na">listenTo</span><span class="p">:</span> <span class="nx">TodoStore</span><span class="p">,</span>
+  <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="c1">// Will return null until got API from server</span>
+      <span class="na">todo</span><span class="p">:</span> <span class="nx">TodoStore</span><span class="p">.</span><span class="nx">getTodo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">TodoView</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">TodoState</span><span class="p">],</span>
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">todo</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">todo</span> <span class="o">||</span> <span class="p">{};</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"todo"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">todo</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
 
       </div>
     </div>
@@ -228,6 +325,20 @@
     </div>
 </div>
 
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v</li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
