@@ -15,12 +15,11 @@ lint: bootstrap clean
 	@$(BIN)/jsxhint $(SRC);
 
 release: lint
+	@git checkout master
 	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
-	@git add dist && git commit -m "Adding release files"
 	@npm version patch
-	@git checkout gh-pages && git rebase master && git checkout master
-	@git push --all && git push --tags
+	@git push origin master && git push --tags
 	@npm publish
 
 clean:
