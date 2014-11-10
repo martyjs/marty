@@ -5,8 +5,8 @@ require 'yaml'
 task :update_version do
   version = JSON.parse(File.read('../package.json'))['version']
   site_config = YAML.load_file('_config.yml')
-  if site_config['marty_version'] != version
-    site_config['marty_version'] = version
+  if site_config['current_version'] != version
+    site_config['current_version'] = version
     File.open('_config.yml', 'w+') { |f| f.write(site_config.to_yaml) }
   end
 end

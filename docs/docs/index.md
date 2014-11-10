@@ -16,11 +16,9 @@ It follows the Flux architecture which Facebook and Instagram created to help de
 
 A core concept within Flux is the Flux update cycle which is a **unidirectional data flow** through the application. 
 
-<pre>Views --&gt; Action Creators --&gt; Dispatcher --+ 
-Ʌ                                          |
-|                                          V
-+---- State Mixin <-------- Stores <-------+
-</pre>
+<center>
+  <img src="/img/data-flow.png" alt="Data flow"/>
+</center>
 
 The flux update cycle starts with some new data from the view or the server. 
 
