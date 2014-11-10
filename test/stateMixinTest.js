@@ -47,9 +47,11 @@ describe('StateMixin', function () {
   describe('when you pass in an object literal', function () {
     describe('#getState()', function () {
       describe('when not listening to anything', function () {
+        var context;
         beforeEach(function () {
           mixin = new StateMixin({
             getState: function () {
+              context = this;
               return initialState;
             }
           });
@@ -60,7 +62,9 @@ describe('StateMixin', function () {
           expect(element.state).to.eql(initialState);
         });
 
-        it('should set the function context to the store');
+        it('should set the function context to the store', function () {
+          expect(context).to.equal(element);
+        });
       });
     });
 
