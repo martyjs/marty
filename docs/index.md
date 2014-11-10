@@ -7,7 +7,7 @@ id: home
   <div class="container">
     <h1>marty.js</h1>
     <p class="lead">
-      Helping you build large, SEO friendly React applications.
+      Making it easy to build isomorphic flux applications with React
     </p>
     <p class="lead">
       <a href="getting-started" class="btn btn-outline-inverse btn-lg">Get started now</a>
