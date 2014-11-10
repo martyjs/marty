@@ -13,3 +13,7 @@ var UserActionCreators = Marty.createActionCreators({
   }
 });
 {% endhighlight %}
+
+##Server actions
+
+Avoid cyclical dependencies.
