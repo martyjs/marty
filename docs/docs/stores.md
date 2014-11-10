@@ -3,6 +3,7 @@ layout: docs
 title: Stores
 id: stores
 group: docs
+header_colour: 1DACA8
 order: 2
 ---
 

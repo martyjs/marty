@@ -4,6 +4,7 @@ title: State Mixin
 description: How to bind store state to React views
 id: state-mixin
 group: docs
+header_colour: 68ADCA
 order: 4
 ---
 

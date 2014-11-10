@@ -3,6 +3,7 @@ layout: docs
 title: Action Creators
 id: action-creators
 group: docs
+header_colour: D65D28
 order: 3
 ---
 

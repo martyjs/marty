@@ -3,6 +3,7 @@ layout: docs
 title: Dispatcher
 id: dispatcher
 group: docs
+header_colour: F1B63A
 order: 7
 ---
 
