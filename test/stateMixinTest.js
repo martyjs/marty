@@ -59,6 +59,8 @@ describe('StateMixin', function () {
         it('should call #getState() when calling #getInitialState()', function () {
           expect(element.state).to.eql(initialState);
         });
+
+        it('should set the function context to the store');
       });
     });
 
