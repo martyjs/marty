@@ -1,5 +1,7 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
+var DataFlowStore = require('./lib/dataFlowStore');
+var DataFlow = require('../lib/diagnostics/dataFlow');
 var ActionCreators = require('../lib/actionCreators');
 
 describe('ActionCreators', function () {
@@ -43,6 +45,60 @@ describe('ActionCreators', function () {
       expect(dispatcher.dispatch).to.have.been.calledWith({
         actionType: testConstant,
         data: message
+      });
+    });
+  });
+
+  describe('tracing', function () {
+    var dataFlows;
+
+    beforeEach(function () {
+      dataFlows = new DataFlowStore();
+      actionCreators = new ActionCreators({
+        name: 'foo',
+        concat: function (a, b) {
+          return a + b;
+        }
+      });
+    });
+
+    describe('when I create an action', function () {
+      var result, dataFlow, callId;
+
+      beforeEach(function () {
+        callId = 'foo';
+        sinon.stub(DataFlow, 'callId').returns(callId);
+        result = actionCreators.concat('foo', 'bar');
+        dataFlow = dataFlows.getAll()[0];
+      });
+
+      it('should start a data flow', function () {
+        expect(dataFlow).to.be.defined;
+      });
+
+      it('should trace entering the action creator', function () {
+        expect(dataFlow.stacktrace[1]).to.eql({
+          id: callId,
+          source: {
+            type: 'ActionCreator',
+            id: actionCreators.name
+          },
+          type: 'entered',
+          function: 'concat',
+          arguments: ['foo', 'bar']
+        });
+      });
+
+      it('should trace leaving the action creator', function () {
+        expect(dataFlow.stacktrace[2]).to.eql({
+          id: callId,
+          type: 'left',
+          returnValue: 'foobar'
+        });
+      });
+
+      afterEach(function () {
+        DataFlow.callId.restore();
       });
     });
   });
