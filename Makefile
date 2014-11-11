@@ -7,7 +7,7 @@ SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 test: lint
 	@$(BIN)/karma start --single-run
 
-test-watch:
+test-watch: lint
 	@$(BIN)/karma start
 
 lint: bootstrap clean

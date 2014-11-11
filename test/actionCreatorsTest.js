@@ -11,6 +11,7 @@ describe('ActionCreators', function () {
     };
 
     actionCreators = new ActionCreators({
+      trace: false,
       dispatcher: dispatcher,
       initialize: sinon.spy(),
       test: function (message) {

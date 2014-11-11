@@ -2,8 +2,8 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var traceFunctions = require('../lib/diagnostics/traceFunctions');
 
-describe.only('traceFunctions()', function () {
-  var functions, traceId, functionType;
+describe('traceFunctions()', function () {
+  var functions, traceId, functionType, tracer;
 
   beforeEach(function () {
     traceId = 'calc';
