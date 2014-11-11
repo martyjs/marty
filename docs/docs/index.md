@@ -119,7 +119,7 @@ var TodoState = Marty.createStateMixin({
   listenTo: TodoStore,
   getState: function () {
     return {
-      // Will return null until got API from server
+      // getTodo will return null until the API call is updated
       todo: TodoStore.getTodo(this.props.id);
     };
   }
