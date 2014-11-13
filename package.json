@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A React.js/Flux Framework",
   "main": "index.js",
   "directories": {

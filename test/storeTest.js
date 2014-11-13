@@ -128,7 +128,7 @@ describe('Store', function () {
       });
 
       Marty.dispatcher.dispatch({
-        data: data,
+        arguments: [data],
         actionType: actionType
       });
     });
@@ -188,7 +188,7 @@ describe('Store', function () {
     function handlePayload(actionType) {
       store.handlePayload({
         actionType: actionType,
-        data: data
+        arguments: [data]
       });
     }
   });
