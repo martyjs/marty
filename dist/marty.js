@@ -4,7 +4,7 @@
 var _ = require('lodash');
 var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
-var package = JSON.parse(Buffer("ewogICJuYW1lIjogIm1hcnR5IiwKICAidmVyc2lvbiI6ICIwLjAuOCIsCiAgImRlc2NyaXB0aW9uIjogIkEgUmVhY3QuanMvRmx1eCBGcmFtZXdvcmsiLAogICJtYWluIjogImluZGV4LmpzIiwKICAiZGlyZWN0b3JpZXMiOiB7CiAgICAidGVzdCI6ICJ0ZXN0IgogIH0sCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJtYWtlIHRlc3QiCiAgfSwKICAicmVwb3NpdG9yeSI6IHsKICAgICJ0eXBlIjogImdpdCIsCiAgICAidXJsIjogImdpdEBnaXRodWIuY29tOmpob2xsaW5nd29ydGgvbWFydHkuZ2l0IgogIH0sCiAgImtleXdvcmRzIjogWwogICAgInJlYWN0IiwKICAgICJmbHV4IgogIF0sCiAgImRldkRlcGVuZGVuY2llcyI6IHsKICAgICJicmZzIjogIl4xLjIuMCIsCiAgICAiYnJvd3NlcmlmeSI6ICJeNS4xMi4wIiwKICAgICJicm93c2VyaWZ5LXNoaW0iOiAiXjMuNy4wIiwKICAgICJjaGFpIjogIl4xLjkuMSIsCiAgICAiY2hhaS1hcy1wcm9taXNlZCI6ICJeNC4xLjEiLAogICAgImpzeGNzIjogIjAuMC4zIiwKICAgICJqc3hoaW50IjogIl4wLjQuMTQiLAogICAgImthcm1hIjogIl4wLjEyLjI0IiwKICAgICJrYXJtYS1icm8iOiAiXjAuMTAuMCIsCiAgICAia2FybWEtY2hyb21lLWxhdW5jaGVyIjogIl4wLjEuNSIsCiAgICAia2FybWEtY2xpIjogIjAuMC40IiwKICAgICJrYXJtYS1tb2NoYSI6ICJeMC4xLjkiLAogICAgImthcm1hLXNwZWMtcmVwb3J0ZXIiOiAiMC4wLjEzIiwKICAgICJtb2NoYSI6ICJeMS4yMS40IiwKICAgICJtb2NoYS1zcGVjLWNvdiI6ICIwLjAuMyIsCiAgICAicmVhY3RpZnkiOiAiXjAuMTQuMCIsCiAgICAic2lub24iOiAiXjEuMTAuMyIsCiAgICAic2lub24tY2hhaSI6ICJeMi41LjAiLAogICAgInVnbGlmeS1qcyI6ICJeMi40LjE1IiwKICAgICJyZWFjdCI6ICJeMC4xMi4wIiwKICAgICJrYXJtYS1zYXVjZS1sYXVuY2hlciI6ICJeMC4yLjEwIiwKICAgICJqcy15YW1sIjogIl4zLjIuMyIKICB9LAogICJhdXRob3IiOiAiSmFtZXMgSG9sbGluZ3dvcnRoIiwKICAibGljZW5zZXMiOiBbCiAgICB7CiAgICAgICJ0eXBlIjogIk1JVCIsCiAgICAgICJ1cmwiOiAiaHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9qaG9sbGluZ3dvcnRoL21hcnR5L21hc3Rlci9MSUNFTlNFIgogICAgfQogIF0sCiAgImJ1Z3MiOiB7CiAgICAidXJsIjogImh0dHBzOi8vZ2l0aHViLmNvbS9qaG9sbGluZ3dvcnRoL21hcnR5L2lzc3VlcyIKICB9LAogICJmaWxlcyI6IFsKICAgICJkaXN0IiwKICAgICJsaWIiLAogICAgImluZGV4LmpzIiwKICAgICJMSUNFTlNFIgogIF0sCiAgImJyb3dzZXJpZnkiOiB7CiAgICAidHJhbnNmb3JtIjogWwogICAgICAiYnJmcyIsCiAgICAgICJyZWFjdGlmeSIKICAgIF0KICB9LAogICJob21lcGFnZSI6ICJodHRwczovL21hcnR5anMub3JnIiwKICAiZGVwZW5kZW5jaWVzIjogewogICAgImxvZGFzaCI6ICJeMi40LjEiLAogICAgImZsdXgiOiAiXjIuMC4xIiwKICAgICJzdXBlcmFnZW50IjogIl4wLjIwLjAiLAogICAgImthcm1hLWZpcmVmb3gtbGF1bmNoZXIiOiAiXjAuMS4zIgogIH0KfQo=","base64"), 'utf-8');
+var package = JSON.parse(Buffer("ewogICJuYW1lIjogIm1hcnR5IiwKICAidmVyc2lvbiI6ICIwLjAuOSIsCiAgImRlc2NyaXB0aW9uIjogIkEgUmVhY3QuanMvRmx1eCBGcmFtZXdvcmsiLAogICJtYWluIjogImluZGV4LmpzIiwKICAiZGlyZWN0b3JpZXMiOiB7CiAgICAidGVzdCI6ICJ0ZXN0IgogIH0sCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJtYWtlIHRlc3QiCiAgfSwKICAicmVwb3NpdG9yeSI6IHsKICAgICJ0eXBlIjogImdpdCIsCiAgICAidXJsIjogImdpdEBnaXRodWIuY29tOmpob2xsaW5nd29ydGgvbWFydHkuZ2l0IgogIH0sCiAgImtleXdvcmRzIjogWwogICAgInJlYWN0IiwKICAgICJmbHV4IgogIF0sCiAgImRldkRlcGVuZGVuY2llcyI6IHsKICAgICJicmZzIjogIl4xLjIuMCIsCiAgICAiYnJvd3NlcmlmeSI6ICJeNS4xMi4wIiwKICAgICJicm93c2VyaWZ5LXNoaW0iOiAiXjMuNy4wIiwKICAgICJjaGFpIjogIl4xLjkuMSIsCiAgICAiY2hhaS1hcy1wcm9taXNlZCI6ICJeNC4xLjEiLAogICAgImpzeGNzIjogIjAuMC4zIiwKICAgICJqc3hoaW50IjogIl4wLjQuMTQiLAogICAgImthcm1hIjogIl4wLjEyLjI0IiwKICAgICJrYXJtYS1icm8iOiAiXjAuMTAuMCIsCiAgICAia2FybWEtY2hyb21lLWxhdW5jaGVyIjogIl4wLjEuNSIsCiAgICAia2FybWEtY2xpIjogIjAuMC40IiwKICAgICJrYXJtYS1tb2NoYSI6ICJeMC4xLjkiLAogICAgImthcm1hLXNwZWMtcmVwb3J0ZXIiOiAiMC4wLjEzIiwKICAgICJtb2NoYSI6ICJeMS4yMS40IiwKICAgICJtb2NoYS1zcGVjLWNvdiI6ICIwLjAuMyIsCiAgICAicmVhY3RpZnkiOiAiXjAuMTQuMCIsCiAgICAic2lub24iOiAiXjEuMTAuMyIsCiAgICAic2lub24tY2hhaSI6ICJeMi41LjAiLAogICAgInVnbGlmeS1qcyI6ICJeMi40LjE1IiwKICAgICJyZWFjdCI6ICJeMC4xMi4wIiwKICAgICJrYXJtYS1zYXVjZS1sYXVuY2hlciI6ICJeMC4yLjEwIiwKICAgICJqcy15YW1sIjogIl4zLjIuMyIKICB9LAogICJhdXRob3IiOiAiSmFtZXMgSG9sbGluZ3dvcnRoIiwKICAibGljZW5zZXMiOiBbCiAgICB7CiAgICAgICJ0eXBlIjogIk1JVCIsCiAgICAgICJ1cmwiOiAiaHR0cHM6Ly9yYXcuZ2l0aHViLmNvbS9qaG9sbGluZ3dvcnRoL21hcnR5L21hc3Rlci9MSUNFTlNFIgogICAgfQogIF0sCiAgImJ1Z3MiOiB7CiAgICAidXJsIjogImh0dHBzOi8vZ2l0aHViLmNvbS9qaG9sbGluZ3dvcnRoL21hcnR5L2lzc3VlcyIKICB9LAogICJmaWxlcyI6IFsKICAgICJkaXN0IiwKICAgICJsaWIiLAogICAgImluZGV4LmpzIiwKICAgICJMSUNFTlNFIgogIF0sCiAgImJyb3dzZXJpZnkiOiB7CiAgICAidHJhbnNmb3JtIjogWwogICAgICAiYnJmcyIsCiAgICAgICJyZWFjdGlmeSIKICAgIF0KICB9LAogICJob21lcGFnZSI6ICJodHRwczovL21hcnR5anMub3JnIiwKICAiZGVwZW5kZW5jaWVzIjogewogICAgImxvZGFzaCI6ICJeMi40LjEiLAogICAgImZsdXgiOiAiXjIuMC4xIiwKICAgICJzdXBlcmFnZW50IjogIl4wLjIwLjAiLAogICAgImthcm1hLWZpcmVmb3gtbGF1bmNoZXIiOiAiXjAuMS4zIgogIH0KfQo=","base64"), 'utf-8');
 
 var Marty = _.extend({
   version: package.version,
@@ -24,10 +24,12 @@ function ActionCreators(options) {
   this.dispatch = dispatch;
   this.initialize.apply(this, arguments);
 
-  function dispatch(actionType, data) {
+  function dispatch(actionType) {
+    var args = _.rest(arguments);
+
     options.dispatcher.dispatch({
       actionType: actionType,
-      data: data
+      arguments: args
     });
   }
 }
@@ -140,7 +142,7 @@ HttpAPI.prototype = {
   },
   request: function (method, url) {
     if (this.baseUrl) {
-      url = this.baseUrl += url;
+      url = this.baseUrl + url;
     }
 
     return request[method](url);
@@ -174,22 +176,24 @@ function StateMixin(options) {
         store.addChangeListener(this.onStoreChanged);
       }, this);
     },
+    componentWillReceiveProps: function (nextProps) {
+      var oldProps = this.props;
+      this.props = nextProps;
+
+      var newState = this.getState();
+
+      this.props = oldProps;
+      this.setState(newState);
+    },
     componentWillUnmount: function () {
       _.each(config.stores, function (store) {
         store.removeChangeListener(this.onStoreChanged);
       }, this);
     },
     getState: function () {
-      return config.getState();
+      return config.getState(this);
     },
     getInitialState: function () {
-      // getState should have view instance as its function context so you can
-      // access props and other functions. getInitialState is the first chance
-      // we have to get access th view instance.
-      if (options.getState) {
-        options.getState = _.bind(options.getState, this);
-      }
-
       return this.getState();
     }
   };
@@ -224,7 +228,7 @@ function StateMixin(options) {
       getState: getState
     };
 
-    function getState() {
+    function getState(view) {
       var state = _
         .chain(storesToGetStateFrom)
         .map(getStateFromStore)
@@ -232,7 +236,7 @@ function StateMixin(options) {
         .value();
 
       if (options.getState) {
-        state = _.extend(state, options.getState());
+        state = _.extend(state, options.getState.call(view));
       }
 
       return state;
@@ -345,7 +349,7 @@ function Store(options) {
       _.isArray(actionTypes) || (actionTypes = [actionTypes]);
       _.each(actionTypes, function (actionType) {
         if (payload.actionType === actionType) {
-          this[handler].call(this, payload.data);
+          this[handler].apply(this, payload.arguments);
         }
       }, this);
     }, this);
