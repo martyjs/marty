@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var DataFlow = require('../lib/diagnostics/dataFlow');
 
-describe.only('DataFlow', function () {
+describe('DataFlow', function () {
   var flow;
 
   beforeEach(function () {

@@ -50,55 +50,65 @@ describe('ActionCreators', function () {
   });
 
   describe('tracing', function () {
+    var Marty = require('../index');
     var dataFlows;
 
     beforeEach(function () {
       dataFlows = new DataFlowStore();
-      actionCreators = new ActionCreators({
-        name: 'foo',
+      actionCreators = Marty.createActionCreators({
+        name: 'TraceCreator',
         concat: function (a, b) {
-          return a + b;
+          console.log('concat', this.id)
+          setTimeout((function () {
+            console.log('concat.timeout', this.id)
+            this.bar(a, b);
+          }).bind(this), 10);
+        },
+        bar: function (a, b) {
+          console.log('bar', this.id)
+          this.dispatch('test', a, b);
         }
       });
     });
 
+    afterEach(function () {
+      dataFlows.dispose();
+    });
+
     describe('when I create an action', function () {
-      var result, dataFlow, callId;
+      var first, second;
 
-      beforeEach(function () {
-        callId = 'foo';
-        sinon.stub(DataFlow, 'callId').returns(callId);
-        result = actionCreators.concat('foo', 'bar');
-        dataFlow = dataFlows.getAll()[0];
+      beforeEach(function (done) {
+        console.log(actionCreators);
+        actionCreators.concat('foo', 'bar');
+        // actionCreators.bar('bim', 'bam');
+        first = dataFlows.first;
+        second = dataFlows.second;
+
+        setTimeout(done, 10);
       });
 
-      it('should start a data flow', function () {
-        expect(dataFlow).to.be.defined;
+      it.only('should have a data flow for every new call', function () {
+        expect(dataFlows.length).to.equal(2);
       });
 
-      it('should trace entering the action creator', function () {
-        expect(dataFlow.stacktrace[1]).to.eql({
-          id: callId,
-          source: {
-            type: 'ActionCreator',
-            id: actionCreators.name
-          },
-          type: 'entered',
-          function: 'concat',
-          arguments: ['foo', 'bar']
+      it('should trace all function calls', function () {
+        console.log(require('util').inspect(first.toJSON(), { depth: null, colors: true }))
+        expect(first.toJSON()).to.eql({
+          name: 'concat',
+          arguments: ['foo', 'bar'],
+          context: { type: 'ActionCreator', id: 'TraceCreator' },
+          returnValue: null,
+          complete: true,
+          children: [{
+            name: 'dispatch',
+            arguments: ['test', 'foo', 'bar'],
+            context: { type: 'Dispatcher', id: null },
+            returnValue: null,
+            complete: true,
+            children: []
+          }]
         });
-      });
-
-      it('should trace leaving the action creator', function () {
-        expect(dataFlow.stacktrace[2]).to.eql({
-          id: callId,
-          type: 'left',
-          returnValue: 'foobar'
-        });
-      });
-
-      afterEach(function () {
-        DataFlow.callId.restore();
       });
     });
   });
