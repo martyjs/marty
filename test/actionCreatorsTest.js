@@ -1,7 +1,6 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
 var DataFlowStore = require('./lib/dataFlowStore');
-var DataFlow = require('../lib/diagnostics/dataFlow');
 var ActionCreators = require('../lib/actionCreators');
 
 describe('ActionCreators', function () {
@@ -49,7 +48,7 @@ describe('ActionCreators', function () {
     });
   });
 
-  describe('tracing', function () {
+  xdescribe('tracing', function () {
     var Marty = require('../index');
     var dataFlows;
 
@@ -58,14 +57,11 @@ describe('ActionCreators', function () {
       actionCreators = Marty.createActionCreators({
         name: 'TraceCreator',
         concat: function (a, b) {
-          console.log('concat', this.id)
           setTimeout((function () {
-            console.log('concat.timeout', this.id)
             this.bar(a, b);
           }).bind(this), 10);
         },
         bar: function (a, b) {
-          console.log('bar', this.id)
           this.dispatch('test', a, b);
         }
       });
@@ -81,19 +77,19 @@ describe('ActionCreators', function () {
       beforeEach(function (done) {
         console.log(actionCreators);
         actionCreators.concat('foo', 'bar');
-        // actionCreators.bar('bim', 'bam');
+        actionCreators.bar('bim', 'bam');
         first = dataFlows.first;
         second = dataFlows.second;
 
         setTimeout(done, 10);
       });
 
-      it.only('should have a data flow for every new call', function () {
+      it('should have a data flow for every new call', function () {
         expect(dataFlows.length).to.equal(2);
       });
 
       it('should trace all function calls', function () {
-        console.log(require('util').inspect(first.toJSON(), { depth: null, colors: true }))
+        console.log(require('util').inspect(first.toJSON(), { depth: null, colors: true }));
         expect(first.toJSON()).to.eql({
           name: 'concat',
           arguments: ['foo', 'bar'],
