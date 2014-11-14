@@ -48,21 +48,31 @@ describe('ActionCreators', function () {
     });
   });
 
-  xdescribe('tracing', function () {
+  describe('tracing', function () {
     var Marty = require('../index');
-    var dataFlows;
+    var dataFlows, actionType, foo, store;
 
     beforeEach(function () {
+      foo = {bar: 'baz'};
+      actionType = 'RECEIVE_FOO';
       dataFlows = new DataFlowStore();
-      actionCreators = Marty.createActionCreators({
-        name: 'TraceCreator',
-        concat: function (a, b) {
-          setTimeout((function () {
-            this.bar(a, b);
-          }).bind(this), 10);
+      store = Marty.createStore({
+        name: 'Foo Store',
+        handlers: {
+          receiveFoo: actionType
         },
-        bar: function (a, b) {
-          this.dispatch('test', a, b);
+        receiveFoo: function (foo) {
+          this.state.concat([foo]);
+          this.hasChanged();
+        },
+        getInitialState: function () {
+          return [];
+        }
+      });
+      actionCreators = Marty.createActionCreators({
+        name: 'FooActions',
+        addFoo: function (foo) {
+          this.dispatch(actionType, foo);
         }
       });
     });
@@ -72,37 +82,35 @@ describe('ActionCreators', function () {
     });
 
     describe('when I create an action', function () {
-      var first, second;
+      var first;
 
-      beforeEach(function (done) {
-        console.log(actionCreators);
-        actionCreators.concat('foo', 'bar');
-        actionCreators.bar('bim', 'bam');
+      beforeEach(function () {
+        actionCreators.addFoo(foo);
         first = dataFlows.first;
-        second = dataFlows.second;
-
-        setTimeout(done, 10);
-      });
-
-      it('should have a data flow for every new call', function () {
-        expect(dataFlows.length).to.equal(2);
       });
 
       it('should trace all function calls', function () {
         console.log(require('util').inspect(first.toJSON(), { depth: null, colors: true }));
         expect(first.toJSON()).to.eql({
-          name: 'concat',
-          arguments: ['foo', 'bar'],
-          context: { type: 'ActionCreator', id: 'TraceCreator' },
-          returnValue: null,
-          complete: true,
-          children: [{
-            name: 'dispatch',
-            arguments: ['test', 'foo', 'bar'],
-            context: { type: 'Dispatcher', id: null },
-            returnValue: null,
-            complete: true,
-            children: []
+          instigator: {
+            name: actionCreators.name,
+            type: 'ActionCreator',
+            action: 'addFoo',
+            arguments: [foo]
+          },
+          payload: {
+            actionType: actionType,
+            arguments: [foo]
+          },
+          handlers: [{
+            name: store.name,
+            type: 'Store',
+            action: 'receiveFoo',
+            state: {
+              before: [],
+              after: [foo]
+            },
+            updateComponents: []
           }]
         });
       });
