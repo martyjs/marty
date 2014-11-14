@@ -89,7 +89,7 @@ describe('ActionCreators', function () {
         first = dataFlows.first;
       });
 
-      it('should trace all function calls', function () {
+      it.only('should trace all function calls', function () {
         console.log(require('util').inspect(first.toJSON(), { depth: null, colors: true }));
         expect(first.toJSON()).to.eql({
           instigator: {
