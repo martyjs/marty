@@ -21,7 +21,7 @@ release: lint build
 	@npm publish
 
 build:
-	@$(BIN)/browserify --require ./index.js --exclude lodash --standalone Marty > dist/marty.js
+	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 clean:
 
