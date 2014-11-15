@@ -1,10 +1,10 @@
 var fs = require('fs');
-var _ = require('lodash');
 var yaml = require('js-yaml');
+var _ = require('lodash-node');
 
-module.exports = function(config) {
-  switch(process.env.ENV) {
-    case "CI":
+module.exports = function (config) {
+  switch (process.env.ENV) {
+    case 'CI':
       _.extend(process.env, saucelabsVariables());
       config.set(saucelabs());
       break;
@@ -62,8 +62,8 @@ module.exports = function(config) {
       },
       browserDisconnectTimeout : 10000,
       browserDisconnectTolerance : 1,
-      browserNoActivityTimeout : 4*60*1000,
-      captureTimeout : 4*60*1000,
+      browserNoActivityTimeout : 4 * 60 * 1000,
+      captureTimeout : 4 * 60 * 1000,
       customLaunchers: customLaunchers,
       browsers: Object.keys(customLaunchers),
       reporters: ['dots', 'saucelabs'],
@@ -114,6 +114,7 @@ module.exports = function(config) {
 
       travis.env.global.forEach(function (variable) {
         var parts = /(.*)="(.*)"/.exec(variable);
+
         config[parts[1]] = parts[2];
       });
 

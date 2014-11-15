@@ -23,6 +23,10 @@ describe('ActionCreators', function () {
     expect(actionCreators.initialize).to.have.been.calledOnce;
   });
 
+  describe('#mixins', function () {
+    it('should allow you to mixin object literals');
+  });
+
   describe('#dispatch()', function () {
     var message = 'Hello World';
 
@@ -37,7 +41,7 @@ describe('ActionCreators', function () {
     it('should pass the action type and data to the dispatcher', function () {
       expect(dispatcher.dispatch).to.have.been.calledWith({
         actionType: testConstant,
-        data: message
+        arguments: [message]
       });
     });
   });

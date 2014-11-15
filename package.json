@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.0.7",
+  "version": "0.0.13",
   "description": "A React.js/Flux Framework",
   "main": "index.js",
   "directories": {
@@ -18,7 +18,6 @@
     "flux"
   ],
   "devDependencies": {
-    "brfs": "^1.2.0",
     "browserify": "^5.12.0",
     "browserify-shim": "^3.7.0",
     "chai": "^1.9.1",
@@ -60,14 +59,13 @@
   ],
   "browserify": {
     "transform": [
-      "brfs",
       "reactify"
     ]
   },
   "homepage": "https://martyjs.org",
   "dependencies": {
-    "lodash": "^2.4.1",
     "flux": "^2.0.1",
-    "superagent": "^0.20.0"
+    "superagent": "^0.20.0",
+    "lodash-node": "^2.4.1",
   }
 }

@@ -7,6 +7,11 @@ SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 test: lint
 	@$(BIN)/karma start --single-run
 
+bootstrap: package.json docs/Gemfile
+	@npm install
+	@which bundle > /dev/null || gem install bundler
+	@cd docs && bundle install
+
 test-watch: lint
 	@$(BIN)/karma start
 
@@ -14,11 +19,10 @@ lint: bootstrap clean
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
-release: lint test build
-	@git add dist && git commit -m "Adding release files"
+release: test build
+	@git add dist && (git diff --exit-code > /dev/null || git commit -m "Rebuilding source")
 	@npm version patch
-	@git checkout gh-pages && git rebase master && git checkout master
-	@git push --all && git push --tags
+	@git push origin master && git push --tags
 	@npm publish
 
 build: lint
@@ -27,11 +31,6 @@ build: lint
 
 docs:
 	@cd docs && bundle exec jekyll serve -w
-
-bootstrap: package.json docs/Gemfile
-	@npm install
-	@which bundle > /dev/null || gem install bundler
-	@cd docs && bundle install
 
 release-docs: bootstrap
 	@cd docs && bundle exec rake release
