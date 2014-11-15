@@ -600,6 +600,10 @@ body {
   margin-bottom: 0;
 }
 
+.bs-docs-section h3 {
+
+}
+
 h1[id] {
   padding-top: 20px;
   margin-top: 0;
@@ -1479,4 +1483,13 @@ h1[id] {
   outline: thin dotted \9; /* IE6-9 */
   -webkit-box-shadow: 0 0 8px rgba(82,168,236,.6);
           box-shadow: 0 0 8px rgba(82,168,236,.6);
+}
+
+.hash-link {
+  padding-left: 5px;
+  color: grey;
+}
+
+.hash-link:hover {
+  color: #428bca;
 }

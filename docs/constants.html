@@ -123,17 +123,75 @@
   <div class="bs-docs-header" id="content"  style="background-color: #433B46">
   <div class="container">
     <h1>Constants</h1>
-    <p></p>
+    <p>Showing you what actions your application is capable of</p>
   </div>
 </div>
 <div class="container bs-docs-container">
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span>
+        <p>When an action creator creates an action, that action has an action type which is just a string identifier (e.g. <code>&#39;DELETE_USER&#39;</code>). The action type is what your stores use to decided whether to handle the action. One of their major benefits is this allows you to loosely couple your actions to your stores (<a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Dementer</a>). This approach does make it difficult to understand at a high level what the application is capable of doing. The solution to this is <strong>Constants</strong>.</p>
+
+<p>Constants are simple object literals where the key and the value are the same. They become a useful reference to help you understand the application (especially useful as the application grows).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">Users</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">DELETE_USER</span><span class="p">:</span> <span class="s1">'DELETE_USER'</span><span class="p">,</span>
+    <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="s1">'RECEIVE_USERS'</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>You then reference the constants in the rest of your application</p>
+<div class="highlight"><pre><code class="language-" data-lang="">var UserActionCreators = Marty.createActionCreators({
+  deleteUser: function (user) {
+    this.dispatch(Constants.Users.DELETE_USER, user);
+  }
+});
+
+var UsersStore = Marty.createStore({
+  handlers: {
+    deleteUser: Constants.Users.DELETE_USER
+  },
+  deleteUser: function (user) {
+    ...
+  }
+})
+
+</code></pre></div>
+<p>Marty offers a helper function, <code>Marty.createConstants()</code>, that makes it easier to create constants. You can pass an array of strings to it</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span>
   <span class="s1">'RECEIVE_USERS'</span><span class="p">,</span>
   <span class="s1">'DELETE_USER'</span>
-<span class="p">]);</span></code></pre></div>
+<span class="p">]);</span>
+
+<span class="c1">//returns</span>
+<span class="p">{</span>
+  <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="s1">'RECEIVE_USERS'</span><span class="p">,</span>
+  <span class="na">DELETE_USER</span><span class="p">:</span> <span class="s1">'DELETE_USER'</span>
+<span class="p">}</span></code></pre></div>
+
+<p>Or you could pass an object literal of arrays. We recommend organising constants by domain and so this our preferred approach.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span>
+  <span class="nx">Users</span><span class="err">:</span> <span class="p">[</span><span class="s1">'RECEIVE_USERS'</span><span class="p">,</span> <span class="s1">'DELETE_USER'</span><span class="p">],</span>
+  <span class="nx">Foos</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">Bars</span><span class="p">:</span> <span class="p">[</span><span class="s1">'ADD_BAR'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">]);</span>
+
+<span class="c1">//returns</span>
+<span class="p">{</span>
+  <span class="na">Users</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="s1">'RECEIVE_USERS'</span><span class="p">,</span>
+    <span class="na">DELETE_USER</span><span class="p">:</span> <span class="s1">'DELETE_USER'</span>
+  <span class="p">},</span>
+  <span class="na">Foos</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">Bars</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">ADD_BAR</span><span class="p">:</span> <span class="s1">'ADD_BAR'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
 
       </div>
     </div>
@@ -218,7 +276,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.0.7</li>
+        <li>v0.0.13</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
@@ -239,6 +297,7 @@
 
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/headings.js"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -134,7 +134,7 @@
 
 <p>It follows the Flux architecture which Facebook and Instagram created to help deal with building ever larger JS web applications. Flux makes your applications easier to understand, debug and test as well as scaling well as your application grows.</p>
 
-<h2>Data flow</h2>
+<h2 id="data-flow">Data flow</h2>
 
 <p>A core concept within Flux is the Flux update cycle which is a <strong>unidirectional data flow</strong> through the application. </p>
 
@@ -158,7 +158,7 @@
 
 <p>The <a href="/docs/actionCreators.html">action creator</a> will pass that action to the <a href="/docs/dispatcher.html">dispatcher</a> which is responsible for keeping a track of all <a href="/docs/stores.html">stores</a> and passing on any actions to them.</p>
 
-<p>The <a href="/docs/stores.html">store</a> is where the applications state and logic live for a specific domain. A store could contain a collection of domain entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or could be some specific information about something (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>). </p>
+<p>The <a href="/docs/stores.html">store</a> is where the applications state and logic live for a specific domain. A store could contain a collection of domain entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or could just be some data about something (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">TodoStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
@@ -173,7 +173,7 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>Stores register handlers for actions which are responsible for updating their state. Once they have updated themselves, they emit an event telling anyone listening to it that it has updated. </p>
+<p>Stores register handlers for actions which are responsible for updating their state. Once they have updated themselves, they emit an event telling anyone listening to it that it has updated.</p>
 
 <p>Finally, you want to update the view with the new state. To bind a stores state to a view you use the <a href="/docs/stateMixin.html">state mixin</a>.</p>
 
@@ -192,7 +192,7 @@
 
 <p>When the view first loads and any time the stores state changes after that the view&#39;s render function will be called and this.state will be whatever the current state of the store.</p>
 
-<h2>Where should my code go?</h2>
+<h2 id="where-does-my-code-go">Where should my code go?</h2>
 
 <p>Anything to do with storing and changing your applications state should live in the <strong><a href="/docs/stores.html">stores</a></strong>. Views are allowed to call the <a href="/docs/stores.html">stores</a> directly to get state (but not to write state) and so the <a href="/docs/stores.html">stores</a> should contain all logic for getting data whether that be from an internal cache or from the server.</p>
 
@@ -200,7 +200,7 @@
 
 <p>When you want to communicate with the server, you should use an <strong><a href="/docs/httpApi.html">Http APIs</a></strong>. The response to an http request should be handled by an <a href="/docs/actionCreators.html">action creator</a>.</p>
 
-<h2>How do I handle asynchronous operations?</h2>
+<h2 id="handle-async-operations">How do I handle asynchronous operations?</h2>
 
 <p>Every operation within a Flux application should be asynchronous by default. This allows you to have a consistent API that encapsulates any remote operations. </p>
 
@@ -232,7 +232,7 @@
   <span class="na">listenTo</span><span class="p">:</span> <span class="nx">TodoStore</span><span class="p">,</span>
   <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
-      <span class="c1">// Will return null until got API from server</span>
+      <span class="c1">// getTodo will return null until the API call is updated</span>
       <span class="na">todo</span><span class="p">:</span> <span class="nx">TodoStore</span><span class="p">.</span><span class="nx">getTodo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
     <span class="p">};</span>
   <span class="p">}</span>
@@ -329,7 +329,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.0.7</li>
+        <li>v0.0.13</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
@@ -350,6 +350,7 @@
 
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/headings.js"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -130,21 +130,192 @@
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+        <p>A store is where the applications state and logic live for a specific domain. A store can contain a collection of domain entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could store some data about something (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
+
+<p>The store should be the <strong>only</strong> place where your applications state changes. If your views want to update its state, it should call an <a href="/docs/actionCreators.html">action creator</a> which dispatches an action that stores listen to and update themselves and then notify the views about their new state. The reasons for this are firstly to give the all parts of the application the opportunity to see this new state and also simplify debugging. Its a lot easier to find a bug if theres only one place the values can change rather than in all views.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">addUsers</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USERS</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
   <span class="p">},</span>
-  <span class="na">addUsers</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
   <span class="p">},</span>
   <span class="nx">getInitialState</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="nx">UsersAPI</span><span class="p">.</span><span class="nx">getAll</span><span class="p">();</span>
     <span class="k">return</span> <span class="p">[];</span>
   <span class="p">},</span>
-  <span class="nx">getAll</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+  <span class="nx">getUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">id</span>
+    <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
+
+<p>A store is a singleton which is created using <a href="#createStore"><code>Marty.createStore</code></a>. When the store is creted it will call <a href="#getInitialState"><code>getInitialState</code></a> which should return an object that all the stores state will live in. This state is accessible by calling <code>this.state</code>. Stores are responsible for fetching their own data so <a href="#getInitialState"><code>getInitialState</code></a> is a good place to make any <a href="/docs/httpApi.html">API calls</a>.</p>
+
+<p>The store will also register with the <a href="/docs/dispatcher.html">dispatcher</a> to be notified of any new actions on creation. When an action arrives, the store determines whether to handle that action or not. It does this by looking at the <a href="#handlers">handlers</a> where the key is the name of the handler function and the value is an <a href="#action-predicates">action predicate</a>.</p>
+
+<p>When an action handler is invoked, its arguments will be <a href="/docs/actionCreators.html#dispatch">the arguments passed to the dispatcher</a>. If the handler updates its state, it can call <a href="#hasChanged"><code>hasChanged</code></a> which will notify any listening views of its new state.</p>
+
+<h2 id="api">API</h2>
+
+<h3 id="createStore">Marty.createStore(instanceProperties)</h3>
+
+<p>To create a new store, you call <code>Marty.createStore</code> passing in a set of intance properties. It returns a singleton store which is listening to the dispatcher.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">},</span>
+  <span class="nx">getInitialState</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[];</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="name">name</h3>
+
+<p>An (optional) display name for the store. Used by developer tools.</p>
+
+<h3 id="handlers">handlers</h3>
+
+<p>The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an <a href="#action-predicates">action predicate</a>.</p>
+
+<p>When invoked the handlers arguments are <a href="/docs/actionCreators.html#dispatch">the arguments passed to the dispatcher</a>. The original action is available by calling <code>this.action</code>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">action</span><span class="p">)</span> <span class="c1">// { type: 'RECEIVE_USER', arguments: [{ name: ...}] }</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h4 id="action-predicates">Action predicates</h4>
+
+<p>An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where query</a>. Some examples of action predicates:</p>
+
+<ul>
+  <li><code>'ADD_USER'</code></li>
+  <li><code>['USER_CREATED', 'USER_UPDATED']</code></li>
+  <li><code>{ source: 'VIEW' }</code></li>
+  <li><code>[{ source: 'VIEW' }, 'USER_DELETED']</code></li>
+</ul>
+
+<h3 id="getInitialState">getInitialState()</h3>
+
+<p><code>getInitialState</code> is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the <a href="#state">state</a> property.</p>
+
+<p>If you do not implement getInitialState or you do not return anything then the default state is an empty object literal (<code>{}</code>).</p>
+
+<h3 id="state">state</h3>
+
+<p>The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.</p>
+
+<p>If you want to change the state to a new instance (or if you are using <a href="immutable">immutable data collections</a>) you can set the states value or call <code>this.setState(state)</code></p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">addUsers</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">users</span><span class="p">);</span>
+
+  <span class="c1">// or</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">users</span><span class="p">));</span>
+<span class="p">}</span></code></pre></div>
+
+<p>If the new state does not equal the current state then <a href="#hasChanged">hasChanged</a> will be called after updating the stores state.</p>
+
+<h3 id="addChangeListener">addChangeListener(callback, [context])</h3>
+
+<p>If you want to be notified of changes to a store, you can register a callback by calling <code>Store.addChangeListener</code>. You can optionally pass the functions context as a second argument.</p>
+
+<p>Once registered, the store will invoke your callback anytime the store changes passing the state and the store as the two arguments.</p>
+
+<p>addChangeListener will return a disposable object. If you want to stop listening to the store, you can call <code>dispose</code> on the object.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">listener</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">,</span> <span class="nx">store</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'state'</span><span class="p">,</span> <span class="nx">state</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'from'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+<span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+
+<span class="nx">listener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span></code></pre></div>
+
+<h3 id="hasChanged">hasChanged()</h3>
+
+<p>To notify any listeners that the store has changed can call <code>this.hasChanged()</code>. When called it will call all <a href="#addChangeListener">registered callbacks</a>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="waitFor">waitFor(*stores)</h3>
+
+<p>If an action handler is dependant on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.</p>
+
+<p>You can also pass an array of dispatch tokens to waitFor.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">waitFor</span><span class="p">(</span><span class="nx">FooStore</span><span class="p">,</span> <span class="nx">BarStore</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="#dispatchToken">dispatchToken</h3>
+
+<p>Dispatch token that is returned from <a href="http://facebook.github.io/flux/docs/dispatcher.html#api"><code>Dispatcher.register()</code></a>. Used by <a href="#waitFor"><code>waitFor()</code></a>.</p>
+
+<h2 id="immutable">Immutable data collections</h2>
+
+<p>Within a Flux application you want the stores to be the <strong>only</strong> place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.</p>
+
+<p>The solution this is to use immutable data collections like <a href="https://github.com/facebook/immutable-js">immutable.js</a> or <a href="http://swannodette.github.io/mori/">mori</a>. Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nx">of</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">users2</span> <span class="o">=</span> <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="c1">// ["foo"]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users2</span><span class="p">)</span> <span class="c1">// ["foo", "bar"]</span></code></pre></div>
+
+<p>Using immutable data collections help you sleep soundly with knowledge that nothing outside of stores will be able to change its state.</p>
+
+<p>While immutable data collections are not required, we try to make it as easy to use as possible. For example, you can simple call this.state with the mutated collection and internally it will check if the collection has changed and handle notifying and listeners.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">();</span>
+  <span class="p">},</span>
+  <span class="nx">addUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+<li><a href="http://facebook.github.io/flux/docs/overview.html#stores">Original article about Flux</a></li>
+</ul>
 
       </div>
     </div>
@@ -229,7 +400,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.0.7</li>
+        <li>v0.0.13</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
@@ -250,6 +421,7 @@
 
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/headings.js"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>
 </html>
