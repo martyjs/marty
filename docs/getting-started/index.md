@@ -6,7 +6,7 @@ id: getting-started
 group: getting-started
 ---
 
-<h1 id="download" class="page-header">Download</h1>
+<h2 id="download" class="page-header">Download</h2>
 
 You can download marty using **npm**
 
@@ -21,7 +21,7 @@ bower install --save marty
 {% endhighlight %}
 
 
-<h1 id="module-loaders" class="page-header">Module loaders</h1>
+<h2 id="module-loaders" class="page-header">Module loaders</h2>
 
 Marty is built using [UMD](https://github.com/umdjs/umd). This means you can use it from [node.js](nodejs.org) or [Browserify](browserify.org)
 
@@ -50,3 +50,7 @@ window.Marty.createStore({
   ...
 })
 {% endhighlight %}
+
+<h2 id="examples">Examples</h2>
+
+* [TodoMVC](https://github.com/jhollingworth/marty/tree/master/examples/flux-todomvc)

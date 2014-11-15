@@ -81,7 +81,7 @@ var UserActionCreators = Marty.createActionCreators({
 
 An (optional) display name for the action creator. Used by Marty Developer Tools.
 
-<h3 id="dispatch">this.dispatch(actionType, [...])</h3>
+<h3 id="dispatch">dispatch(actionType, [...])</h3>
 
 Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
 
@@ -89,7 +89,7 @@ The actions source will be null.
 
 Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
 
-<h3 id="dispatchViewAction">this.dispatchViewAction(actionType, [...])</h3>
+<h3 id="dispatchViewAction">dispatchViewAction(actionType, [...])</h3>
 
 Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
 
@@ -97,7 +97,7 @@ The actions source will be <code>VIEW</code> (or <code>Marty.constants.actionSou
 
 Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
 
-<h3 id="dispatchServerAction">this.dispatchServerAction(actionType, [...])</h3>
+<h3 id="dispatchServerAction">dispatchServerAction(actionType, [...])</h3>
 
 Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
 
