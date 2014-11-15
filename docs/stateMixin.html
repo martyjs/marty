@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>State Mixin | marty.js</title>
+  <title>State mixin | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -75,7 +75,7 @@
                 
                   
                     
-                    <li class="active"><a href="/docs/stateMixin.html" class="active">State Mixin</a></li>
+                    <li class="active"><a href="/docs/stateMixin.html" class="active">State mixin</a></li>
                     
                   
                 
@@ -122,15 +122,21 @@
   </header>
   <div class="bs-docs-header" id="content"  style="background-color: #68ADCA">
   <div class="container">
-    <h1>State Mixin</h1>
-    <p>How to bind store state to React views</p>
+    <h1>State mixin</h1>
+    <p>How to bind store state to React components</p>
   </div>
 </div>
 <div class="container bs-docs-container">
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+        <p>We found that there was a lot of boilerplate code in React components to start listening to <a href="/docs/stores.html">stores</a> and get their states. The State mixin helps to reduce the amount of code you have to write.</p>
+
+<p>Firstly it automatically handles <a href="/docs/stores.html#addChangeListener">adding change listeners</a> to <a href="#listenTo">stores you specify</a> as well as disposing of those listeners when the component unmounts.</p>
+
+<p>It also introduces a new function <a href="#getState"><code>getState</code></a> which returns state of the component. It will be called just before the initial render of the component and whenever a store updates.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
   <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
   <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
@@ -149,6 +155,79 @@
     <span class="o">&lt;</span><span class="sr">/ul&gt;</span><span class="se">)</span><span class="err">;
 </span>  <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
+
+<h2 id="api">API</h2>
+
+<h3 id="createStateMixinObject">Marty.createStateMixin(<i>Object</i>)</h3>
+
+<h4 id="listenTo">listenTo</h4>
+
+<p>Expects either a <a href="/docs/stores.html">store</a> or an array of <a href="/docs/stores.html">stores</a>. Just before the <a href="http://facebook.github.io/react/docs/component-specs.html#mounting-componentwillmount">initial render</a>, it will register a change listener with the specified store(s).</p>
+
+<p>When the element is about to be <a href="http://facebook.github.io/react/docs/component-specs.html#unmounting-componentwillunmount">unmounted from the DOM</a> it will dispose of an change listeners.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+  <span class="na">listenTo</span><span class="p">:</span> <span class="p">[</span><span class="nx">UserStore</span><span class="p">,</span> <span class="nx">FooStore</span><span class="p">]</span>
+<span class="p">});</span></code></pre></div>
+
+<h4 id="getState">getState</h4>
+
+<p>The result of <code>getState</code> will be <a href="http://facebook.github.io/react/docs/component-api.html#setstate">set as the state of the bound component</a>. <code>getState</code> will be called when</p>
+
+<ul>
+<li><a href="http://facebook.github.io/react/docs/component-specs.html#getinitialstate"><code>getInitialState</code></a> is called</li>
+<li>The components <a href="http://facebook.github.io/react/docs/component-specs.html#updating-componentwillupdate">props change</a></li>
+<li>Any of the stores change</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+  <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h4 id="stores">Stores</h4>
+
+<p>If the value of a key is a <a href="/docs/stores.html">store</a>, then the mixin will automatically listen to the store and merge the stores state with result of <code>getState</code></p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+  <span class="na">foos</span><span class="p">:</span> <span class="nx">FooStore</span><span class="p">,</span>
+  <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="c1">// UserState.getState() =&gt;</span>
+<span class="p">{</span>
+  <span class="na">foos</span><span class="p">:</span> <span class="p">[...],</span>
+  <span class="na">user</span><span class="p">:</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="p">...}</span>
+<span class="p">}</span></code></pre></div>
+
+<p><code>getState</code> is optional and so you could just pass in a set of stores and it will automatically listen to them and build the state</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">FooBarState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+  <span class="na">foos</span><span class="p">:</span> <span class="nx">FooStore</span><span class="p">,</span>
+  <span class="na">bars</span><span class="p">:</span> <span class="nx">BarStore</span>
+<span class="p">});</span>
+
+<span class="c1">// FooBarState.getState() =&gt;</span>
+<span class="p">{</span>
+  <span class="na">foos</span><span class="p">:</span> <span class="p">[...],</span>
+  <span class="na">bars</span><span class="p">:</span> <span class="p">[...]</span>
+<span class="p">}</span></code></pre></div>
+
+<h3 id="createStateMixinStore">Marty.createStateMixin(<i>Store</i>)</h3>
+
+<p>If you are only interested in the state of a <em>single</em> store then you can pass a store directly to <code>createStateMixin</code> which will automatically listen to the store and <code>getState</code> will return the state of the store.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">(</span><span class="nx">UserStore</span><span class="p">);</span>
+
+<span class="c1">// UserState.getState() =&gt;</span>
+<span class="p">[{</span><span class="na">name</span><span class="p">:</span> <span class="s1">'foo'</span><span class="p">},</span> <span class="p">...]</span></code></pre></div>
 
       </div>
     </div>
@@ -193,7 +272,7 @@
             
               
                 
-                <li class="active"><a href="/docs/stateMixin.html" class="active">State Mixin</a></li>
+                <li class="active"><a href="/docs/stateMixin.html" class="active">State mixin</a></li>
                 
               
             

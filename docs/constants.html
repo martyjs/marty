@@ -75,7 +75,7 @@
                 
                   
                     
-                    <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                    <li><a href="/docs/stateMixin.html">State mixin</a></li>
                     
                   
                 
@@ -158,7 +158,9 @@ var UsersStore = Marty.createStore({
 })
 
 </code></pre></div>
-<p>Marty offers a helper function, <code>Marty.createConstants()</code>, that makes it easier to create constants. You can pass an array of strings to it</p>
+<h2 id="api">API</h2>
+
+<h3 id="createConstantsArray">Marty.createConstants(<i>Array</i>)</h3>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span>
   <span class="s1">'RECEIVE_USERS'</span><span class="p">,</span>
@@ -171,7 +173,7 @@ var UsersStore = Marty.createStore({
   <span class="na">DELETE_USER</span><span class="p">:</span> <span class="s1">'DELETE_USER'</span>
 <span class="p">}</span></code></pre></div>
 
-<p>Or you could pass an object literal of arrays. We recommend organising constants by domain and so this our preferred approach.</p>
+<h3 id="createConstantsObj">Marty.createConstants(<i>Object</i>)</h3>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span>
   <span class="nx">Users</span><span class="err">:</span> <span class="p">[</span><span class="s1">'RECEIVE_USERS'</span><span class="p">,</span> <span class="s1">'DELETE_USER'</span><span class="p">],</span>
@@ -236,7 +238,7 @@ var UsersStore = Marty.createStore({
             
               
                 
-                <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                <li><a href="/docs/stateMixin.html">State mixin</a></li>
                 
               
             

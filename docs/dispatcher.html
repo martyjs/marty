@@ -75,7 +75,7 @@
                 
                   
                     
-                    <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                    <li><a href="/docs/stateMixin.html">State mixin</a></li>
                     
                   
                 
@@ -130,9 +130,22 @@
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">foo</span><span class="p">,</span> <span class="p">{</span>
-  <span class="na">bar</span><span class="p">:</span> <span class="s1">'bar'</span>
-<span class="p">});</span></code></pre></div>
+        <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> with the dispatcher a callback with the dispatcher. Whenever an <a href="/docs/actionCreators.html">action creators</a> create actions it is passed to the dispatcher which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
+
+<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a> which is a singleton accessible on <code>Marty</code>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Action</span><span class="p">(</span><span class="s1">'ADD_FOO'</span><span class="p">,</span> <span class="p">[],</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">constants</span><span class="p">.</span><span class="nx">actionSources</span><span class="p">.</span><span class="nx">VIEW</span><span class="p">);</span>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span></code></pre></div>
+
+<h2 id="further-reading">Further reading</h2>
+
+<ul>
+<li><a href="http://facebook.github.io/flux/docs/dispatcher.html">Dispatcher documentation</a></li>
+</ul>
 
       </div>
     </div>
@@ -177,7 +190,7 @@
             
               
                 
-                <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                <li><a href="/docs/stateMixin.html">State mixin</a></li>
                 
               
             

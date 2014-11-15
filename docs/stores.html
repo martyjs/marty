@@ -75,7 +75,7 @@
                 
                   
                     
-                    <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                    <li><a href="/docs/stateMixin.html">State mixin</a></li>
                     
                   
                 
@@ -182,7 +182,7 @@
 
 <h3 id="name">name</h3>
 
-<p>An (optional) display name for the store. Used by developer tools.</p>
+<p>An (optional) display name for the store. Used by Marty Developer Tools.</p>
 
 <h3 id="handlers">handlers</h3>
 
@@ -204,12 +204,46 @@
 
 <p>An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where query</a>. Some examples of action predicates:</p>
 
-<ul>
-  <li><code>'ADD_USER'</code></li>
-  <li><code>['USER_CREATED', 'USER_UPDATED']</code></li>
-  <li><code>{ source: 'VIEW' }</code></li>
-  <li><code>[{ source: 'VIEW' }, 'USER_DELETED']</code></li>
-</ul>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">foo</span><span class="p">:</span> <span class="s1">'ADD_USER'</span><span class="p">,</span>
+    <span class="na">bar</span><span class="p">:</span> <span class="p">[</span><span class="s1">'ADD_USER'</span><span class="p">,</span> <span class="s1">'UPDATE_USER'</span><span class="p">],</span>
+    <span class="na">baz</span><span class="p">:</span> <span class="p">{</span> <span class="na">source</span><span class="p">:</span> <span class="s1">'VIEW'</span> <span class="p">},</span>
+    <span class="na">bam</span><span class="p">:</span> <span class="p">[{</span> <span class="na">source</span><span class="p">:</span> <span class="s1">'VIEW'</span> <span class="p">},</span> <span class="s1">'USER_DELETED'</span><span class="p">]</span>
+  <span class="p">},</span>
+  <span class="c1">// called when action.type == 'ADD_USER'</span>
+  <span class="na">foo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="p">..</span> <span class="p">},</span>
+
+  <span class="c1">// called when action.type == 'ADD_USER' || action.type ==  'UPDATE_USER'</span>
+  <span class="nx">bar</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="p">..</span> <span class="p">},</span>
+
+  <span class="c1">// called when action.source == 'VIEW'</span>
+  <span class="nx">baz</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="p">..</span> <span class="p">},</span>
+
+  <span class="c1">// called when action.source == 'VIEW' || action.type ==  'USER_DELETED'</span>
+  <span class="nx">bam</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="p">..</span> <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h4 id="rollback">Rollback</h4>
+
+<p>There are a number of cases where it would be useful to be able to rollback an action (e.g. if you&#39;ve optimistically added an entity to your locally store but the associated request to the server failed).</p>
+
+<p>To provide a rollback to an action handler, simply return a function from the action handler. If an <a href="/docs/actionCreators.html#dispatch">action is rolled back</a>, the function you return will be called.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="kd">function</span> <span class="nx">rollback</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">user</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
 
 <h3 id="getInitialState">getInitialState()</h3>
 
@@ -250,7 +284,7 @@
 
 <h3 id="hasChanged">hasChanged()</h3>
 
-<p>To notify any listeners that the store has changed can call <code>this.hasChanged()</code>. When called it will call all <a href="#addChangeListener">registered callbacks</a>.</p>
+<p>Calls any <a href="#addChangeListener">registered callbacks</a>.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
@@ -287,7 +321,7 @@
 
 <p>Within a Flux application you want the stores to be the <strong>only</strong> place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.</p>
 
-<p>The solution this is to use immutable data collections like <a href="https://github.com/facebook/immutable-js">immutable.js</a> or <a href="http://swannodette.github.io/mori/">mori</a>. Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.</p>
+<p>The solution this is to use immutable data collections like <a href="http://facebook.github.io/immutable-js/">immutable.js</a> or <a href="http://swannodette.github.io/mori/">mori</a>. Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nx">of</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">users2</span> <span class="o">=</span> <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">);</span>
@@ -360,7 +394,7 @@
             
               
                 
-                <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                <li><a href="/docs/stateMixin.html">State mixin</a></li>
                 
               
             

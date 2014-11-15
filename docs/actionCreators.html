@@ -75,7 +75,7 @@
                 
                   
                     
-                    <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                    <li><a href="/docs/stateMixin.html">State mixin</a></li>
                     
                   
                 
@@ -137,13 +137,13 @@
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
   <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">Users</span><span class="p">.</span><span class="nx">CREATE_USER</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">Users</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">UserStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">createUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">Users</span><span class="p">.</span><span class="nx">CREATE_USER</span>
+    <span class="na">createUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">Users</span><span class="p">.</span><span class="nx">ADD_USER</span>
   <span class="p">},</span>
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
@@ -158,9 +158,25 @@
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">source</span><span class="p">:</span> <span class="s1">'VIEW'</span><span class="p">,</span>
-  <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_USER'</span><span class="p">,</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'ADD_USER'</span><span class="p">,</span>
   <span class="na">arguments</span><span class="p">:</span> <span class="p">[</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'foo@bar.com'</span><span class="p">]</span>
 <span class="p">}</span></code></pre></div>
+
+<p>The second responsiblity of action creators is to coordinate optimistic actions and server responses. For example, if you were to create a new user you will likely want to add it to a local store and then start synchronising with the server in the hopes that the request will successfully complete. If for whatever reasons that request fails you need a way to easily rollback any changes to the stores.</p>
+
+<p>The <a href="#dispatch">dispatch function</a> actually returns the action after all stores have finishing processing it. The action has a <code>rollback()</code> function on it will ask the stores to <a href="/docs/stores.html#rollback">rollback any changes they&#39;ve made (if possible)</a>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">Users</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">,</span> <span class="nx">user</span><span class="p">);</span>
+
+    <span class="c1">// if you wanted to rollback straight away</span>
+    <span class="nx">action</span><span class="p">.</span><span class="nx">rollback</span><span class="p">();</span>
+
+    <span class="c1">// or you could pass it to the API</span>
+    <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">saveUser</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">rollback</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
 
 <h2 id="api">API</h2>
 
@@ -170,13 +186,13 @@
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">Users</span><span class="p">.</span><span class="nx">CREATE_USER</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">Users</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
 <h3 id="name">name</h3>
 
-<p>An (optional) display name for the action creator. Used by developer tools.</p>
+<p>An (optional) display name for the action creator. Used by Marty Developer Tools.</p>
 
 <h3 id="dispatch">this.dispatch(actionType, [...])</h3>
 
@@ -184,17 +200,23 @@
 
 <p>The actions source will be null.</p>
 
+<p>Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.</p>
+
 <h3 id="dispatchViewAction">this.dispatchViewAction(actionType, [...])</h3>
 
 <p>Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any <a href="/docs/stores.html#handleAction">store action handlers</a>.</p>
 
 <p>The actions source will be <code>VIEW</code> (or <code>Marty.constants.actionSources.VIEW</code>).</p>
 
+<p>Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.</p>
+
 <h3 id="dispatchServerAction">this.dispatchServerAction(actionType, [...])</h3>
 
 <p>Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any <a href="/docs/stores.html#handleAction">store action handlers</a>.</p>
 
 <p>The actions source will be <code>SERVER</code> (or <code>Marty.constants.actionSources.SERVER</code>).</p>
+
+<p>Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.</p>
 
 <h2 id="server-action-creators">Server Action Creators</h2>
 
@@ -279,7 +301,7 @@
             
               
                 
-                <li><a href="/docs/stateMixin.html">State Mixin</a></li>
+                <li><a href="/docs/stateMixin.html">State mixin</a></li>
                 
               
             
