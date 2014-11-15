@@ -66,6 +66,6 @@
   "dependencies": {
     "flux": "^2.0.1",
     "superagent": "^0.20.0",
-    "lodash-node": "^2.4.1",
+    "lodash-node": "^2.4.1"
   }
 }

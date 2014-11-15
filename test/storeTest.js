@@ -34,7 +34,7 @@ describe('Store', function () {
     expect(store.dispatchToken).to.equal(dispatchToken);
   });
 
-  it('should have registered handlePayload with the dispatcher', function () {
+  it('should have registered handleAction with the dispatcher', function () {
     expect(dispatcher.register).to.have.been.called;
   });
 
@@ -129,7 +129,7 @@ describe('Store', function () {
 
       Marty.dispatcher.dispatch({
         arguments: [data],
-        actionType: actionType
+        type: actionType
       });
     });
 
@@ -142,12 +142,12 @@ describe('Store', function () {
     it('should wait for the specified stores to complete');
   });
 
-  describe('#handlePayload()', function () {
+  describe('#handleAction()', function () {
     var data = {};
 
     describe('when the store does not handle action type', function () {
       beforeEach(function () {
-        handlePayload('foo');
+        handleAction('foo');
       });
 
       it('should not call any handlers', function () {
@@ -158,7 +158,7 @@ describe('Store', function () {
 
     describe('when the store has one action type for a handler', function () {
       beforeEach(function () {
-        handlePayload('one-action');
+        handleAction('one-action');
       });
 
       it('should call the action handler', function () {
@@ -172,8 +172,8 @@ describe('Store', function () {
 
     describe('when the store has multiple aciton types for a handler', function () {
       beforeEach(function () {
-        handlePayload('multi-1-action');
-        handlePayload('multi-2-action');
+        handleAction('multi-1-action');
+        handleAction('multi-2-action');
       });
 
       it('should call the action handler', function () {
@@ -185,9 +185,9 @@ describe('Store', function () {
       });
     });
 
-    function handlePayload(actionType) {
-      store.handlePayload({
-        actionType: actionType,
+    function handleAction(actionType) {
+      store.handleAction({
+        type: actionType,
         arguments: [data]
       });
     }

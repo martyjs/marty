@@ -12,7 +12,7 @@ React's focus is the view where as Marty focuses on managing the state needed to
 It follows the Flux architecture which Facebook and Instagram created to help deal with building ever larger JS web applications. Flux makes your applications easier to understand, debug and test as well as scaling well as your application grows.
 
 
-## Data flow
+<h2 id="data-flow">Data flow</h2>
 
 A core concept within Flux is the Flux update cycle which is a **unidirectional data flow** through the application. 
 

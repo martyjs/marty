@@ -1,14 +1,14 @@
 ---
 layout: docs
 title: Constants
-description: Showing you what actions your application can do
+description: Showing you what actions your application is capable of
 id: constants
 group: docs
 header_colour: 433B46
 order: 6
 ---
 
-When an action creator creates an action, that action has an action type which is just a string identifier (e.g. 'DELETE_USER'). The action type is what your stores use to decided whether to handle the action. One of their major benefits is this allows you to loosely couple your actions to your stores ([Law of Dementer](http://en.wikipedia.org/wiki/Law_of_Demeter)). This approach does make it difficult to understand at a high level what the application is capable of doing. The solution to this is **Constants**.
+When an action creator creates an action, that action has an action type which is just a string identifier (e.g. <code>'DELETE_USER'</code>). The action type is what your stores use to decided whether to handle the action. One of their major benefits is this allows you to loosely couple your actions to your stores ([Law of Dementer](http://en.wikipedia.org/wiki/Law_of_Demeter)). This approach does make it difficult to understand at a high level what the application is capable of doing. The solution to this is **Constants**.
 
 Constants are simple object literals where the key and the value are the same. They become a useful reference to help you understand the application (especially useful as the application grows).
 
@@ -41,9 +41,7 @@ var UsersStore = Marty.createStore({
 
 ```
 
-Marty offers a helper function, #createConstants, that makes it easier to create constants.
-
-In its simplest form you can pass in array
+Marty offers a helper function, <code>Marty.createConstants()</code>, that makes it easier to create constants. You can pass an array of strings to it
 
 {% highlight js %}
 var Constants = Marty.createConstants([
@@ -58,7 +56,7 @@ var Constants = Marty.createConstants([
 }
 {% endhighlight %}
 
-We recommend organising constants by domain so you can all pass in an object literal of arrays
+Or you could pass an object literal of arrays. We recommend organising constants by domain and so this our preferred approach.
 
 {% highlight js %}
 var Constants = Marty.createConstants([
