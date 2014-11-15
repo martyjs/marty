@@ -45,6 +45,18 @@ var action = {
 
 <h2 id="api">API</h2>
 
+<h3 id="createActionCreators">Marty.createActionCreators(instanceProperties)</h3>
+
+To create soem new action creators, you call <code>Marty.createActionCreators</code> passing in a set of intance properties. It returns your action creators as a singleton.
+
+{% highlight js %}
+var UserActionCreators = Marty.createActionCreators({
+  createUser: function (name, email) {
+    this.dispatch(Constants.Users.CREATE_USER, name, email);
+  }
+});
+{% endhighlight %}
+
 <h3 id="dispatch">this.dispatch(actionType, [...])</h3>
 
 Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
@@ -65,7 +77,7 @@ The actions source will be <code>SERVER</code> (or <code>Marty.constants.actionS
 
 <h2 id="server-action-creators">Server Action Creators</h2>
 
-Action creators often will call an [Http API](/docs/httpApi.html) which, when complete, will then call another action creator with the new data. This causes a cyclic dependency between the Action Creator and the HTTP API.
+Action creators often will call an [Http API](/docs/httpApi.html) which, when complete, will then call another action creator with the new data. If you are using a module loader (e.g. CommonJS, AMD) it can cause a cyclic dependency between the Action Creator and the HTTP API.
 
 The way to get around this is to have a seperate action creator, called a Server Action Creator, that is responsible for handling responses from Http APIs.
 

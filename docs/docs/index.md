@@ -40,7 +40,7 @@ TodoActionCreators.createTodo("Learn Flux");
 
 The [action creator](/docs/actionCreators.html) will pass that action to the [dispatcher](/docs/dispatcher.html) which is responsible for keeping a track of all [stores](/docs/stores.html) and passing on any actions to them.
 
-The [store](/docs/stores.html) is where the applications state and logic live for a specific domain. A store could contain a collection of domain entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or could be some specific information about something (Like a [Backbone Model](http://backbonejs.org/#Model)). 
+The [store](/docs/stores.html) is where the applications state and logic live for a specific domain. A store could contain a collection of domain entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or could just be some data about something (Like a [Backbone Model](http://backbonejs.org/#Model)).
 
 {% highlight js %}
 var TodoStore = Marty.createStore({
@@ -57,7 +57,7 @@ var TodoStore = Marty.createStore({
 });
 {% endhighlight %}
 
-Stores register handlers for actions which are responsible for updating their state. Once they have updated themselves, they emit an event telling anyone listening to it that it has updated. 
+Stores register handlers for actions which are responsible for updating their state. Once they have updated themselves, they emit an event telling anyone listening to it that it has updated.
 
 Finally, you want to update the view with the new state. To bind a stores state to a view you use the [state mixin](/docs/stateMixin.html).
 
@@ -78,7 +78,7 @@ var Todos = React.createClass({
 
 When the view first loads and any time the stores state changes after that the view's render function will be called and this.state will be whatever the current state of the store.
 
-##Where should my code go?
+<h2 id="where-does-my-code-go">Where should my code go?</h2>
 
 Anything to do with storing and changing your applications state should live in the **[stores](/docs/stores.html)**. Views are allowed to call the [stores](/docs/stores.html) directly to get state (but not to write state) and so the [stores](/docs/stores.html) should contain all logic for getting data whether that be from an internal cache or from the server.
 
@@ -86,7 +86,7 @@ If you want to write data, that should live within an **[action creator](/docs/a
 
 When you want to communicate with the server, you should use an **[Http APIs](/docs/httpApi.html)**. The response to an http request should be handled by an [action creator](/docs/actionCreators.html).
 
-##How do I handle asynchronous operations?
+<h2 id="handle-async-operations">How do I handle asynchronous operations?</h2>
 
 Every operation within a Flux application should be asynchronous by default. This allows you to have a consistent API that encapsulates any remote operations. 
 

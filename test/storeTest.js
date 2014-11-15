@@ -4,6 +4,7 @@ var Store = require('../lib/store');
 
 describe('Store', function () {
   var store, changeListener, dispatcher, dispatchToken = 'foo', initialState = {};
+  var actualAction, actualChangeListenerFunctionContext, expectedChangeListenerFunctionContext;
 
   beforeEach(function () {
     dispatcher = {
@@ -16,14 +17,18 @@ describe('Store', function () {
         one: 'one-action',
         multiple: ['multi-1-action', 'multi-2-action']
       },
-      one: sinon.spy(),
+      one: sinon.spy(function () {
+        actualAction = this.action;
+      }),
       multiple: sinon.spy(),
       initialize: sinon.spy(),
       getInitialState: sinon.stub().returns(initialState)
     });
-
-    changeListener = sinon.spy();
-    store.addChangeListener(changeListener);
+    expectedChangeListenerFunctionContext = {};
+    changeListener = sinon.spy(function () {
+      actualChangeListenerFunctionContext = this;
+    });
+    store.addChangeListener(changeListener, expectedChangeListenerFunctionContext);
   });
 
   it('should call initialize once', function () {
@@ -102,6 +107,10 @@ describe('Store', function () {
       expect(changeListener).to.have.been.calledOnce;
     });
 
+    it('should set the callbacks function context', function () {
+      expect(actualChangeListenerFunctionContext).to.equal(expectedChangeListenerFunctionContext);
+    });
+
     describe('#removeChangeListener()', function () {
       beforeEach(function () {
         store.removeChangeListener(changeListener);
@@ -143,7 +152,7 @@ describe('Store', function () {
   });
 
   describe('#handleAction()', function () {
-    var data = {};
+    var data = {}, expectedAction;
 
     describe('when the store does not handle action type', function () {
       beforeEach(function () {
@@ -158,7 +167,7 @@ describe('Store', function () {
 
     describe('when the store has one action type for a handler', function () {
       beforeEach(function () {
-        handleAction('one-action');
+        expectedAction = handleAction('one-action');
       });
 
       it('should call the action handler', function () {
@@ -167,6 +176,10 @@ describe('Store', function () {
 
       it('should pass the payload data to the handler', function () {
         expect(store.one).to.have.been.calledWith(data);
+      });
+
+      it('should make the action accessible in the function context', function () {
+        expect(actualAction).to.equal(expectedAction);
       });
     });
 
@@ -186,10 +199,14 @@ describe('Store', function () {
     });
 
     function handleAction(actionType) {
-      store.handleAction({
+      var action = {
         type: actionType,
         arguments: [data]
-      });
+      };
+
+      store.handleAction(action);
+
+      return action;
     }
   });
 });
