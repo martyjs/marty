@@ -1,6 +1,8 @@
 var sinon = require('sinon');
+var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
+var Action = require('../lib/action');
 
 describe('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
@@ -143,10 +145,7 @@ describe('Store', function () {
         one: sinon.spy()
       });
 
-      Marty.dispatcher.dispatch({
-        arguments: [data],
-        type: actionType
-      });
+      Marty.dispatcher.dispatch(new Action(actionType, [data]));
     });
 
     it('calls the handlers', function () {
@@ -232,11 +231,57 @@ describe('Store', function () {
       });
     });
 
+    describe('rollbacks', function () {
+      var Marty = require('../index');
+      var Store, ActionCreators, interimState;
+
+      beforeEach(function () {
+        Store = Marty.createStore({
+          handlers: {
+            add: 'ADD'
+          },
+          getInitialState: function () {
+            return [];
+          },
+          add: function (user) {
+            this.state.push(user);
+
+            return function rollback() {
+              this.state.splice(this.state.indexOf(user), 1);
+            };
+          }
+        });
+
+        ActionCreators = Marty.createActionCreators({
+          add: function (user) {
+            var action = this.dispatch('ADD', user);
+
+            interimState = _.clone(Store.getState());
+
+            action.rollback();
+          }
+        });
+      });
+
+      describe('when you create an action and then rollback', function () {
+        var user = {name: 'foo'};
+
+        beforeEach(function () {
+          ActionCreators.add(user);
+        });
+
+        it('should call the action handler', function () {
+          expect(interimState).to.eql([user]);
+        });
+
+        it('should call the action handlers rollback functions', function () {
+          expect(Store.getState()).to.eql([]);
+        });
+      });
+    });
+
     function handleAction(actionType) {
-      var action = {
-        type: actionType,
-        arguments: [data]
-      };
+      var action = new Action(actionType, [data]);
 
       store.handleAction(action);
 
@@ -244,11 +289,7 @@ describe('Store', function () {
     }
 
     function handleActionFrom(actionType, source) {
-      var action = {
-        source: source,
-        type: actionType,
-        arguments: [data]
-      };
+      var action = new Action(actionType, [data], source);
 
       store.handleAction(action);
 

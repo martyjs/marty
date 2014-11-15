@@ -39,11 +39,7 @@ describe('ActionCreators', function () {
     });
 
     it('should pass the action type and data to the dispatcher', function () {
-      expect(dispatcher.dispatch).to.have.been.calledWith({
-        source: null,
-        type: testConstant,
-        arguments: [message]
-      });
+      expect(dispatcher.dispatch).to.have.been.calledOnce;
     });
   });
 
