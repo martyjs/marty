@@ -180,9 +180,9 @@
 
 <h2 id="api">API</h2>
 
-<h3 id="createActionCreators">Marty.createActionCreators(instanceProperties)</h3>
+<h3 id="createActionCreators">createActionCreators(props)</h3>
 
-<p>To create soem new action creators, you call <code>Marty.createActionCreators</code> passing in a set of intance properties. It returns your action creators as a singleton.</p>
+<p>To create some new action creators, you call <code>Marty.createActionCreators</code> passing in a set of properties. It returns your action creators as a singleton.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
