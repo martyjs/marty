@@ -1,9 +1,12 @@
 var sinon = require('sinon');
+var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
+var Action = require('../lib/action');
 
 describe('Store', function () {
-  var store, changeListener, dispatcher, dispatchToken = 'foo', initialState = {};
+  var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
+  var actualAction, actualChangeListenerFunctionContext, expectedChangeListenerFunctionContext;
 
   beforeEach(function () {
     dispatcher = {
@@ -14,28 +17,36 @@ describe('Store', function () {
       dispatcher: dispatcher,
       handlers: {
         one: 'one-action',
-        multiple: ['multi-1-action', 'multi-2-action']
+        multiple: ['multi-1-action', 'multi-2-action'],
+        where: { source: 'VIEW' },
+        whereAndAction: [{source: 'VIEW'}, 'where-and-action']
       },
-      one: sinon.spy(),
+      one: sinon.spy(function () {
+        actualAction = this.action;
+      }),
+      where: sinon.spy(),
       multiple: sinon.spy(),
       initialize: sinon.spy(),
+      whereAndAction: sinon.spy(),
       getInitialState: sinon.stub().returns(initialState)
     });
-
-    changeListener = sinon.spy();
-    store.addChangeListener(changeListener);
-  });
-
-  it('should call initialize once', function () {
-    expect(store.initialize).to.have.been.calledOnce;
+    expectedChangeListenerFunctionContext = {};
+    listener = sinon.spy(function () {
+      actualChangeListenerFunctionContext = this;
+    });
+    changeListener = store.addChangeListener(listener, expectedChangeListenerFunctionContext);
   });
 
   it('should have a dispatch token', function () {
     expect(store.dispatchToken).to.equal(dispatchToken);
   });
 
-  it('should have registered handlePayload with the dispatcher', function () {
+  it('should have registered handleAction with the dispatcher', function () {
     expect(dispatcher.register).to.have.been.called;
+  });
+
+  describe('#mixins', function () {
+    it('should allow you to mixin object literals');
   });
 
   describe('#getInitialState()', function () {
@@ -60,7 +71,7 @@ describe('Store', function () {
     });
 
     it('should call the change listener with the new state', function () {
-      expect(changeListener).to.have.been.calledWith(newState);
+      expect(listener).to.have.been.calledWith(newState);
     });
   });
 
@@ -77,7 +88,7 @@ describe('Store', function () {
       });
 
       it('should call the change listener with the new state', function () {
-        expect(changeListener).to.have.been.calledWith(newState);
+        expect(listener).to.have.been.calledWith(newState);
       });
     });
 
@@ -87,7 +98,7 @@ describe('Store', function () {
       });
 
       it('should not call the change linstener', function () {
-        expect(changeListener).to.not.have.been.called;
+        expect(listener).to.not.have.been.called;
       });
     });
   });
@@ -99,17 +110,24 @@ describe('Store', function () {
     });
 
     it('should call the change listener', function () {
-      expect(changeListener).to.have.been.calledOnce;
+      expect(listener).to.have.been.calledOnce;
     });
 
-    describe('#removeChangeListener()', function () {
+    it('should pass the state as the first argument to the callback');
+    it('should pass the store as the second argument to the callback');
+
+    it('should set the callbacks function context', function () {
+      expect(actualChangeListenerFunctionContext).to.equal(expectedChangeListenerFunctionContext);
+    });
+
+    describe('#dispose()', function () {
       beforeEach(function () {
-        store.removeChangeListener(changeListener);
+        changeListener.dispose();
         store.hasChanged();
       });
 
       it('should NOT call the change listener', function () {
-        expect(changeListener).to.have.been.calledOnce;
+        expect(listener).to.have.been.calledOnce;
       });
     });
   });
@@ -127,10 +145,7 @@ describe('Store', function () {
         one: sinon.spy()
       });
 
-      Marty.dispatcher.dispatch({
-        arguments: [data],
-        actionType: actionType
-      });
+      Marty.dispatcher.dispatch(new Action(actionType, [data]));
     });
 
     it('calls the handlers', function () {
@@ -139,15 +154,21 @@ describe('Store', function () {
   });
 
   describe('#waitFor()', function () {
-    it('should wait for the specified stores to complete');
+    describe('when I pass in an array of stores', function () {
+      it('should wait for the specified stores to complete');
+    });
+
+    describe('when I pass in stores as arguments', function () {
+      it('should wait for the specified stores to complete');
+    });
   });
 
-  describe('#handlePayload()', function () {
-    var data = {};
+  describe('#handleAction()', function () {
+    var data = {}, expectedAction;
 
     describe('when the store does not handle action type', function () {
       beforeEach(function () {
-        handlePayload('foo');
+        handleAction('foo');
       });
 
       it('should not call any handlers', function () {
@@ -158,7 +179,7 @@ describe('Store', function () {
 
     describe('when the store has one action type for a handler', function () {
       beforeEach(function () {
-        handlePayload('one-action');
+        expectedAction = handleAction('one-action');
       });
 
       it('should call the action handler', function () {
@@ -168,12 +189,16 @@ describe('Store', function () {
       it('should pass the payload data to the handler', function () {
         expect(store.one).to.have.been.calledWith(data);
       });
+
+      it('should make the action accessible in the function context', function () {
+        expect(actualAction).to.equal(expectedAction);
+      });
     });
 
-    describe('when the store has multiple aciton types for a handler', function () {
+    describe('when the store has multiple action types for a handler', function () {
       beforeEach(function () {
-        handlePayload('multi-1-action');
-        handlePayload('multi-2-action');
+        handleAction('multi-1-action');
+        handleAction('multi-2-action');
       });
 
       it('should call the action handler', function () {
@@ -185,11 +210,90 @@ describe('Store', function () {
       });
     });
 
-    function handlePayload(actionType) {
-      store.handlePayload({
-        actionType: actionType,
-        arguments: [data]
+    describe('when the store has a where clause for a handler', function () {
+      beforeEach(function () {
+        handleActionFrom('foo', 'VIEW');
       });
+
+      it('should call the action handler', function () {
+        expect(store.where).to.have.been.called;
+      });
+    });
+
+    describe('when the store has a where clause and an action type for a handler', function () {
+      beforeEach(function () {
+        handleActionFrom('foo', 'VIEW');
+        handleAction('where-and-action');
+      });
+
+      it('should call the action handler for either', function () {
+        expect(store.whereAndAction).to.have.been.calledTwice;
+      });
+    });
+
+    describe('rollbacks', function () {
+      var Marty = require('../index');
+      var Store, ActionCreators, interimState;
+
+      beforeEach(function () {
+        Store = Marty.createStore({
+          handlers: {
+            add: 'ADD'
+          },
+          getInitialState: function () {
+            return [];
+          },
+          add: function (user) {
+            this.state.push(user);
+
+            return function rollback() {
+              this.state.splice(this.state.indexOf(user), 1);
+            };
+          }
+        });
+
+        ActionCreators = Marty.createActionCreators({
+          add: function (user) {
+            var action = this.dispatch('ADD', user);
+
+            interimState = _.clone(Store.getState());
+
+            action.rollback();
+          }
+        });
+      });
+
+      describe('when you create an action and then rollback', function () {
+        var user = {name: 'foo'};
+
+        beforeEach(function () {
+          ActionCreators.add(user);
+        });
+
+        it('should call the action handler', function () {
+          expect(interimState).to.eql([user]);
+        });
+
+        it('should call the action handlers rollback functions', function () {
+          expect(Store.getState()).to.eql([]);
+        });
+      });
+    });
+
+    function handleAction(actionType) {
+      var action = new Action(actionType, [data]);
+
+      store.handleAction(action);
+
+      return action;
+    }
+
+    function handleActionFrom(actionType, source) {
+      var action = new Action(actionType, [data], source);
+
+      store.handleAction(action);
+
+      return action;
     }
   });
 });

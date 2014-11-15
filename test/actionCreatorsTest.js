@@ -39,10 +39,17 @@ describe('ActionCreators', function () {
     });
 
     it('should pass the action type and data to the dispatcher', function () {
-      expect(dispatcher.dispatch).to.have.been.calledWith({
-        actionType: testConstant,
-        arguments: [message]
-      });
+      expect(dispatcher.dispatch).to.have.been.calledOnce;
     });
+  });
+
+  describe('#dispatchViewAction()', function () {
+    it('should dispatch the action');
+    it('should set the view source to being VIEW');
+  });
+
+  describe('#dispatchServerAction()', function () {
+    it('should dispatch the action');
+    it('should set the view source to being SERVER');
   });
 });

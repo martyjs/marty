@@ -8,6 +8,7 @@
 ```
 make test        # lint & run tests
 make release     # deploys master branch to production
+make docs        # show documentation on http://localhost:4000
 ```
 
 ## Installation

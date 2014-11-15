@@ -44,6 +44,14 @@ describe('StateMixin', function () {
     });
   });
 
+  describe('when the component unmounts', function () {
+    it('should dispose of any listeners');
+  });
+
+  describe('when the component props changes', function () {
+    it('should update the components state');
+  });
+
   describe('when you pass in an object literal', function () {
     describe('#getState()', function () {
       describe('when not listening to anything', function () {

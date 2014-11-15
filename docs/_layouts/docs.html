@@ -1,0 +1,40 @@
+---
+layout: default
+sectionid: docs
+---
+
+<div class="bs-docs-header" id="content" {% if page.header_colour != null %} style="background-color: #{{page.header_colour}}"{% endif %}>
+  <div class="container">
+    <h1>{{page.title}}</h1>
+    <p>{{page.description}}</p>
+  </div>
+</div>
+<div class="container bs-docs-container">
+  <div class="row">
+    <div class="col-md-9" role="main">
+      <div class="bs-docs-section">
+        {{content}}
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" role="complementary">
+        <ul class="nav bs-docs-sidenav">
+          {% assign pages_list = site.pages | sort:"order" %}
+          {% assign group = page.group %}
+          {% for node in pages_list %}
+            {% if node.title != null %}
+              {% if group == null or group == node.group %}
+                {% if page.url == node.url %}
+                <li class="active"><a href="{{ BASE_PATH }}{{node.url}}" class="active">{{node.title}}</a></li>
+                {% else %}
+                <li><a href="{{ BASE_PATH }}{{node.url}}">{{node.title}}</a></li>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {% assign pages_list = nil %}
+          {% assign group = nil %}
+        </ul>
+      </div>
+    </div>
+</div>
