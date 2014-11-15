@@ -104,7 +104,7 @@ var UsersStore = Marty.createStore({
   // called when action.source == 'VIEW'
   baz: function () { .. },
 
-  // called when action.source == 'VIEW' || action.type ==  'UPDATE_USER'
+  // called when action.source == 'VIEW' || action.type ==  'USER_DELETED'
   bam: function () { .. }
 });
 {% endhighlight %}
