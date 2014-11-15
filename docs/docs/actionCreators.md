@@ -16,13 +16,13 @@ At their most basic, an action creator is a function that calls [<code>this.disp
 var UserActionCreators = Marty.createActionCreators({
   name: 'Users',
   createUser: function (name, email) {
-    this.dispatch(Constants.Users.CREATE_USER, name, email);
+    this.dispatch(Constants.Users.ADD_USER, name, email);
   }
 });
 
 var UserStore = Marty.createStore({
   handlers: {
-    createUser: Constants.Users.CREATE_USER
+    createUser: Constants.Users.ADD_USER
   },
   createUser: function (name, email) {
     this.state.push({
@@ -39,10 +39,29 @@ Internally the dispatch function will create a new action which is passed to the
 {% highlight js %}
 var action = {
   source: 'VIEW',
-  type: 'CREATE_USER',
+  type: 'ADD_USER',
   arguments: ['foo', 'foo@bar.com']
 }
 {% endhighlight %}
+
+The second responsiblity of action creators is to coordinate optimistic actions and server responses. For example, if you were to create a new user you will likely want to add it to a local store and then start synchronising with the server in the hopes that the request will successfully complete. If for whatever reasons that request fails you need a way to easily rollback any changes to the stores.
+
+The [dispatch function](#dispatch) actually returns the action after all stores have finishing processing it. The action has a <code>rollback()</code> function on it will ask the stores to [rollback any changes they've made (if possible)](/docs/stores.html#rollback).
+
+{% highlight js %}
+var UserActionCreators = Marty.createActionCreators({
+  createUser: function (user) {
+    var action = this.dispatch(Constants.Users.ADD_USER, user);
+
+    // if you wanted to rollback straight away
+    action.rollback();
+
+    // or you could pass it to the API
+    UserAPI.saveUser(user, action.rollback);
+  }
+});
+{% endhighlight %}
+
 
 <h2 id="api">API</h2>
 
@@ -53,14 +72,14 @@ To create soem new action creators, you call <code>Marty.createActionCreators</c
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
   createUser: function (name, email) {
-    this.dispatch(Constants.Users.CREATE_USER, name, email);
+    this.dispatch(Constants.Users.ADD_USER, name, email);
   }
 });
 {% endhighlight %}
 
 <h3 id="name">name</h3>
 
-An (optional) display name for the action creator. Used by developer tools.
+An (optional) display name for the action creator. Used by Marty Developer Tools.
 
 <h3 id="dispatch">this.dispatch(actionType, [...])</h3>
 
@@ -68,17 +87,23 @@ Creates a new action, with the action type being the first argument. The remaini
 
 The actions source will be null.
 
+Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
+
 <h3 id="dispatchViewAction">this.dispatchViewAction(actionType, [...])</h3>
 
 Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
 
 The actions source will be <code>VIEW</code> (or <code>Marty.constants.actionSources.VIEW</code>).
 
+Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
+
 <h3 id="dispatchServerAction">this.dispatchServerAction(actionType, [...])</h3>
 
 Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
 
 The actions source will be <code>SERVER</code> (or <code>Marty.constants.actionSources.SERVER</code>).
+
+Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
 
 <h2 id="server-action-creators">Server Action Creators</h2>
 

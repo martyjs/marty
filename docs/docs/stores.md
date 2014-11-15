@@ -63,7 +63,7 @@ var UsersStore = Marty.createStore({
 
 <h3 id="name">name</h3>
 
-An (optional) display name for the store. Used by developer tools.
+An (optional) display name for the store. Used by Marty Developer Tools.
 
 <h3 id="handlers">handlers</h3>
 
@@ -87,12 +87,52 @@ var UsersStore = Marty.createStore({
 
 An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where query</a>. Some examples of action predicates:
 
-<ul>
-  <li><code>'ADD_USER'</code></li>
-  <li><code>['USER_CREATED', 'USER_UPDATED']</code></li>
-  <li><code>{ source: 'VIEW' }</code></li>
-  <li><code>[{ source: 'VIEW' }, 'USER_DELETED']</code></li>
-</ul>
+{% highlight js %}
+var UsersStore = Marty.createStore({
+  handlers: {
+    foo: 'ADD_USER',
+    bar: ['ADD_USER', 'UPDATE_USER'],
+    baz: { source: 'VIEW' },
+    bam: [{ source: 'VIEW' }, 'USER_DELETED']
+  },
+  // called when action.type == 'ADD_USER'
+  foo: function () { .. },
+
+  // called when action.type == 'ADD_USER' || action.type ==  'UPDATE_USER'
+  bar: function () { .. },
+
+  // called when action.source == 'VIEW'
+  baz: function () { .. },
+
+  // called when action.source == 'VIEW' || action.type ==  'UPDATE_USER'
+  bam: function () { .. }
+});
+{% endhighlight %}
+
+
+<h4 id="rollback">Rollback</h4>
+
+There are a number of cases where it would be useful to be able to rollback an action (e.g. if you've optimistically added an entity to your locally store but the associated request to the server failed).
+
+To provide a rollback to an action handler, simply return a function from the action handler. If an [action is rolled back](/docs/actionCreators.html#dispatch), the function you return will be called.
+
+{% highlight js %}
+var UsersStore = Marty.createStore({
+  handlers: {
+    addUser: Constants.RECEIVE_USER
+  },
+  addUser: function (user) {
+    this.state.push(user);
+    this.hasChanged();
+
+    return function rollback() {
+      this.state.splice(this.state.indexOf(user), 1);
+      this.hasChanged();
+    };
+  }
+});
+{% endhighlight %}
+
 
 <h3 id="getInitialState">getInitialState()</h3>
 
