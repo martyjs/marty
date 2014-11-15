@@ -39,7 +39,7 @@ var Users = React.createClass({
 
 <h2 id="api">API</h2>
 
-<h3 id="createStateMixinObject">Marty.createStateMixin(<i>Object</i>)</h3>
+<h3 id="createStateMixinObject">createStateMixin(<i>Object</i>)</h3>
 
 <h4 id="listenTo">listenTo</h4>
 

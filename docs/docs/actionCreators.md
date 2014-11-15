@@ -65,9 +65,9 @@ var UserActionCreators = Marty.createActionCreators({
 
 <h2 id="api">API</h2>
 
-<h3 id="createActionCreators">Marty.createActionCreators(instanceProperties)</h3>
+<h3 id="createActionCreators">createActionCreators(props)</h3>
 
-To create soem new action creators, you call <code>Marty.createActionCreators</code> passing in a set of intance properties. It returns your action creators as a singleton.
+To create some new action creators, you call <code>Marty.createActionCreators</code> passing in a set of properties. It returns your action creators as a singleton.
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({

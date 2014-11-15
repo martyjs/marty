@@ -41,7 +41,7 @@ When an action handler is invoked, its arguments will be [the arguments passed t
 
 <h2 id="api">API</h2>
 
-<h3 id="createStore">Marty.createStore(instanceProperties)</h3>
+<h3 id="createStore">createStore(props)</h3>
 
 To create a new store, you call <code>Marty.createStore</code> passing in a set of intance properties. It returns a singleton store which is listening to the dispatcher.
 

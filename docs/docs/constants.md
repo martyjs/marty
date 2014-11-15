@@ -43,7 +43,7 @@ var UsersStore = Marty.createStore({
 
 <h2 id="api">API</h2>
 
-<h3 id="createConstantsArray">Marty.createConstants(<i>Array</i>)</h3>
+<h3 id="createConstantsArray">createConstants(<i>Array</i>)</h3>
 
 {% highlight js %}
 var Constants = Marty.createConstants([
