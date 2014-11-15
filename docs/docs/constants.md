@@ -41,7 +41,9 @@ var UsersStore = Marty.createStore({
 
 ```
 
-Marty offers a helper function, <code>Marty.createConstants()</code>, that makes it easier to create constants. You can pass an array of strings to it
+<h2 id="api">API</h2>
+
+<h3 id="createConstantsArray">Marty.createConstants(<i>Array</i>)</h3>
 
 {% highlight js %}
 var Constants = Marty.createConstants([
@@ -56,7 +58,8 @@ var Constants = Marty.createConstants([
 }
 {% endhighlight %}
 
-Or you could pass an object literal of arrays. We recommend organising constants by domain and so this our preferred approach.
+
+<h3 id="createConstantsObj">Marty.createConstants(<i>Object</i>)</h3>
 
 {% highlight js %}
 var Constants = Marty.createConstants([

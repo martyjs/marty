@@ -109,7 +109,6 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-
 <h4 id="rollback">Rollback</h4>
 
 There are a number of cases where it would be useful to be able to rollback an action (e.g. if you've optimistically added an entity to your locally store but the associated request to the server failed).
