@@ -13,6 +13,10 @@ describe('HttpAPI', function () {
     });
   });
 
+  describe('#mixins', function () {
+    it('should allow you to mixin object literals');
+  });
+
   describe('#baseUrl', function () {
     it('when the url ends with a / and the path begins with a /');
   });

@@ -14,6 +14,7 @@ At their most basic, an action creator is a function that calls [<code>this.disp
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
+  name: 'Users',
   createUser: function (name, email) {
     this.dispatch(Constants.Users.CREATE_USER, name, email);
   }
@@ -56,6 +57,10 @@ var UserActionCreators = Marty.createActionCreators({
   }
 });
 {% endhighlight %}
+
+<h3 id="name">name</h3>
+
+An (optional) display name for the action creator. Used by developer tools.
 
 <h3 id="dispatch">this.dispatch(actionType, [...])</h3>
 
@@ -114,3 +119,4 @@ Utilmately this is just semantics so actions and action creators are terms that 
 
 * [Actions and Action Creators](http://facebook.github.io/react/blog/2014/07/30/flux-actions-and-the-dispatcher.html#actions-and-actioncreators)
 * [Discussion on actions & action creators](https://groups.google.com/forum/#!topic/reactjs/jBPHH4Q-8Sc)
+* [Original article about Flux](http://facebook.github.io/flux/docs/overview.html#stores)
