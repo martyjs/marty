@@ -137,7 +137,7 @@ listener.dispose();
 
 <h3 id="hasChanged">hasChanged()</h3>
 
-To notify any listeners that the store has changed can call <code>this.hasChanged()</code>. When called it will call all [registered callbacks](#addChangeListener).
+Calls any [registered callbacks](#addChangeListener).
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
@@ -178,7 +178,7 @@ Dispatch token that is returned from [<code>Dispatcher.register()</code>](http:/
 
 Within a Flux application you want the stores to be the **only** place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.
 
-The solution this is to use immutable data collections like [immutable.js](https://github.com/facebook/immutable-js) or [mori](http://swannodette.github.io/mori/). Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.
+The solution this is to use immutable data collections like [immutable.js](http://facebook.github.io/immutable-js/) or [mori](http://swannodette.github.io/mori/). Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.
 
 {% highlight js %}
 var users = Immutable.List.of("foo");
