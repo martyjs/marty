@@ -123,21 +123,146 @@
   <div class="bs-docs-header" id="content"  style="background-color: #D9544D">
   <div class="container">
     <h1>HTTP API</h1>
-    <p>How you can use Marty to talk to the server</p>
+    <p>How you communicate with the server</p>
   </div>
 </div>
 <div class="container bs-docs-container">
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
+        <p>It&#39;s likely at some point that you will need to communicate with the server. HTTP APIs encapsulate that communication for you.</p>
+
+<p>HTTP APIs allow you to define functions that create HTTP requests. Internally we are using <a href="https://github.com/ded/reqwest">reqwest</a> so anything you can do <a href="https://github.com/ded/reqwest#api">reqwest</a> you can do with HTTP APIS.</p>
+
+<p>All requests return a promise (Promises/A) that allow you to easily define what happens when a request has finished.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
   <span class="na">baseUrl</span><span class="p">:</span> <span class="s1">'http://foo.com'</span>
   <span class="na">getAll</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/users'</span><span class="p">).</span><span class="nx">end</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveAll</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/users'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveAll</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+  <span class="nx">createUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">data</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
+        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+        <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>One scenario to consider is what happens if an HTTP request fails. It&#39;s already possible to <a href="/docs/stores.html#rollback">rollback changes to stores</a> so the recommend approach is to pass the rollback function through to the API call so that it can be invoked if an error occurs.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
+  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">rollback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">data</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
+        <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">rollback</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">UserActions</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="s1">'ADD_USER'</span><span class="p">,</span> <span class="nx">user</span><span class="p">);</span>
+
+    <span class="nx">UsersAPI</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">rollback</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h2 id="api">API</h2>
+
+<h3 id="createHttpAPI">createHttpAPI(props)</h3>
+
+<p>To create a new HTTP API, you call <code>Marty.createHttpAPI</code> passing in a set of properties. It returns your HTTP API as a singleton.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
+  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">data</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
+        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+        <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="name">name</h3>
+
+<p>An (optional) display name for the HTTP API. Used by Marty Developer Tools.</p>
+
+<h3 id="baseUrl">baseUrl</h3>
+
+<p>An (optional) base url to prepend to any urls.</p>
+
+<h3 id="requestUrl">request(method, url)</h3>
+
+<p>Starts an HTTP request with the given <code>method</code> and <code>url</code>.</p>
+
+<p>Returns a <code>Promise</code>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
+  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span> <span class="s1">'/users'</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="requestOptions">request(method, options)</h3>
+
+<p>Starts an HTTP request with the given <code>method</code> and <code>options</code>. The options available to you are</p>
+
+<ul>
+<li><code>url</code> a fully qualified uri</li>
+<li><code>method</code> http method (default: <code>GET</code>)</li>
+<li><code>headers</code> http headers (default: <code>{}</code>)</li>
+<li><code>data</code> entity body for <code>PATCH</code>, <code>POST</code> and <code>PUT</code> requests. Must be a query <code>String</code> or <code>JSON</code> object</li>
+<li><code>type</code> a string enum. <code>html</code>, <code>xml</code>, <code>json</code>, or <code>jsonp</code>. Default is inferred by resource extension. Eg: <code>.json</code> will set <code>type</code> to <code>json</code>. <code>.xml</code> to <code>xml</code> etc.</li>
+<li><code>contentType</code> sets the <code>Content-Type</code> of the request. Eg: <code>application/json</code></li>
+<li><code>crossOrigin</code> for cross-origin requests for browsers that support this feature.</li>
+<li><code>success</code> A function called when the request successfully completes</li>
+<li><code>error</code> A function called when the request fails.</li>
+<li><code>complete</code> A function called whether the request is a success or failure. Always called when complete.</li>
+<li><code>jsonpCallback</code> Specify the callback function name for a <code>JSONP</code> request. This value will be used instead of the random (but recommended) name automatically generated by reqwest.</li>
+</ul>
+
+<p>Returns a <code>Promise</code>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
+  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="s1">'POST'</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'foo'</span> <span class="p">}</span>
     <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
+
+<h3 id="getUrl">get(url)</h3>
+
+<p>Same as <a href="#requestUrl"><code>request(&#39;GET&#39;, url)</code></a></p>
+
+<h3 id="getOptions">get(options)</h3>
+
+<p>Same as <a href="#requestOptions"><code>request(&#39;GET&#39;, options)</code></a></p>
+
+<h3 id="postUrl">post(url)</h3>
+
+<p>Same as <a href="#requestUrl"><code>request(&#39;POST&#39;, url)</code></a></p>
+
+<h3 id="postOptions">post(options)</h3>
+
+<p>Same as <a href="#requestOptions"><code>request(&#39;POST&#39;, options)</code></a></p>
+
+<h3 id="putUrl">put(url)</h3>
+
+<p>Same as <a href="#requestUrl"><code>request(&#39;PUT&#39;, url)</code></a></p>
+
+<h3 id="putOptions">put(options)</h3>
+
+<p>Same as <a href="#requestOptions"><code>request(&#39;PUT&#39;, options)</code></a></p>
+
+<h3 id="deleteUrl">delete(url)</h3>
+
+<p>Same as <a href="#requestUrl"><code>request(&#39;DELETE&#39;, url)</code></a></p>
+
+<h3 id="deleteOptions">delete(options)</h3>
+
+<p>Same as <a href="#requestOptions"><code>request(&#39;DELETE&#39;, options)</code></a></p>
 
       </div>
     </div>
