@@ -30,7 +30,7 @@ release: test build
 	@npm publish
 
 build: lint
-	@$(BIN)/browserify --require ./index.js  --exclude superagent --standalone Marty > dist/marty.js
+	@$(BIN)/browserify --require ./index.js  --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 
 docs: bootstrap-ruby

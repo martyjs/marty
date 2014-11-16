@@ -10,7 +10,7 @@ var Marty = _.extend({
 }, create);
 
 module.exports = Marty;
-},{"./lib/create":4,"./lib/dispatcher":5,"./lib/internalConstants":7,"./lib/utils/tinydash":10}],1:[function(require,module,exports){
+},{"./lib/create":4,"./lib/dispatcher":5,"./lib/internalConstants":8,"./lib/utils/tinydash":11}],1:[function(require,module,exports){
 var _ = require('./utils/tinydash');
 
 function Action(type, args, source) {
@@ -55,7 +55,7 @@ function Action(type, args, source) {
 }
 
 module.exports = Action;
-},{"./utils/tinydash":10}],2:[function(require,module,exports){
+},{"./utils/tinydash":11}],2:[function(require,module,exports){
 var Action = require('./action');
 var _ = require('./utils/tinydash');
 var actionSources = require('./internalConstants').actionSources;
@@ -103,7 +103,7 @@ ActionCreators.prototype = {
 };
 
 module.exports = ActionCreators;
-},{"./action":1,"./internalConstants":7,"./utils/tinydash":10}],3:[function(require,module,exports){
+},{"./action":1,"./internalConstants":8,"./utils/tinydash":11}],3:[function(require,module,exports){
 var _ = require('./utils/tinydash');
 
 function constants(obj) {
@@ -141,7 +141,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"./utils/tinydash":10}],4:[function(require,module,exports){
+},{"./utils/tinydash":11}],4:[function(require,module,exports){
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
@@ -173,49 +173,67 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":2,"./constants":3,"./httpAPI":6,"./stateMixin":8,"./store":9}],5:[function(require,module,exports){
+},{"./actionCreators":2,"./constants":3,"./httpAPI":7,"./stateMixin":9,"./store":10}],5:[function(require,module,exports){
 module.exports = require('flux').Dispatcher;
-},{"flux":12}],6:[function(require,module,exports){
+},{"flux":13}],6:[function(require,module,exports){
+var http = {
+  request: require('reqwest')
+};
+
+module.exports = http;
+},{"reqwest":52}],7:[function(require,module,exports){
+var http = require('./http');
 var _ = require('./utils/tinydash');
-var request = require('superagent');
 
 function HttpAPI(options) {
   options || (options = {});
 
   _.extend(this, options);
-
-  this.initialize.apply(this, arguments);
 }
 
 HttpAPI.prototype = {
-  initialize: function () {
-  },
-  get: function (url) {
-    return this.request('get', url);
-  },
-  post: function (url) {
-    return this.request('post', url);
-  },
-  put: function (url) {
-    return this.request('put', url);
-  },
-  request: function (method, url) {
-    if (this.baseUrl) {
-      url = this.baseUrl + url;
+  get: function (url, options) {
+    if (_.isString(url)) {
+      options = _.extend({}, options, {
+        url: url
+      });
+    } else {
+      options = url;
     }
 
-    return request[method](url);
+    options.method = 'GET';
+
+    return this.request(options);
+  },
+  request: function (options) {
+    if (this.baseUrl) {
+      var separator = '';
+      var firstCharOfUrl = options.url[0];
+      var lastCharOfBaseUrl = this.baseUrl[this.baseUrl.length - 1];
+
+      // Do some text wrangling to make sure concatenation of base url
+      // stupid people (i.e. me)
+      if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
+        separator = '/';
+      } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
+        options.url = options.url.substring(1);
+      }
+
+      options.url = this.baseUrl + separator + options.url;
+    }
+
+    return http.request(options);
   }
 };
 
 module.exports = HttpAPI;
-},{"./utils/tinydash":10,"superagent":undefined}],7:[function(require,module,exports){
+},{"./http":6,"./utils/tinydash":11}],8:[function(require,module,exports){
 var constants = require('./constants');
 
 module.exports = constants({
   actionSources: ['VIEW', 'SERVER']
 });
-},{"./constants":3}],8:[function(require,module,exports){
+},{"./constants":3}],9:[function(require,module,exports){
 var _ = require('./utils/tinydash');
 var reservedKeys = ['listenTo', 'getState'];
 
@@ -324,7 +342,7 @@ function StateMixin(options) {
       if (!isStore(stores[i])) {
         return false;
       }
-    };
+    }
     return true;
   }
 
@@ -334,7 +352,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"./utils/tinydash":10}],9:[function(require,module,exports){
+},{"./utils/tinydash":11}],10:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('./utils/tinydash');
 var EventEmitter = require('events').EventEmitter;
@@ -472,7 +490,7 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"./utils/tinydash":10,"events":11}],10:[function(require,module,exports){
+},{"./utils/tinydash":11,"events":12}],11:[function(require,module,exports){
 module.exports = {
   extend: require('lodash-node/modern/objects/assign'),
   object: require('lodash-node/modern/arrays/zipObject'),
@@ -487,9 +505,9 @@ module.exports = {
   each: require('lodash-node/modern/collections/forEach'),
   toArray: require('lodash-node/modern/collections/toArray'),
   bind: require('lodash-node/modern/functions/bind'),
-  // createCallback: require('lodash-node/modern/functions/createCallback')
+  createCallback: require('lodash-node/modern/functions/createCallback')
 };
-},{"lodash-node/modern/arrays/zipObject":15,"lodash-node/modern/collections/forEach":16,"lodash-node/modern/collections/map":17,"lodash-node/modern/collections/toArray":18,"lodash-node/modern/functions/bind":19,"lodash-node/modern/objects/assign":36,"lodash-node/modern/objects/isArray":39,"lodash-node/modern/objects/isFunction":40,"lodash-node/modern/objects/isNull":41,"lodash-node/modern/objects/isObject":42,"lodash-node/modern/objects/isString":43,"lodash-node/modern/objects/isUndefined":44,"lodash-node/modern/objects/values":46}],11:[function(require,module,exports){
+},{"lodash-node/modern/arrays/zipObject":16,"lodash-node/modern/collections/forEach":17,"lodash-node/modern/collections/map":18,"lodash-node/modern/collections/toArray":19,"lodash-node/modern/functions/bind":20,"lodash-node/modern/functions/createCallback":21,"lodash-node/modern/objects/assign":37,"lodash-node/modern/objects/isArray":40,"lodash-node/modern/objects/isFunction":41,"lodash-node/modern/objects/isNull":42,"lodash-node/modern/objects/isObject":43,"lodash-node/modern/objects/isString":44,"lodash-node/modern/objects/isUndefined":45,"lodash-node/modern/objects/values":47}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -792,7 +810,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -804,7 +822,7 @@ function isUndefined(arg) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":13}],13:[function(require,module,exports){
+},{"./lib/Dispatcher":14}],14:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -1056,7 +1074,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":14}],14:[function(require,module,exports){
+},{"./invariant":15}],15:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -1111,7 +1129,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1161,7 +1179,7 @@ function zipObject(keys, values) {
 
 module.exports = zipObject;
 
-},{"../objects/isArray":39}],16:[function(require,module,exports){
+},{"../objects/isArray":40}],17:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1218,7 +1236,7 @@ function forEach(collection, callback, thisArg) {
 
 module.exports = forEach;
 
-},{"../internals/baseCreateCallback":24,"../objects/forOwn":38}],17:[function(require,module,exports){
+},{"../internals/baseCreateCallback":25,"../objects/forOwn":39}],18:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1290,7 +1308,7 @@ function map(collection, callback, thisArg) {
 
 module.exports = map;
 
-},{"../functions/createCallback":20,"../objects/forOwn":38}],18:[function(require,module,exports){
+},{"../functions/createCallback":21,"../objects/forOwn":39}],19:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1325,7 +1343,7 @@ function toArray(collection) {
 
 module.exports = toArray;
 
-},{"../internals/slice":35,"../objects/isString":43,"../objects/values":46}],19:[function(require,module,exports){
+},{"../internals/slice":36,"../objects/isString":44,"../objects/values":47}],20:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1367,7 +1385,7 @@ function bind(func, thisArg) {
 
 module.exports = bind;
 
-},{"../internals/createWrapper":27,"../internals/slice":35}],20:[function(require,module,exports){
+},{"../internals/createWrapper":28,"../internals/slice":36}],21:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1450,7 +1468,7 @@ function createCallback(func, thisArg, argCount) {
 
 module.exports = createCallback;
 
-},{"../internals/baseCreateCallback":24,"../internals/baseIsEqual":26,"../objects/isObject":42,"../objects/keys":45,"../utilities/property":50}],21:[function(require,module,exports){
+},{"../internals/baseCreateCallback":25,"../internals/baseIsEqual":27,"../objects/isObject":43,"../objects/keys":46,"../utilities/property":51}],22:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1465,7 +1483,7 @@ var arrayPool = [];
 
 module.exports = arrayPool;
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1529,7 +1547,7 @@ function baseBind(bindData) {
 
 module.exports = baseBind;
 
-},{"../objects/isObject":42,"./baseCreate":23,"./setBindData":33,"./slice":35}],23:[function(require,module,exports){
+},{"../objects/isObject":43,"./baseCreate":24,"./setBindData":34,"./slice":36}],24:[function(require,module,exports){
 (function (global){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
@@ -1575,7 +1593,7 @@ if (!nativeCreate) {
 module.exports = baseCreate;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../objects/isObject":42,"../utilities/noop":49,"./isNative":29}],24:[function(require,module,exports){
+},{"../objects/isObject":43,"../utilities/noop":50,"./isNative":30}],25:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1657,7 +1675,7 @@ function baseCreateCallback(func, thisArg, argCount) {
 
 module.exports = baseCreateCallback;
 
-},{"../functions/bind":19,"../support":47,"../utilities/identity":48,"./setBindData":33}],25:[function(require,module,exports){
+},{"../functions/bind":20,"../support":48,"../utilities/identity":49,"./setBindData":34}],26:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1737,7 +1755,7 @@ function baseCreateWrapper(bindData) {
 
 module.exports = baseCreateWrapper;
 
-},{"../objects/isObject":42,"./baseCreate":23,"./setBindData":33,"./slice":35}],26:[function(require,module,exports){
+},{"../objects/isObject":43,"./baseCreate":24,"./setBindData":34,"./slice":36}],27:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1948,7 +1966,7 @@ function baseIsEqual(a, b, callback, isWhere, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"../objects/forIn":37,"../objects/isFunction":40,"./getArray":28,"./objectTypes":31,"./releaseArray":32}],27:[function(require,module,exports){
+},{"../objects/forIn":38,"../objects/isFunction":41,"./getArray":29,"./objectTypes":32,"./releaseArray":33}],28:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2056,7 +2074,7 @@ function createWrapper(func, bitmask, partialArgs, partialRightArgs, thisArg, ar
 
 module.exports = createWrapper;
 
-},{"../objects/isFunction":40,"./baseBind":22,"./baseCreateWrapper":25,"./slice":35}],28:[function(require,module,exports){
+},{"../objects/isFunction":41,"./baseBind":23,"./baseCreateWrapper":26,"./slice":36}],29:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2079,7 +2097,7 @@ function getArray() {
 
 module.exports = getArray;
 
-},{"./arrayPool":21}],29:[function(require,module,exports){
+},{"./arrayPool":22}],30:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2115,7 +2133,7 @@ function isNative(value) {
 
 module.exports = isNative;
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2130,7 +2148,7 @@ var maxPoolSize = 40;
 
 module.exports = maxPoolSize;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2152,7 +2170,7 @@ var objectTypes = {
 
 module.exports = objectTypes;
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2179,7 +2197,7 @@ function releaseArray(array) {
 
 module.exports = releaseArray;
 
-},{"./arrayPool":21,"./maxPoolSize":30}],33:[function(require,module,exports){
+},{"./arrayPool":22,"./maxPoolSize":31}],34:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2224,7 +2242,7 @@ var setBindData = !defineProperty ? noop : function(func, value) {
 
 module.exports = setBindData;
 
-},{"../utilities/noop":49,"./isNative":29}],34:[function(require,module,exports){
+},{"../utilities/noop":50,"./isNative":30}],35:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2264,7 +2282,7 @@ var shimKeys = function(object) {
 
 module.exports = shimKeys;
 
-},{"./objectTypes":31}],35:[function(require,module,exports){
+},{"./objectTypes":32}],36:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2304,7 +2322,7 @@ function slice(array, start, end) {
 
 module.exports = slice;
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2376,7 +2394,7 @@ var assign = function(object, source, guard) {
 
 module.exports = assign;
 
-},{"../internals/baseCreateCallback":24,"../internals/objectTypes":31,"./keys":45}],37:[function(require,module,exports){
+},{"../internals/baseCreateCallback":25,"../internals/objectTypes":32,"./keys":46}],38:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2432,7 +2450,7 @@ var forIn = function(collection, callback, thisArg) {
 
 module.exports = forIn;
 
-},{"../internals/baseCreateCallback":24,"../internals/objectTypes":31}],38:[function(require,module,exports){
+},{"../internals/baseCreateCallback":25,"../internals/objectTypes":32}],39:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2484,7 +2502,7 @@ var forOwn = function(collection, callback, thisArg) {
 
 module.exports = forOwn;
 
-},{"../internals/baseCreateCallback":24,"../internals/objectTypes":31,"./keys":45}],39:[function(require,module,exports){
+},{"../internals/baseCreateCallback":25,"../internals/objectTypes":32,"./keys":46}],40:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2531,7 +2549,7 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"../internals/isNative":29}],40:[function(require,module,exports){
+},{"../internals/isNative":30}],41:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2560,7 +2578,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2592,7 +2610,7 @@ function isNull(value) {
 
 module.exports = isNull;
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2633,7 +2651,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{"../internals/objectTypes":31}],43:[function(require,module,exports){
+},{"../internals/objectTypes":32}],44:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2672,7 +2690,7 @@ function isString(value) {
 
 module.exports = isString;
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2701,7 +2719,7 @@ function isUndefined(value) {
 
 module.exports = isUndefined;
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2739,7 +2757,7 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"../internals/isNative":29,"../internals/shimKeys":34,"./isObject":42}],46:[function(require,module,exports){
+},{"../internals/isNative":30,"../internals/shimKeys":35,"./isObject":43}],47:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2777,7 +2795,7 @@ function values(object) {
 
 module.exports = values;
 
-},{"./keys":45}],47:[function(require,module,exports){
+},{"./keys":46}],48:[function(require,module,exports){
 (function (global){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
@@ -2821,7 +2839,7 @@ support.funcNames = typeof Function.name == 'string';
 module.exports = support;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./internals/isNative":29}],48:[function(require,module,exports){
+},{"./internals/isNative":30}],49:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2851,7 +2869,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2879,7 +2897,7 @@ function noop() {
 
 module.exports = noop;
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2920,6 +2938,623 @@ function property(key) {
 }
 
 module.exports = property;
+
+},{}],52:[function(require,module,exports){
+/*!
+  * Reqwest! A general purpose XHR connection manager
+  * license MIT (c) Dustin Diaz 2014
+  * https://github.com/ded/reqwest
+  */
+
+!function (name, context, definition) {
+  if (typeof module != 'undefined' && module.exports) module.exports = definition()
+  else if (typeof define == 'function' && define.amd) define(definition)
+  else context[name] = definition()
+}('reqwest', this, function () {
+
+  var win = window
+    , doc = document
+    , httpsRe = /^http/
+    , protocolRe = /(^\w+):\/\//
+    , twoHundo = /^(20\d|1223)$/ //http://stackoverflow.com/questions/10046972/msie-returns-status-code-of-1223-for-ajax-request
+    , byTag = 'getElementsByTagName'
+    , readyState = 'readyState'
+    , contentType = 'Content-Type'
+    , requestedWith = 'X-Requested-With'
+    , head = doc[byTag]('head')[0]
+    , uniqid = 0
+    , callbackPrefix = 'reqwest_' + (+new Date())
+    , lastValue // data stored by the most recent JSONP callback
+    , xmlHttpRequest = 'XMLHttpRequest'
+    , xDomainRequest = 'XDomainRequest'
+    , noop = function () {}
+
+    , isArray = typeof Array.isArray == 'function'
+        ? Array.isArray
+        : function (a) {
+            return a instanceof Array
+          }
+
+    , defaultHeaders = {
+          'contentType': 'application/x-www-form-urlencoded'
+        , 'requestedWith': xmlHttpRequest
+        , 'accept': {
+              '*':  'text/javascript, text/html, application/xml, text/xml, */*'
+            , 'xml':  'application/xml, text/xml'
+            , 'html': 'text/html'
+            , 'text': 'text/plain'
+            , 'json': 'application/json, text/javascript'
+            , 'js':   'application/javascript, text/javascript'
+          }
+      }
+
+    , xhr = function(o) {
+        // is it x-domain
+        if (o['crossOrigin'] === true) {
+          var xhr = win[xmlHttpRequest] ? new XMLHttpRequest() : null
+          if (xhr && 'withCredentials' in xhr) {
+            return xhr
+          } else if (win[xDomainRequest]) {
+            return new XDomainRequest()
+          } else {
+            throw new Error('Browser does not support cross-origin requests')
+          }
+        } else if (win[xmlHttpRequest]) {
+          return new XMLHttpRequest()
+        } else {
+          return new ActiveXObject('Microsoft.XMLHTTP')
+        }
+      }
+    , globalSetupOptions = {
+        dataFilter: function (data) {
+          return data
+        }
+      }
+
+  function succeed(r) {
+    var protocol = protocolRe.exec(r.url);
+    protocol = (protocol && protocol[1]) || window.location.protocol;
+    return httpsRe.test(protocol) ? twoHundo.test(r.request.status) : !!r.request.response;
+  }
+
+  function handleReadyState(r, success, error) {
+    return function () {
+      // use _aborted to mitigate against IE err c00c023f
+      // (can't read props on aborted request objects)
+      if (r._aborted) return error(r.request)
+      if (r._timedOut) return error(r.request, 'Request is aborted: timeout')
+      if (r.request && r.request[readyState] == 4) {
+        r.request.onreadystatechange = noop
+        if (succeed(r)) success(r.request)
+        else
+          error(r.request)
+      }
+    }
+  }
+
+  function setHeaders(http, o) {
+    var headers = o['headers'] || {}
+      , h
+
+    headers['Accept'] = headers['Accept']
+      || defaultHeaders['accept'][o['type']]
+      || defaultHeaders['accept']['*']
+
+    var isAFormData = typeof FormData === 'function' && (o['data'] instanceof FormData);
+    // breaks cross-origin requests with legacy browsers
+    if (!o['crossOrigin'] && !headers[requestedWith]) headers[requestedWith] = defaultHeaders['requestedWith']
+    if (!headers[contentType] && !isAFormData) headers[contentType] = o['contentType'] || defaultHeaders['contentType']
+    for (h in headers)
+      headers.hasOwnProperty(h) && 'setRequestHeader' in http && http.setRequestHeader(h, headers[h])
+  }
+
+  function setCredentials(http, o) {
+    if (typeof o['withCredentials'] !== 'undefined' && typeof http.withCredentials !== 'undefined') {
+      http.withCredentials = !!o['withCredentials']
+    }
+  }
+
+  function generalCallback(data) {
+    lastValue = data
+  }
+
+  function urlappend (url, s) {
+    return url + (/\?/.test(url) ? '&' : '?') + s
+  }
+
+  function handleJsonp(o, fn, err, url) {
+    var reqId = uniqid++
+      , cbkey = o['jsonpCallback'] || 'callback' // the 'callback' key
+      , cbval = o['jsonpCallbackName'] || reqwest.getcallbackPrefix(reqId)
+      , cbreg = new RegExp('((^|\\?|&)' + cbkey + ')=([^&]+)')
+      , match = url.match(cbreg)
+      , script = doc.createElement('script')
+      , loaded = 0
+      , isIE10 = navigator.userAgent.indexOf('MSIE 10.0') !== -1
+
+    if (match) {
+      if (match[3] === '?') {
+        url = url.replace(cbreg, '$1=' + cbval) // wildcard callback func name
+      } else {
+        cbval = match[3] // provided callback func name
+      }
+    } else {
+      url = urlappend(url, cbkey + '=' + cbval) // no callback details, add 'em
+    }
+
+    win[cbval] = generalCallback
+
+    script.type = 'text/javascript'
+    script.src = url
+    script.async = true
+    if (typeof script.onreadystatechange !== 'undefined' && !isIE10) {
+      // need this for IE due to out-of-order onreadystatechange(), binding script
+      // execution to an event listener gives us control over when the script
+      // is executed. See http://jaubourg.net/2010/07/loading-script-as-onclick-handler-of.html
+      script.htmlFor = script.id = '_reqwest_' + reqId
+    }
+
+    script.onload = script.onreadystatechange = function () {
+      if ((script[readyState] && script[readyState] !== 'complete' && script[readyState] !== 'loaded') || loaded) {
+        return false
+      }
+      script.onload = script.onreadystatechange = null
+      script.onclick && script.onclick()
+      // Call the user callback with the last value stored and clean up values and scripts.
+      fn(lastValue)
+      lastValue = undefined
+      head.removeChild(script)
+      loaded = 1
+    }
+
+    // Add the script to the DOM head
+    head.appendChild(script)
+
+    // Enable JSONP timeout
+    return {
+      abort: function () {
+        script.onload = script.onreadystatechange = null
+        err({}, 'Request is aborted: timeout', {})
+        lastValue = undefined
+        head.removeChild(script)
+        loaded = 1
+      }
+    }
+  }
+
+  function getRequest(fn, err) {
+    var o = this.o
+      , method = (o['method'] || 'GET').toUpperCase()
+      , url = typeof o === 'string' ? o : o['url']
+      // convert non-string objects to query-string form unless o['processData'] is false
+      , data = (o['processData'] !== false && o['data'] && typeof o['data'] !== 'string')
+        ? reqwest.toQueryString(o['data'])
+        : (o['data'] || null)
+      , http
+      , sendWait = false
+
+    // if we're working on a GET request and we have data then we should append
+    // query string to end of URL and not post data
+    if ((o['type'] == 'jsonp' || method == 'GET') && data) {
+      url = urlappend(url, data)
+      data = null
+    }
+
+    if (o['type'] == 'jsonp') return handleJsonp(o, fn, err, url)
+
+    // get the xhr from the factory if passed
+    // if the factory returns null, fall-back to ours
+    http = (o.xhr && o.xhr(o)) || xhr(o)
+
+    http.open(method, url, o['async'] === false ? false : true)
+    setHeaders(http, o)
+    setCredentials(http, o)
+    if (win[xDomainRequest] && http instanceof win[xDomainRequest]) {
+        http.onload = fn
+        http.onerror = err
+        // NOTE: see
+        // http://social.msdn.microsoft.com/Forums/en-US/iewebdevelopment/thread/30ef3add-767c-4436-b8a9-f1ca19b4812e
+        http.onprogress = function() {}
+        sendWait = true
+    } else {
+      http.onreadystatechange = handleReadyState(this, fn, err)
+    }
+    o['before'] && o['before'](http)
+    if (sendWait) {
+      setTimeout(function () {
+        http.send(data)
+      }, 200)
+    } else {
+      http.send(data)
+    }
+    return http
+  }
+
+  function Reqwest(o, fn) {
+    this.o = o
+    this.fn = fn
+
+    init.apply(this, arguments)
+  }
+
+  function setType(header) {
+    // json, javascript, text/plain, text/html, xml
+    if (header.match('json')) return 'json'
+    if (header.match('javascript')) return 'js'
+    if (header.match('text')) return 'html'
+    if (header.match('xml')) return 'xml'
+  }
+
+  function init(o, fn) {
+
+    this.url = typeof o == 'string' ? o : o['url']
+    this.timeout = null
+
+    // whether request has been fulfilled for purpose
+    // of tracking the Promises
+    this._fulfilled = false
+    // success handlers
+    this._successHandler = function(){}
+    this._fulfillmentHandlers = []
+    // error handlers
+    this._errorHandlers = []
+    // complete (both success and fail) handlers
+    this._completeHandlers = []
+    this._erred = false
+    this._responseArgs = {}
+
+    var self = this
+
+    fn = fn || function () {}
+
+    if (o['timeout']) {
+      this.timeout = setTimeout(function () {
+        timedOut()
+      }, o['timeout'])
+    }
+
+    if (o['success']) {
+      this._successHandler = function () {
+        o['success'].apply(o, arguments)
+      }
+    }
+
+    if (o['error']) {
+      this._errorHandlers.push(function () {
+        o['error'].apply(o, arguments)
+      })
+    }
+
+    if (o['complete']) {
+      this._completeHandlers.push(function () {
+        o['complete'].apply(o, arguments)
+      })
+    }
+
+    function complete (resp) {
+      o['timeout'] && clearTimeout(self.timeout)
+      self.timeout = null
+      while (self._completeHandlers.length > 0) {
+        self._completeHandlers.shift()(resp)
+      }
+    }
+
+    function success (resp) {
+      var type = o['type'] || resp && setType(resp.getResponseHeader('Content-Type')) // resp can be undefined in IE
+      resp = (type !== 'jsonp') ? self.request : resp
+      // use global data filter on response text
+      var filteredResponse = globalSetupOptions.dataFilter(resp.responseText, type)
+        , r = filteredResponse
+      try {
+        resp.responseText = r
+      } catch (e) {
+        // can't assign this in IE<=8, just ignore
+      }
+      if (r) {
+        switch (type) {
+        case 'json':
+          try {
+            resp = win.JSON ? win.JSON.parse(r) : eval('(' + r + ')')
+          } catch (err) {
+            return error(resp, 'Could not parse JSON in response', err)
+          }
+          break
+        case 'js':
+          resp = eval(r)
+          break
+        case 'html':
+          resp = r
+          break
+        case 'xml':
+          resp = resp.responseXML
+              && resp.responseXML.parseError // IE trololo
+              && resp.responseXML.parseError.errorCode
+              && resp.responseXML.parseError.reason
+            ? null
+            : resp.responseXML
+          break
+        }
+      }
+
+      self._responseArgs.resp = resp
+      self._fulfilled = true
+      fn(resp)
+      self._successHandler(resp)
+      while (self._fulfillmentHandlers.length > 0) {
+        resp = self._fulfillmentHandlers.shift()(resp)
+      }
+
+      complete(resp)
+    }
+
+    function timedOut() {
+      self._timedOut = true
+      self.request.abort()      
+    }
+
+    function error(resp, msg, t) {
+      resp = self.request
+      self._responseArgs.resp = resp
+      self._responseArgs.msg = msg
+      self._responseArgs.t = t
+      self._erred = true
+      while (self._errorHandlers.length > 0) {
+        self._errorHandlers.shift()(resp, msg, t)
+      }
+      complete(resp)
+    }
+
+    this.request = getRequest.call(this, success, error)
+  }
+
+  Reqwest.prototype = {
+    abort: function () {
+      this._aborted = true
+      this.request.abort()
+    }
+
+  , retry: function () {
+      init.call(this, this.o, this.fn)
+    }
+
+    /**
+     * Small deviation from the Promises A CommonJs specification
+     * http://wiki.commonjs.org/wiki/Promises/A
+     */
+
+    /**
+     * `then` will execute upon successful requests
+     */
+  , then: function (success, fail) {
+      success = success || function () {}
+      fail = fail || function () {}
+      if (this._fulfilled) {
+        this._responseArgs.resp = success(this._responseArgs.resp)
+      } else if (this._erred) {
+        fail(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
+      } else {
+        this._fulfillmentHandlers.push(success)
+        this._errorHandlers.push(fail)
+      }
+      return this
+    }
+
+    /**
+     * `always` will execute whether the request succeeds or fails
+     */
+  , always: function (fn) {
+      if (this._fulfilled || this._erred) {
+        fn(this._responseArgs.resp)
+      } else {
+        this._completeHandlers.push(fn)
+      }
+      return this
+    }
+
+    /**
+     * `fail` will execute when the request fails
+     */
+  , fail: function (fn) {
+      if (this._erred) {
+        fn(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
+      } else {
+        this._errorHandlers.push(fn)
+      }
+      return this
+    }
+  , 'catch': function (fn) {
+      return this.fail(fn)
+    }
+  }
+
+  function reqwest(o, fn) {
+    return new Reqwest(o, fn)
+  }
+
+  // normalize newline variants according to spec -> CRLF
+  function normalize(s) {
+    return s ? s.replace(/\r?\n/g, '\r\n') : ''
+  }
+
+  function serial(el, cb) {
+    var n = el.name
+      , t = el.tagName.toLowerCase()
+      , optCb = function (o) {
+          // IE gives value="" even where there is no value attribute
+          // 'specified' ref: http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-862529273
+          if (o && !o['disabled'])
+            cb(n, normalize(o['attributes']['value'] && o['attributes']['value']['specified'] ? o['value'] : o['text']))
+        }
+      , ch, ra, val, i
+
+    // don't serialize elements that are disabled or without a name
+    if (el.disabled || !n) return
+
+    switch (t) {
+    case 'input':
+      if (!/reset|button|image|file/i.test(el.type)) {
+        ch = /checkbox/i.test(el.type)
+        ra = /radio/i.test(el.type)
+        val = el.value
+        // WebKit gives us "" instead of "on" if a checkbox has no value, so correct it here
+        ;(!(ch || ra) || el.checked) && cb(n, normalize(ch && val === '' ? 'on' : val))
+      }
+      break
+    case 'textarea':
+      cb(n, normalize(el.value))
+      break
+    case 'select':
+      if (el.type.toLowerCase() === 'select-one') {
+        optCb(el.selectedIndex >= 0 ? el.options[el.selectedIndex] : null)
+      } else {
+        for (i = 0; el.length && i < el.length; i++) {
+          el.options[i].selected && optCb(el.options[i])
+        }
+      }
+      break
+    }
+  }
+
+  // collect up all form elements found from the passed argument elements all
+  // the way down to child elements; pass a '<form>' or form fields.
+  // called with 'this'=callback to use for serial() on each element
+  function eachFormElement() {
+    var cb = this
+      , e, i
+      , serializeSubtags = function (e, tags) {
+          var i, j, fa
+          for (i = 0; i < tags.length; i++) {
+            fa = e[byTag](tags[i])
+            for (j = 0; j < fa.length; j++) serial(fa[j], cb)
+          }
+        }
+
+    for (i = 0; i < arguments.length; i++) {
+      e = arguments[i]
+      if (/input|select|textarea/i.test(e.tagName)) serial(e, cb)
+      serializeSubtags(e, [ 'input', 'select', 'textarea' ])
+    }
+  }
+
+  // standard query string style serialization
+  function serializeQueryString() {
+    return reqwest.toQueryString(reqwest.serializeArray.apply(null, arguments))
+  }
+
+  // { 'name': 'value', ... } style serialization
+  function serializeHash() {
+    var hash = {}
+    eachFormElement.apply(function (name, value) {
+      if (name in hash) {
+        hash[name] && !isArray(hash[name]) && (hash[name] = [hash[name]])
+        hash[name].push(value)
+      } else hash[name] = value
+    }, arguments)
+    return hash
+  }
+
+  // [ { name: 'name', value: 'value' }, ... ] style serialization
+  reqwest.serializeArray = function () {
+    var arr = []
+    eachFormElement.apply(function (name, value) {
+      arr.push({name: name, value: value})
+    }, arguments)
+    return arr
+  }
+
+  reqwest.serialize = function () {
+    if (arguments.length === 0) return ''
+    var opt, fn
+      , args = Array.prototype.slice.call(arguments, 0)
+
+    opt = args.pop()
+    opt && opt.nodeType && args.push(opt) && (opt = null)
+    opt && (opt = opt.type)
+
+    if (opt == 'map') fn = serializeHash
+    else if (opt == 'array') fn = reqwest.serializeArray
+    else fn = serializeQueryString
+
+    return fn.apply(null, args)
+  }
+
+  reqwest.toQueryString = function (o, trad) {
+    var prefix, i
+      , traditional = trad || false
+      , s = []
+      , enc = encodeURIComponent
+      , add = function (key, value) {
+          // If value is a function, invoke it and return its value
+          value = ('function' === typeof value) ? value() : (value == null ? '' : value)
+          s[s.length] = enc(key) + '=' + enc(value)
+        }
+    // If an array was passed in, assume that it is an array of form elements.
+    if (isArray(o)) {
+      for (i = 0; o && i < o.length; i++) add(o[i]['name'], o[i]['value'])
+    } else {
+      // If traditional, encode the "old" way (the way 1.3.2 or older
+      // did it), otherwise encode params recursively.
+      for (prefix in o) {
+        if (o.hasOwnProperty(prefix)) buildParams(prefix, o[prefix], traditional, add)
+      }
+    }
+
+    // spaces should be + according to spec
+    return s.join('&').replace(/%20/g, '+')
+  }
+
+  function buildParams(prefix, obj, traditional, add) {
+    var name, i, v
+      , rbracket = /\[\]$/
+
+    if (isArray(obj)) {
+      // Serialize array item.
+      for (i = 0; obj && i < obj.length; i++) {
+        v = obj[i]
+        if (traditional || rbracket.test(prefix)) {
+          // Treat each array item as a scalar.
+          add(prefix, v)
+        } else {
+          buildParams(prefix + '[' + (typeof v === 'object' ? i : '') + ']', v, traditional, add)
+        }
+      }
+    } else if (obj && obj.toString() === '[object Object]') {
+      // Serialize object item.
+      for (name in obj) {
+        buildParams(prefix + '[' + name + ']', obj[name], traditional, add)
+      }
+
+    } else {
+      // Serialize scalar item.
+      add(prefix, obj)
+    }
+  }
+
+  reqwest.getcallbackPrefix = function () {
+    return callbackPrefix
+  }
+
+  // jQuery and Zepto compatibility, differences can be remapped here so you can call
+  // .ajax.compat(options, callback)
+  reqwest.compat = function (o, fn) {
+    if (o) {
+      o['type'] && (o['method'] = o['type']) && delete o['type']
+      o['dataType'] && (o['type'] = o['dataType'])
+      o['jsonpCallback'] && (o['jsonpCallbackName'] = o['jsonpCallback']) && delete o['jsonpCallback']
+      o['jsonp'] && (o['jsonpCallback'] = o['jsonp'])
+    }
+    return new Reqwest(o, fn)
+  }
+
+  reqwest.ajaxSetup = function (options) {
+    options = options || {}
+    for (var k in options) {
+      globalSetupOptions[k] = options[k]
+    }
+  }
+
+  return reqwest
+});
 
 },{}]},{},[])("./index.js")
 });
