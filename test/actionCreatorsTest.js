@@ -1,7 +1,10 @@
+var React = require('react');
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var DataFlowStore = require('./lib/dataFlowStore');
+var ActionStore = require('./lib/actionStore');
+var diagnostics = require('../lib/diagnostics');
 var ActionCreators = require('../lib/actionCreators');
+var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, testConstant = 'TEST';
@@ -12,7 +15,6 @@ describe('ActionCreators', function () {
     };
 
     actionCreators = new ActionCreators({
-      trace: false,
       dispatcher: dispatcher,
       initialize: sinon.spy(),
       test: function (message) {
@@ -41,21 +43,22 @@ describe('ActionCreators', function () {
     });
   });
 
-  xdescribe('tracing', function () {
+  describe('tracing', function () {
     var Marty = require('../index');
-    var dataFlows, actionType, foo, store;
+    var actions, actionType, foo, store, fooView, barView;
 
     beforeEach(function () {
       foo = {bar: 'baz'};
       actionType = 'RECEIVE_FOO';
-      dataFlows = new DataFlowStore();
+      diagnostics.enabled = true;
+      actions = new ActionStore();
       store = Marty.createStore({
         name: 'Foo Store',
         handlers: {
           receiveFoo: actionType
         },
         receiveFoo: function (foo) {
-          this.state.concat([foo]);
+          this.state.push(foo);
           this.hasChanged();
         },
         getInitialState: function () {
@@ -65,45 +68,75 @@ describe('ActionCreators', function () {
       actionCreators = Marty.createActionCreators({
         name: 'FooActions',
         addFoo: function (foo) {
-          this.dispatch(actionType, foo);
+          this.dispatchViewAction(actionType, foo);
         }
+      });
+      fooView = renderClassWithState({
+        name: 'Foos',
+        foos: store
+      });
+      barView = renderClassWithState({
+        name: 'Bars',
+        bars: store
       });
     });
 
     afterEach(function () {
-      dataFlows.dispose();
+      actions.dispose();
+      diagnostics.enabled = false;
     });
 
-    describe('when I create an action', function () {
+    describe('when I dispatch an action', function () {
       var first;
 
       beforeEach(function () {
         actionCreators.addFoo(foo);
-        first = dataFlows.first;
+        first = actions.first;
       });
 
       it('should trace all function calls', function () {
-        console.log(require('util').inspect(first.toJSON(), { depth: null, colors: true }));
         expect(first.toJSON()).to.eql({
-          instigator: {
+          type: actionType,
+          source: 'VIEW',
+          arguments: [foo],
+          creator: {
             name: actionCreators.name,
             type: 'ActionCreator',
             action: 'addFoo',
-            arguments: [foo]
-          },
-          payload: {
-            actionType: actionType,
             arguments: [foo]
           },
           handlers: [{
             name: store.name,
             type: 'Store',
             action: 'receiveFoo',
+            exception: null,
             state: {
               before: [],
               after: [foo]
             },
-            updateComponents: []
+            views: [{
+              name: 'Foos',
+              exception: null,
+              state: {
+                before: {
+                  foos: []
+                },
+                after: {
+                  foos: [foo]
+                }
+              }
+            }, {
+              name: 'Bars',
+              exception: null,
+              state: {
+                before: {
+                  bars: []
+                },
+                after: {
+                  bars: [foo]
+                }
+              }
+            }]
           }]
         });
       });
@@ -119,4 +152,15 @@ describe('ActionCreators', function () {
     it('should dispatch the action');
     it('should set the view source to being SERVER');
   });
+
+  function renderClassWithState(stateProps) {
+    var state = require('../index').createStateMixin(stateProps);
+
+    return TestUtils.renderIntoDocument(React.createElement(React.createClass({
+      mixins: [state],
+      render: function () {
+        return React.createElement('div', null, this.state.name);
+      }
+    })));
+  }
 });
