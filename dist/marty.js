@@ -149,22 +149,33 @@ var StateMixin = require('./stateMixin');
 var ActionCreators = require('./actionCreators');
 
 module.exports = {
-  createStore: function (options) {
-    return new Store(defaults(this, options));
-  },
-  createHttpAPI: function (options) {
-    return new HttpAPI(defaults(this, options));
-  },
-  createConstants: function (obj) {
-    return constants(obj);
-  },
-  createActionCreators: function (options) {
-    return new ActionCreators(defaults(this, options));
-  },
-  createStateMixin: function (options) {
-    return new StateMixin(defaults(this, options));
-  }
+  createStore: createStore,
+  createHttpAPI: createHttpAPI,
+  createHTTPAPI: createHttpAPI, // For those who really care about correct casing
+  createConstants: createConstants,
+  createStateMixin: createStateMixin,
+  createActionCreators: createActionCreators
 };
+
+function createStore(options) {
+  return new Store(defaults(this, options));
+}
+
+function createHttpAPI(options) {
+  return new HttpAPI(defaults(this, options));
+}
+
+function createConstants(obj) {
+  return constants(obj);
+}
+
+function createActionCreators(options) {
+  return new ActionCreators(defaults(this, options));
+}
+
+function createStateMixin(options) {
+  return new StateMixin(defaults(this, options));
+}
 
 function defaults(marty, options) {
   if (!options.dispatcher) {
@@ -192,39 +203,61 @@ function HttpAPI(options) {
 }
 
 HttpAPI.prototype = {
-  get: function (url, options) {
+  get: function () {
+    return this.request.apply(this, argumentsWithMethod(arguments, 'GET'));
+  },
+  put: function () {
+    return this.request.apply(this, argumentsWithMethod(arguments, 'PUT'));
+  },
+  post: function () {
+    return this.request.apply(this, argumentsWithMethod(arguments, 'POST'));
+  },
+  delete: function () {
+    return this.request.apply(this, argumentsWithMethod(arguments, 'DELETE'));
+  },
+  request: function (method, url) {
+    var options;
+
     if (_.isString(url)) {
-      options = _.extend({}, options, {
+      options = _.extend({
         url: url
       });
     } else {
       options = url;
     }
 
-    options.method = 'GET';
+    options.method = method;
 
-    return this.request(options);
-  },
-  request: function (options) {
-    if (this.baseUrl) {
-      var separator = '';
-      var firstCharOfUrl = options.url[0];
-      var lastCharOfBaseUrl = this.baseUrl[this.baseUrl.length - 1];
-
-      // Do some text wrangling to make sure concatenation of base url
-      // stupid people (i.e. me)
-      if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
-        separator = '/';
-      } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
-        options.url = options.url.substring(1);
-      }
-
-      options.url = this.baseUrl + separator + options.url;
-    }
-
-    return http.request(options);
+    return request(options, this.baseUrl);
   }
 };
+
+function argumentsWithMethod(args, method) {
+  args = _.toArray(args);
+  args.unshift(method);
+
+  return args;
+}
+
+function request(options, baseUrl) {
+  if (baseUrl) {
+    var separator = '';
+    var firstCharOfUrl = options.url[0];
+    var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
+
+    // Do some text wrangling to make sure concatenation of base url
+    // stupid people (i.e. me)
+    if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
+      separator = '/';
+    } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
+      options.url = options.url.substring(1);
+    }
+
+    options.url = baseUrl + separator + options.url;
+  }
+
+  return http.request(options);
+}
 
 module.exports = HttpAPI;
 },{"./http":6,"./utils/tinydash":11}],8:[function(require,module,exports){
