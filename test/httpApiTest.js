@@ -54,23 +54,6 @@ describe('HttpAPI', function () {
       });
     });
 
-    describe('when you pass in a url and some options', function () {
-      beforeEach(function () {
-        headers = { foo: 'bar' };
-        return makeRequest('get', '/foos', {
-          headers: headers
-        });
-      });
-
-      it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'GET',
-          headers: headers
-        });
-      });
-    });
-
     describe('when you pass in a some options', function () {
       beforeEach(function () {
         headers = { foo: 'bar' };
@@ -100,23 +83,6 @@ describe('HttpAPI', function () {
         expect(request).to.have.been.calledWith({
           url: baseUrl + 'foos',
           method: 'PUT'
-        });
-      });
-    });
-
-    describe('when you pass in a url and some options', function () {
-      beforeEach(function () {
-        headers = { foo: 'bar' };
-        return makeRequest('put', '/foos', {
-          headers: headers
-        });
-      });
-
-      it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'PUT',
-          headers: headers
         });
       });
     });
@@ -154,23 +120,6 @@ describe('HttpAPI', function () {
       });
     });
 
-    describe('when you pass in a url and some options', function () {
-      beforeEach(function () {
-        headers = { foo: 'bar' };
-        return makeRequest('post', '/foos', {
-          headers: headers
-        });
-      });
-
-      it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'POST',
-          headers: headers
-        });
-      });
-    });
-
     describe('when you pass in a some options', function () {
       beforeEach(function () {
         headers = { foo: 'bar' };
@@ -200,23 +149,6 @@ describe('HttpAPI', function () {
         expect(request).to.have.been.calledWith({
           url: baseUrl + 'foos',
           method: 'DELETE'
-        });
-      });
-    });
-
-    describe('when you pass in a url and some options', function () {
-      beforeEach(function () {
-        headers = { foo: 'bar' };
-        return makeRequest('delete', '/foos', {
-          headers: headers
-        });
-      });
-
-      it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'DELETE',
-          headers: headers
         });
       });
     });
