@@ -1,29 +1,41 @@
 BIN = ./node_modules/.bin
 
-.PHONY: bootstrap start clean test;
+.PHONY: bootstrap bootstrap-js bootstrap-ruby start clean test docs release-docs;
 
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
 	@$(BIN)/karma start --single-run
 
-test-watch:
+bootstrap: bootstrap-js bootstrap-ruby
+
+bootstrap-js: package.json
+	@npm install
+
+bootstrap-ruby: docs/Gemfile
+	@which bundle > /dev/null || gem install bundler
+	@cd docs && bundle install
+
+test-watch: lint
 	@$(BIN)/karma start
 
-lint: bootstrap clean
+lint: bootstrap-js clean
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
-release: lint
-	@git checkout master
-	@$(BIN)/browserify --require ./index.js --standalone Marty > dist/marty.js
-	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
-	@git add dist && git commit -m "Rebuilt"
+release: test build
+	@git add dist && (git diff --exit-code > /dev/null || git commit -m "Rebuilding source")
 	@npm version patch
+	@bower version patch
 	@git push origin master && git push --tags
 	@npm publish
 
-clean:
+build: lint
+	@$(BIN)/browserify --require ./index.js  --standalone Marty > dist/marty.js
+	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 
-bootstrap: package.json
-	@npm install;
+docs: bootstrap-ruby
+	@cd docs && bundle exec jekyll serve -w
+
+release-docs: bootstrap-ruby
+	@cd docs && bundle exec rake release

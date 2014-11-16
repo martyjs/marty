@@ -6,8 +6,10 @@
 ## Quick start
 
 ```
-make test        # lint & run tests
-make release     # deploys master branch to production
+make test         # lint & run tests
+make release      # builds, inc's npm version, pushes build and tags to master then publishes to npm
+make release-docs # builds documentation and copies into ../marty-gh-pages
+make docs         # show documentation on http://localhost:4000
 ```
 
 ## Installation

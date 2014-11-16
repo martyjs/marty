@@ -1,7 +1,7 @@
 {
   "name": "marty",
   "main": "dist/marty.js",
-  "version": "0.0.1",
+  "version": "0.0.15",
   "homepage": "martyjs.org",
   "authors": [
     "jhollingworth <jamiehollingworth@gmail.com>"
@@ -18,5 +18,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "superagent": "~0.20.0",
+    "lodash": "~2.4.1"
+  }
 }

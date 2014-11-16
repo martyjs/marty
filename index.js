@@ -1,14 +1,13 @@
-var fs = require('fs');
-var _ = require('lodash');
 var create = require('./lib/create');
+var _ = require('./lib/utils/tinydash');
 var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
-var package = JSON.parse(fs.readFileSync(__dirname + '/package.json'), 'utf-8');
+var constants = require('./lib/internalConstants');
 
 var Marty = _.extend({
-  version: package.version,
+  constants: constants,
+  Diagnostics: Diagnostics,
   dispatcher: new Dispatcher(),
-  diagnostics: Diagnostics
 }, create);
 
 module.exports = Marty;

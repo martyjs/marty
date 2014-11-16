@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.0.9",
+  "version": "0.0.15",
   "description": "A React.js/Flux Framework",
   "main": "index.js",
   "directories": {
@@ -18,7 +18,6 @@
     "flux"
   ],
   "devDependencies": {
-    "brfs": "^1.2.0",
     "browserify": "^5.12.0",
     "browserify-shim": "^3.7.0",
     "chai": "^1.9.1",
@@ -39,7 +38,9 @@
     "uglify-js": "^2.4.15",
     "react": "^0.12.0",
     "karma-sauce-launcher": "^0.2.10",
-    "js-yaml": "^3.2.3"
+    "karma-firefox-launcher": "^0.1.3",
+    "js-yaml": "^3.2.3",
+    "bluebird": "^2.3.11"
   },
   "author": "James Hollingworth",
   "licenses": [
@@ -59,15 +60,13 @@
   ],
   "browserify": {
     "transform": [
-      "brfs",
       "reactify"
     ]
   },
   "homepage": "https://martyjs.org",
   "dependencies": {
-    "lodash": "^2.4.1",
     "flux": "^2.0.1",
-    "superagent": "^0.20.0",
-    "karma-firefox-launcher": "^0.1.3"
+    "lodash-node": "^2.4.1",
+    "reqwest": "^1.1.5"
   }
 }
