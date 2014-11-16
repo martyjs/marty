@@ -26,6 +26,7 @@ lint: bootstrap-js clean
 release: test build
 	@git add dist && (git diff --exit-code > /dev/null || git commit -m "Rebuilding source")
 	@npm version patch
+	@bower version patch
 	@git push origin master && git push --tags
 	@npm publish
 
