@@ -1,4 +1,5 @@
 var React = require('react');
+var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
 var StateMixin = require('../lib/stateMixin');
@@ -45,10 +46,57 @@ describe('StateMixin', function () {
   });
 
   describe('when the component unmounts', function () {
-    it('should dispose of any listeners');
+    var disposable, store;
+
+    beforeEach(function () {
+      disposable = {
+        dispose: sinon.spy()
+      };
+
+      store = {
+        getState: function () {
+          return {};
+        },
+        addChangeListener: function () {
+          return disposable;
+        }
+      };
+
+      mixin = new StateMixin(store);
+      element = renderClassWithMixin(mixin);
+
+      React.unmountComponentAtNode(element.getDOMNode().parentNode);
+    });
+
+    it('should dispose of any listeners', function () {
+      expect(disposable.dispose).to.have.been.called;
+    });
   });
 
   describe('when the component props changes', function () {
+    beforeEach(function () {
+      // var Mixin = new StateMixin({
+      //   getState: sinon.spy(function () {
+      //     return {};
+      //   })
+      // });
+
+      // var ChildComponent = React.createClass({
+      //   mixin: [Mixin],
+      //   render: function () {
+      //     return <div></div>;
+      //   }
+      // });
+
+      // var ParentComponent = React.createClass({
+      //   render: function () {
+      //     return <ChildComponent user={this.state.user} />;
+      //   }
+      // });
+
+      // var element = TestUtils.renderIntoDocument(React.createElement(ParentComponent));
+    });
+
     it('should update the components state');
   });
 
@@ -74,6 +122,10 @@ describe('StateMixin', function () {
           expect(context).to.equal(element);
         });
       });
+    });
+
+    describe('#getInitialState()', function () {
+      it('should set state to merge of #getInitialState() and #getState()');
     });
 
     describe('#listenTo', function () {

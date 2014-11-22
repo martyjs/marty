@@ -115,8 +115,9 @@ describe('Store', function () {
       expect(listener).to.have.been.calledOnce;
     });
 
-    it('should pass the state as the first argument to the callback');
-    it('should pass the store as the second argument to the callback');
+    it('should pass the state and store as the arguments', function () {
+      expect(listener).to.have.been.calledWith(store.state, store);
+    });
 
     it('should set the callbacks function context', function () {
       expect(actualChangeListenerFunctionContext).to.equal(expectedChangeListenerFunctionContext);
@@ -297,6 +298,25 @@ describe('Store', function () {
 
       return action;
     }
+  });
+
+  describe('#clear()', function () {
+    var Marty = require('../index');
+
+    beforeEach(function () {
+      store = Marty.createStore({
+        getInitialState: function () {
+          return {};
+        }
+      });
+
+      store.state['foo'] = 'bar';
+      store.clear();
+    });
+
+    it('should replace the state with the original state', function () {
+      expect(store.state).to.eql({});
+    });
   });
 
   describe('#query()', function () {
