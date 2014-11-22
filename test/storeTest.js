@@ -3,6 +3,8 @@ var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
 var Action = require('../lib/action');
+var Promise = require('es6-promise').Promise;
+var StoreQuery = require('../lib/storeQuery');
 
 describe('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
@@ -294,6 +296,73 @@ describe('Store', function () {
       store.handleAction(action);
 
       return action;
+    }
+  });
+
+  describe('#query()', function () {
+    var queryKey;
+    var Marty = require('../index');
+
+    beforeEach(function () {
+      queryKey = 'foo';
+      store = Marty.createStore({});
+    });
+
+    it('should return a StoreQuery', function () {
+      expect(store.query(queryKey, noop, noop)).to.be.an.instanceof(StoreQuery);
+    });
+
+    describe('when a query with the given key is in progress', function () {
+      var expectedQuery, endQuery;
+
+      beforeEach(function () {
+        expectedQuery = store.query(queryKey, noop, function () {
+          return new Promise(function (resolve) { endQuery = resolve; });
+        });
+      });
+
+      it('should return the in progress query', function () {
+        var actualQuery = store.query(queryKey, noop, noop);
+
+        expect(actualQuery).to.equal(expectedQuery);
+      });
+
+      afterEach(function () {
+        endQuery && endQuery();
+      });
+    });
+
+    describe('when a query is in progress and then completes', function () {
+      var query, endQuery;
+
+      beforeEach(function () {
+        query = store.query(queryKey, noop, function () {
+          return new Promise(function (resolve) { endQuery = resolve; });
+        });
+      });
+
+      it('should return a new query', function (done) {
+        var inProgressQuery = store.query(queryKey, noop, noop);
+
+        expect(inProgressQuery).to.equal(query);
+
+        endQuery();
+
+        setTimeout(function () {
+          var newQuery = store.query(queryKey, noop, noop);
+
+          expect(newQuery).to.not.equal(query, 'we should get a new query once the query has finished');
+
+          done();
+        }, 1);
+      });
+
+      afterEach(function () {
+        endQuery && endQuery();
+      });
+    });
+
+    function noop() {
     }
   });
 });

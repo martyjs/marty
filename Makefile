@@ -6,7 +6,7 @@ SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
 	@node build/lib/mockServer.js &
-	@$(BIN)/karma start
+	@$(BIN)/karma start --single-run
 
 bootstrap: bootstrap-js bootstrap-ruby
 

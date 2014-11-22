@@ -70,6 +70,7 @@
   "dependencies": {
     "flux": "^2.0.1",
     "lodash-node": "^2.4.1",
-    "reqwest": "^1.1.5"
+    "reqwest": "^1.1.5",
+    "es6-promise": "^2.0.0"
   }
 }
