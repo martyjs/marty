@@ -1,19 +1,16 @@
-var sinon = require('sinon');
+// var sinon = require('sinon');
 var _ = require('lodash-node');
-var http = require('../lib/http');
+// var http = require('../lib/http');
+var format = require('util').format;
 var expect = require('chai').expect;
 var HttpAPI = require('../lib/httpAPI');
+var MOCK_SERVER_PORT = 8956;
 
 describe('HttpAPI', function () {
-  var request, API, baseUrl, headers;
+  var API, baseUrl, response;
 
   beforeEach(function () {
-    baseUrl = 'http://foos.com/';
-    request = sinon.stub(http, 'request');
-  });
-
-  afterEach(function () {
-    request.restore();
+    baseUrl = format('http://localhost:%s/', MOCK_SERVER_PORT);
   });
 
   describe('#mixins', function () {
@@ -21,21 +18,25 @@ describe('HttpAPI', function () {
   });
 
   describe('when you dont specify a baseUrl', function () {
-    var url = 'http://foos.com/foos';
+    var url;
 
     beforeEach(function () {
+      url = baseUrl + 'foos';
+
       API = new HttpAPI({
         getFoos: function () {
-          return this.get(url);
+          return this.get(url).then(storeResponse);
         }
       });
-      API.getFoos();
+
+      return API.getFoos();
     });
 
     it('should start a get request with the given url', function () {
-      expect(request).to.have.been.calledWith({
-        url: url,
-        method: 'GET'
+      expect(response).to.eql({
+        url: '/foos',
+        method: 'GET',
+        body: {}
       });
     });
   });
@@ -47,27 +48,26 @@ describe('HttpAPI', function () {
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'GET'
+        expect(response).to.eql({
+          url: '/foos',
+          method: 'GET',
+          body: {}
         });
       });
     });
 
     describe('when you pass in a some options', function () {
       beforeEach(function () {
-        headers = { foo: 'bar' };
         return makeRequest('get', {
-          url: 'foos',
-          headers: headers
+          url: 'bars/baz',
         });
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
+        expect(response).to.eql({
+          url: '/bars/baz',
           method: 'GET',
-          headers: headers
+          body: {}
         });
       });
     });
@@ -80,27 +80,31 @@ describe('HttpAPI', function () {
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'PUT'
+        expect(response).to.eql({
+          url: '/foos',
+          method: 'PUT',
+          body: {}
         });
       });
     });
 
     describe('when you pass in a some options', function () {
+      var expectedBody;
+
       beforeEach(function () {
-        headers = { foo: 'bar' };
+        expectedBody = { foo: 'bar' };
+
         return makeRequest('put', {
-          url: 'foos',
-          headers: headers
+          url: 'bars/baz',
+          data: expectedBody
         });
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
+        expect(response).to.eql({
           method: 'PUT',
-          headers: headers
+          url: '/bars/baz',
+          body: expectedBody
         });
       });
     });
@@ -113,27 +117,31 @@ describe('HttpAPI', function () {
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'POST'
+        expect(response).to.eql({
+          url: '/foos',
+          method: 'POST',
+          body: {}
         });
       });
     });
 
     describe('when you pass in a some options', function () {
+      var expectedBody;
+
       beforeEach(function () {
-        headers = { foo: 'bar' };
+        expectedBody = { foo: 'bar' };
+
         return makeRequest('post', {
-          url: 'foos',
-          headers: headers
+          url: 'bars/baz',
+          data: expectedBody
         });
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
+        expect(response).to.eql({
           method: 'POST',
-          headers: headers
+          url: '/bars/baz',
+          body: expectedBody
         });
       });
     });
@@ -146,27 +154,26 @@ describe('HttpAPI', function () {
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'DELETE'
+        expect(response).to.eql({
+          url: '/foos',
+          method: 'DELETE',
+          body: {}
         });
       });
     });
 
     describe('when you pass in a some options', function () {
       beforeEach(function () {
-        headers = { foo: 'bar' };
         return makeRequest('delete', {
-          url: 'foos',
-          headers: headers
+          url: 'bars/baz',
         });
       });
 
       it('should create some options which include the url', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
+        expect(response).to.eql({
+          url: '/bars/baz',
           method: 'DELETE',
-          headers: headers
+          body: {}
         });
       });
     });
@@ -178,17 +185,18 @@ describe('HttpAPI', function () {
         API = new HttpAPI({
           baseUrl: baseUrl,
           getUser: function () {
-            return this.get('/foos');
+            return this.get('/foos').then(storeResponse);
           }
         });
 
-        API.getUser();
+        return API.getUser();
       });
 
       it('should add the / if its missing', function () {
-        expect(request).to.have.been.calledWith({
-          url: baseUrl + 'foos',
-          method: 'GET'
+        expect(response).to.eql({
+          url: '/foos',
+          method: 'GET',
+          body: {}
         });
       });
     });
@@ -196,23 +204,28 @@ describe('HttpAPI', function () {
     describe('when you dont specify a / in the baseUrl or url', function () {
       beforeEach(function () {
         API = new HttpAPI({
-          baseUrl: 'http://foos.com',
+          baseUrl: baseUrl.substring(0, baseUrl.length - 1),
           getUser: function () {
-            return this.get('foos');
+            return this.get('foos').then(storeResponse);
           }
         });
 
-        API.getUser();
+        return API.getUser();
       });
 
       it('should add the / if its missing', function () {
-        expect(request).to.have.been.calledWith({
-          url: 'http://foos.com/foos',
-          method: 'GET'
+        expect(response).to.eql({
+          url: '/foos',
+          method: 'GET',
+          body: {}
         });
       });
     });
   });
+
+  function storeResponse(res) {
+    response = res;
+  }
 
   function makeRequest(method) {
     var args = _.rest(arguments);
@@ -220,7 +233,7 @@ describe('HttpAPI', function () {
     API = new HttpAPI({
       baseUrl: baseUrl,
       execute: function () {
-        return this[method].apply(this, args);
+        return this[method].apply(this, args).then(storeResponse);
       }
     });
 

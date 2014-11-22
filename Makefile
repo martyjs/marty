@@ -1,11 +1,12 @@
 BIN = ./node_modules/.bin
 
-.PHONY: bootstrap bootstrap-js bootstrap-ruby start clean test docs release-docs;
+.PHONY: bootstrap bootstrap-js bootstrap-ruby start test docs release-docs;
 
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
-	@$(BIN)/karma start --single-run
+	@node build/lib/mockServer.js &
+	@$(BIN)/karma start
 
 bootstrap: bootstrap-js bootstrap-ruby
 
@@ -17,9 +18,10 @@ bootstrap-ruby: docs/Gemfile
 	@cd docs && bundle install
 
 test-watch: lint
+	@node build/lib/mockServer.js &
 	@$(BIN)/karma start
 
-lint: bootstrap-js clean
+lint: bootstrap-js
 	@$(BIN)/jsxcs $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
