@@ -125,17 +125,17 @@ describe('ActionCreators', function () {
             arguments: [foo]
           },
           handlers: [{
-            name: store.name,
+            store: store.name,
             type: 'Store',
-            action: 'receiveFoo',
-            exception: null,
+            name: 'receiveFoo',
+            error: null,
             state: {
               before: [],
               after: [foo]
             },
             views: [{
               name: 'Foos',
-              exception: null,
+              error: null,
               state: {
                 before: {
                   foos: []
@@ -146,7 +146,7 @@ describe('ActionCreators', function () {
               }
             }, {
               name: 'Bars',
-              exception: null,
+              error: null,
               state: {
                 before: {
                   bars: []

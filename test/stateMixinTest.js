@@ -67,7 +67,7 @@ describe('StateMixin', function () {
         it('should add a view to the handler', function () {
           expect(action.handlers[0].views[0]).to.eql({
             name: 'bar',
-            exception: expectedError,
+            error: expectedError,
             state: {
               after: {},
               before: undefined
@@ -84,7 +84,7 @@ describe('StateMixin', function () {
         it('should add a view to the handler', function () {
           expect(action.handlers[0].views[0]).to.eql({
             name: 'bar',
-            exception: null,
+            error: null,
             state: {
               after: expectedState,
               before: undefined
