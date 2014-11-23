@@ -226,7 +226,31 @@ describe('StateMixin', function () {
     });
 
     describe('#getInitialState()', function () {
-      it('should set state to merge of #getInitialState() and #getState()');
+      var state;
+      beforeEach(function () {
+        state = {
+          foo: 'bar'
+        };
+
+        initialState = {
+          bar: 'baz'
+        };
+
+        mixin = new StateMixin({
+          getInitialState: function () {
+            return initialState;
+          },
+          getState: function () {
+            return state;
+          }
+        });
+      });
+      it('should set state to merge of #getInitialState() and #getState()', function () {
+        expect(mixin.getInitialState()).to.eql({
+          foo: 'bar',
+          bar: 'baz'
+        });
+      });
     });
 
     describe('#listenTo', function () {
