@@ -160,30 +160,45 @@ describe('StateMixin', function () {
   });
 
   describe('when the component props changes', function () {
+    var child, parent, childRenderCount;
+
     beforeEach(function () {
-      // var Mixin = new StateMixin({
-      //   getState: sinon.spy(function () {
-      //     return {};
-      //   })
-      // });
+      childRenderCount = 0;
+      mixin = new StateMixin({
+        getState: sinon.spy(function () {
+          return {};
+        })
+      });
 
-      // var ChildComponent = React.createClass({
-      //   mixin: [Mixin],
-      //   render: function () {
-      //     return <div></div>;
-      //   }
-      // });
+      child = React.createClass({
+        mixin: [mixin],
+        render: function () {
+          childRenderCount++;
+          return React.createElement('div');
+        }
+      });
 
-      // var ParentComponent = React.createClass({
-      //   render: function () {
-      //     return <ChildComponent user={this.state.user} />;
-      //   }
-      // });
+      parent = React.createClass({
+        render: function () {
+          return React.createElement(child, { user: this.state.user });
+        },
+        getInitialState: function () {
+          return {
+            user: { name: 'foo' }
+          };
+        }
+      });
 
-      // var element = TestUtils.renderIntoDocument(React.createElement(ParentComponent));
+      element = TestUtils.renderIntoDocument(React.createElement(parent));
+
+      element.setState({
+        user: { name: 'bar' }
+      });
     });
 
-    it('should update the components state');
+    it('should update the components state', function () {
+      expect(childRenderCount).to.equal(2);
+    });
   });
 
   describe('when you pass in an object literal', function () {
