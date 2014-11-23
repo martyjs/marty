@@ -2,6 +2,7 @@ var React = require('react');
 var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
+var Action = require('../lib/action');
 var StateMixin = require('../lib/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
 
@@ -22,6 +23,91 @@ describe('StateMixin', function () {
 
   it('should throw an error if you dont pass in an object literal', function () {
     expect(function () { StateMixin(); }).to.throw(Error);
+  });
+
+  describe('when a store changes', function () {
+    var expectedState, action, store;
+
+    beforeEach(function () {
+      action = new Action();
+      expectedState = {};
+      store = {
+        name: 'foo',
+        action: action,
+        addChangeListener: sinon.spy(),
+        getState: sinon.stub().returns(expectedState),
+      };
+
+      mixin = new StateMixin({
+        name: 'bar',
+        listenTo: store,
+        getState: function () {
+          return store.getState();
+        }
+      });
+
+      action.addStoreHandler(store, 'test');
+      element = renderClassWithMixin(mixin);
+    });
+
+    describe('when diagnostics is enabled', function () {
+      beforeEach(function () {
+        Marty.diagnostics.enabled = true;
+      });
+
+      describe('when the handler fails', function () {
+        var expectedError;
+
+        beforeEach(function () {
+          expectedError = new Error();
+          store.getState = sinon.stub().throws(expectedError);
+          element.onStoreChanged(null, store);
+        });
+
+        it('should add a view to the handler', function () {
+          expect(action.handlers[0].views[0]).to.eql({
+            name: 'bar',
+            exception: expectedError,
+            state: {
+              after: {},
+              before: undefined
+            }
+          });
+        });
+      });
+
+      describe('when the handler is successful', function () {
+        beforeEach(function () {
+          element.onStoreChanged(null, store);
+        });
+
+        it('should add a view to the handler', function () {
+          expect(action.handlers[0].views[0]).to.eql({
+            name: 'bar',
+            exception: null,
+            state: {
+              after: expectedState,
+              before: undefined
+            }
+          });
+        });
+      });
+
+      afterEach(function () {
+        Marty.diagnostics.enabled = false;
+      });
+    });
+
+    describe('when diagnostics is disabled', function () {
+      beforeEach(function () {
+        Marty.diagnostics.enabled = false;
+        element.onStoreChanged(null, store);
+      });
+
+      it('should not add a view handler', function () {
+        expect(action.handlers[0].views).to.be.empty;
+      });
+    });
   });
 
   describe('when you pass in a store', function () {

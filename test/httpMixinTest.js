@@ -11,9 +11,6 @@ describe('HttpMixin', function () {
     baseUrl = format('http://localhost:%s/', MOCK_SERVER_PORT);
   });
 
-  describe('#mixins', function () {
-    it('should allow you to mixin object literals');
-  });
 
   describe('when you dont specify a baseUrl', function () {
     var url;

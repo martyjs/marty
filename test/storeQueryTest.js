@@ -4,14 +4,19 @@ var StoreQuery = require('../lib/storeQuery');
 var NotFoundError = require('../lib/errors/notFound');
 
 describe('StoreQuery', function () {
-  var query;
+  var query, expectedContext, actualContext;
+
+  beforeEach(function () {
+    expectedContext = { store: 1 };
+  });
 
   describe('when the local query returns a value', function () {
     var expectedResult;
     beforeEach(function () {
       expectedResult = {foo: 'bar'};
 
-      query = new StoreQuery(function () {
+      query = new StoreQuery(expectedContext, function () {
+        actualContext = this;
         return expectedResult;
       });
     });
@@ -27,6 +32,10 @@ describe('StoreQuery', function () {
     it('should have the result', function () {
       expect(query.result).to.equal(expectedResult);
     });
+
+    it('should set the context to the store', function () {
+      expect(actualContext).to.equal(expectedContext);
+    });
   });
 
   describe('when the local query throws an exception', function () {
@@ -34,7 +43,7 @@ describe('StoreQuery', function () {
     beforeEach(function () {
       expectedError = new Error();
 
-      query = new StoreQuery(function () {
+      query = new StoreQuery(expectedContext, function () {
         throw expectedError;
       });
     });
@@ -55,7 +64,7 @@ describe('StoreQuery', function () {
   describe('when the local query does not return a value', function () {
     describe('when the remote query returns null', function () {
       beforeEach(function () {
-        query = new StoreQuery(noop, noop);
+        query = new StoreQuery(expectedContext, noop, noop);
       });
 
       it('should have a status of failed', function () {
@@ -76,7 +85,8 @@ describe('StoreQuery', function () {
       beforeEach(function () {
         expectedResult = {foo: 'bar'};
 
-        query = new StoreQuery(noop, function () {
+        query = new StoreQuery(expectedContext, noop, function () {
+          actualContext = this;
           return expectedResult;
         });
       });
@@ -92,6 +102,10 @@ describe('StoreQuery', function () {
       it('should have the result', function () {
         expect(query.result).to.equal(expectedResult);
       });
+
+      it('should set the context to the store', function () {
+        expect(actualContext).to.equal(expectedContext);
+      });
     });
 
     describe('when the remote query throws an exception', function () {
@@ -99,7 +113,7 @@ describe('StoreQuery', function () {
       beforeEach(function () {
         expectedError = new Error();
 
-        query = new StoreQuery(function () {
+        query = new StoreQuery(expectedContext, noop, function () {
           throw expectedError;
         });
       });
@@ -124,7 +138,7 @@ describe('StoreQuery', function () {
         beforeEach(function (done) {
           expectedError = new Error();
 
-          query = new StoreQuery(noop, function () {
+          query = new StoreQuery(expectedContext, noop, function () {
             return new Promise(function (resolve, reject) {
               reject(expectedError);
             });
@@ -154,7 +168,7 @@ describe('StoreQuery', function () {
             localResult = null;
             expectedResult = { foo: 'bar' };
 
-            query = new StoreQuery(function () {
+            query = new StoreQuery(expectedContext, function () {
               return localResult;
             }, function () {
               return new Promise(function (resolve) {
@@ -181,7 +195,7 @@ describe('StoreQuery', function () {
 
         describe('when the local query then does not return a value', function () {
           beforeEach(function (done) {
-            query = new StoreQuery(noop, function () {
+            query = new StoreQuery(expectedContext, noop, function () {
               return new Promise(function (resolve) {
                 resolve();
               });

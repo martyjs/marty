@@ -16,7 +16,6 @@ describe('ActionCreators', function () {
 
     actionCreators = new ActionCreators({
       dispatcher: dispatcher,
-      initialize: sinon.spy(),
       test: function (message) {
         this.dispatch(testConstant, message);
       }
@@ -24,7 +23,27 @@ describe('ActionCreators', function () {
   });
 
   describe('#mixins', function () {
-    it('should allow you to mixin object literals');
+    var mixin1, mixin2;
+
+    beforeEach(function () {
+      mixin1 = {
+        foo: function () { return 'bar'; }
+      };
+
+      mixin2 = {
+        bar: function () { return 'baz'; }
+      };
+
+      actionCreators = new ActionCreators({
+        dispatcher: dispatcher,
+        mixins: [mixin1, mixin2]
+      });
+    });
+
+    it('should allow you to mixin object literals', function () {
+      expect(actionCreators.foo()).to.equal('bar');
+      expect(actionCreators.bar()).to.equal('baz');
+    });
   });
 
   describe('#dispatch()', function () {

@@ -48,7 +48,27 @@ describe('Store', function () {
   });
 
   describe('#mixins', function () {
-    it('should allow you to mixin object literals');
+    var mixin1, mixin2;
+
+    beforeEach(function () {
+      mixin1 = {
+        foo: function () { return 'bar'; }
+      };
+
+      mixin2 = {
+        bar: function () { return 'baz'; }
+      };
+
+      store = new Store({
+        dispatcher: dispatcher,
+        mixins: [mixin1, mixin2]
+      });
+    });
+
+    it('should allow you to mixin object literals', function () {
+      expect(store.foo()).to.equal('bar');
+      expect(store.bar()).to.equal('baz');
+    });
   });
 
   describe('#getInitialState()', function () {
