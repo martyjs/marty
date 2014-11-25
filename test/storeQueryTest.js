@@ -21,12 +21,12 @@ describe('StoreQuery', function () {
       });
     });
 
-    it('should have a status of successful', function () {
-      expect(query.status).to.equal('successful');
+    it('should have a status of done', function () {
+      expect(query.status).to.equal('done');
     });
 
-    it('should say it is finished', function () {
-      expect(query.finished).to.be.true;
+    it('should say it is done', function () {
+      expect(query.done).to.be.true;
     });
 
     it('should have the result', function () {
@@ -48,12 +48,12 @@ describe('StoreQuery', function () {
       });
     });
 
-    it('should have a status of failed', function () {
-      expect(query.status).to.equal('failed');
+    it('should have a status of error', function () {
+      expect(query.status).to.equal('error');
     });
 
-    it('should say it is finished', function () {
-      expect(query.finished).to.be.true;
+    it('should say it is done', function () {
+      expect(query.done).to.be.true;
     });
 
     it('should have the result', function () {
@@ -67,12 +67,12 @@ describe('StoreQuery', function () {
         query = new StoreQuery(expectedContext, noop, noop);
       });
 
-      it('should have a status of failed', function () {
-        expect(query.status).to.equal('failed');
+      it('should have a status of error', function () {
+        expect(query.status).to.equal('error');
       });
 
-      it('should say it is finished', function () {
-        expect(query.finished).to.be.true;
+      it('should say it is done', function () {
+        expect(query.done).to.be.true;
       });
 
       it('should have the result', function () {
@@ -91,12 +91,12 @@ describe('StoreQuery', function () {
         });
       });
 
-      it('should have a status of successful', function () {
-        expect(query.status).to.equal('successful');
+      it('should have a status of done', function () {
+        expect(query.status).to.equal('done');
       });
 
-      it('should say it is finished', function () {
-        expect(query.finished).to.be.true;
+      it('should say it is done', function () {
+        expect(query.done).to.be.true;
       });
 
       it('should have the result', function () {
@@ -118,12 +118,12 @@ describe('StoreQuery', function () {
         });
       });
 
-      it('should have a status of failed', function () {
-        expect(query.status).to.equal('failed');
+      it('should have a status of error', function () {
+        expect(query.status).to.equal('error');
       });
 
-      it('should say it is finished', function () {
-        expect(query.finished).to.be.true;
+      it('should say it is done', function () {
+        expect(query.done).to.be.true;
       });
 
       it('should have the error', function () {
@@ -147,12 +147,12 @@ describe('StoreQuery', function () {
           setTimeout(done, 1);
         });
 
-        it('should have a status of failed', function () {
-          expect(query.status).to.equal('failed');
+        it('should have a status of error', function () {
+          expect(query.status).to.equal('error');
         });
 
-        it('should say it is finished', function () {
-          expect(query.finished).to.be.true;
+        it('should say it is done', function () {
+          expect(query.done).to.be.true;
         });
 
         it('should have the error', function () {
@@ -160,7 +160,7 @@ describe('StoreQuery', function () {
         });
       });
 
-      describe('when the promise completes successful', function () {
+      describe('when the promise completes done', function () {
         describe('when the local query then returns a value', function () {
           var expectedResult, localResult;
 
@@ -180,12 +180,12 @@ describe('StoreQuery', function () {
             setTimeout(done, 1);
           });
 
-          it('should have a status of successful', function () {
-            expect(query.status).to.equal('successful');
+          it('should have a status of done', function () {
+            expect(query.status).to.equal('done');
           });
 
-          it('should say it is finished', function () {
-            expect(query.finished).to.be.true;
+          it('should say it is done', function () {
+            expect(query.done).to.be.true;
           });
 
           it('should have the result', function () {
@@ -204,12 +204,12 @@ describe('StoreQuery', function () {
             setTimeout(done, 1);
           });
 
-          it('should have a status of failed', function () {
-            expect(query.status).to.equal('failed');
+          it('should have a status of error', function () {
+            expect(query.status).to.equal('error');
           });
 
-          it('should say it is finished', function () {
-            expect(query.finished).to.be.true;
+          it('should say it is done', function () {
+            expect(query.done).to.be.true;
           });
 
           it('should have the error', function () {
