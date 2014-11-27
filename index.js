@@ -7,7 +7,11 @@ var constants = require('./lib/internalConstants');
 var Marty = _.extend({
   constants: constants,
   diagnostics: diagnostics,
-  dispatcher: new Dispatcher(),
+  dispatcher: new Dispatcher()
 }, create);
 
 module.exports = Marty;
+
+Marty.stores = {
+  Actions: require('./lib/stores/actionsStore')
+};
