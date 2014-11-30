@@ -168,7 +168,10 @@ describe('Store', function () {
         one: sinon.spy()
       });
 
-      Marty.dispatcher.dispatch(new Action(actionType, [data]));
+      Marty.dispatcher.dispatch(new Action({
+        type: actionType,
+        arguments: [data]
+      }));
     });
 
     it('calls the handlers', function () {
@@ -277,7 +280,7 @@ describe('Store', function () {
 
         ActionCreators = Marty.createActionCreators({
           add: function (user) {
-            var action = this.dispatch('ADD', user);
+            var action = this.dispatch(user);
 
             interimState = _.clone(Store.getState());
 
@@ -304,7 +307,10 @@ describe('Store', function () {
     });
 
     function handleAction(actionType) {
-      var action = new Action(actionType, [data]);
+      var action = new Action({
+        type: actionType,
+        arguments: [data]
+      });
 
       store.handleAction(action);
 
@@ -312,7 +318,11 @@ describe('Store', function () {
     }
 
     function handleActionFrom(actionType, source) {
-      var action = new Action(actionType, [data], source);
+      var action = new Action({
+        source: source,
+        type: actionType,
+        arguments: [data]
+      });
 
       store.handleAction(action);
 

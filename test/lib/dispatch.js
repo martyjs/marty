@@ -1,17 +1,7 @@
-var _ = require('lodash-node');
-var Dispatcher = require('../../lib/dispatcher');
-var DispatchMixin = require('../../lib/mixins/dispatchMixin');
+var dispatcher = require('../../index').dispatcher;
 
 function dispatch() {
-  var dispatcher = getDispatcher();
-
   return dispatcher.dispatch.apply(dispatcher, arguments);
-}
-
-function getDispatcher() {
-  return _.extend({
-    __dispatcher: require('../../index').dispatcher,
-  }, DispatchMixin);
 }
 
 module.exports = dispatch;

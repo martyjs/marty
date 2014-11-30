@@ -1,18 +1,14 @@
-var React = require('react');
-var sinon = require('sinon');
+// var React = require('react');
 var expect = require('chai').expect;
 var Promise = require('es6-promise').Promise;
-var diagnostics = require('../lib/diagnostics');
 var MockDispatcher = require('./lib/mockDispatcher');
 var ActionCreators = require('../lib/actionCreators');
-var ActionStore = require('../lib/stores/actionsStore');
-var TestUtils = require('react/addons').addons.TestUtils;
+// var TestUtils = require('react/addons').addons.TestUtils;
 
-
-describe.only('ActionCreators', function () {
-  var actionCreators, dispatcher, testConstant = 'TEST';
+describe('ActionCreators', function () {
+  var actionCreators, dispatcher;
   var token, expectedActionType, expectedOtherArg, expectedArg;
-  var actualAction, payload, expectedError;
+  var actualAction, payload, expectedError, promise;
 
   beforeEach(function () {
     dispatcher = new MockDispatcher();
@@ -22,20 +18,25 @@ describe.only('ActionCreators', function () {
     describe('when the promise fails', function () {
       beforeEach(function (done) {
         expectedError = new Error('foo');
+        promise = new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            reject(expectedError);
+          });
+        });
+
         actionCreators = new ActionCreators({
           dispatcher: dispatcher,
-          someAction: function (arg) {
-            return new Promise(function (resolve, reject) {
-              setTimeout(function () {
-                reject(expectedError);
-                done();
-              }, 2);
-            });
+          someAction: function () {
+            return promise;
           }
         });
         token = actionCreators.someAction();
-        actualAction = dispatcher.getActionWithType('ACTION_ERROR');
-        payload = (actualAction || {}).arguments[0];
+
+        promise.catch(function () {
+          actualAction = dispatcher.getActionWithType('ACTION_ERROR');
+          payload = (actualAction || { arguments: [] }).arguments[0];
+          done();
+        });
       });
 
       it('should dispatch an ACTION_ERROR action', function () {
@@ -56,23 +57,37 @@ describe.only('ActionCreators', function () {
     });
 
     describe('when the promise completes', function () {
+      var dispatched;
+
       beforeEach(function (done) {
+        expectedArg = { foo: 'bar' };
+        expectedActionType = 'SOME_ACTION';
+        promise = new Promise(function (resolve) {
+          setTimeout(function () {
+            resolve();
+          }, 2);
+        });
+
         actionCreators = new ActionCreators({
           dispatcher: dispatcher,
-          someAction: function (arg) {
-            return new Promise(function (resolve) {
-              setTimeout(function () {
-                resolve();
-                done();
-              }, 2);
-            })
+          someAction: function () {
+            dispatched = promise.then((function () {
+              this.dispatch(expectedArg);
+            }).bind(this));
+
+            return dispatched;
           }
         });
         actionCreators.someAction(expectedArg);
+        dispatched.then(done);
       });
 
       it('should dispatch an ACTION_DONE action', function () {
         expect(dispatcher.getActionWithType('ACTION_DONE')).to.exist;
+      });
+
+      it('should have dispatched the action', function () {
+        expect(dispatcher.getActionWithType(expectedActionType)).to.be.defined;
       });
     });
   });
@@ -82,7 +97,7 @@ describe.only('ActionCreators', function () {
       expectedError = new Error('foo');
       actionCreators = new ActionCreators({
         dispatcher: dispatcher,
-        someAction: function (arg) {
+        someAction: function () {
           throw expectedError;
         }
       });
@@ -113,7 +128,7 @@ describe.only('ActionCreators', function () {
       expectedError = new Error('foo');
       actionCreators = new ActionCreators({
         dispatcher: dispatcher,
-        someAction: function (arg) {
+        someAction: function () {
           return expectedError;
         }
       });
@@ -143,7 +158,7 @@ describe.only('ActionCreators', function () {
     beforeEach(function () {
       expectedArg = { foo: 'bar' };
       expectedOtherArg = { baz: 'bim' };
-      expectedActionType = 'SOME_ACTION'
+      expectedActionType = 'SOME_ACTION';
       actionCreators = new ActionCreators({
         dispatcher: dispatcher,
         someAction: function (arg) {
@@ -180,7 +195,7 @@ describe.only('ActionCreators', function () {
       });
     });
 
-    describe('#dispatch()',function () {
+    describe('#dispatch()', function () {
       beforeEach(function () {
         actualAction = dispatcher.getActionWithType(expectedActionType);
       });
@@ -249,7 +264,7 @@ describe.only('ActionCreators', function () {
   //   });
   // });
 
-  describe('#getActionType', function () {
+  describe('#getActionType()', function () {
     it('should return the function name as upper case with underscores', function () {
       expect(actionCreators.getActionType('fooBarBaz')).to.equal('FOO_BAR_BAZ');
     });
@@ -355,14 +370,14 @@ describe.only('ActionCreators', function () {
   //   });
   // });
 
-  function renderClassWithState(stateProps) {
-    var state = require('../index').createStateMixin(stateProps);
+  // function renderClassWithState(stateProps) {
+  //   var state = require('../index').createStateMixin(stateProps);
 
-    return TestUtils.renderIntoDocument(React.createElement(React.createClass({
-      mixins: [state],
-      render: function () {
-        return React.createElement('div', null, this.state.name);
-      }
-    })));
-  }
+  //   return TestUtils.renderIntoDocument(React.createElement(React.createClass({
+  //     mixins: [state],
+  //     render: function () {
+  //       return React.createElement('div', null, this.state.name);
+  //     }
+  //   })));
+  // }
 });

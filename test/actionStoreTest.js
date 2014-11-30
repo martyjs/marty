@@ -1,17 +1,18 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var Action = require('../lib/action');
+var uuid = require('../lib/utils/uuid');
 var dispatch = require('./lib/dispatch');
+var ActionPayload = require('../lib/action');
 var ActionStore = require('../lib/stores/actionsStore');
 var ActionConstants = require('../lib/internalConstants').Actions;
 
 describe('ActionStore', function () {
-  var listener, expectedActionType, action, actualAction;
+  var listener, expectedActionType, token, actualAction, expectedArguments;
 
   beforeEach(function () {
+    token = uuid();
     listener = sinon.spy();
     expectedActionType = 'FOO_BAR';
-    action = new Action(expectedActionType);
   });
 
   afterEach(function () {
@@ -20,9 +21,10 @@ describe('ActionStore', function () {
 
   describe('when an action starts', function () {
     beforeEach(function () {
+      expectedArguments = [1, 2];
       ActionStore.addChangeListener(listener);
-      dispatch(ActionConstants.ACTION_STARTING, action);
-      actualAction = ActionStore.getAction(action.token);
+      dispatchStarting(expectedArguments);
+      actualAction = ActionStore.getAction(token);
     });
 
     it('should add the action', function () {
@@ -42,16 +44,17 @@ describe('ActionStore', function () {
     });
   });
 
+
   describe('when an action fails', function () {
     var expectedError;
 
     beforeEach(function () {
       expectedError = new Error();
-      dispatch(ActionConstants.ACTION_STARTING, action);
+      dispatchStarting();
 
       ActionStore.addChangeListener(listener);
-      dispatch(ActionConstants.ACTION_ERROR, action.token, expectedError);
-      actualAction = ActionStore.getAction(action.token);
+      dispatchError(expectedError);
+      actualAction = ActionStore.getAction(token);
     });
 
     it('should have a \'error\' status', function () {
@@ -72,15 +75,11 @@ describe('ActionStore', function () {
   });
 
   describe('when an action is done', function () {
-    var expectedError;
-
     beforeEach(function () {
-      expectedError = new Error();
-      dispatch(ActionConstants.ACTION_STARTING, action);
-
+      dispatchStarting();
       ActionStore.addChangeListener(listener);
-      dispatch(ActionConstants.ACTION_DONE, action.token);
-      actualAction = ActionStore.getAction(action.token);
+      dispatchDone();
+      actualAction = ActionStore.getAction(token);
     });
 
     it('should have a \'done\' status', function () {
@@ -95,4 +94,29 @@ describe('ActionStore', function () {
       expect(listener).to.have.been.calledOnce;
     });
   });
+
+  function dispatchDone() {
+    dispatch(new ActionPayload({
+      type: ActionConstants.ACTION_DONE,
+      arguments: [token]
+    }));
+  }
+
+  function dispatchError(error) {
+    dispatch(new ActionPayload({
+      type: ActionConstants.ACTION_ERROR,
+      arguments: [token, error]
+    }));
+  }
+
+  function dispatchStarting(args) {
+    dispatch(new ActionPayload({
+      type: ActionConstants.ACTION_STARTING,
+      arguments: [{
+        token: token,
+        type: expectedActionType,
+        arguments: args
+      }]
+    }));
+  }
 });

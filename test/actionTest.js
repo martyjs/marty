@@ -22,12 +22,12 @@ describe('Action', function () {
       },
     };
 
-    action = new Action(
-      actionType,
-      args,
-      source,
-      creator
-    );
+    action = new Action({
+      type: actionType,
+      arguments: args,
+      source: source,
+      creator: creator
+    });
   });
 
   describe('#toJSON()', function () {
