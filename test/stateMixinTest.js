@@ -483,7 +483,7 @@ describe('StateMixin', function () {
           arguments: [{
             token: stateToken
           }]
-        }))
+        }));
 
         getState = sinon.spy(function () {
           return {

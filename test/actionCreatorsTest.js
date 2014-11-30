@@ -208,10 +208,6 @@ describe('ActionCreators', function () {
       it('should include the actions type', function () {
         expect(payload.type).to.equal(expectedActionType);
       });
-
-      it('should include actions arguments', function () {
-        expect(payload.arguments).to.eql([expectedArg]);
-      });
     });
 
     describe('#dispatch()', function () {
