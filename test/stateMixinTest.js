@@ -2,8 +2,8 @@ var React = require('react');
 var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
-var StateMixin = require('../lib/stateMixin');
 var ActionPayload = require('../lib/actionPayload');
+var StateMixin = require('../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {
