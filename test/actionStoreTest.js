@@ -2,7 +2,7 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var uuid = require('../lib/utils/uuid');
 var dispatch = require('./lib/dispatch');
-var ActionPayload = require('../lib/action');
+var ActionPayload = require('../lib/actionPayload');
 var ActionStore = require('../lib/stores/actionsStore');
 var ActionConstants = require('../lib/internalConstants').Actions;
 

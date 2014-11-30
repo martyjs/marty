@@ -2,9 +2,9 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
-var Action = require('../lib/action');
 var Promise = require('es6-promise').Promise;
 var StoreQuery = require('../lib/storeQuery');
+var ActionPayload = require('../lib/actionPayload');
 
 describe('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
@@ -168,7 +168,7 @@ describe('Store', function () {
         one: sinon.spy()
       });
 
-      Marty.dispatcher.dispatch(new Action({
+      Marty.dispatcher.dispatch(new ActionPayload({
         type: actionType,
         arguments: [data]
       }));
@@ -307,7 +307,7 @@ describe('Store', function () {
     });
 
     function handleAction(actionType) {
-      var action = new Action({
+      var action = new ActionPayload({
         type: actionType,
         arguments: [data]
       });
@@ -318,7 +318,7 @@ describe('Store', function () {
     }
 
     function handleActionFrom(actionType, source) {
-      var action = new Action({
+      var action = new ActionPayload({
         source: source,
         type: actionType,
         arguments: [data]

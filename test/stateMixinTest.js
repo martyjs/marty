@@ -2,8 +2,8 @@ var React = require('react');
 var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
-var Action = require('../lib/action');
 var StateMixin = require('../lib/stateMixin');
+var ActionPayload = require('../lib/actionPayload');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {
@@ -29,7 +29,7 @@ describe('StateMixin', function () {
     var expectedState, action, store;
 
     beforeEach(function () {
-      action = new Action();
+      action = new ActionPayload();
       expectedState = {};
       store = {
         name: 'foo',

@@ -1,8 +1,8 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var Action = require('../lib/action');
+var ActionPayload = require('../lib/actionPayload');
 
-describe('Action', function () {
+describe('ActionPayload', function () {
   var action, store, storeState, actionType, args, source, creator;
   var name, nextState, view, viewHandler, storeHandler, lastState, expectedError;
 
@@ -22,7 +22,7 @@ describe('Action', function () {
       },
     };
 
-    action = new Action({
+    action = new ActionPayload({
       type: actionType,
       arguments: args,
       source: source,
