@@ -19,6 +19,19 @@ describe('ActionStore', function () {
     ActionStore.dispose();
   });
 
+  describe('#Marty.getAction()', function () {
+    var Marty = require('../index');
+
+    beforeEach(function () {
+      dispatchStarting();
+      actualAction = Marty.getAction(token);
+    });
+
+    it('should return the action', function () {
+      expect(actualAction).to.exist;
+    });
+  });
+
   describe('when an action starts', function () {
     beforeEach(function () {
       expectedArguments = [1, 2];
@@ -43,7 +56,6 @@ describe('ActionStore', function () {
       expect(listener).to.have.been.calledOnce;
     });
   });
-
 
   describe('when an action fails', function () {
     var expectedError;

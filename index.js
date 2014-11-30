@@ -6,12 +6,17 @@ var constants = require('./lib/internalConstants');
 
 var Marty = _.extend({
   constants: constants,
+  getAction: getAction,
   diagnostics: diagnostics,
-  dispatcher: new Dispatcher()
+  dispatcher: new Dispatcher(),
 }, create);
 
 module.exports = Marty;
 
-Marty.stores = {
+Marty.Stores = {
   Actions: require('./lib/stores/actionsStore')
 };
+
+function getAction(token) {
+  return Marty.Stores.Actions.getAction(token);
+}
