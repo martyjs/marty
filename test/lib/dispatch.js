@@ -1,4 +1,5 @@
 var _ = require('lodash-node');
+var Dispatcher = require('../../lib/dispatcher');
 var DispatchMixin = require('../../lib/mixins/dispatchMixin');
 
 function dispatch() {
