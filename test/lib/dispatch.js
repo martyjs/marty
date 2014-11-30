@@ -1,6 +1,6 @@
-var dispatcher = require('../../index').dispatcher;
-
 function dispatch() {
+  var dispatcher = require('../../index').dispatcher;
+
   return dispatcher.dispatch.apply(dispatcher, arguments);
 }
 

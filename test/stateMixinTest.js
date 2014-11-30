@@ -2,12 +2,15 @@ var React = require('react');
 var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
+var uuid = require('../lib/utils/uuid');
+var dispatch = require('./lib/dispatch');
 var ActionPayload = require('../lib/actionPayload');
 var StateMixin = require('../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
+var ActionConstants = require('../lib/internalConstants').Actions;
 
 describe('StateMixin', function () {
-  var element, mixin, initialState;
+  var element, mixin, initialState, getState, setState;
 
   beforeEach(function () {
     initialState = {
@@ -290,6 +293,10 @@ describe('StateMixin', function () {
           store.setState(newState);
           expect(element.state).to.eql(newState);
         });
+
+        afterEach(function () {
+          store.dispose();
+        });
       });
 
       describe('multiple stores', function () {
@@ -320,6 +327,11 @@ describe('StateMixin', function () {
             store2: newState
           });
         });
+
+        afterEach(function () {
+          store1.dispose();
+          store2.dispose();
+        });
       });
     });
   });
@@ -348,6 +360,11 @@ describe('StateMixin', function () {
         store2: newState
       });
     });
+
+    afterEach(function () {
+      store1.dispose();
+      store2.dispose();
+    });
   });
 
   describe('when you pass in an object literal of stores', function () {
@@ -373,6 +390,122 @@ describe('StateMixin', function () {
       expect(element.state).to.eql({
         storeState: storeState,
         manualState: manualState
+      });
+    });
+
+    afterEach(function () {
+      store.dispose();
+    });
+  });
+
+  describe('when the action store changes', function () {
+    var token;
+    var Marty = require('../index');
+
+    beforeEach(function () {
+      token = uuid();
+    });
+
+    afterEach(function () {
+      Marty.Stores.Actions.dispose();
+    });
+
+    describe('when you have disabled listening to actions', function () {
+      beforeEach(function () {
+        getState = sinon.spy();
+        mixin = Marty.createStateMixin({
+          listenToActions: false,
+          getState: getState
+        });
+
+        element = renderClassWithMixin(mixin);
+
+        dispatch(new ActionPayload({
+          type: ActionConstants.ACTION_STARTING,
+          arguments: [{
+            token: token
+          }]
+        }));
+      });
+
+      it('should not listen to the action store', function () {
+        expect(getState).to.have.been.calledOnce;
+      });
+    });
+
+    describe('when the action that changed was the one you are interested in', function () {
+      beforeEach(function () {
+        dispatch(new ActionPayload({
+          type: ActionConstants.ACTION_STARTING,
+          arguments: [{
+            token: token
+          }]
+        }));
+
+        getState = sinon.spy(function () {
+          return {
+            action: Marty.getAction(token)
+          };
+        });
+
+        mixin = Marty.createStateMixin({
+          getState: getState
+        });
+
+        element = renderClassWithMixin(mixin);
+        setState = sinon.spy(element, 'setState');
+
+        dispatch(new ActionPayload({
+          type: ActionConstants.ACTION_DONE,
+          arguments: [token]
+        }));
+      });
+
+      it('should not listen to the action store', function () {
+        expect(setState).to.have.been.calledOnce;
+      });
+    });
+
+    describe('when the action that changed was NOT the one you are interested in', function () {
+      var stateToken, setState;
+
+      beforeEach(function () {
+        stateToken = uuid();
+        dispatch(new ActionPayload({
+          type: ActionConstants.ACTION_STARTING,
+          arguments: [{
+            token: token
+          }]
+        }));
+
+        dispatch(new ActionPayload({
+          type: ActionConstants.ACTION_STARTING,
+          arguments: [{
+            token: stateToken
+          }]
+        }))
+
+        getState = sinon.spy(function () {
+          return {
+            action: Marty.getAction(stateToken)
+          };
+        });
+
+        mixin = Marty.createStateMixin({
+          getState: getState
+        });
+
+        element = renderClassWithMixin(mixin);
+        setState = sinon.spy(element, 'setState');
+
+        dispatch(new ActionPayload({
+          type: ActionConstants.ACTION_DONE,
+          arguments: [token]
+        }));
+      });
+
+      it('should not listen to the action store', function () {
+        expect(setState).to.have.not.been.called;
       });
     });
   });

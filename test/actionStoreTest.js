@@ -52,6 +52,10 @@ describe('ActionStore', function () {
       expect(actualAction.type).to.equal(expectedActionType);
     });
 
+    it('should have the actions token', function () {
+      expect(actualAction.token).to.equal(token);
+    });
+
     it('should emit a change to all listeners', function () {
       expect(listener).to.have.been.calledOnce;
     });
