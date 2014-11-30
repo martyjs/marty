@@ -355,7 +355,13 @@ describe('Store', function () {
 
     beforeEach(function () {
       queryKey = 'foo';
+      listener = sinon.spy();
       store = Marty.createStore({});
+      changeListener = store.addChangeListener(listener);
+    });
+
+    afterEach(function () {
+      changeListener.dispose();
     });
 
     it('should return a StoreQuery', function () {
@@ -387,7 +393,9 @@ describe('Store', function () {
 
       beforeEach(function () {
         query = store.query(queryKey, noop, function () {
-          return new Promise(function (resolve) { endQuery = resolve; });
+          return new Promise(function (resolve) {
+            endQuery = resolve;
+          });
         });
       });
 
@@ -403,6 +411,14 @@ describe('Store', function () {
 
           expect(newQuery).to.not.equal(query, 'we should get a new query once the query has finished');
 
+          done();
+        }, 1);
+      });
+
+      it('should tell any listeners that it has changed', function (done) {
+        endQuery();
+        setTimeout(function () {
+          expect(listener).to.have.been.called;
           done();
         }, 1);
       });
