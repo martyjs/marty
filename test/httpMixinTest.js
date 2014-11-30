@@ -2,7 +2,7 @@ var MOCK_SERVER_PORT = 8956;
 var _ = require('lodash-node');
 var format = require('util').format;
 var expect = require('chai').expect;
-var HttpMixin = require('../lib/httpMixin');
+var HttpMixin = require('../lib/mixins/httpMixin');
 
 describe('HttpMixin', function () {
   var API, baseUrl, response;
