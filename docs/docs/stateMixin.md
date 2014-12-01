@@ -118,3 +118,15 @@ var UserState = Marty.createStateMixin(UserStore);
 // UserState.getState() =>
 [{name: 'foo'}, ...]
 {% endhighlight %}
+
+<h3 id="listenToActions">listenToActions</h3>
+
+Flag to determine when you should listen to the Actions store.
+
+Defaults to ``true``.
+
+{% highlight js %}
+var UserState = Marty.createStateMixin({
+  listenToActions: false
+});
+{% endhighlight %}

@@ -13,7 +13,7 @@ Flux is an answer to that problem. At its most basic level it's a set of rules a
  
 There are 3 things you will need to understand: How to tell the application to change its state ([Action creators](/docs/actionCreators.html)), How to change the applications state ([Stores](/docs/stores.html)) and how to tell the view that the state has changed ([State mixins](/docs/stateMixin.html)).
 
-Action Creators are where any changes to your applications state starts. An action creators create actions (weird that!). An action is a function that is responsible for coordinating changes to local and remote state. All actions must have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL"). 
+Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. All actions must have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL"). 
 
 If an action is making a change to your local state then it can pass its type data along to something called a dispatcher.
 

@@ -64,7 +64,7 @@ var UsersStore = Marty.createStore({
 
 <h3 id="name">name</h3>
 
-An (optional) display name for the store. Used by Marty Developer Tools.
+An (optional) display name for the store. Used for richer debugging.
 
 <h3 id="handlers">handlers</h3>
 

@@ -1,9 +1,7 @@
-// var React = require('react');
 var expect = require('chai').expect;
 var Promise = require('es6-promise').Promise;
 var MockDispatcher = require('./lib/mockDispatcher');
 var ActionCreators = require('../lib/actionCreators');
-// var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher;
@@ -263,136 +261,9 @@ describe('ActionCreators', function () {
     });
   });
 
-  // describe('#dispatch()', function () {
-  //   var message = 'Hello World';
-
-  //   beforeEach(function () {
-  //     actionCreators.test(message);
-  //   });
-
-  //   it('should call dispatcher#dispatch', function () {
-  //     expect(dispatcher.dispatch).to.have.been.calledOnce;
-  //   });
-
-  //   it('should pass the action type and data to the dispatcher', function () {
-  //     expect(dispatcher.dispatch).to.have.been.calledOnce;
-  //   });
-  // });
-
   describe('#getActionType()', function () {
     it('should return the function name as upper case with underscores', function () {
       expect(actionCreators.getActionType('fooBarBaz')).to.equal('FOO_BAR_BAZ');
     });
   });
-
-  // describe('tracing', function () {
-  //   var Marty = require('../index');
-  //   var actions, actionType, foo, store, fooView, barView;
-
-  //   beforeEach(function () {
-  //     foo = {bar: 'baz'};
-  //     actionType = 'RECEIVE_FOO';
-  //     diagnostics.enabled = true;
-  //     actions = new ActionStore();
-  //     store = Marty.createStore({
-  //       name: 'Foo Store',
-  //       handlers: {
-  //         receiveFoo: actionType
-  //       },
-  //       receiveFoo: function (foo) {
-  //         this.state.push(foo);
-  //         this.hasChanged();
-  //       },
-  //       getInitialState: function () {
-  //         return [];
-  //       }
-  //     });
-  //     actionCreators = Marty.createActionCreators({
-  //       name: 'FooActions',
-  //       addFoo: function (foo) {
-  //         this.dispatchViewAction(actionType, foo);
-  //       }
-  //     });
-  //     fooView = renderClassWithState({
-  //       name: 'Foos',
-  //       foos: store
-  //     });
-  //     barView = renderClassWithState({
-  //       name: 'Bars',
-  //       bars: store
-  //     });
-  //   });
-
-  //   afterEach(function () {
-  //     actions.dispose();
-  //     diagnostics.enabled = false;
-  //   });
-
-  //   describe('when I dispatch an action', function () {
-  //     var first;
-
-  //     beforeEach(function () {
-  //       actionCreators.addFoo(foo);
-  //       first = actions.first;
-  //     });
-
-  //     it('should trace all function calls', function () {
-  //       expect(first.toJSON()).to.eql({
-  //         type: actionType,
-  //         source: 'VIEW',
-  //         arguments: [foo],
-  //         creator: {
-  //           name: actionCreators.name,
-  //           type: 'ActionCreator',
-  //           action: 'addFoo',
-  //           arguments: [foo]
-  //         },
-  //         handlers: [{
-  //           store: store.name,
-  //           type: 'Store',
-  //           name: 'receiveFoo',
-  //           error: null,
-  //           state: {
-  //             before: [],
-  //             after: [foo]
-  //           },
-  //           views: [{
-  //             name: 'Foos',
-  //             error: null,
-  //             state: {
-  //               before: {
-  //                 foos: []
-  //               },
-  //               after: {
-  //                 foos: [foo]
-  //               }
-  //             }
-  //           }, {
-  //             name: 'Bars',
-  //             error: null,
-  //             state: {
-  //               before: {
-  //                 bars: []
-  //               },
-  //               after: {
-  //                 bars: [foo]
-  //               }
-  //             }
-  //           }]
-  //         }]
-  //       });
-  //     });
-  //   });
-  // });
-
-  // function renderClassWithState(stateProps) {
-  //   var state = require('../index').createStateMixin(stateProps);
-
-  //   return TestUtils.renderIntoDocument(React.createElement(React.createClass({
-  //     mixins: [state],
-  //     render: function () {
-  //       return React.createElement('div', null, this.state.name);
-  //     }
-  //   })));
-  // }
 });
