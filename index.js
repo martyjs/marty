@@ -13,6 +13,7 @@ var Marty = _.extend({
 
 module.exports = Marty;
 
+Marty.ActionPayload = require('./lib/actionPayload');
 Marty.Stores = {
   Actions: require('./lib/stores/actionsStore')
 };

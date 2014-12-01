@@ -5,6 +5,8 @@ var Store = require('../lib/store');
 var Promise = require('es6-promise').Promise;
 var StoreQuery = require('../lib/storeQuery');
 var ActionPayload = require('../lib/actionPayload');
+var ActionHandlerNotFoundError = require('../lib/errors/actionHandlerNotFound');
+var ActionPredicateUndefinedError = require('../lib/errors/actionPredicateUndefined');
 
 describe('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
@@ -48,26 +50,56 @@ describe('Store', function () {
   });
 
   describe('#mixins', function () {
-    var mixin1, mixin2;
+    describe('when you have multiple mixins', function () {
+      var mixin1, mixin2;
 
-    beforeEach(function () {
-      mixin1 = {
-        foo: function () { return 'bar'; }
-      };
+      beforeEach(function () {
+        mixin1 = {
+          foo: function () { return 'bar'; }
+        };
 
-      mixin2 = {
-        bar: function () { return 'baz'; }
-      };
+        mixin2 = {
+          bar: function () { return 'baz'; }
+        };
 
-      store = new Store({
-        dispatcher: dispatcher,
-        mixins: [mixin1, mixin2]
+        store = new Store({
+          dispatcher: dispatcher,
+          mixins: [mixin1, mixin2]
+        });
+      });
+
+      it('should allow you to mixin object literals', function () {
+        expect(store.foo()).to.equal('bar');
+        expect(store.bar()).to.equal('baz');
       });
     });
 
-    it('should allow you to mixin object literals', function () {
-      expect(store.foo()).to.equal('bar');
-      expect(store.bar()).to.equal('baz');
+    describe('when the mixin has handlers', function () {
+      var handlerMixin;
+
+      beforeEach(function () {
+        handlerMixin = {
+          handlers: {
+            baz: 'BAZ'
+          },
+          baz: noop
+        };
+
+        store = new Store({
+          dispatcher: dispatcher,
+          handlers: {
+            foo: 'FOO',
+            bar: 'BAR'
+          },
+          mixins: [handlerMixin],
+          foo: noop,
+          bar: noop
+        });
+      });
+
+      it('should do a deep merge', function () {
+        expect(store.handlers).to.include.keys('foo', 'bar', 'baz');
+      });
     });
   });
 
@@ -176,6 +208,39 @@ describe('Store', function () {
 
     it('calls the handlers', function () {
       expect(store.one).to.have.been.calledWith(data);
+    });
+  });
+
+  describe('#handlers', function () {
+    describe('when the action handler is null', function () {
+      it('should throw an ActionHandlerNotFoundError', function () {
+        expect(createStoreWithMissingActionHandler).to.throw(ActionHandlerNotFoundError);
+
+        function createStoreWithMissingActionHandler() {
+          return new Store({
+            dispatcher: dispatcher,
+            handlers: {
+              foo: 'FOO'
+            }
+          });
+        }
+      });
+    });
+
+    describe('when the handler action predicate is null', function () {
+      it('should throw an ActionPredicateUndefinedError', function () {
+        expect(createStoreWithANullActionPredicate).to.throw(ActionPredicateUndefinedError);
+
+        function createStoreWithANullActionPredicate() {
+          return new Store({
+            dispatcher: dispatcher,
+            handlers: {
+              foo: null
+            },
+            foo: noop
+          });
+        }
+      });
     });
   });
 
@@ -427,8 +492,8 @@ describe('Store', function () {
         endQuery && endQuery();
       });
     });
-
-    function noop() {
-    }
   });
+
+  function noop() {
+  }
 });
