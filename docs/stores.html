@@ -130,9 +130,9 @@
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <p>A store is where the applications state and logic live for a specific domain. A store can contain a collection of domain entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could store some data about something (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
+        <p>Stores hold information about a domain. That domain could be a collection of entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could be some information about something specific (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>). It is responsible for processing actions from the <a href="/docs/dispatcher.html">dispatcher</a>, updating its own state and notifying interested parties when its state changes.</p>
 
-<p>The store should be the <strong>only</strong> place where your applications state changes. If your views want to update its state, it should call an <a href="/docs/actionCreators.html">action creator</a> which dispatches an action that stores listen to and update themselves and then notify the views about their new state. The reasons for this are firstly to give the all parts of the application the opportunity to see this new state and also simplify debugging. Its a lot easier to find a bug if theres only one place the values can change rather than in all views.</p>
+<p>The store should be the <strong>only</strong> place where your applications state changes. If your views want to update its state, it should call an <a href="/docs/actionCreators.html">action creator</a> which dispatches an action that stores listen to and update themselves and then notify the views about their new state.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
@@ -154,17 +154,17 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>A store is a singleton which is created using <a href="#createStore"><code>Marty.createStore</code></a>. When the store is creted it will call <a href="#getInitialState"><code>getInitialState</code></a> which should return an object that all the stores state will live in. This state is accessible by calling <code>this.state</code>. Stores are responsible for fetching their own data so <a href="#getInitialState"><code>getInitialState</code></a> is a good place to make any <a href="/docs/httpApi.html">API calls</a>.</p>
+<p>A store is a singleton which is created using <a href="#createStore"><code>Marty.createStore</code></a>. When the store is created it will call <a href="#getInitialState"><code>getInitialState</code></a> which should return an object that all the stores state will live in. This state is accessible by calling <code>this.state</code>.</p>
 
-<p>The store will also register with the <a href="/docs/dispatcher.html">dispatcher</a> to be notified of any new actions on creation. When an action arrives, the store determines whether to handle that action or not. It does this by looking at the <a href="#handlers">handlers</a> where the key is the name of the handler function and the value is an <a href="#action-predicates">action predicate</a>.</p>
+<p>When an action is dispatched, the store will check its <a href="/docs/stores.html#handlers"><code>handlers</code> hash</a> to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. If the handler updates the stores state state, it can call <a href="#hasChanged"><code>hasChanged</code></a> which will notify any listening views of its new state.</p>
 
-<p>When an action handler is invoked, its arguments will be <a href="/docs/actionCreators.html#dispatch">the arguments passed to the dispatcher</a>. If the handler updates its state, it can call <a href="#hasChanged"><code>hasChanged</code></a> which will notify any listening views of its new state.</p>
+<p>If your view needs some data, it should request it from the relevant store. The store is responsible for sourcing it, either locally or from the server. The <a href="/docs/stores.html#query">query</a> API helps simplify handling async operations.</p>
 
 <h2 id="api">API</h2>
 
 <h3 id="createStore">createStore(props)</h3>
 
-<p>To create a new store, you call <code>Marty.createStore</code> passing in a set of intance properties. It returns a singleton store which is listening to the dispatcher.</p>
+<p>To create a new store, you call <code>Marty.createStore</code> passing in a set of instance properties. It returns a singleton store which is listening to the dispatcher.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
@@ -182,7 +182,7 @@
 
 <h3 id="name">name</h3>
 
-<p>An (optional) display name for the store. Used by Marty Developer Tools.</p>
+<p>An (optional) display name for the store. Used for richer debugging.</p>
 
 <h3 id="handlers">handlers</h3>
 
@@ -293,6 +293,59 @@
   <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="query">query(key, localQuery, remoteQuery)</h3>
+
+<p>When requesting data from a store we should assume that it might require an async operation. <code>Store#query</code> provides a simple syntax that allows you to encapsulate that complexity. </p>
+
+<p>A query accepts 3 arguments</p>
+
+<ul>
+<li><strong>key</strong> To prevent duplicate requests, you pass in string that acts like a lock. If a query with that key is in progress, then the in progress query will be returned rather than creating a new one.</li>
+<li><strong>local query</strong> The local query is a function which, when invoked, will query the local state for the required information. If it returns a value, then the query will complete there. </li>
+<li><strong>remote query</strong> If the remote query does not return a value then the remote query will be invoked. The remote query expects you to return a promise. If the promise is fulfilled, the query expects the data to be available locally so will re-invoke the local query.</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> 
+      <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+      <span class="p">},</span>
+      <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p><code>Store#query</code> will return a <code>StoreQuery</code> which represents the current state of the query. A query can have one of 3 statuses <strong>pending</strong>, <strong>done</strong> or <strong>error</strong>. You can get the queries status by accessing <code>StoreQuery#status</code> or with the helpers <code>StoreQuery#pending</code>, <code>StoreQuery#error</code> or <code>StoreQuery#done</code>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">userQuery</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">userQuery</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span> <span class="c1">// =&gt; pending</span></code></pre></div>
+
+<p>If the query has an error, then the error is accessible at <code>StoreQuery#error</code></p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">if</span> <span class="p">(</span><span class="nx">userQuery</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'failed to get user'</span><span class="p">,</span> <span class="nx">userQuery</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+
+<p>If the query is done, then the result is accessible at <code>StoreQuery#result</code></p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">if</span> <span class="p">(</span><span class="nx">userQuery</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'got user'</span><span class="p">,</span> <span class="nx">userQuery</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+
+<p>If you start a new query then the store will notify any listeners when the queries status changes</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">userQuery</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">userQuery</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">userQuery</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
@@ -434,7 +487,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.0.13</li>
+        <li>v0.1.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

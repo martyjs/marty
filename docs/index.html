@@ -130,121 +130,136 @@
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <p>React&#39;s focus is the view where as Marty focuses on managing the state needed to build those views. </p>
+        <p>State is a big problem in the UI. Most JS applications have little or no restrictions on who or how its state can be changed. This makes it difficult to understand why something happens. Anyone who&#39;s spent late nights trying to understand why your application has suddenly stopped working after removing an innocuous line will understand this.</p>
 
-<p>It follows the Flux architecture which Facebook and Instagram created to help deal with building ever larger JS web applications. Flux makes your applications easier to understand, debug and test as well as scaling well as your application grows.</p>
+<p>Flux is an answer to that problem. At its most basic level it&#39;s a set of rules about how to manage your applications state. Specifically who can change it, where they can change it and in what direction those changes should be propagated through your application.</p>
 
-<h2 id="data-flow">Data flow</h2>
+<p>There are 3 things you will need to understand: How to tell the application to change its state (<a href="/docs/actionCreators.html">Action creators</a>), How to change the applications state (<a href="/docs/stores.html">Stores</a>) and how to tell the view that the state has changed (<a href="/docs/stateMixin.html">State mixins</a>).</p>
 
-<p>A core concept within Flux is the Flux update cycle which is a <strong>unidirectional data flow</strong> through the application. </p>
+<p>Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. All actions must have a type which is a string describing the action (e.g. &quot;UPDATE_USER_EMAIL&quot;). </p>
+
+<p>If an action is making a change to your local state then it can pass its type data along to something called a dispatcher.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateUserEmail</span><span class="p">:</span> <span class="p">[</span><span class="s2">"UPDATE_USER_EMAIL"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
+
+<p>The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'action with type'</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="s1">', has been dispatched) ;
+});
+
+Marty.dispatcher.dispatch({
+  type: '</span><span class="nx">foo</span><span class="err">'</span> 
+<span class="p">});</span></code></pre></div>
+
+<p>Normally you don&#39;t manually register callbacks with the dispatcher, instead you create stores which do this for you. Stores hold information about a domain. That domain could be a collection of entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could be some information about something specific (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">updateEmail</span><span class="p">:</span> <span class="s2">"UPDATE_USER_EMAIL"</span>
+  <span class="p">},</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{};</span>
+  <span class="p">},</span>
+  <span class="nx">getUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">userId</span><span class="p">];</span>
+  <span class="p">},</span>
+  <span class="nx">updateEmail</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">userId</span><span class="p">].</span><span class="nx">email</span> <span class="o">=</span> <span class="nx">email</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>When your application starts, each store will automatically start listening to the dispatcher. When an action is dispatched, each store will check its <a href="/docs/stores.html#handlers"><code>handlers</code> hash</a> to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler should then update its internal state (all stored in <code>this.state</code>). </p>
+
+<p>The next (and final) step is how to notify views that theres new data. Like the dispatcher, you can register to be notified of any changes to a store.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'User store has changed'</span><span class="p">,</span> <span class="nx">state</span><span class="p">);</span>
+<span class="p">});</span></code></pre></div>
+
+<p>So if you have a view thats interested in a domain it ask the store to notify it of any changes. When the store updates, your view just rerenders itself with whatever the new state of the store is. You might be asking what if the store changed something your view isn&#39;t interested in (e.g. a different entity)? Thanks to Reacts virtual DOM it doesn&#39;t really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views <em>significantly simpler</em> since you just render whatever the store tells you to render.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span> 
+               <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">}</span>
+               <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="sr">/input</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">updateEmail</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmailthis</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nl">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+  <span class="nx">componentDidMount</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">userStoreListener</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onUserStoreChanged</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">componentWillUnmount</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">nextProps</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">userStoreListener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span>
+  <span class="p">},</span>
+  <span class="nx">onUserStoreChanged</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>As your application grows you start to find that there is a lot of boiler plate code to get views to listen to stores. <a href="/docs/stateMixin.html">State mixins</a> are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStateMixin</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+  <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
+  <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">UserStateMixin</span><span class="p">],</span>
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span> 
+               <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">}</span>
+               <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="sr">/input</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">updateEmail</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmailthis</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Whenever you want to change value within your application your data must follow this flow of <a href="/docs/actionCreators.html">Action creator</a> <strong>-&gt;</strong> <a href="/docs/dispatcher.html">Dispatcher</a> <strong>-&gt;</strong> <a href="/docs/stores.html">Store</a> <strong>-&gt;</strong> <a href="/docs/stateMixin.html">State mixin</a> <strong>-&gt;</strong> View. Known as a <strong>unidirectional data flow</strong></p>
 
 <p><center>
   <img src="/img/data-flow.png" alt="Data flow"/>
 </center></p>
 
-<p>The flux update cycle starts with some new data from the view or the server. </p>
+<p>While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There&#39;s only one place your application state can change so if you don&#39;t have to dig into all the views to work out what changed a value (Its even easier if you&#39;re using <a href="/docs/stores.html#immutable">immutable data collections</a>). Thanks to action types being stings you have a loosely coupled <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a> architecture which is easy to grow without increasing the complexity of the code base.</p>
 
-<p>It gets passed to an <a href="/docs/actionCreators.html">action creator</a> which transforms the data into an action, something that can be interpreted by the rest of the application.</p>
+<h2 id="further-reading">Further reading</h2>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">TodoActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreator</span><span class="p">({</span>
-  <span class="na">createTodoItem</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="s2">"CREATE_TODO"</span><span class="p">,</span> <span class="p">{</span>
-      <span class="na">text</span><span class="p">:</span> <span class="nx">text</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-
-<span class="nx">TodoActionCreators</span><span class="p">.</span><span class="nx">createTodo</span><span class="p">(</span><span class="s2">"Learn Flux"</span><span class="p">);</span></code></pre></div>
-
-<p>The <a href="/docs/actionCreators.html">action creator</a> will pass that action to the <a href="/docs/dispatcher.html">dispatcher</a> which is responsible for keeping a track of all <a href="/docs/stores.html">stores</a> and passing on any actions to them.</p>
-
-<p>The <a href="/docs/stores.html">store</a> is where the applications state and logic live for a specific domain. A store could contain a collection of domain entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or could just be some data about something (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">TodoStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
-  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">addTodo</span><span class="p">:</span> <span class="s2">"CREATE_TODO"</span>
-  <span class="p">},</span>
-  <span class="na">addTodo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">todo</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
-  <span class="p">},</span>
-  <span class="nx">getInitialState</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[];</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-
-<p>Stores register handlers for actions which are responsible for updating their state. Once they have updated themselves, they emit an event telling anyone listening to it that it has updated.</p>
-
-<p>Finally, you want to update the view with the new state. To bind a stores state to a view you use the <a href="/docs/stateMixin.html">state mixin</a>.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Todos</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">(</span><span class="nx">TodoStore</span><span class="p">)],</span>
-  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">(</span>
-      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"todos"</span><span class="o">&gt;</span>
-        <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
-          <span class="k">return</span> <span class="o">&lt;</span><span class="nx">Todo</span> <span class="nx">item</span><span class="o">=</span><span class="p">{</span><span class="nx">todo</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
-</span>        <span class="p">})}</span>
-      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
-</span>    <span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-
-<p>When the view first loads and any time the stores state changes after that the view&#39;s render function will be called and this.state will be whatever the current state of the store.</p>
-
-<h2 id="where-does-my-code-go">Where should my code go?</h2>
-
-<p>Anything to do with storing and changing your applications state should live in the <strong><a href="/docs/stores.html">stores</a></strong>. Views are allowed to call the <a href="/docs/stores.html">stores</a> directly to get state (but not to write state) and so the <a href="/docs/stores.html">stores</a> should contain all logic for getting data whether that be from an internal cache or from the server.</p>
-
-<p>If you want to write data, that should live within an <strong><a href="/docs/actionCreators.html">action creator</a></strong>. <a href="/docs/actionCreators.html">Action creators</a> are the starting point for data flowing through the system and we want to make sure everyone knows about any state changes. </p>
-
-<p>When you want to communicate with the server, you should use an <strong><a href="/docs/httpApi.html">Http APIs</a></strong>. The response to an http request should be handled by an <a href="/docs/actionCreators.html">action creator</a>.</p>
-
-<h2 id="handle-async-operations">How do I handle asynchronous operations?</h2>
-
-<p>Every operation within a Flux application should be asynchronous by default. This allows you to have a consistent API that encapsulates any remote operations. </p>
-
-<p>Within a marty application this means that any get request against a store <em>might</em> not return a result and so you should make sure to guard against it within your views.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">TodoStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
-  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">addTodo</span><span class="p">:</span> <span class="s2">"CREATE_TODO"</span>
-  <span class="p">},</span>
-  <span class="na">getTodo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">todo</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">todo</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="nx">TodoAPI</span><span class="p">.</span><span class="nx">getTodo</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>    
-  <span class="p">},</span>
-  <span class="nx">addTodo</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">todo</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">todo</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
-  <span class="p">},</span>
-  <span class="nx">getInitialState</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{};</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-
-<span class="kd">var</span> <span class="nx">TodoState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
-  <span class="na">listenTo</span><span class="p">:</span> <span class="nx">TodoStore</span><span class="p">,</span>
-  <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="c1">// getTodo will return null until the API call is updated</span>
-      <span class="na">todo</span><span class="p">:</span> <span class="nx">TodoStore</span><span class="p">.</span><span class="nx">getTodo</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
-    <span class="p">};</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-
-<span class="kd">var</span> <span class="nx">TodoView</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">TodoState</span><span class="p">],</span>
-  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">todo</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">todo</span> <span class="o">||</span> <span class="p">{};</span>
-    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"todo"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">todo</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
-</span>  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
+<ul>
+<li><a href="http://facebook.github.io/flux/docs/overview.html#stores">Original article about Flux</a></li>
+<li><a href="http://facebook.github.io/react/blog/2014/07/30/flux-actions-and-the-dispatcher.html#actions-and-actioncreators">Actions and Action Creators</a></li>
+</ul>
 
       </div>
     </div>
@@ -329,7 +344,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.0.13</li>
+        <li>v0.1.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
