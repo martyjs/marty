@@ -2,28 +2,215 @@
 var create = require('./lib/create');
 var _ = require('./lib/utils/tinydash');
 var Dispatcher = require('./lib/dispatcher');
+var diagnostics = require('./lib/diagnostics');
 var constants = require('./lib/internalConstants');
 
 var Marty = _.extend({
   constants: constants,
-  dispatcher: new Dispatcher()
+  getAction: getAction,
+  diagnostics: diagnostics,
+  dispatcher: new Dispatcher(),
 }, create);
 
 module.exports = Marty;
-},{"./lib/create":4,"./lib/dispatcher":5,"./lib/internalConstants":8,"./lib/utils/tinydash":11}],1:[function(require,module,exports){
+
+Marty.Stores = {
+  Actions: require('./lib/stores/actionsStore')
+};
+
+function getAction(token) {
+  return Marty.Stores.Actions.getAction(token);
+}
+},{"./lib/create":4,"./lib/diagnostics":5,"./lib/dispatcher":6,"./lib/internalConstants":10,"./lib/stores/actionsStore":15,"./lib/utils/tinydash":18}],1:[function(require,module,exports){
+var uuid = require('./utils/uuid');
 var _ = require('./utils/tinydash');
+var ActionPayload = require('./actionPayload');
+var Actions = require('./internalConstants').Actions;
 
-function Action(type, args, source) {
+function ActionCreators(options) {
+  var creator = this;
+
+  options || (options = {});
+
+  this.getActionType = getActionType;
+
+  _.extend.apply(_, [
+    this,
+    wrapFunctions(options)
+  ].concat(options.mixins));
+
+
+  function getActionType(name) {
+    return name.replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toUpperCase();
+  }
+
+  function wrapFunctions(functions) {
+    _.each(functions, function (func, name) {
+      var actionType;
+
+      if (_.isFunction(func)) {
+        actionType = creator.getActionType(name);
+      } else if (_.isArray(func) && func.length === 2 && _.isFunction(func[1])) {
+        actionType = func[0];
+        func = func[1];
+      } else {
+        return;
+      }
+
+      functions[name] = function () {
+        var result;
+        var token = uuid();
+        var actionType = creator.getActionType(name);
+
+        dispatchStarting();
+
+        try {
+          result = func.apply(actionContext(), arguments);
+
+          if (result) {
+            if (result instanceof Error) {
+              dispatchError(result);
+            } else if (_.isFunction(result.then)) {
+              result.then(dispatchDone, dispatchError);
+            } else {
+              dispatchDone();
+            }
+          } else {
+            dispatchDone();
+          }
+        } catch (e) {
+          dispatchError(e);
+        }
+
+        return token;
+
+        function actionContext() {
+          return _.extend({
+            dispatch: function () {
+              return dispatch({
+                type: actionType,
+                arguments: arguments
+              });
+            }
+          }, this);
+        }
+
+        function dispatchStarting() {
+          dispatch({
+            type: Actions.ACTION_STARTING,
+            arguments: [{
+              token: token,
+              type: actionType
+            }]
+          });
+        }
+
+        function dispatchDone() {
+          dispatch({
+            type: Actions.ACTION_DONE,
+            arguments: [token]
+          });
+        }
+
+        function dispatchError(err) {
+          dispatch({
+            type: Actions.ACTION_ERROR,
+            arguments: [{
+              token: token,
+              error: err
+            }]
+          });
+        }
+      };
+    });
+
+    return functions;
+  }
+
+  function dispatch(payload) {
+    var action = new ActionPayload(payload);
+    options.dispatcher.dispatch(action);
+    return action;
+  }
+
+  // function traceFunctions(actionCreator, functions) {
+  //   _.each(functions, function (func, name) {
+  //     if (!_.isFunction(func)) {
+  //       return;
+  //     }
+
+  //     functions[name] = function () {
+  //       var context = this;
+  //       var creator = context.__creator || {
+  //         action: name,
+  //         type: 'ActionCreator',
+  //         name: actionCreator.name,
+  //         arguments: _.toArray(arguments)
+  //       };
+
+  //       if (!context.__creator) {
+  //         context = _.extend({
+  //           '__creator': creator
+  //         }, actionCreator);
+  //       }
+
+  //       return func.apply(context, arguments);
+  //     };
+  //   });
+
+  //   return functions;
+  // }
+
+}
+
+module.exports = ActionCreators;
+},{"./actionPayload":2,"./internalConstants":10,"./utils/tinydash":18,"./utils/uuid":19}],2:[function(require,module,exports){
+var uuid = require('./utils/uuid');
+var _ = require('./utils/tinydash');
+var cloneState = require('./utils/cloneState');
+var Statuses = require('./internalConstants').Statuses;
+
+function Action(options) {
+  options || (options = {});
+
+  var handlers = [];
   var rollbackHandlers = [];
+  var status = Statuses.pending;
 
-  this.type = type;
-  this.source = source;
-  this.arguments = args;
+  this.token = uuid();
+  this.type = options.type;
+  this.source = options.source;
+  this.creator = options.creator;
+  this.arguments = _.toArray(options.arguments);
 
   this.toJSON = toJSON;
   this.toString = toString;
   this.rollback = rollback;
+  this.addViewHandler = addViewHandler;
+  this.addStoreHandler = addStoreHandler;
   this.addRollbackHandler = addRollbackHandler;
+
+  Object.defineProperty(this, 'handlers', {
+    get: function () {
+      return handlers;
+    }
+  });
+
+  Object.defineProperty(this, 'status', {
+    get: function () {
+      return status;
+    }
+  });
+
+  Object.defineProperty(this, 'done', {
+    get: function () {
+      return isDone(status);
+    }
+  });
+
+  function isDone() {
+    return false;
+  }
 
   function toString() {
     return JSON.stringify(this.toJSON(), null, 2);
@@ -33,6 +220,8 @@ function Action(type, args, source) {
     return {
       type: this.type,
       source: this.source,
+      creator: this.creator,
+      handlers: this.handlers,
       arguments: this.arguments
     };
   }
@@ -41,6 +230,55 @@ function Action(type, args, source) {
     _.each(rollbackHandlers, function (rollback) {
       rollback();
     });
+  }
+
+  function addViewHandler(name, view, lastState) {
+    var storeHandler = handlers[handlers.length - 1];
+
+    var viewHandler = {
+      name: name,
+      error: null,
+      state: {
+        after: null,
+        before: lastState
+      }
+    };
+
+    storeHandler.views.push(viewHandler);
+
+    return {
+      dispose: function () {
+        viewHandler.state.after = cloneState(view.state);
+      },
+      failed: function (err) {
+        viewHandler.error = err;
+      }
+    };
+  }
+
+  function addStoreHandler(store, handlerName) {
+    var handler = {
+      views: [],
+      type: 'Store',
+      error: null,
+      store: store.name,
+      name: handlerName,
+      state: {
+        before: cloneState(store.getState()),
+        after: undefined
+      },
+    };
+
+    handlers.push(handler);
+
+    return {
+      dispose: function () {
+        handler.state.after = cloneState(store.getState());
+      },
+      failed: function (err) {
+        handler.error = err;
+      }
+    };
   }
 
   function addRollbackHandler(rollbackHandler, context) {
@@ -55,55 +293,7 @@ function Action(type, args, source) {
 }
 
 module.exports = Action;
-},{"./utils/tinydash":11}],2:[function(require,module,exports){
-var Action = require('./action');
-var _ = require('./utils/tinydash');
-var actionSources = require('./internalConstants').actionSources;
-
-function ActionCreators(options) {
-  options || (options = {});
-
-  _.extend(this, options);
-
-  this.dispatch = dispatchAction;
-  this.dispatchViewAction = dispatchViewAction;
-  this.dispatchServerAction = dispatchServerAction;
-
-  this.initialize.apply(this, arguments);
-
-  function dispatchViewAction(actionType) {
-    return dispatch(actionType, actionArguments(arguments), actionSources.VIEW);
-  }
-
-  function dispatchServerAction(actionType) {
-    return dispatch(actionType, actionArguments(arguments), actionSources.SERVER);
-  }
-
-  function dispatchAction(actionType) {
-    return dispatch(actionType, actionArguments(arguments));
-  }
-
-  function actionArguments(args) {
-    args = _.toArray(args);
-    args.shift();
-    return args;
-  }
-
-  function dispatch(actionType, args, source) {
-    var action = new Action(actionType, args, source);
-
-    options.dispatcher.dispatch(action);
-
-    return action;
-  }
-}
-
-ActionCreators.prototype = {
-  initialize: function () { }
-};
-
-module.exports = ActionCreators;
-},{"./action":1,"./internalConstants":8,"./utils/tinydash":11}],3:[function(require,module,exports){
+},{"./internalConstants":10,"./utils/cloneState":16,"./utils/tinydash":18,"./utils/uuid":19}],3:[function(require,module,exports){
 var _ = require('./utils/tinydash');
 
 function constants(obj) {
@@ -141,11 +331,11 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"./utils/tinydash":11}],4:[function(require,module,exports){
+},{"./utils/tinydash":18}],4:[function(require,module,exports){
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
-var StateMixin = require('./stateMixin');
+var StateMixin = require('./mixins/stateMixin');
 var ActionCreators = require('./actionCreators');
 
 module.exports = {
@@ -184,17 +374,57 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":2,"./constants":3,"./httpAPI":7,"./stateMixin":9,"./store":10}],5:[function(require,module,exports){
-module.exports = require('flux').Dispatcher;
-},{"flux":13}],6:[function(require,module,exports){
-var http = {
-  request: require('reqwest')
+},{"./actionCreators":1,"./constants":3,"./httpAPI":9,"./mixins/stateMixin":12,"./store":13}],5:[function(require,module,exports){
+var ACTION_STARTED = 'action-started';
+var EventEmitter = require('events').EventEmitter;
+var diagnosticEvents = new EventEmitter();
+
+module.exports = {
+  enabled: false,
+  onAction: onAction,
+  dispatchingAction: dispatchingAction
 };
 
-module.exports = http;
-},{"reqwest":52}],7:[function(require,module,exports){
-var http = require('./http');
+function dispatchingAction(action) {
+  diagnosticEvents.emit(ACTION_STARTED, action);
+}
+
+function onAction(callback) {
+  diagnosticEvents.on(ACTION_STARTED, callback);
+
+  return {
+    dispose: function () {
+      diagnosticEvents.removeListener(ACTION_STARTED, callback);
+    }
+  };
+}
+},{"events":20}],6:[function(require,module,exports){
+module.exports = require('flux').Dispatcher;
+},{"flux":25}],7:[function(require,module,exports){
+function ActionHandlerNotFoundError(actionHandler, store) {
+  this.name = 'Action handler not found';
+  this.message = 'The action handler "' + actionHandler + '" could not be found';
+
+  if (store && store.name) {
+    this.message += ' in the ' + store.name + ' store';
+  }
+}
+
+ActionHandlerNotFoundError.prototype = Error.prototype;
+
+module.exports = ActionHandlerNotFoundError;
+},{}],8:[function(require,module,exports){
+function NotFoundError(message) {
+  this.name = 'Not found';
+  this.message = message || '';
+}
+
+NotFoundError.prototype = Error.prototype;
+
+module.exports = NotFoundError;
+},{}],9:[function(require,module,exports){
 var _ = require('./utils/tinydash');
+var HttpMixin = require('./mixins/httpMixin');
 
 function HttpAPI(options) {
   options || (options = {});
@@ -202,7 +432,22 @@ function HttpAPI(options) {
   _.extend(this, options);
 }
 
-HttpAPI.prototype = {
+_.extend(HttpAPI.prototype, HttpMixin);
+},{"./mixins/httpMixin":11,"./utils/tinydash":18}],10:[function(require,module,exports){
+var constants = require('./constants');
+
+module.exports = constants({
+  ActionSources: ['VIEW', 'SERVER'],
+  Statuses: ['pending', 'error', 'done'],
+  Actions: ['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']
+});
+},{"./constants":3}],11:[function(require,module,exports){
+var _ = require('../utils/tinydash');
+var http = {
+  request: require('reqwest')
+};
+
+var HttpMixin = {
   get: function () {
     return this.request.apply(this, argumentsWithMethod(arguments, 'GET'));
   },
@@ -259,19 +504,17 @@ function request(options, baseUrl) {
   return http.request(options);
 }
 
-module.exports = HttpAPI;
-},{"./http":6,"./utils/tinydash":11}],8:[function(require,module,exports){
-var constants = require('./constants');
-
-module.exports = constants({
-  actionSources: ['VIEW', 'SERVER']
-});
-},{"./constants":3}],9:[function(require,module,exports){
-var _ = require('./utils/tinydash');
+module.exports = HttpMixin;
+},{"../utils/tinydash":18,"reqwest":67}],12:[function(require,module,exports){
+var _ = require('../utils/tinydash');
+var diagnostics = require('../diagnostics');
 var reservedKeys = ['listenTo', 'getState'];
+var cloneState = require('../utils/cloneState');
 
 function StateMixin(options) {
-  var config, listeners;
+  var config, listeners, lastState;
+  var ActionsStore = require('../stores/actionsStore');
+  var listenToActions = shouldListenToActions(options);
 
   if (!options) {
     throw new Error('The state mixin is expecting some options');
@@ -284,13 +527,56 @@ function StateMixin(options) {
   }
 
   var mixin = {
-    onStoreChanged: function () {
-      this.setState(this.getState());
+    onStoreChanged: function (state, store) {
+      this.setState(this.tryGetState(store));
+    },
+    onActionChanged: function (state, store, actionToken) {
+      var nextState = this.tryGetState(store);
+
+      if (!nextState) {
+        return;
+      }
+
+      if (isActionThatChanged(nextState) || _.any(_.map(nextState, isActionThatChanged))) {
+        this.setState(nextState);
+      }
+
+      function isActionThatChanged(action) {
+        return action && action.token === actionToken;
+      }
+    },
+    tryGetState: function (store) {
+      var handler;
+
+      if (diagnostics.enabled && store && store.action) {
+        handler = store.action.addViewHandler(options.name, this, lastState);
+      }
+
+      try {
+        return this.getState();
+      } catch (e) {
+        if (handler) {
+          handler.failed(e);
+        }
+
+        return {};
+      } finally {
+        if (handler) {
+          handler.dispose();
+          lastState = cloneState(this.state);
+        }
+      }
     },
     componentDidMount: function () {
       listeners = _.map(config.stores, function (store) {
         return store.addChangeListener(this.onStoreChanged);
       }, this);
+
+      if (listenToActions) {
+        listeners.push(
+          ActionsStore.addChangeListener(this.onActionChanged)
+        );
+      }
     },
     componentWillReceiveProps: function (nextProps) {
       var oldProps = this.props;
@@ -310,7 +596,19 @@ function StateMixin(options) {
       return config.getState(this);
     },
     getInitialState: function () {
-      return this.getState();
+      var initialState = {};
+
+      if (options.getInitialState) {
+        initialState = options.getInitialState();
+      }
+
+      var state = _.extend({}, initialState, this.getState());
+
+      if (diagnostics.enabled) {
+        lastState = cloneState(state);
+      }
+
+      return state;
     }
   };
 
@@ -370,6 +668,10 @@ function StateMixin(options) {
     }
   }
 
+  function shouldListenToActions(options) {
+    return _.isUndefined(options.listenToActions) || !!options.listenToActions;
+  }
+
   function areStores(stores) {
     for (var i = stores.length - 1; i >= 0; i--) {
       if (!isStore(stores[i])) {
@@ -385,17 +687,23 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"./utils/tinydash":11}],10:[function(require,module,exports){
+},{"../diagnostics":5,"../stores/actionsStore":15,"../utils/cloneState":16,"../utils/tinydash":18}],13:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('./utils/tinydash');
+var StoreQuery = require('./storeQuery');
 var EventEmitter = require('events').EventEmitter;
+var ActionHandlerNotFoundError = require('./errors/actionHandlerNotFound');
 
 function Store(options) {
   var state;
+  var queries = {};
   var defaultState = {};
   var emitter = new EventEmitter();
 
   this.handlers = {};
+  this.query = query;
+  this.clear = clear;
+  this.dispose = dispose;
   this.waitFor = waitFor;
   this.setState = setState;
   this.getState = getState;
@@ -404,7 +712,7 @@ function Store(options) {
   this.getInitialState = getInitialState;
   this.addChangeListener = addChangeListener;
 
-  _.extend(this, options);
+  _.extend.apply(_, [this, options].concat(options.mixins));
 
   this.dispatchToken = options.dispatcher.register(_.bind(this.handleAction, this));
   state = this.getInitialState();
@@ -413,21 +721,48 @@ function Store(options) {
     state = defaultState;
   }
 
-  if (Object.defineProperty) {
-    Object.defineProperty(this, 'state', {
-      get: function () {
-        return getState();
-      },
-      set: function (value) {
-        this.setState(value);
-      }
-    });
-  } else {
-    this.state = state;
-  }
+  Object.defineProperty(this, 'state', {
+    get: function () {
+      return getState();
+    },
+    set: function (value) {
+      this.setState(value);
+    }
+  });
 
   function getInitialState() {
     return defaultState;
+  }
+
+  function dispose() {
+    emitter.removeAllListeners(CHANGE_EVENT);
+    this.clear();
+  }
+
+  function query(key, localQuery, remoteQuery) {
+    var storeQuery = queries[key];
+
+    if (storeQuery && !storeQuery.complete) {
+      return storeQuery;
+    }
+
+    storeQuery = new StoreQuery(this, localQuery, remoteQuery);
+
+    var listener = storeQuery.addChangeListener(function (status, finished) {
+      if (finished) {
+        delete queries[key];
+        listener.dispose();
+      }
+      this.hasChanged();
+    }, this);
+
+    queries[key] = storeQuery;
+
+    return storeQuery;
+  }
+
+  function clear() {
+    this.state = this.getInitialState();
   }
 
   function setState(newState) {
@@ -455,22 +790,39 @@ function Store(options) {
     };
   }
 
-  function hasChanged() {
-    emitter.emit.call(emitter, CHANGE_EVENT, this.state, this);
+  function hasChanged(eventArgs) {
+    emitter.emit.call(emitter, CHANGE_EVENT, this.state, this, eventArgs);
   }
 
   function handleAction(action) {
     var handlers = _.object(_.map(this.handlers, getHandlerWithPredicates));
-    _.each(handlers, function (predicates, handler) {
+
+    _.each(handlers, function (predicates, handlerName) {
       _.each(predicates, function (predicate) {
         if (predicate(action)) {
-          var rollbackHandler;
+          var rollbackHandler, actionHandler;
+          var handler = action.addStoreHandler(this, handlerName, predicate.toJSON());
+
           try {
             this.action = action;
-            rollbackHandler = this[handler].apply(this, action.arguments);
+            actionHandler = this[handlerName];
+
+            if (actionHandler) {
+              rollbackHandler = actionHandler.apply(this, action.arguments);
+            } else {
+              throw new ActionHandlerNotFoundError(handlerName, this);
+            }
+          } catch (e) {
+            handler.failed(e);
+            throw e;
           } finally {
-            action.addRollbackHandler(rollbackHandler, this);
             this.action = null;
+
+            action.addRollbackHandler(rollbackHandler, this);
+
+            if (handler) {
+              handler.dispose();
+            }
           }
         }
       }, this);
@@ -490,7 +842,13 @@ function Store(options) {
           };
         }
 
-        return _.createCallback(actionPredicate);
+        var func = _.createCallback(actionPredicate);
+
+        func.toJSON = function () {
+          return actionPredicate;
+        };
+
+        return func;
       }
     }
   }
@@ -523,7 +881,198 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"./utils/tinydash":11,"events":12}],11:[function(require,module,exports){
+},{"./errors/actionHandlerNotFound":7,"./storeQuery":14,"./utils/tinydash":18,"events":20}],14:[function(require,module,exports){
+var CHANGE_EVENT = 'changed';
+var _ = require('./utils/tinydash');
+var NotFoundError = require('./errors/notFound');
+var EventEmitter = require('events').EventEmitter;
+var Statuses = require('./internalConstants').Statuses;
+
+function StoreQuery(store, localQuery, remoteQuery) {
+  var error, result;
+  var emitter = new EventEmitter();
+  var status = Statuses.pending;
+
+  this.addChangeListener = addChangeListener;
+
+  Object.defineProperty(this, 'status', {
+    get: function () {
+      return status;
+    }
+  });
+
+  Object.defineProperty(this, 'done', {
+    get: function () {
+      return isDone(status);
+    }
+  });
+
+  Object.defineProperty(this, 'error', {
+    get: function () {
+      return error;
+    }
+  });
+
+  Object.defineProperty(this, 'result', {
+    get: function () {
+      return result;
+    }
+  });
+
+  try {
+    resolve(localQuery.call(store));
+  } catch (err) {
+    reject(err);
+  }
+
+  if (isDone()) {
+    return;
+  }
+
+  try {
+    result = remoteQuery.call(store);
+  } catch (err) {
+    reject(err);
+  }
+
+  if (isDone()) {
+    return;
+  }
+
+  if (isUndefined(result)) {
+    notFound('The remote query did not return a value');
+  } else {
+    if (isPromise(result)) {
+      result.catch(reject).then(function () {
+        resolve(localQuery());
+
+        if (!isDone()) {
+          notFound('Could not find result in local cache after remote query');
+        }
+      });
+    } else {
+      resolve(result);
+    }
+  }
+
+  function notFound(message) {
+    reject(new NotFoundError(message));
+  }
+
+  function isUndefined(value) {
+    return _.isUndefined(value) || _.isNull(value);
+  }
+
+  function resolve(data) {
+    if (!isUndefined(data)) {
+      result = data;
+      setStatus(Statuses.done);
+    }
+  }
+
+  function reject(err) {
+    error = err;
+    setStatus(Statuses.error);
+  }
+
+  function isPromise(obj) {
+    return _.isFunction(obj.then);
+  }
+
+  function isDone() {
+    return status === Statuses.error || status === Statuses.done;
+  }
+
+  function setStatus(newStatus) {
+    status = newStatus;
+    emitter.emit(CHANGE_EVENT, status, isDone());
+  }
+
+  function addChangeListener(callback, context) {
+    if (context) {
+      callback = _.bind(callback, context);
+    }
+
+    emitter.on(CHANGE_EVENT, callback);
+
+    return {
+      dispose: function () {
+        emitter.removeListener(CHANGE_EVENT, callback);
+      }
+    };
+  }
+}
+
+module.exports = StoreQuery;
+},{"./errors/notFound":8,"./internalConstants":10,"./utils/tinydash":18,"events":20}],15:[function(require,module,exports){
+var Marty = require('../../index');
+var Statuses = require('../internalConstants').Statuses;
+var ActionConstants = require('../internalConstants').Actions;
+
+var ActionsStore = Marty.createStore({
+  name: 'Actions',
+  handlers: {
+    actionDone: ActionConstants.ACTION_DONE,
+    actionError: ActionConstants.ACTION_ERROR,
+    actionStarting: ActionConstants.ACTION_STARTING
+  },
+  getState: function () {
+    return {};
+  },
+  actionStarting: function (action) {
+    this.state[action.token] = {
+      type: action.type,
+      token: action.token,
+      status: Statuses.pending,
+      arguments: action.arguments
+    };
+    this.hasChanged(action.token);
+  },
+  actionError: function (actionToken, error) {
+    var action = this.state[actionToken];
+
+    if (action) {
+      action.status = Statuses.error;
+      action.error = error;
+      action.done = true;
+      this.hasChanged(actionToken);
+    }
+  },
+  actionDone: function (actionToken) {
+    var action = this.state[actionToken];
+
+    if (action) {
+      action.status = Statuses.done;
+      action.done = true;
+      this.hasChanged(actionToken);
+    }
+  },
+  getAction: function (actionToken) {
+    return this.state[actionToken];
+  }
+});
+
+module.exports = ActionsStore;
+},{"../../index":undefined,"../internalConstants":10}],16:[function(require,module,exports){
+var _ = require('./tinydash');
+var isImmutable = require('./isImmutable');
+
+function cloneState(state) {
+  if (isImmutable(state)) {
+    return state;
+  }
+
+  return _.cloneDeep(state);
+}
+
+module.exports = cloneState;
+},{"./isImmutable":17,"./tinydash":18}],17:[function(require,module,exports){
+function isImmutable() {
+  return false;
+}
+
+module.exports = isImmutable;
+},{}],18:[function(require,module,exports){
 module.exports = {
   extend: require('lodash-node/modern/objects/assign'),
   object: require('lodash-node/modern/arrays/zipObject'),
@@ -532,15 +1081,29 @@ module.exports = {
   isArray: require('lodash-node/modern/objects/isArray'),
   isString: require('lodash-node/modern/objects/isString'),
   isObject: require('lodash-node/modern/objects/isObject'),
+  cloneDeep: require('lodash-node/modern/objects/cloneDeep'),
   isFunction: require('lodash-node/modern/objects/isFunction'),
   isUndefined: require('lodash-node/modern/objects/isUndefined'),
   map: require('lodash-node/modern/collections/map'),
+  any: require('lodash-node/modern/collections/some'),
   each: require('lodash-node/modern/collections/forEach'),
   toArray: require('lodash-node/modern/collections/toArray'),
   bind: require('lodash-node/modern/functions/bind'),
   createCallback: require('lodash-node/modern/functions/createCallback')
 };
-},{"lodash-node/modern/arrays/zipObject":16,"lodash-node/modern/collections/forEach":17,"lodash-node/modern/collections/map":18,"lodash-node/modern/collections/toArray":19,"lodash-node/modern/functions/bind":20,"lodash-node/modern/functions/createCallback":21,"lodash-node/modern/objects/assign":37,"lodash-node/modern/objects/isArray":40,"lodash-node/modern/objects/isFunction":41,"lodash-node/modern/objects/isNull":42,"lodash-node/modern/objects/isObject":43,"lodash-node/modern/objects/isString":44,"lodash-node/modern/objects/isUndefined":45,"lodash-node/modern/objects/values":47}],12:[function(require,module,exports){
+},{"lodash-node/modern/arrays/zipObject":28,"lodash-node/modern/collections/forEach":29,"lodash-node/modern/collections/map":30,"lodash-node/modern/collections/some":31,"lodash-node/modern/collections/toArray":32,"lodash-node/modern/functions/bind":33,"lodash-node/modern/functions/createCallback":34,"lodash-node/modern/objects/assign":51,"lodash-node/modern/objects/cloneDeep":52,"lodash-node/modern/objects/isArray":55,"lodash-node/modern/objects/isFunction":56,"lodash-node/modern/objects/isNull":57,"lodash-node/modern/objects/isObject":58,"lodash-node/modern/objects/isString":59,"lodash-node/modern/objects/isUndefined":60,"lodash-node/modern/objects/values":62}],19:[function(require,module,exports){
+var format = require('util').format;
+
+function uuid() {
+  return format('%s%s-%s-%s-%s-%s%s%s', s4(), s4(), s4(), s4(), s4(), s4(), s4(), s4());
+}
+
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+}
+
+module.exports = uuid;
+},{"util":24}],20:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -843,7 +1406,694 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+},{}],22:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    if (canPost) {
+        var queue = [];
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+}
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+
+},{}],23:[function(require,module,exports){
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+},{}],24:[function(require,module,exports){
+(function (process,global){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var formatRegExp = /%[sdj%]/g;
+exports.format = function(f) {
+  if (!isString(f)) {
+    var objects = [];
+    for (var i = 0; i < arguments.length; i++) {
+      objects.push(inspect(arguments[i]));
+    }
+    return objects.join(' ');
+  }
+
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  var str = String(f).replace(formatRegExp, function(x) {
+    if (x === '%%') return '%';
+    if (i >= len) return x;
+    switch (x) {
+      case '%s': return String(args[i++]);
+      case '%d': return Number(args[i++]);
+      case '%j':
+        try {
+          return JSON.stringify(args[i++]);
+        } catch (_) {
+          return '[Circular]';
+        }
+      default:
+        return x;
+    }
+  });
+  for (var x = args[i]; i < len; x = args[++i]) {
+    if (isNull(x) || !isObject(x)) {
+      str += ' ' + x;
+    } else {
+      str += ' ' + inspect(x);
+    }
+  }
+  return str;
+};
+
+
+// Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+exports.deprecate = function(fn, msg) {
+  // Allow for deprecating things in the process of starting up.
+  if (isUndefined(global.process)) {
+    return function() {
+      return exports.deprecate(fn, msg).apply(this, arguments);
+    };
+  }
+
+  if (process.noDeprecation === true) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function(set) {
+  if (isUndefined(debugEnviron))
+    debugEnviron = process.env.NODE_DEBUG || '';
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
+
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  };
+  // legacy...
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  }
+  // set default options
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+exports.inspect = inspect;
+
+
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+  'bold' : [1, 22],
+  'italic' : [3, 23],
+  'underline' : [4, 24],
+  'inverse' : [7, 27],
+  'white' : [37, 39],
+  'grey' : [90, 39],
+  'black' : [30, 39],
+  'blue' : [34, 39],
+  'cyan' : [36, 39],
+  'green' : [32, 39],
+  'magenta' : [35, 39],
+  'red' : [31, 39],
+  'yellow' : [33, 39]
+};
+
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+
+function arrayToHash(array) {
+  var hash = {};
+
+  array.forEach(function(val, idx) {
+    hash[val] = true;
+  });
+
+  return hash;
+}
+
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect &&
+      value &&
+      isFunction(value.inspect) &&
+      // Filter out the util module, it's inspect function is special
+      value.inspect !== exports.inspect &&
+      // Also filter out any prototype objects using the circular check.
+      !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes, ctx);
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+    return ret;
+  }
+
+  // Primitive types cannot have properties
+  var primitive = formatPrimitive(ctx, value);
+  if (primitive) {
+    return primitive;
+  }
+
+  // Look up the keys of the object.
+  var keys = Object.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = Object.getOwnPropertyNames(value);
+  }
+
+  // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+  if (isError(value)
+      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
+  }
+
+  // Some type of object without properties can be shortcutted.
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '', array = false, braces = ['{', '}'];
+
+  // Make Array say that they are Array
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  }
+
+  // Make functions say that they are functions
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  }
+
+  // Make RegExps say that they are RegExps
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  }
+
+  // Make dates with properties first say the date
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  }
+
+  // Make error with message first say the error
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+
+  var output;
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function(key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+
+  return reduceToSingleString(output, base, braces);
+}
+
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value))
+    return ctx.stylize('undefined', 'undefined');
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+                                             .replace(/'/g, "\\'")
+                                             .replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+  if (isNumber(value))
+    return ctx.stylize('' + value, 'number');
+  if (isBoolean(value))
+    return ctx.stylize('' + value, 'boolean');
+  // For some reason typeof null is "object", so special case here.
+  if (isNull(value))
+    return ctx.stylize('null', 'null');
+}
+
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+  keys.forEach(function(key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          key, true));
+    }
+  });
+  return output;
+}
+
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+  if (!str) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function(line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function(line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+    name = JSON.stringify('' + key);
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'")
+                 .replace(/\\"/g, '"')
+                 .replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = output.reduce(function(prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] +
+           (base === '' ? '' : base + '\n ') +
+           ' ' +
+           output.join(',\n  ') +
+           ' ' +
+           braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+  return Array.isArray(ar);
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) &&
+      (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+exports.isBuffer = require('./support/isBuffer');
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+              'Oct', 'Nov', 'Dec'];
+
+// 26 Feb 16:19:34
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()),
+              pad(d.getMinutes()),
+              pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+}
+
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function() {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+
+
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = require('inherits');
+
+exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+
+  var keys = Object.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":23,"_process":22,"inherits":21}],25:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -855,7 +2105,7 @@ function isUndefined(arg) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":14}],14:[function(require,module,exports){
+},{"./lib/Dispatcher":26}],26:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -1107,7 +2357,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":15}],15:[function(require,module,exports){
+},{"./invariant":27}],27:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -1162,7 +2412,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],16:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1212,7 +2462,7 @@ function zipObject(keys, values) {
 
 module.exports = zipObject;
 
-},{"../objects/isArray":40}],17:[function(require,module,exports){
+},{"../objects/isArray":55}],29:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1269,7 +2519,7 @@ function forEach(collection, callback, thisArg) {
 
 module.exports = forEach;
 
-},{"../internals/baseCreateCallback":25,"../objects/forOwn":39}],18:[function(require,module,exports){
+},{"../internals/baseCreateCallback":39,"../objects/forOwn":54}],30:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1341,7 +2591,85 @@ function map(collection, callback, thisArg) {
 
 module.exports = map;
 
-},{"../functions/createCallback":21,"../objects/forOwn":39}],19:[function(require,module,exports){
+},{"../functions/createCallback":34,"../objects/forOwn":54}],31:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var createCallback = require('../functions/createCallback'),
+    forOwn = require('../objects/forOwn'),
+    isArray = require('../objects/isArray');
+
+/**
+ * Checks if the callback returns a truey value for **any** element of a
+ * collection. The function returns as soon as it finds a passing value and
+ * does not iterate over the entire collection. The callback is bound to
+ * `thisArg` and invoked with three arguments; (value, index|key, collection).
+ *
+ * If a property name is provided for `callback` the created "_.pluck" style
+ * callback will return the property value of the given element.
+ *
+ * If an object is provided for `callback` the created "_.where" style callback
+ * will return `true` for elements that have the properties of the given object,
+ * else `false`.
+ *
+ * @static
+ * @memberOf _
+ * @alias any
+ * @category Collections
+ * @param {Array|Object|string} collection The collection to iterate over.
+ * @param {Function|Object|string} [callback=identity] The function called
+ *  per iteration. If a property name or object is provided it will be used
+ *  to create a "_.pluck" or "_.where" style callback, respectively.
+ * @param {*} [thisArg] The `this` binding of `callback`.
+ * @returns {boolean} Returns `true` if any element passed the callback check,
+ *  else `false`.
+ * @example
+ *
+ * _.some([null, 0, 'yes', false], Boolean);
+ * // => true
+ *
+ * var characters = [
+ *   { 'name': 'barney', 'age': 36, 'blocked': false },
+ *   { 'name': 'fred',   'age': 40, 'blocked': true }
+ * ];
+ *
+ * // using "_.pluck" callback shorthand
+ * _.some(characters, 'blocked');
+ * // => true
+ *
+ * // using "_.where" callback shorthand
+ * _.some(characters, { 'age': 1 });
+ * // => false
+ */
+function some(collection, callback, thisArg) {
+  var result;
+  callback = createCallback(callback, thisArg, 3);
+
+  var index = -1,
+      length = collection ? collection.length : 0;
+
+  if (typeof length == 'number') {
+    while (++index < length) {
+      if ((result = callback(collection[index], index, collection))) {
+        break;
+      }
+    }
+  } else {
+    forOwn(collection, function(value, index, collection) {
+      return !(result = callback(value, index, collection));
+    });
+  }
+  return !!result;
+}
+
+module.exports = some;
+
+},{"../functions/createCallback":34,"../objects/forOwn":54,"../objects/isArray":55}],32:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1376,7 +2704,7 @@ function toArray(collection) {
 
 module.exports = toArray;
 
-},{"../internals/slice":36,"../objects/isString":44,"../objects/values":47}],20:[function(require,module,exports){
+},{"../internals/slice":50,"../objects/isString":59,"../objects/values":62}],33:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1418,7 +2746,7 @@ function bind(func, thisArg) {
 
 module.exports = bind;
 
-},{"../internals/createWrapper":28,"../internals/slice":36}],21:[function(require,module,exports){
+},{"../internals/createWrapper":42,"../internals/slice":50}],34:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1501,7 +2829,7 @@ function createCallback(func, thisArg, argCount) {
 
 module.exports = createCallback;
 
-},{"../internals/baseCreateCallback":25,"../internals/baseIsEqual":27,"../objects/isObject":43,"../objects/keys":46,"../utilities/property":51}],22:[function(require,module,exports){
+},{"../internals/baseCreateCallback":39,"../internals/baseIsEqual":41,"../objects/isObject":58,"../objects/keys":61,"../utilities/property":66}],35:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1516,7 +2844,7 @@ var arrayPool = [];
 
 module.exports = arrayPool;
 
-},{}],23:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1580,7 +2908,161 @@ function baseBind(bindData) {
 
 module.exports = baseBind;
 
-},{"../objects/isObject":43,"./baseCreate":24,"./setBindData":34,"./slice":36}],24:[function(require,module,exports){
+},{"../objects/isObject":58,"./baseCreate":38,"./setBindData":48,"./slice":50}],37:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var assign = require('../objects/assign'),
+    forEach = require('../collections/forEach'),
+    forOwn = require('../objects/forOwn'),
+    getArray = require('./getArray'),
+    isArray = require('../objects/isArray'),
+    isObject = require('../objects/isObject'),
+    releaseArray = require('./releaseArray'),
+    slice = require('./slice');
+
+/** Used to match regexp flags from their coerced string values */
+var reFlags = /\w*$/;
+
+/** `Object#toString` result shortcuts */
+var argsClass = '[object Arguments]',
+    arrayClass = '[object Array]',
+    boolClass = '[object Boolean]',
+    dateClass = '[object Date]',
+    funcClass = '[object Function]',
+    numberClass = '[object Number]',
+    objectClass = '[object Object]',
+    regexpClass = '[object RegExp]',
+    stringClass = '[object String]';
+
+/** Used to identify object classifications that `_.clone` supports */
+var cloneableClasses = {};
+cloneableClasses[funcClass] = false;
+cloneableClasses[argsClass] = cloneableClasses[arrayClass] =
+cloneableClasses[boolClass] = cloneableClasses[dateClass] =
+cloneableClasses[numberClass] = cloneableClasses[objectClass] =
+cloneableClasses[regexpClass] = cloneableClasses[stringClass] = true;
+
+/** Used for native method references */
+var objectProto = Object.prototype;
+
+/** Used to resolve the internal [[Class]] of values */
+var toString = objectProto.toString;
+
+/** Native method shortcuts */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/** Used to lookup a built-in constructor by [[Class]] */
+var ctorByClass = {};
+ctorByClass[arrayClass] = Array;
+ctorByClass[boolClass] = Boolean;
+ctorByClass[dateClass] = Date;
+ctorByClass[funcClass] = Function;
+ctorByClass[objectClass] = Object;
+ctorByClass[numberClass] = Number;
+ctorByClass[regexpClass] = RegExp;
+ctorByClass[stringClass] = String;
+
+/**
+ * The base implementation of `_.clone` without argument juggling or support
+ * for `thisArg` binding.
+ *
+ * @private
+ * @param {*} value The value to clone.
+ * @param {boolean} [isDeep=false] Specify a deep clone.
+ * @param {Function} [callback] The function to customize cloning values.
+ * @param {Array} [stackA=[]] Tracks traversed source objects.
+ * @param {Array} [stackB=[]] Associates clones with source counterparts.
+ * @returns {*} Returns the cloned value.
+ */
+function baseClone(value, isDeep, callback, stackA, stackB) {
+  if (callback) {
+    var result = callback(value);
+    if (typeof result != 'undefined') {
+      return result;
+    }
+  }
+  // inspect [[Class]]
+  var isObj = isObject(value);
+  if (isObj) {
+    var className = toString.call(value);
+    if (!cloneableClasses[className]) {
+      return value;
+    }
+    var ctor = ctorByClass[className];
+    switch (className) {
+      case boolClass:
+      case dateClass:
+        return new ctor(+value);
+
+      case numberClass:
+      case stringClass:
+        return new ctor(value);
+
+      case regexpClass:
+        result = ctor(value.source, reFlags.exec(value));
+        result.lastIndex = value.lastIndex;
+        return result;
+    }
+  } else {
+    return value;
+  }
+  var isArr = isArray(value);
+  if (isDeep) {
+    // check for circular references and return corresponding clone
+    var initedStack = !stackA;
+    stackA || (stackA = getArray());
+    stackB || (stackB = getArray());
+
+    var length = stackA.length;
+    while (length--) {
+      if (stackA[length] == value) {
+        return stackB[length];
+      }
+    }
+    result = isArr ? ctor(value.length) : {};
+  }
+  else {
+    result = isArr ? slice(value) : assign({}, value);
+  }
+  // add array properties assigned by `RegExp#exec`
+  if (isArr) {
+    if (hasOwnProperty.call(value, 'index')) {
+      result.index = value.index;
+    }
+    if (hasOwnProperty.call(value, 'input')) {
+      result.input = value.input;
+    }
+  }
+  // exit for shallow clone
+  if (!isDeep) {
+    return result;
+  }
+  // add the source value to the stack of traversed objects
+  // and associate it with its clone
+  stackA.push(value);
+  stackB.push(result);
+
+  // recursively populate clone (susceptible to call stack limits)
+  (isArr ? forEach : forOwn)(value, function(objValue, key) {
+    result[key] = baseClone(objValue, isDeep, callback, stackA, stackB);
+  });
+
+  if (initedStack) {
+    releaseArray(stackA);
+    releaseArray(stackB);
+  }
+  return result;
+}
+
+module.exports = baseClone;
+
+},{"../collections/forEach":29,"../objects/assign":51,"../objects/forOwn":54,"../objects/isArray":55,"../objects/isObject":58,"./getArray":43,"./releaseArray":47,"./slice":50}],38:[function(require,module,exports){
 (function (global){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
@@ -1626,7 +3108,7 @@ if (!nativeCreate) {
 module.exports = baseCreate;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../objects/isObject":43,"../utilities/noop":50,"./isNative":30}],25:[function(require,module,exports){
+},{"../objects/isObject":58,"../utilities/noop":65,"./isNative":44}],39:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1708,7 +3190,7 @@ function baseCreateCallback(func, thisArg, argCount) {
 
 module.exports = baseCreateCallback;
 
-},{"../functions/bind":20,"../support":48,"../utilities/identity":49,"./setBindData":34}],26:[function(require,module,exports){
+},{"../functions/bind":33,"../support":63,"../utilities/identity":64,"./setBindData":48}],40:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1788,7 +3270,7 @@ function baseCreateWrapper(bindData) {
 
 module.exports = baseCreateWrapper;
 
-},{"../objects/isObject":43,"./baseCreate":24,"./setBindData":34,"./slice":36}],27:[function(require,module,exports){
+},{"../objects/isObject":58,"./baseCreate":38,"./setBindData":48,"./slice":50}],41:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -1999,7 +3481,7 @@ function baseIsEqual(a, b, callback, isWhere, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"../objects/forIn":38,"../objects/isFunction":41,"./getArray":29,"./objectTypes":32,"./releaseArray":33}],28:[function(require,module,exports){
+},{"../objects/forIn":53,"../objects/isFunction":56,"./getArray":43,"./objectTypes":46,"./releaseArray":47}],42:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2107,7 +3589,7 @@ function createWrapper(func, bitmask, partialArgs, partialRightArgs, thisArg, ar
 
 module.exports = createWrapper;
 
-},{"../objects/isFunction":41,"./baseBind":23,"./baseCreateWrapper":26,"./slice":36}],29:[function(require,module,exports){
+},{"../objects/isFunction":56,"./baseBind":36,"./baseCreateWrapper":40,"./slice":50}],43:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2130,7 +3612,7 @@ function getArray() {
 
 module.exports = getArray;
 
-},{"./arrayPool":22}],30:[function(require,module,exports){
+},{"./arrayPool":35}],44:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2166,7 +3648,7 @@ function isNative(value) {
 
 module.exports = isNative;
 
-},{}],31:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2181,7 +3663,7 @@ var maxPoolSize = 40;
 
 module.exports = maxPoolSize;
 
-},{}],32:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2203,7 +3685,7 @@ var objectTypes = {
 
 module.exports = objectTypes;
 
-},{}],33:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2230,7 +3712,7 @@ function releaseArray(array) {
 
 module.exports = releaseArray;
 
-},{"./arrayPool":22,"./maxPoolSize":31}],34:[function(require,module,exports){
+},{"./arrayPool":35,"./maxPoolSize":45}],48:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2275,7 +3757,7 @@ var setBindData = !defineProperty ? noop : function(func, value) {
 
 module.exports = setBindData;
 
-},{"../utilities/noop":50,"./isNative":30}],35:[function(require,module,exports){
+},{"../utilities/noop":65,"./isNative":44}],49:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2315,7 +3797,7 @@ var shimKeys = function(object) {
 
 module.exports = shimKeys;
 
-},{"./objectTypes":32}],36:[function(require,module,exports){
+},{"./objectTypes":46}],50:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2355,7 +3837,7 @@ function slice(array, start, end) {
 
 module.exports = slice;
 
-},{}],37:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2427,7 +3909,66 @@ var assign = function(object, source, guard) {
 
 module.exports = assign;
 
-},{"../internals/baseCreateCallback":25,"../internals/objectTypes":32,"./keys":46}],38:[function(require,module,exports){
+},{"../internals/baseCreateCallback":39,"../internals/objectTypes":46,"./keys":61}],52:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var baseClone = require('../internals/baseClone'),
+    baseCreateCallback = require('../internals/baseCreateCallback');
+
+/**
+ * Creates a deep clone of `value`. If a callback is provided it will be
+ * executed to produce the cloned values. If the callback returns `undefined`
+ * cloning will be handled by the method instead. The callback is bound to
+ * `thisArg` and invoked with one argument; (value).
+ *
+ * Note: This method is loosely based on the structured clone algorithm. Functions
+ * and DOM nodes are **not** cloned. The enumerable properties of `arguments` objects and
+ * objects created by constructors other than `Object` are cloned to plain `Object` objects.
+ * See http://www.w3.org/TR/html5/infrastructure.html#internal-structured-cloning-algorithm.
+ *
+ * @static
+ * @memberOf _
+ * @category Objects
+ * @param {*} value The value to deep clone.
+ * @param {Function} [callback] The function to customize cloning values.
+ * @param {*} [thisArg] The `this` binding of `callback`.
+ * @returns {*} Returns the deep cloned value.
+ * @example
+ *
+ * var characters = [
+ *   { 'name': 'barney', 'age': 36 },
+ *   { 'name': 'fred',   'age': 40 }
+ * ];
+ *
+ * var deep = _.cloneDeep(characters);
+ * deep[0] === characters[0];
+ * // => false
+ *
+ * var view = {
+ *   'label': 'docs',
+ *   'node': element
+ * };
+ *
+ * var clone = _.cloneDeep(view, function(value) {
+ *   return _.isElement(value) ? value.cloneNode(true) : undefined;
+ * });
+ *
+ * clone.node == view.node;
+ * // => false
+ */
+function cloneDeep(value, callback, thisArg) {
+  return baseClone(value, true, typeof callback == 'function' && baseCreateCallback(callback, thisArg, 1));
+}
+
+module.exports = cloneDeep;
+
+},{"../internals/baseClone":37,"../internals/baseCreateCallback":39}],53:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2483,7 +4024,7 @@ var forIn = function(collection, callback, thisArg) {
 
 module.exports = forIn;
 
-},{"../internals/baseCreateCallback":25,"../internals/objectTypes":32}],39:[function(require,module,exports){
+},{"../internals/baseCreateCallback":39,"../internals/objectTypes":46}],54:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2535,7 +4076,7 @@ var forOwn = function(collection, callback, thisArg) {
 
 module.exports = forOwn;
 
-},{"../internals/baseCreateCallback":25,"../internals/objectTypes":32,"./keys":46}],40:[function(require,module,exports){
+},{"../internals/baseCreateCallback":39,"../internals/objectTypes":46,"./keys":61}],55:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2582,7 +4123,7 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"../internals/isNative":30}],41:[function(require,module,exports){
+},{"../internals/isNative":44}],56:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2611,7 +4152,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{}],42:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2643,7 +4184,7 @@ function isNull(value) {
 
 module.exports = isNull;
 
-},{}],43:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2684,7 +4225,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{"../internals/objectTypes":32}],44:[function(require,module,exports){
+},{"../internals/objectTypes":46}],59:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2723,7 +4264,7 @@ function isString(value) {
 
 module.exports = isString;
 
-},{}],45:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2752,7 +4293,7 @@ function isUndefined(value) {
 
 module.exports = isUndefined;
 
-},{}],46:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2790,7 +4331,7 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"../internals/isNative":30,"../internals/shimKeys":35,"./isObject":43}],47:[function(require,module,exports){
+},{"../internals/isNative":44,"../internals/shimKeys":49,"./isObject":58}],62:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2828,7 +4369,7 @@ function values(object) {
 
 module.exports = values;
 
-},{"./keys":46}],48:[function(require,module,exports){
+},{"./keys":61}],63:[function(require,module,exports){
 (function (global){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
@@ -2872,7 +4413,7 @@ support.funcNames = typeof Function.name == 'string';
 module.exports = support;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./internals/isNative":30}],49:[function(require,module,exports){
+},{"./internals/isNative":44}],64:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2902,7 +4443,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],50:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2930,7 +4471,7 @@ function noop() {
 
 module.exports = noop;
 
-},{}],51:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2972,7 +4513,7 @@ function property(key) {
 
 module.exports = property;
 
-},{}],52:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 /*!
   * Reqwest! A general purpose XHR connection manager
   * license MIT (c) Dustin Diaz 2014

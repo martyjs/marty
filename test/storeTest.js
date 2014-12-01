@@ -2,7 +2,11 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
-var Action = require('../lib/action');
+var Promise = require('es6-promise').Promise;
+var StoreQuery = require('../lib/storeQuery');
+var ActionPayload = require('../lib/actionPayload');
+var ActionHandlerNotFoundError = require('../lib/errors/actionHandlerNotFound');
+var ActionPredicateUndefinedError = require('../lib/errors/actionPredicateUndefined');
 
 describe('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
@@ -46,7 +50,57 @@ describe('Store', function () {
   });
 
   describe('#mixins', function () {
-    it('should allow you to mixin object literals');
+    describe('when you have multiple mixins', function () {
+      var mixin1, mixin2;
+
+      beforeEach(function () {
+        mixin1 = {
+          foo: function () { return 'bar'; }
+        };
+
+        mixin2 = {
+          bar: function () { return 'baz'; }
+        };
+
+        store = new Store({
+          dispatcher: dispatcher,
+          mixins: [mixin1, mixin2]
+        });
+      });
+
+      it('should allow you to mixin object literals', function () {
+        expect(store.foo()).to.equal('bar');
+        expect(store.bar()).to.equal('baz');
+      });
+    });
+
+    describe('when the mixin has handlers', function () {
+      var handlerMixin;
+
+      beforeEach(function () {
+        handlerMixin = {
+          handlers: {
+            baz: 'BAZ'
+          },
+          baz: noop
+        };
+
+        store = new Store({
+          dispatcher: dispatcher,
+          handlers: {
+            foo: 'FOO',
+            bar: 'BAR'
+          },
+          mixins: [handlerMixin],
+          foo: noop,
+          bar: noop
+        });
+      });
+
+      it('should do a deep merge', function () {
+        expect(store.handlers).to.include.keys('foo', 'bar', 'baz');
+      });
+    });
   });
 
   describe('#getInitialState()', function () {
@@ -113,8 +167,9 @@ describe('Store', function () {
       expect(listener).to.have.been.calledOnce;
     });
 
-    it('should pass the state as the first argument to the callback');
-    it('should pass the store as the second argument to the callback');
+    it('should pass the state and store as the arguments', function () {
+      expect(listener).to.have.been.calledWith(store.state, store);
+    });
 
     it('should set the callbacks function context', function () {
       expect(actualChangeListenerFunctionContext).to.equal(expectedChangeListenerFunctionContext);
@@ -145,11 +200,47 @@ describe('Store', function () {
         one: sinon.spy()
       });
 
-      Marty.dispatcher.dispatch(new Action(actionType, [data]));
+      Marty.dispatcher.dispatch(new ActionPayload({
+        type: actionType,
+        arguments: [data]
+      }));
     });
 
     it('calls the handlers', function () {
       expect(store.one).to.have.been.calledWith(data);
+    });
+  });
+
+  describe('#handlers', function () {
+    describe('when the action handler is null', function () {
+      it('should throw an ActionHandlerNotFoundError', function () {
+        expect(createStoreWithMissingActionHandler).to.throw(ActionHandlerNotFoundError);
+
+        function createStoreWithMissingActionHandler() {
+          return new Store({
+            dispatcher: dispatcher,
+            handlers: {
+              foo: 'FOO'
+            }
+          });
+        }
+      });
+    });
+
+    describe('when the handler action predicate is null', function () {
+      it('should throw an ActionPredicateUndefinedError', function () {
+        expect(createStoreWithANullActionPredicate).to.throw(ActionPredicateUndefinedError);
+
+        function createStoreWithANullActionPredicate() {
+          return new Store({
+            dispatcher: dispatcher,
+            handlers: {
+              foo: null
+            },
+            foo: noop
+          });
+        }
+      });
     });
   });
 
@@ -254,7 +345,7 @@ describe('Store', function () {
 
         ActionCreators = Marty.createActionCreators({
           add: function (user) {
-            var action = this.dispatch('ADD', user);
+            var action = this.dispatch(user);
 
             interimState = _.clone(Store.getState());
 
@@ -281,7 +372,10 @@ describe('Store', function () {
     });
 
     function handleAction(actionType) {
-      var action = new Action(actionType, [data]);
+      var action = new ActionPayload({
+        type: actionType,
+        arguments: [data]
+      });
 
       store.handleAction(action);
 
@@ -289,11 +383,117 @@ describe('Store', function () {
     }
 
     function handleActionFrom(actionType, source) {
-      var action = new Action(actionType, [data], source);
+      var action = new ActionPayload({
+        source: source,
+        type: actionType,
+        arguments: [data]
+      });
 
       store.handleAction(action);
 
       return action;
     }
   });
+
+  describe('#clear()', function () {
+    var Marty = require('../index');
+
+    beforeEach(function () {
+      store = Marty.createStore({
+        getInitialState: function () {
+          return {};
+        }
+      });
+
+      store.state['foo'] = 'bar';
+      store.clear();
+    });
+
+    it('should replace the state with the original state', function () {
+      expect(store.state).to.eql({});
+    });
+  });
+
+  describe('#query()', function () {
+    var queryKey;
+    var Marty = require('../index');
+
+    beforeEach(function () {
+      queryKey = 'foo';
+      listener = sinon.spy();
+      store = Marty.createStore({});
+      changeListener = store.addChangeListener(listener);
+    });
+
+    afterEach(function () {
+      changeListener.dispose();
+    });
+
+    it('should return a StoreQuery', function () {
+      expect(store.query(queryKey, noop, noop)).to.be.an.instanceof(StoreQuery);
+    });
+
+    describe('when a query with the given key is in progress', function () {
+      var expectedQuery, endQuery;
+
+      beforeEach(function () {
+        expectedQuery = store.query(queryKey, noop, function () {
+          return new Promise(function (resolve) { endQuery = resolve; });
+        });
+      });
+
+      it('should return the in progress query', function () {
+        var actualQuery = store.query(queryKey, noop, noop);
+
+        expect(actualQuery).to.equal(expectedQuery);
+      });
+
+      afterEach(function () {
+        endQuery && endQuery();
+      });
+    });
+
+    describe('when a query is in progress and then completes', function () {
+      var query, endQuery;
+
+      beforeEach(function () {
+        query = store.query(queryKey, noop, function () {
+          return new Promise(function (resolve) {
+            endQuery = resolve;
+          });
+        });
+      });
+
+      it('should return a new query', function (done) {
+        var inProgressQuery = store.query(queryKey, noop, noop);
+
+        expect(inProgressQuery).to.equal(query);
+
+        endQuery();
+
+        setTimeout(function () {
+          var newQuery = store.query(queryKey, noop, noop);
+
+          expect(newQuery).to.not.equal(query, 'we should get a new query once the query has finished');
+
+          done();
+        }, 1);
+      });
+
+      it('should tell any listeners that it has changed', function (done) {
+        endQuery();
+        setTimeout(function () {
+          expect(listener).to.have.been.called;
+          done();
+        }, 1);
+      });
+
+      afterEach(function () {
+        endQuery && endQuery();
+      });
+    });
+  });
+
+  function noop() {
+  }
 });

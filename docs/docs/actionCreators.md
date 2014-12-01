@@ -7,61 +7,97 @@ header_colour: D65D28
 order: 3
 ---
 
+Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state.
 
-When new data arrives into your application it needs to be processed by the stores before being passed to the views (Called a [data flow](/docs/#data-flow)). Action creators are responsible for formatting that data in a standardised way so that it can be processed by the stores. It does this by creating an action which is composed of a type, some data and (optionally) a source (e.g. from the view, server).
+All actions have a type which is string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/docs/dispatcher.html)) and use [action's type to determine whether to do something with it](/docs/stores.html#handlers). Using strings helps us build loosely coupled applications that can grow without increasing complexity. 
 
-At their most basic, an action creator is a function that calls [<code>this.dispatch</code>](#dispatch) with an action type (Ideally from a [constant](/docs/constants.html)) and any data you want to pass to the store.
+Lets look at how you define an action creator using marty:
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
-  name: 'Users',
-  createUser: function (name, email) {
-    this.dispatch(Constants.Users.ADD_USER, name, email);
+  updateEmail: ["UPDATE_EMAIL", function (userId, email) {
+    ...
+  }]
+});
+
+UserActionCreators.updateEmail(123, "foo@bar.com");
+{% endhighlight %}
+
+In this case the actions type is "UPDATE\_EMAIL" and the second function in the array is the action which will be invoked when you call ``updateEmail``. We found that more often than not the action type is the same as the actions function name so by convention we camelize, underscore and upper case it. In the above example, specifying the action type is superfluous because updateEmail becomes "UPDATE\_EMAIL".
+
+```
+var UserActionCreators = Marty.createActionCreators({
+  updateEmail: function (userId, email) {
+    ...
+  }
+});
+```
+If you want to make a change locally, you can use ``this.dispatch()``.
+
+```
+var UserActionCreators = Marty.createActionCreators({
+  updateEmail: function (userId, email) {
+    this.dispatch(userId, email);
   }
 });
 
-var UserStore = Marty.createStore({
-  handlers: {
-    createUser: Constants.Users.ADD_USER
-  },
-  createUser: function (name, email) {
-    this.state.push({
-      name: name,
-      email: email
-    });
-    this.hasChanged();
-  }
-})
-{% endhighlight %}
+Marty.dispatcher.register(function (action) {
+  console.log(action.type) // => "UPDATE_EMAIL"
+  console.log(action.arguments) // => [123, "foo@bar.com"];
+});
 
-Internally the dispatch function will create a new action which is passed to the [dispatcher](/docs/dispatcher.html) which it to [<code>Store#handleAction</code>](/docs/stores.html#handAction).
+UserActionCreators.updateEmail(123, "foo@bar.com");
+```
+Action creators become more complex when you start involving remote requests since they involve asynchronous calls and have the potential to fail. Traditionally you would pass in a callback or return a promise but comply with Flux's unidirectional data flow rule. So we need a different approach to ensure data is flowing in the right direction.
 
-{% highlight js %}
-var action = {
-  source: 'VIEW',
-  type: 'ADD_USER',
-  arguments: ['foo', 'foo@bar.com']
-}
-{% endhighlight %}
+Marty has an Actions store (``Marty.Stores.Actions``) which knows about all actions. When you create an action, it will return an **action token** which you can use to get the status of an action.
 
-The second responsiblity of action creators is to coordinate optimistic actions and server responses. For example, if you were to create a new user you will likely want to add it to a local store and then start synchronising with the server in the hopes that the request will successfully complete. If for whatever reasons that request fails you need a way to easily rollback any changes to the stores.
-
-The [dispatch function](#dispatch) actually returns the action after all stores have finishing processing it. The action has a <code>rollback()</code> function on it will ask the stores to [rollback any changes they've made (if possible)](/docs/stores.html#rollback).
-
-{% highlight js %}
+```
 var UserActionCreators = Marty.createActionCreators({
   createUser: function (user) {
-    var action = this.dispatch(Constants.Users.ADD_USER, user);
+    return UserAPI.createUser(user);
+  }
+});
 
-    // if you wanted to rollback straight away
-    action.rollback();
+var createUserToken = UserActionCreators.createUser(user);
 
-    // or you could pass it to the API
-    UserAPI.saveUser(user, action.rollback);
+Marty.Stores.Actions.addChangeListener(function () {
+  var action = Marty.getAction(createUserAction); // Shortcut for Marty.Stores.Actions.getAction()
+  console.log(action.status)
+});
+```
+
+Like [store queries](/docs/stores.html#query), an action's status can either be **pending**, **done** or **error**. If you are using the [state mixin](/docs/stateMixin.html) then it automatically listens to the actions store ([unless you tell it not to](/docs/stateMixin.html#listenToActions)).
+
+{% highlight js %}
+var UserFormState = Marty.createStateMixin({
+  getState: function () {
+    return {
+      createUser: Marty.getAction(this.state.createUserToken)
+    }
+  }
+});
+var UserForm = Marty.createActionCreators({
+  render: function () {
+    var createUser = this.status.createUser;
+
+    if (createUser) {
+      if (createUser.pending) {
+        console.log('creating user');
+      } else if (createUser.error) {
+        console.log('creating user failed', createUser.error); 
+      } else if (createUser.done) {
+        console.log('creating user done', createUser.result); 
+      }
+    }
+  },
+  createUser: function (user) {
+    this.setState({
+      createUserToken: UserActionCreators.createUser(user)
+    })
   }
 });
 {% endhighlight %}
-
 
 <h2 id="api">API</h2>
 
@@ -71,39 +107,25 @@ To create some new action creators, you call <code>Marty.createActionCreators</c
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
-  createUser: function (name, email) {
-    this.dispatch(Constants.Users.ADD_USER, name, email);
+  addUser: function (name, email) {
+    this.dispatch(name, email);
   }
 });
 {% endhighlight %}
 
 <h3 id="name">name</h3>
 
-An (optional) display name for the action creator. Used by Marty Developer Tools.
+An (optional) display name for the action creator. Used for richer debugging.
 
-<h3 id="dispatch">dispatch(actionType, [...])</h3>
+<h3 id="dispatch">dispatch([...])</h3>
 
-Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
-
-The actions source will be null.
+Dispatches an action payload. Any [action handlers](/docs/stores.html#handleAction) will be invoked with the given action handlers. 
 
 Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
 
-<h3 id="dispatchViewAction">dispatchViewAction(actionType, [...])</h3>
+<h3 id="getActionType">getActionType(functionName)</h3>
 
-Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
-
-The actions source will be <code>VIEW</code> (or <code>Marty.constants.actionSources.VIEW</code>).
-
-Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
-
-<h3 id="dispatchServerAction">dispatchServerAction(actionType, [...])</h3>
-
-Creates a new action, with the action type being the first argument. The remaining arguments will be the arguments for any [store action handlers](/docs/stores.html#handleAction).
-
-The actions source will be <code>SERVER</code> (or <code>Marty.constants.actionSources.SERVER</code>).
-
-Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
+Returns the action type for a given function name. The default implementation will camelize, underscore and upper case the function name (fooBarBaz becomes "FOO\_BAR_BAZ"). To implement your own naming strategy you can re-implement this function.
 
 <h2 id="server-action-creators">Server Action Creators</h2>
 
@@ -114,25 +136,24 @@ The way to get around this is to have a seperate action creator, called a Server
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
   saveUser: function (user) {
-    UserAPI.createUser(user);
+    return UserAPI.saveUser(user);
   }
 });
 
 var UserServerActionCreators = Marty.createActionCreators({
-  receiveUser: function (user) {
-    this.dispatch(Constants.Users.ADD_USER, user);
+  addUser: function (user) {
+    this.dispatch(user);
   }
 });
 
 var UserAPI = Marty.createHttpAPI({
-  createUser: function (user) {
+  saveUser: function (user) {
     this.post({ url: '/users', data: user }).then(function (user) {
-      UserServerActionCreators.receiveUser(user);
+      UserServerActionCreators.addUser(user);
     });
   }
 });
 {% endhighlight %}
-
 
 <h2 id="actions-vs-action-creators">Actions vs Action Creators</h2>
 

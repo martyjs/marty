@@ -7,130 +7,144 @@ group: docs
 order: 1
 ---
 
-React's focus is the view where as Marty focuses on managing the state needed to build those views. 
+State is a big problem in the UI. Most JS applications have little or no restrictions on who or how its state can be changed. This makes it difficult to understand why something happens. Anyone who's spent late nights trying to understand why your application has suddenly stopped working after removing an innocuous line will understand this.
 
-It follows the Flux architecture which Facebook and Instagram created to help deal with building ever larger JS web applications. Flux makes your applications easier to understand, debug and test as well as scaling well as your application grows.
+Flux is an answer to that problem. At its most basic level it's a set of rules about how to manage your applications state. Specifically who can change it, where they can change it and in what direction those changes should be propagated through your application.
+ 
+There are 3 things you will need to understand: How to tell the application to change its state ([Action creators](/docs/actionCreators.html)), How to change the applications state ([Stores](/docs/stores.html)) and how to tell the view that the state has changed ([State mixins](/docs/stateMixin.html)).
 
+Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. All actions must have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL"). 
 
-<h2 id="data-flow">Data flow</h2>
+If an action is making a change to your local state then it can pass its type data along to something called a dispatcher.
 
-A core concept within Flux is the Flux update cycle which is a **unidirectional data flow** through the application. 
+{% highlight js %}
+var UserActionCreators = Marty.createActionCreators({
+  updateUserEmail: ["UPDATE_USER_EMAIL", function (userId, email) {
+    this.dispatch(userId, email);
+  }
+});
+
+UserActionCreators.updateUserEmail(122, "foo@bar.com");
+{% endhighlight %}
+
+The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
+
+{% highlight js %}
+Marty.dispatcher.register(function (action) {
+  console.log('action with type', action.type', has been dispatched) ;
+});
+
+Marty.dispatcher.dispatch({
+  type: 'foo' 
+});
+{% endhighlight %}
+
+Normally you don't manually register callbacks with the dispatcher, instead you create stores which do this for you. Stores hold information about a domain. That domain could be a collection of entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or it could be some information about something specific (Like a [Backbone Model](http://backbonejs.org/#Model)).
+
+{% highlight js %}
+var UserStore = Marty.createStore({
+  handlers: {
+    updateEmail: "UPDATE_USER_EMAIL"
+  },
+  getInitialState: function () {
+    return {};
+  },
+  getUser: function (userId) {
+    return this.state[userId];
+  },
+  updateEmail: function (userId, email) {
+    this.state[userId].email = email;
+    this.hasChanged();
+  }
+});
+{% endhighlight %}
+
+When your application starts, each store will automatically start listening to the dispatcher. When an action is dispatched, each store will check its [``handlers`` hash](/docs/stores.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler should then update its internal state (all stored in ``this.state``). 
+
+The next (and final) step is how to notify views that theres new data. Like the dispatcher, you can register to be notified of any changes to a store.
+
+{% highlight js %}
+UserStore.addChangeListener(function (state) {
+  console.log('User store has changed', state);
+});
+{% endhighlight %}
+
+So if you have a view thats interested in a domain it ask the store to notify it of any changes. When the store updates, your view just rerenders itself with whatever the new state of the store is. You might be asking what if the store changed something your view isn't interested in (e.g. a different entity)? Thanks to Reacts virtual DOM it doesn't really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views *significantly simpler* since you just render whatever the store tells you to render.
+
+{% highlight js %}
+var User = React.createClass({
+  render: function () {
+    return (
+      <div className="user">
+        <input type="text" 
+               onChange={this.updateEmail}
+               value={this.state.user.email}></input>
+      </div>
+    );
+  },
+  updateEmail: function (e) {
+    var email = e.target.value;
+    UserActionCreators.updateUserEmailthis.props.userId, email);
+  }
+  getInitialState: function () {
+    return {
+      user: UserStore.getUser(this.props.userId)
+    };
+  },
+  componentDidMount: function () {
+    this.userStoreListener = UserStore.addChangeListener(this.onUserStoreChanged);
+  },
+  componentWillUnmount: function (nextProps) {
+    this.userStoreListener.dispose();
+  },
+  onUserStoreChanged: function () {
+    this.setState({
+      user: UserStore.getUser(this.props.userId)
+    });
+  }
+});
+{% endhighlight %}
+
+As your application grows you start to find that there is a lot of boiler plate code to get views to listen to stores. [State mixins](/docs/stateMixin.html) are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:
+
+{% highlight js %}
+var UserStateMixin = Marty.createStateMixin({
+  listenTo: UserStore,
+  getState: function () {
+    return {
+      user: UserStore.getUser(this.props.userId)
+    };
+  }
+});
+
+var User = React.createClass({
+  mixins: [UserStateMixin],
+  render: function () {
+    return (
+      <div className="user">
+        <input type="text" 
+               onChange={this.updateEmail}
+               value={this.state.user.email}></input>
+      </div>
+    );
+  },
+  updateEmail: function (e) {
+    var email = e.target.value;
+    UserActionCreators.updateUserEmailthis.props.userId, email);
+  }
+});
+{% endhighlight %}
+
+Whenever you want to change value within your application your data must follow this flow of [Action creator](/docs/actionCreators.html) **->** [Dispatcher](/docs/dispatcher.html) **->** [Store](/docs/stores.html) **->** [State mixin](/docs/stateMixin.html) **->** View. Known as a **unidirectional data flow**
 
 <center>
   <img src="/img/data-flow.png" alt="Data flow"/>
 </center>
 
-The flux update cycle starts with some new data from the view or the server. 
-
-It gets passed to an [action creator](/docs/actionCreators.html) which transforms the data into an action, something that can be interpreted by the rest of the application.
+While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There's only one place your application state can change so if you don't have to dig into all the views to work out what changed a value (Its even easier if you're using [immutable data collections](/docs/stores.html#immutable)). Thanks to action types being stings you have a loosely coupled [Law of Demeter](http://en.wikipedia.org/wiki/Law_of_Demeter) architecture which is easy to grow without increasing the complexity of the code base.
 
 
-{% highlight js %}
-var TodoActionCreators = Marty.createActionCreator({
-  createTodoItem: function (text) {
-    this.dispatch("CREATE_TODO", {
-      text: text
-    });
-  }
-});
+<h2 id="further-reading">Further reading</h2>
 
-TodoActionCreators.createTodo("Learn Flux");
-{% endhighlight %}
-
-
-The [action creator](/docs/actionCreators.html) will pass that action to the [dispatcher](/docs/dispatcher.html) which is responsible for keeping a track of all [stores](/docs/stores.html) and passing on any actions to them.
-
-The [store](/docs/stores.html) is where the applications state and logic live for a specific domain. A store could contain a collection of domain entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or could just be some data about something (Like a [Backbone Model](http://backbonejs.org/#Model)).
-
-{% highlight js %}
-var TodoStore = Marty.createStore({
-  handlers: {
-    addTodo: "CREATE_TODO"
-  },
-  addTodo: function (todo) {
-    this.state.push(todo);
-    this.hasChanged();
-  },
-  getInitialState: function () {
-    return [];
-  }
-});
-{% endhighlight %}
-
-Stores register handlers for actions which are responsible for updating their state. Once they have updated themselves, they emit an event telling anyone listening to it that it has updated.
-
-Finally, you want to update the view with the new state. To bind a stores state to a view you use the [state mixin](/docs/stateMixin.html).
-
-{% highlight js %}
-var Todos = React.createClass({
-  mixins: [Marty.createStateMixin(TodoStore)],
-  render: function () {
-    return (
-      <div className="todos">
-        {this.state.map(function (todo) {
-          return <Todo item={todo} />
-        })}
-      </div>
-    );
-  }
-});
-{% endhighlight %}
-
-When the view first loads and any time the stores state changes after that the view's render function will be called and this.state will be whatever the current state of the store.
-
-<h2 id="where-does-my-code-go">Where should my code go?</h2>
-
-Anything to do with storing and changing your applications state should live in the **[stores](/docs/stores.html)**. Views are allowed to call the [stores](/docs/stores.html) directly to get state (but not to write state) and so the [stores](/docs/stores.html) should contain all logic for getting data whether that be from an internal cache or from the server.
-
-If you want to write data, that should live within an **[action creator](/docs/actionCreators.html)**. [Action creators](/docs/actionCreators.html) are the starting point for data flowing through the system and we want to make sure everyone knows about any state changes. 
-
-When you want to communicate with the server, you should use an **[Http APIs](/docs/httpApi.html)**. The response to an http request should be handled by an [action creator](/docs/actionCreators.html).
-
-<h2 id="handle-async-operations">How do I handle asynchronous operations?</h2>
-
-Every operation within a Flux application should be asynchronous by default. This allows you to have a consistent API that encapsulates any remote operations. 
-
-Within a marty application this means that any get request against a store *might* not return a result and so you should make sure to guard against it within your views.
-
-{% highlight js %}
-var TodoStore = Marty.createStore({
-  handlers: {
-    addTodo: "CREATE_TODO"
-  },
-  getTodo: function (id) {
-    var todo = this.state[id];
-
-    if (todo) {
-      return todo;
-    }
-
-    TodoAPI.getTodo(id);    
-  },
-  addTodo: function (todo) {
-    this.state[todo.id] = todo;
-    this.hasChanged();
-  },
-  getInitialState: function () {
-    return {};
-  }
-});
-
-var TodoState = Marty.createStateMixin({
-  listenTo: TodoStore,
-  getState: function () {
-    return {
-      // getTodo will return null until the API call is updated
-      todo: TodoStore.getTodo(this.props.id);
-    };
-  }
-});
-
-var TodoView = React.createClass({
-  mixins: [TodoState],
-  render: function () {
-    var todo = this.state.todo || {};
-    return <div className="todo">{todo.text}</div>;
-  }
-});
-{% endhighlight %}
-
+* [Original article about Flux](http://facebook.github.io/flux/docs/overview.html#stores)
+* [Actions and Action Creators](http://facebook.github.io/react/blog/2014/07/30/flux-actions-and-the-dispatcher.html#actions-and-actioncreators)

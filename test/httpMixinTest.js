@@ -1,21 +1,16 @@
-// var sinon = require('sinon');
+var MOCK_SERVER_PORT = 8956;
 var _ = require('lodash-node');
-// var http = require('../lib/http');
 var format = require('util').format;
 var expect = require('chai').expect;
-var HttpAPI = require('../lib/httpAPI');
-var MOCK_SERVER_PORT = 8956;
+var HttpMixin = require('../lib/mixins/httpMixin');
 
-describe('HttpAPI', function () {
+describe('HttpMixin', function () {
   var API, baseUrl, response;
 
   beforeEach(function () {
     baseUrl = format('http://localhost:%s/', MOCK_SERVER_PORT);
   });
 
-  describe('#mixins', function () {
-    it('should allow you to mixin object literals');
-  });
 
   describe('when you dont specify a baseUrl', function () {
     var url;
@@ -23,13 +18,7 @@ describe('HttpAPI', function () {
     beforeEach(function () {
       url = baseUrl + 'foos';
 
-      API = new HttpAPI({
-        getFoos: function () {
-          return this.get(url).then(storeResponse);
-        }
-      });
-
-      return API.getFoos();
+      return HttpMixin.get(url).then(storeResponse);
     });
 
     it('should start a get request with the given url', function () {
@@ -182,12 +171,12 @@ describe('HttpAPI', function () {
   describe('#baseUrl', function () {
     describe('when you have a baseUrl', function () {
       beforeEach(function () {
-        API = new HttpAPI({
+        API = _.extend({
           baseUrl: baseUrl,
           getUser: function () {
             return this.get('/foos').then(storeResponse);
           }
-        });
+        }, HttpMixin);
 
         return API.getUser();
       });
@@ -203,12 +192,12 @@ describe('HttpAPI', function () {
 
     describe('when you dont specify a / in the baseUrl or url', function () {
       beforeEach(function () {
-        API = new HttpAPI({
+        API = _.extend({
           baseUrl: baseUrl.substring(0, baseUrl.length - 1),
           getUser: function () {
             return this.get('foos').then(storeResponse);
           }
-        });
+        }, HttpMixin);
 
         return API.getUser();
       });
@@ -230,12 +219,12 @@ describe('HttpAPI', function () {
   function makeRequest(method) {
     var args = _.rest(arguments);
 
-    API = new HttpAPI({
+    API = _.extend({
       baseUrl: baseUrl,
       execute: function () {
         return this[method].apply(this, args).then(storeResponse);
       }
-    });
+    }, HttpMixin);
 
     return API.execute();
   }
