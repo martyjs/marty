@@ -7,9 +7,9 @@ header_colour: 1DACA8
 order: 2
 ---
 
-A store is where the applications state and logic live for a specific domain. A store can contain a collection of domain entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or it could store some data about something (Like a [Backbone Model](http://backbonejs.org/#Model)).
+Stores hold information about a domain. That domain could be a collection of entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or it could be some information about something specific (Like a [Backbone Model](http://backbonejs.org/#Model)). It is responsible for processing actions from the [dispatcher](/docs/dispatcher.html), updating its own state and notifying interested parties when its state changes.
 
-The store should be the **only** place where your applications state changes. If your views want to update its state, it should call an [action creator](/docs/actionCreators.html) which dispatches an action that stores listen to and update themselves and then notify the views about their new state. The reasons for this are firstly to give the all parts of the application the opportunity to see this new state and also simplify debugging. Its a lot easier to find a bug if theres only one place the values can change rather than in all views.
+The store should be the **only** place where your applications state changes. If your views want to update its state, it should call an [action creator](/docs/actionCreators.html) which dispatches an action that stores listen to and update themselves and then notify the views about their new state.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
@@ -33,17 +33,18 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-A store is a singleton which is created using [<code>Marty.createStore</code>](#createStore). When the store is creted it will call [<code>getInitialState</code>](#getInitialState) which should return an object that all the stores state will live in. This state is accessible by calling <code>this.state</code>. Stores are responsible for fetching their own data so [<code>getInitialState</code>](#getInitialState) is a good place to make any [API calls](/docs/httpApi.html).
+A store is a singleton which is created using [<code>Marty.createStore</code>](#createStore). When the store is created it will call [<code>getInitialState</code>](#getInitialState) which should return an object that all the stores state will live in. This state is accessible by calling <code>this.state</code>.
 
-The store will also register with the [dispatcher](/docs/dispatcher.html) to be notified of any new actions on creation. When an action arrives, the store determines whether to handle that action or not. It does this by looking at the [handlers](#handlers) where the key is the name of the handler function and the value is an [action predicate](#action-predicates).
+When an action is dispatched, the store will check its [``handlers`` hash](/docs/stores.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. If the handler updates the stores state state, it can call [<code>hasChanged</code>](#hasChanged) which will notify any listening views of its new state.
 
-When an action handler is invoked, its arguments will be [the arguments passed to the dispatcher](/docs/actionCreators.html#dispatch). If the handler updates its state, it can call [<code>hasChanged</code>](#hasChanged) which will notify any listening views of its new state.
+If your view needs some data, it should request it from the relevant store. The store is responsible for sourcing it, either locally or from the server. The [query](/docs/stores.html#query) API helps simplify handling async operations.
+
 
 <h2 id="api">API</h2>
 
 <h3 id="createStore">createStore(props)</h3>
 
-To create a new store, you call <code>Marty.createStore</code> passing in a set of intance properties. It returns a singleton store which is listening to the dispatcher.
+To create a new store, you call <code>Marty.createStore</code> passing in a set of instance properties. It returns a singleton store which is listening to the dispatcher.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
@@ -186,6 +187,67 @@ var UsersStore = Marty.createStore({
   addUser: function (user) {
     this.state.push(user);
     this.hasChanged();
+  }
+});
+{% endhighlight %}
+
+<h3 id="query">query(key, localQuery, remoteQuery)</h3>
+
+When requesting data from a store we should assume that it might require an async operation. ``Store#query`` provides a simple syntax that allows you to encapsulate that complexity. 
+
+A query accepts 3 arguments
+
+* **key** To prevent duplicate requests, you pass in string that acts like a lock. If a query with that key is in progress, then the in progress query will be returned rather than creating a new one.
+* **local query** The local query is a function which, when invoked, will query the local state for the required information. If it returns a value, then the query will complete there. 
+* **remote query** If the remote query does not return a value then the remote query will be invoked. The remote query expects you to return a promise. If the promise is fulfilled, the query expects the data to be available locally so will re-invoke the local query.
+
+{% highlight js %}
+var UsersStore = Marty.createStore({
+  getUser: function (id) {
+    return this.query(id, 
+      function () {
+        return this.state[id];
+      },
+      function () {
+        return UserAPI.getUser(id);
+      }
+    );
+  }
+});
+{% endhighlight %}
+
+``Store#query`` will return a ``StoreQuery`` which represents the current state of the query. A query can have one of 3 statuses **pending**, **done** or **error**. You can get the queries status by accessing ``StoreQuery#status`` or with the helpers ``StoreQuery#pending``, ``StoreQuery#error`` or ``StoreQuery#done``.
+
+{% highlight js %}
+var userQuery = UserStore.getUser(id);
+
+console.log(userQuery.status) // => pending
+{% endhighlight %}
+
+If the query has an error, then the error is accessible at ``StoreQuery#error``
+
+{% highlight js %}
+if (userQuery.error) {
+  console.log('failed to get user', userQuery.error);
+}
+{% endhighlight %}
+
+If the query is done, then the result is accessible at ``StoreQuery#result``
+
+{% highlight js %}
+if (userQuery.done) {
+  console.log('got user', userQuery.result);
+}
+{% endhighlight %}
+
+If you start a new query then the store will notify any listeners when the queries status changes
+
+{% highlight js %}
+UserStore.addChangeListener(function () {
+  var userQuery = UserStore.getUser(id);
+
+  if (userQuery.done) {
+    console.log(userQuery.result);
   }
 });
 {% endhighlight %}
