@@ -14,6 +14,7 @@ var Marty = _.extend({
 
 module.exports = Marty;
 
+Marty.ActionPayload = require('./lib/actionPayload');
 Marty.Stores = {
   Actions: require('./lib/stores/actionsStore')
 };
@@ -21,7 +22,7 @@ Marty.Stores = {
 function getAction(token) {
   return Marty.Stores.Actions.getAction(token);
 }
-},{"./lib/create":4,"./lib/diagnostics":5,"./lib/dispatcher":6,"./lib/internalConstants":10,"./lib/stores/actionsStore":15,"./lib/utils/tinydash":18}],1:[function(require,module,exports){
+},{"./lib/actionPayload":2,"./lib/create":4,"./lib/diagnostics":5,"./lib/dispatcher":6,"./lib/internalConstants":11,"./lib/stores/actionsStore":16,"./lib/utils/tinydash":19}],1:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var _ = require('./utils/tinydash');
 var ActionPayload = require('./actionPayload');
@@ -60,7 +61,6 @@ function ActionCreators(options) {
       functions[name] = function () {
         var result;
         var token = uuid();
-        var actionType = creator.getActionType(name);
 
         dispatchStarting();
 
@@ -132,39 +132,10 @@ function ActionCreators(options) {
     options.dispatcher.dispatch(action);
     return action;
   }
-
-  // function traceFunctions(actionCreator, functions) {
-  //   _.each(functions, function (func, name) {
-  //     if (!_.isFunction(func)) {
-  //       return;
-  //     }
-
-  //     functions[name] = function () {
-  //       var context = this;
-  //       var creator = context.__creator || {
-  //         action: name,
-  //         type: 'ActionCreator',
-  //         name: actionCreator.name,
-  //         arguments: _.toArray(arguments)
-  //       };
-
-  //       if (!context.__creator) {
-  //         context = _.extend({
-  //           '__creator': creator
-  //         }, actionCreator);
-  //       }
-
-  //       return func.apply(context, arguments);
-  //     };
-  //   });
-
-  //   return functions;
-  // }
-
 }
 
 module.exports = ActionCreators;
-},{"./actionPayload":2,"./internalConstants":10,"./utils/tinydash":18,"./utils/uuid":19}],2:[function(require,module,exports){
+},{"./actionPayload":2,"./internalConstants":11,"./utils/tinydash":19,"./utils/uuid":20}],2:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var _ = require('./utils/tinydash');
 var cloneState = require('./utils/cloneState');
@@ -293,7 +264,7 @@ function Action(options) {
 }
 
 module.exports = Action;
-},{"./internalConstants":10,"./utils/cloneState":16,"./utils/tinydash":18,"./utils/uuid":19}],3:[function(require,module,exports){
+},{"./internalConstants":11,"./utils/cloneState":17,"./utils/tinydash":19,"./utils/uuid":20}],3:[function(require,module,exports){
 var _ = require('./utils/tinydash');
 
 function constants(obj) {
@@ -331,7 +302,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"./utils/tinydash":18}],4:[function(require,module,exports){
+},{"./utils/tinydash":19}],4:[function(require,module,exports){
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
@@ -374,7 +345,7 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":1,"./constants":3,"./httpAPI":9,"./mixins/stateMixin":12,"./store":13}],5:[function(require,module,exports){
+},{"./actionCreators":1,"./constants":3,"./httpAPI":10,"./mixins/stateMixin":13,"./store":14}],5:[function(require,module,exports){
 var ACTION_STARTED = 'action-started';
 var EventEmitter = require('events').EventEmitter;
 var diagnosticEvents = new EventEmitter();
@@ -398,9 +369,9 @@ function onAction(callback) {
     }
   };
 }
-},{"events":20}],6:[function(require,module,exports){
+},{"events":21}],6:[function(require,module,exports){
 module.exports = require('flux').Dispatcher;
-},{"flux":25}],7:[function(require,module,exports){
+},{"flux":26}],7:[function(require,module,exports){
 function ActionHandlerNotFoundError(actionHandler, store) {
   this.name = 'Action handler not found';
   this.message = 'The action handler "' + actionHandler + '" could not be found';
@@ -414,6 +385,19 @@ ActionHandlerNotFoundError.prototype = Error.prototype;
 
 module.exports = ActionHandlerNotFoundError;
 },{}],8:[function(require,module,exports){
+function ActionPredicateUndefinedError(actionHandler, store) {
+  this.name = 'Action predicate undefined';
+  this.message = 'The action predicate for "' + actionHandler + '" was undefined';
+
+  if (store && store.name) {
+    this.message += ' in the ' + store.name + ' store';
+  }
+}
+
+ActionPredicateUndefinedError.prototype = Error.prototype;
+
+module.exports = ActionPredicateUndefinedError;
+},{}],9:[function(require,module,exports){
 function NotFoundError(message) {
   this.name = 'Not found';
   this.message = message || '';
@@ -422,7 +406,7 @@ function NotFoundError(message) {
 NotFoundError.prototype = Error.prototype;
 
 module.exports = NotFoundError;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var _ = require('./utils/tinydash');
 var HttpMixin = require('./mixins/httpMixin');
 
@@ -433,7 +417,9 @@ function HttpAPI(options) {
 }
 
 _.extend(HttpAPI.prototype, HttpMixin);
-},{"./mixins/httpMixin":11,"./utils/tinydash":18}],10:[function(require,module,exports){
+
+module.exports = HttpAPI;
+},{"./mixins/httpMixin":12,"./utils/tinydash":19}],11:[function(require,module,exports){
 var constants = require('./constants');
 
 module.exports = constants({
@@ -441,7 +427,7 @@ module.exports = constants({
   Statuses: ['pending', 'error', 'done'],
   Actions: ['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']
 });
-},{"./constants":3}],11:[function(require,module,exports){
+},{"./constants":3}],12:[function(require,module,exports){
 var _ = require('../utils/tinydash');
 var http = {
   request: require('reqwest')
@@ -472,6 +458,13 @@ var HttpMixin = {
     }
 
     options.method = method;
+    options.type || (options.type = 'json');
+    options.contentType || (options.contentType = 'application/json');
+
+    if (options.contentType === 'application/json') {
+      options.processData = false;
+      options.data = JSON.stringify(options.data);
+    }
 
     return request(options, this.baseUrl);
   }
@@ -505,7 +498,7 @@ function request(options, baseUrl) {
 }
 
 module.exports = HttpMixin;
-},{"../utils/tinydash":18,"reqwest":67}],12:[function(require,module,exports){
+},{"../utils/tinydash":19,"reqwest":81}],13:[function(require,module,exports){
 var _ = require('../utils/tinydash');
 var diagnostics = require('../diagnostics');
 var reservedKeys = ['listenTo', 'getState'];
@@ -687,18 +680,23 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":5,"../stores/actionsStore":15,"../utils/cloneState":16,"../utils/tinydash":18}],13:[function(require,module,exports){
+},{"../diagnostics":5,"../stores/actionsStore":16,"../utils/cloneState":17,"../utils/tinydash":19}],14:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('./utils/tinydash');
 var StoreQuery = require('./storeQuery');
 var EventEmitter = require('events').EventEmitter;
 var ActionHandlerNotFoundError = require('./errors/actionHandlerNotFound');
+var ActionPredicateUndefinedError = require('./errors/actionPredicateUndefined');
 
 function Store(options) {
   var state;
   var queries = {};
   var defaultState = {};
   var emitter = new EventEmitter();
+
+  if (!options.dispatcher) {
+    throw new Error('Must pass in a dispatcher');
+  }
 
   this.handlers = {};
   this.query = query;
@@ -712,7 +710,8 @@ function Store(options) {
   this.getInitialState = getInitialState;
   this.addChangeListener = addChangeListener;
 
-  _.extend.apply(_, [this, options].concat(options.mixins));
+  extendStore(this, options);
+  validateHandlers(this);
 
   this.dispatchToken = options.dispatcher.register(_.bind(this.handleAction, this));
   state = this.getInitialState();
@@ -730,6 +729,33 @@ function Store(options) {
     }
   });
 
+  function validateHandlers(store) {
+    _.each(store.handlers, function (actionPredicate, handlerName) {
+      var actionHandler = store[handlerName];
+
+      if (_.isUndefined(actionHandler) || _.isNull(actionHandler)) {
+        throw new ActionHandlerNotFoundError(handlerName, store);
+      }
+
+      if (!actionPredicate) {
+        throw new ActionPredicateUndefinedError(handlerName, store);
+      }
+    });
+  }
+
+  function extendStore(store, options) {
+    var handlers = _.map(options.mixins, function (mixin) {
+      return mixin.handlers;
+    });
+
+    var mixins = _.map(options.mixins, function (mixin) {
+      return _.omit(mixin, 'handlers');
+    });
+
+    _.extend.apply(_, [store, options].concat(mixins));
+    _.extend.apply(_, [store.handlers].concat(handlers));
+  }
+
   function getInitialState() {
     return defaultState;
   }
@@ -742,7 +768,7 @@ function Store(options) {
   function query(key, localQuery, remoteQuery) {
     var storeQuery = queries[key];
 
-    if (storeQuery && !storeQuery.complete) {
+    if (storeQuery && !storeQuery.done) {
       return storeQuery;
     }
 
@@ -881,7 +907,7 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"./errors/actionHandlerNotFound":7,"./storeQuery":14,"./utils/tinydash":18,"events":20}],14:[function(require,module,exports){
+},{"./errors/actionHandlerNotFound":7,"./errors/actionPredicateUndefined":8,"./storeQuery":15,"./utils/tinydash":19,"events":21}],15:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('./utils/tinydash');
 var NotFoundError = require('./errors/notFound');
@@ -889,7 +915,7 @@ var EventEmitter = require('events').EventEmitter;
 var Statuses = require('./internalConstants').Statuses;
 
 function StoreQuery(store, localQuery, remoteQuery) {
-  var error, result;
+  var error, result, remoteResult;
   var emitter = new EventEmitter();
   var status = Statuses.pending;
 
@@ -898,6 +924,12 @@ function StoreQuery(store, localQuery, remoteQuery) {
   Object.defineProperty(this, 'status', {
     get: function () {
       return status;
+    }
+  });
+
+  Object.defineProperty(this, 'pending', {
+    get: function () {
+      return status === Statuses.pending;
     }
   });
 
@@ -930,7 +962,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
   }
 
   try {
-    result = remoteQuery.call(store);
+    remoteResult = remoteQuery.call(store);
   } catch (err) {
     reject(err);
   }
@@ -939,19 +971,19 @@ function StoreQuery(store, localQuery, remoteQuery) {
     return;
   }
 
-  if (isUndefined(result)) {
+  if (isUndefined(remoteResult)) {
     notFound('The remote query did not return a value');
   } else {
-    if (isPromise(result)) {
-      result.catch(reject).then(function () {
-        resolve(localQuery());
+    if (isPromise(remoteResult)) {
+      remoteResult.catch(reject).then(function () {
+        resolve(localQuery.call(store));
 
         if (!isDone()) {
           notFound('Could not find result in local cache after remote query');
         }
       });
     } else {
-      resolve(result);
+      resolve(remoteResult);
     }
   }
 
@@ -1004,7 +1036,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
 }
 
 module.exports = StoreQuery;
-},{"./errors/notFound":8,"./internalConstants":10,"./utils/tinydash":18,"events":20}],15:[function(require,module,exports){
+},{"./errors/notFound":9,"./internalConstants":11,"./utils/tinydash":19,"events":21}],16:[function(require,module,exports){
 var Marty = require('../../index');
 var Statuses = require('../internalConstants').Statuses;
 var ActionConstants = require('../internalConstants').Actions;
@@ -1053,7 +1085,7 @@ var ActionsStore = Marty.createStore({
 });
 
 module.exports = ActionsStore;
-},{"../../index":undefined,"../internalConstants":10}],16:[function(require,module,exports){
+},{"../../index":undefined,"../internalConstants":11}],17:[function(require,module,exports){
 var _ = require('./tinydash');
 var isImmutable = require('./isImmutable');
 
@@ -1066,14 +1098,15 @@ function cloneState(state) {
 }
 
 module.exports = cloneState;
-},{"./isImmutable":17,"./tinydash":18}],17:[function(require,module,exports){
+},{"./isImmutable":18,"./tinydash":19}],18:[function(require,module,exports){
 function isImmutable() {
   return false;
 }
 
 module.exports = isImmutable;
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports = {
+  omit: require('lodash-node/modern/objects/omit'),
   extend: require('lodash-node/modern/objects/assign'),
   object: require('lodash-node/modern/arrays/zipObject'),
   values: require('lodash-node/modern/objects/values'),
@@ -1091,7 +1124,7 @@ module.exports = {
   bind: require('lodash-node/modern/functions/bind'),
   createCallback: require('lodash-node/modern/functions/createCallback')
 };
-},{"lodash-node/modern/arrays/zipObject":28,"lodash-node/modern/collections/forEach":29,"lodash-node/modern/collections/map":30,"lodash-node/modern/collections/some":31,"lodash-node/modern/collections/toArray":32,"lodash-node/modern/functions/bind":33,"lodash-node/modern/functions/createCallback":34,"lodash-node/modern/objects/assign":51,"lodash-node/modern/objects/cloneDeep":52,"lodash-node/modern/objects/isArray":55,"lodash-node/modern/objects/isFunction":56,"lodash-node/modern/objects/isNull":57,"lodash-node/modern/objects/isObject":58,"lodash-node/modern/objects/isString":59,"lodash-node/modern/objects/isUndefined":60,"lodash-node/modern/objects/values":62}],19:[function(require,module,exports){
+},{"lodash-node/modern/arrays/zipObject":29,"lodash-node/modern/collections/forEach":30,"lodash-node/modern/collections/map":31,"lodash-node/modern/collections/some":32,"lodash-node/modern/collections/toArray":33,"lodash-node/modern/functions/bind":34,"lodash-node/modern/functions/createCallback":35,"lodash-node/modern/objects/assign":63,"lodash-node/modern/objects/cloneDeep":64,"lodash-node/modern/objects/isArray":68,"lodash-node/modern/objects/isFunction":69,"lodash-node/modern/objects/isNull":70,"lodash-node/modern/objects/isObject":71,"lodash-node/modern/objects/isString":72,"lodash-node/modern/objects/isUndefined":73,"lodash-node/modern/objects/omit":75,"lodash-node/modern/objects/values":76}],20:[function(require,module,exports){
 var format = require('util').format;
 
 function uuid() {
@@ -1103,7 +1136,7 @@ function s4() {
 }
 
 module.exports = uuid;
-},{"util":24}],20:[function(require,module,exports){
+},{"util":25}],21:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1406,7 +1439,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1431,7 +1464,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1496,14 +1529,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2093,7 +2126,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":23,"_process":22,"inherits":21}],25:[function(require,module,exports){
+},{"./support/isBuffer":24,"_process":23,"inherits":22}],26:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -2105,7 +2138,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":26}],26:[function(require,module,exports){
+},{"./lib/Dispatcher":27}],27:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -2357,7 +2390,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":27}],27:[function(require,module,exports){
+},{"./invariant":28}],28:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -2412,7 +2445,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2462,7 +2495,7 @@ function zipObject(keys, values) {
 
 module.exports = zipObject;
 
-},{"../objects/isArray":55}],29:[function(require,module,exports){
+},{"../objects/isArray":68}],30:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2519,7 +2552,7 @@ function forEach(collection, callback, thisArg) {
 
 module.exports = forEach;
 
-},{"../internals/baseCreateCallback":39,"../objects/forOwn":54}],30:[function(require,module,exports){
+},{"../internals/baseCreateCallback":40,"../objects/forOwn":66}],31:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2591,7 +2624,7 @@ function map(collection, callback, thisArg) {
 
 module.exports = map;
 
-},{"../functions/createCallback":34,"../objects/forOwn":54}],31:[function(require,module,exports){
+},{"../functions/createCallback":35,"../objects/forOwn":66}],32:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2669,7 +2702,7 @@ function some(collection, callback, thisArg) {
 
 module.exports = some;
 
-},{"../functions/createCallback":34,"../objects/forOwn":54,"../objects/isArray":55}],32:[function(require,module,exports){
+},{"../functions/createCallback":35,"../objects/forOwn":66,"../objects/isArray":68}],33:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2704,7 +2737,7 @@ function toArray(collection) {
 
 module.exports = toArray;
 
-},{"../internals/slice":50,"../objects/isString":59,"../objects/values":62}],33:[function(require,module,exports){
+},{"../internals/slice":62,"../objects/isString":72,"../objects/values":76}],34:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2746,7 +2779,7 @@ function bind(func, thisArg) {
 
 module.exports = bind;
 
-},{"../internals/createWrapper":42,"../internals/slice":50}],34:[function(require,module,exports){
+},{"../internals/createWrapper":49,"../internals/slice":62}],35:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2829,7 +2862,7 @@ function createCallback(func, thisArg, argCount) {
 
 module.exports = createCallback;
 
-},{"../internals/baseCreateCallback":39,"../internals/baseIsEqual":41,"../objects/isObject":58,"../objects/keys":61,"../utilities/property":66}],35:[function(require,module,exports){
+},{"../internals/baseCreateCallback":40,"../internals/baseIsEqual":45,"../objects/isObject":71,"../objects/keys":74,"../utilities/property":80}],36:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2844,7 +2877,7 @@ var arrayPool = [];
 
 module.exports = arrayPool;
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -2908,7 +2941,7 @@ function baseBind(bindData) {
 
 module.exports = baseBind;
 
-},{"../objects/isObject":58,"./baseCreate":38,"./setBindData":48,"./slice":50}],37:[function(require,module,exports){
+},{"../objects/isObject":71,"./baseCreate":39,"./setBindData":60,"./slice":62}],38:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3062,7 +3095,7 @@ function baseClone(value, isDeep, callback, stackA, stackB) {
 
 module.exports = baseClone;
 
-},{"../collections/forEach":29,"../objects/assign":51,"../objects/forOwn":54,"../objects/isArray":55,"../objects/isObject":58,"./getArray":43,"./releaseArray":47,"./slice":50}],38:[function(require,module,exports){
+},{"../collections/forEach":30,"../objects/assign":63,"../objects/forOwn":66,"../objects/isArray":68,"../objects/isObject":71,"./getArray":50,"./releaseArray":58,"./slice":62}],39:[function(require,module,exports){
 (function (global){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
@@ -3108,7 +3141,7 @@ if (!nativeCreate) {
 module.exports = baseCreate;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../objects/isObject":58,"../utilities/noop":65,"./isNative":44}],39:[function(require,module,exports){
+},{"../objects/isObject":71,"../utilities/noop":79,"./isNative":52}],40:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3190,7 +3223,7 @@ function baseCreateCallback(func, thisArg, argCount) {
 
 module.exports = baseCreateCallback;
 
-},{"../functions/bind":33,"../support":63,"../utilities/identity":64,"./setBindData":48}],40:[function(require,module,exports){
+},{"../functions/bind":34,"../support":77,"../utilities/identity":78,"./setBindData":60}],41:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3270,7 +3303,149 @@ function baseCreateWrapper(bindData) {
 
 module.exports = baseCreateWrapper;
 
-},{"../objects/isObject":58,"./baseCreate":38,"./setBindData":48,"./slice":50}],41:[function(require,module,exports){
+},{"../objects/isObject":71,"./baseCreate":39,"./setBindData":60,"./slice":62}],42:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var baseIndexOf = require('./baseIndexOf'),
+    cacheIndexOf = require('./cacheIndexOf'),
+    createCache = require('./createCache'),
+    largeArraySize = require('./largeArraySize'),
+    releaseObject = require('./releaseObject');
+
+/**
+ * The base implementation of `_.difference` that accepts a single array
+ * of values to exclude.
+ *
+ * @private
+ * @param {Array} array The array to process.
+ * @param {Array} [values] The array of values to exclude.
+ * @returns {Array} Returns a new array of filtered values.
+ */
+function baseDifference(array, values) {
+  var index = -1,
+      indexOf = baseIndexOf,
+      length = array ? array.length : 0,
+      isLarge = length >= largeArraySize,
+      result = [];
+
+  if (isLarge) {
+    var cache = createCache(values);
+    if (cache) {
+      indexOf = cacheIndexOf;
+      values = cache;
+    } else {
+      isLarge = false;
+    }
+  }
+  while (++index < length) {
+    var value = array[index];
+    if (indexOf(values, value) < 0) {
+      result.push(value);
+    }
+  }
+  if (isLarge) {
+    releaseObject(values);
+  }
+  return result;
+}
+
+module.exports = baseDifference;
+
+},{"./baseIndexOf":44,"./cacheIndexOf":46,"./createCache":48,"./largeArraySize":54,"./releaseObject":59}],43:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var isArguments = require('../objects/isArguments'),
+    isArray = require('../objects/isArray');
+
+/**
+ * The base implementation of `_.flatten` without support for callback
+ * shorthands or `thisArg` binding.
+ *
+ * @private
+ * @param {Array} array The array to flatten.
+ * @param {boolean} [isShallow=false] A flag to restrict flattening to a single level.
+ * @param {boolean} [isStrict=false] A flag to restrict flattening to arrays and `arguments` objects.
+ * @param {number} [fromIndex=0] The index to start from.
+ * @returns {Array} Returns a new flattened array.
+ */
+function baseFlatten(array, isShallow, isStrict, fromIndex) {
+  var index = (fromIndex || 0) - 1,
+      length = array ? array.length : 0,
+      result = [];
+
+  while (++index < length) {
+    var value = array[index];
+
+    if (value && typeof value == 'object' && typeof value.length == 'number'
+        && (isArray(value) || isArguments(value))) {
+      // recursively flatten arrays (susceptible to call stack limits)
+      if (!isShallow) {
+        value = baseFlatten(value, isShallow, isStrict);
+      }
+      var valIndex = -1,
+          valLength = value.length,
+          resIndex = result.length;
+
+      result.length += valLength;
+      while (++valIndex < valLength) {
+        result[resIndex++] = value[valIndex];
+      }
+    } else if (!isStrict) {
+      result.push(value);
+    }
+  }
+  return result;
+}
+
+module.exports = baseFlatten;
+
+},{"../objects/isArguments":67,"../objects/isArray":68}],44:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+
+/**
+ * The base implementation of `_.indexOf` without support for binary searches
+ * or `fromIndex` constraints.
+ *
+ * @private
+ * @param {Array} array The array to search.
+ * @param {*} value The value to search for.
+ * @param {number} [fromIndex=0] The index to search from.
+ * @returns {number} Returns the index of the matched value or `-1`.
+ */
+function baseIndexOf(array, value, fromIndex) {
+  var index = (fromIndex || 0) - 1,
+      length = array ? array.length : 0;
+
+  while (++index < length) {
+    if (array[index] === value) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = baseIndexOf;
+
+},{}],45:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3481,7 +3656,135 @@ function baseIsEqual(a, b, callback, isWhere, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"../objects/forIn":53,"../objects/isFunction":56,"./getArray":43,"./objectTypes":46,"./releaseArray":47}],42:[function(require,module,exports){
+},{"../objects/forIn":65,"../objects/isFunction":69,"./getArray":50,"./objectTypes":57,"./releaseArray":58}],46:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var baseIndexOf = require('./baseIndexOf'),
+    keyPrefix = require('./keyPrefix');
+
+/**
+ * An implementation of `_.contains` for cache objects that mimics the return
+ * signature of `_.indexOf` by returning `0` if the value is found, else `-1`.
+ *
+ * @private
+ * @param {Object} cache The cache object to inspect.
+ * @param {*} value The value to search for.
+ * @returns {number} Returns `0` if `value` is found, else `-1`.
+ */
+function cacheIndexOf(cache, value) {
+  var type = typeof value;
+  cache = cache.cache;
+
+  if (type == 'boolean' || value == null) {
+    return cache[value] ? 0 : -1;
+  }
+  if (type != 'number' && type != 'string') {
+    type = 'object';
+  }
+  var key = type == 'number' ? value : keyPrefix + value;
+  cache = (cache = cache[type]) && cache[key];
+
+  return type == 'object'
+    ? (cache && baseIndexOf(cache, value) > -1 ? 0 : -1)
+    : (cache ? 0 : -1);
+}
+
+module.exports = cacheIndexOf;
+
+},{"./baseIndexOf":44,"./keyPrefix":53}],47:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var keyPrefix = require('./keyPrefix');
+
+/**
+ * Adds a given value to the corresponding cache object.
+ *
+ * @private
+ * @param {*} value The value to add to the cache.
+ */
+function cachePush(value) {
+  var cache = this.cache,
+      type = typeof value;
+
+  if (type == 'boolean' || value == null) {
+    cache[value] = true;
+  } else {
+    if (type != 'number' && type != 'string') {
+      type = 'object';
+    }
+    var key = type == 'number' ? value : keyPrefix + value,
+        typeCache = cache[type] || (cache[type] = {});
+
+    if (type == 'object') {
+      (typeCache[key] || (typeCache[key] = [])).push(value);
+    } else {
+      typeCache[key] = true;
+    }
+  }
+}
+
+module.exports = cachePush;
+
+},{"./keyPrefix":53}],48:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var cachePush = require('./cachePush'),
+    getObject = require('./getObject'),
+    releaseObject = require('./releaseObject');
+
+/**
+ * Creates a cache object to optimize linear searches of large arrays.
+ *
+ * @private
+ * @param {Array} [array=[]] The array to search.
+ * @returns {null|Object} Returns the cache object or `null` if caching should not be used.
+ */
+function createCache(array) {
+  var index = -1,
+      length = array.length,
+      first = array[0],
+      mid = array[(length / 2) | 0],
+      last = array[length - 1];
+
+  if (first && typeof first == 'object' &&
+      mid && typeof mid == 'object' && last && typeof last == 'object') {
+    return false;
+  }
+  var cache = getObject();
+  cache['false'] = cache['null'] = cache['true'] = cache['undefined'] = false;
+
+  var result = getObject();
+  result.array = array;
+  result.cache = cache;
+  result.push = cachePush;
+
+  while (++index < length) {
+    result.push(array[index]);
+  }
+  return result;
+}
+
+module.exports = createCache;
+
+},{"./cachePush":47,"./getObject":51,"./releaseObject":59}],49:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3589,7 +3892,7 @@ function createWrapper(func, bitmask, partialArgs, partialRightArgs, thisArg, ar
 
 module.exports = createWrapper;
 
-},{"../objects/isFunction":56,"./baseBind":36,"./baseCreateWrapper":40,"./slice":50}],43:[function(require,module,exports){
+},{"../objects/isFunction":69,"./baseBind":37,"./baseCreateWrapper":41,"./slice":62}],50:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3612,7 +3915,44 @@ function getArray() {
 
 module.exports = getArray;
 
-},{"./arrayPool":35}],44:[function(require,module,exports){
+},{"./arrayPool":36}],51:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var objectPool = require('./objectPool');
+
+/**
+ * Gets an object from the object pool or creates a new one if the pool is empty.
+ *
+ * @private
+ * @returns {Object} The object from the pool.
+ */
+function getObject() {
+  return objectPool.pop() || {
+    'array': null,
+    'cache': null,
+    'criteria': null,
+    'false': false,
+    'index': 0,
+    'null': false,
+    'number': null,
+    'object': null,
+    'push': null,
+    'string': null,
+    'true': false,
+    'undefined': false,
+    'value': null
+  };
+}
+
+module.exports = getObject;
+
+},{"./objectPool":56}],52:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3648,7 +3988,37 @@ function isNative(value) {
 
 module.exports = isNative;
 
-},{}],45:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+
+/** Used to prefix keys to avoid issues with `__proto__` and properties on `Object.prototype` */
+var keyPrefix = +new Date + '';
+
+module.exports = keyPrefix;
+
+},{}],54:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+
+/** Used as the size when optimizations are enabled for large arrays */
+var largeArraySize = 75;
+
+module.exports = largeArraySize;
+
+},{}],55:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3663,7 +4033,22 @@ var maxPoolSize = 40;
 
 module.exports = maxPoolSize;
 
-},{}],46:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+
+/** Used to pool arrays and objects used internally */
+var objectPool = [];
+
+module.exports = objectPool;
+
+},{}],57:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3685,7 +4070,7 @@ var objectTypes = {
 
 module.exports = objectTypes;
 
-},{}],47:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3712,7 +4097,38 @@ function releaseArray(array) {
 
 module.exports = releaseArray;
 
-},{"./arrayPool":35,"./maxPoolSize":45}],48:[function(require,module,exports){
+},{"./arrayPool":36,"./maxPoolSize":55}],59:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var maxPoolSize = require('./maxPoolSize'),
+    objectPool = require('./objectPool');
+
+/**
+ * Releases the given object back to the object pool.
+ *
+ * @private
+ * @param {Object} [object] The object to release.
+ */
+function releaseObject(object) {
+  var cache = object.cache;
+  if (cache) {
+    releaseObject(cache);
+  }
+  object.array = object.cache = object.criteria = object.object = object.number = object.string = object.value = null;
+  if (objectPool.length < maxPoolSize) {
+    objectPool.push(object);
+  }
+}
+
+module.exports = releaseObject;
+
+},{"./maxPoolSize":55,"./objectPool":56}],60:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3757,7 +4173,7 @@ var setBindData = !defineProperty ? noop : function(func, value) {
 
 module.exports = setBindData;
 
-},{"../utilities/noop":65,"./isNative":44}],49:[function(require,module,exports){
+},{"../utilities/noop":79,"./isNative":52}],61:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3797,7 +4213,7 @@ var shimKeys = function(object) {
 
 module.exports = shimKeys;
 
-},{"./objectTypes":46}],50:[function(require,module,exports){
+},{"./objectTypes":57}],62:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3837,7 +4253,7 @@ function slice(array, start, end) {
 
 module.exports = slice;
 
-},{}],51:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3909,7 +4325,7 @@ var assign = function(object, source, guard) {
 
 module.exports = assign;
 
-},{"../internals/baseCreateCallback":39,"../internals/objectTypes":46,"./keys":61}],52:[function(require,module,exports){
+},{"../internals/baseCreateCallback":40,"../internals/objectTypes":57,"./keys":74}],64:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -3968,7 +4384,7 @@ function cloneDeep(value, callback, thisArg) {
 
 module.exports = cloneDeep;
 
-},{"../internals/baseClone":37,"../internals/baseCreateCallback":39}],53:[function(require,module,exports){
+},{"../internals/baseClone":38,"../internals/baseCreateCallback":40}],65:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4024,7 +4440,7 @@ var forIn = function(collection, callback, thisArg) {
 
 module.exports = forIn;
 
-},{"../internals/baseCreateCallback":39,"../internals/objectTypes":46}],54:[function(require,module,exports){
+},{"../internals/baseCreateCallback":40,"../internals/objectTypes":57}],66:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4076,7 +4492,49 @@ var forOwn = function(collection, callback, thisArg) {
 
 module.exports = forOwn;
 
-},{"../internals/baseCreateCallback":39,"../internals/objectTypes":46,"./keys":61}],55:[function(require,module,exports){
+},{"../internals/baseCreateCallback":40,"../internals/objectTypes":57,"./keys":74}],67:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+
+/** `Object#toString` result shortcuts */
+var argsClass = '[object Arguments]';
+
+/** Used for native method references */
+var objectProto = Object.prototype;
+
+/** Used to resolve the internal [[Class]] of values */
+var toString = objectProto.toString;
+
+/**
+ * Checks if `value` is an `arguments` object.
+ *
+ * @static
+ * @memberOf _
+ * @category Objects
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if the `value` is an `arguments` object, else `false`.
+ * @example
+ *
+ * (function() { return _.isArguments(arguments); })(1, 2, 3);
+ * // => true
+ *
+ * _.isArguments([1, 2, 3]);
+ * // => false
+ */
+function isArguments(value) {
+  return value && typeof value == 'object' && typeof value.length == 'number' &&
+    toString.call(value) == argsClass || false;
+}
+
+module.exports = isArguments;
+
+},{}],68:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4123,7 +4581,7 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"../internals/isNative":44}],56:[function(require,module,exports){
+},{"../internals/isNative":52}],69:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4152,7 +4610,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{}],57:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4184,7 +4642,7 @@ function isNull(value) {
 
 module.exports = isNull;
 
-},{}],58:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4225,7 +4683,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{"../internals/objectTypes":46}],59:[function(require,module,exports){
+},{"../internals/objectTypes":57}],72:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4264,7 +4722,7 @@ function isString(value) {
 
 module.exports = isString;
 
-},{}],60:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4293,7 +4751,7 @@ function isUndefined(value) {
 
 module.exports = isUndefined;
 
-},{}],61:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4331,7 +4789,76 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"../internals/isNative":44,"../internals/shimKeys":49,"./isObject":58}],62:[function(require,module,exports){
+},{"../internals/isNative":52,"../internals/shimKeys":61,"./isObject":71}],75:[function(require,module,exports){
+/**
+ * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
+ * Build: `lodash modularize modern exports="node" -o ./modern/`
+ * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <http://lodash.com/license>
+ */
+var baseDifference = require('../internals/baseDifference'),
+    baseFlatten = require('../internals/baseFlatten'),
+    createCallback = require('../functions/createCallback'),
+    forIn = require('./forIn');
+
+/**
+ * Creates a shallow clone of `object` excluding the specified properties.
+ * Property names may be specified as individual arguments or as arrays of
+ * property names. If a callback is provided it will be executed for each
+ * property of `object` omitting the properties the callback returns truey
+ * for. The callback is bound to `thisArg` and invoked with three arguments;
+ * (value, key, object).
+ *
+ * @static
+ * @memberOf _
+ * @category Objects
+ * @param {Object} object The source object.
+ * @param {Function|...string|string[]} [callback] The properties to omit or the
+ *  function called per iteration.
+ * @param {*} [thisArg] The `this` binding of `callback`.
+ * @returns {Object} Returns an object without the omitted properties.
+ * @example
+ *
+ * _.omit({ 'name': 'fred', 'age': 40 }, 'age');
+ * // => { 'name': 'fred' }
+ *
+ * _.omit({ 'name': 'fred', 'age': 40 }, function(value) {
+ *   return typeof value == 'number';
+ * });
+ * // => { 'name': 'fred' }
+ */
+function omit(object, callback, thisArg) {
+  var result = {};
+  if (typeof callback != 'function') {
+    var props = [];
+    forIn(object, function(value, key) {
+      props.push(key);
+    });
+    props = baseDifference(props, baseFlatten(arguments, true, false, 1));
+
+    var index = -1,
+        length = props.length;
+
+    while (++index < length) {
+      var key = props[index];
+      result[key] = object[key];
+    }
+  } else {
+    callback = createCallback(callback, thisArg, 3);
+    forIn(object, function(value, key, object) {
+      if (!callback(value, key, object)) {
+        result[key] = value;
+      }
+    });
+  }
+  return result;
+}
+
+module.exports = omit;
+
+},{"../functions/createCallback":35,"../internals/baseDifference":42,"../internals/baseFlatten":43,"./forIn":65}],76:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4369,7 +4896,7 @@ function values(object) {
 
 module.exports = values;
 
-},{"./keys":61}],63:[function(require,module,exports){
+},{"./keys":74}],77:[function(require,module,exports){
 (function (global){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
@@ -4413,7 +4940,7 @@ support.funcNames = typeof Function.name == 'string';
 module.exports = support;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./internals/isNative":44}],64:[function(require,module,exports){
+},{"./internals/isNative":52}],78:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4443,7 +4970,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],65:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4471,7 +4998,7 @@ function noop() {
 
 module.exports = noop;
 
-},{}],66:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 /**
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modularize modern exports="node" -o ./modern/`
@@ -4513,7 +5040,7 @@ function property(key) {
 
 module.exports = property;
 
-},{}],67:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 /*!
   * Reqwest! A general purpose XHR connection manager
   * license MIT (c) Dustin Diaz 2014
