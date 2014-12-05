@@ -1004,7 +1004,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
 
   function reject(err) {
     error = err;
-    setStatus(Statuses.error);
+    setStatus(Statuses.failed);
   }
 
   function isPromise(obj) {
@@ -1064,7 +1064,7 @@ var ActionsStore = Marty.createStore({
     var action = this.state[actionToken];
 
     if (action) {
-      action.status = Statuses.error;
+      action.status = Statuses.failed;
       action.error = error;
       action.done = true;
       this.hasChanged(actionToken);
