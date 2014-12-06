@@ -200,7 +200,7 @@ describe('Store', function () {
         one: sinon.spy()
       });
 
-      Marty.dispatcher.dispatch(new ActionPayload({
+      Marty.Dispatcher.dispatch(new ActionPayload({
         type: actionType,
         arguments: [data]
       }));

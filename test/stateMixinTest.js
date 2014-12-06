@@ -55,7 +55,7 @@ describe('StateMixin', function () {
 
     describe('when diagnostics is enabled', function () {
       beforeEach(function () {
-        Marty.diagnostics.enabled = true;
+        Marty.Diagnostics.enabled = true;
       });
 
       describe('when the handler fails', function () {
@@ -97,13 +97,13 @@ describe('StateMixin', function () {
       });
 
       afterEach(function () {
-        Marty.diagnostics.enabled = false;
+        Marty.Diagnostics.enabled = false;
       });
     });
 
     describe('when diagnostics is disabled', function () {
       beforeEach(function () {
-        Marty.diagnostics.enabled = false;
+        Marty.Diagnostics.enabled = false;
         element.onStoreChanged(null, store);
       });
 

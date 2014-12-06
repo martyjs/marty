@@ -1,23 +1,23 @@
 var create = require('./lib/create');
 var _ = require('./lib/utils/tinydash');
 var Dispatcher = require('./lib/dispatcher');
-var diagnostics = require('./lib/diagnostics');
-var constants = require('./lib/internalConstants');
+var Diagnostics = require('./lib/diagnostics');
+var ActionPayload = require('./lib/actionPayload');
+var ActionStore = require('./lib/stores/actionsStore');
 
 var Marty = _.extend({
-  constants: constants,
   getAction: getAction,
-  diagnostics: diagnostics,
-  dispatcher: new Dispatcher(),
+  Diagnostics: Diagnostics,
+  ActionPayload: ActionPayload,
+  Dispatcher: Dispatcher.getCurrent(),
+  Stores: {
+    Actions: ActionStore
+  }
 }, create);
+
+function getAction(token) {
+  return ActionStore.getAction(token);
+}
 
 module.exports = Marty;
 
-Marty.ActionPayload = require('./lib/actionPayload');
-Marty.Stores = {
-  Actions: require('./lib/stores/actionsStore')
-};
-
-function getAction(token) {
-  return Marty.Stores.Actions.getAction(token);
-}

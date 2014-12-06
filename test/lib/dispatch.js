@@ -1,5 +1,5 @@
 function dispatch() {
-  var dispatcher = require('../../index').dispatcher;
+  var dispatcher = require('../../index').Dispatcher;
 
   return dispatcher.dispatch.apply(dispatcher, arguments);
 }
