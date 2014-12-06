@@ -2,7 +2,7 @@
 name: Marty
 description: A React.js/Flux Framework
 url: http://martyjs.org
-baseurl: "/"
+baseurl: /
 relative_permalinks: true
 paginate: 5
 timezone: America/Los_Angeles
@@ -30,4 +30,4 @@ redcarpet:
 sass:
   style: :compressed
   sass_dir: _css
-current_version: 0.1.0
+current_version: 0.1.3
