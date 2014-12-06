@@ -298,19 +298,19 @@
 
 <h3 id="query">query(key, localQuery, remoteQuery)</h3>
 
-<p>When requesting data from a store we should assume that it might require an async operation. <code>Store#query</code> provides a simple syntax that allows you to encapsulate that complexity. </p>
+<p>When requesting data from a store we should assume that it might require an async operation. <code>Store#query</code> provides a simple syntax that allows you to encapsulate that complexity.</p>
 
 <p>A query accepts 3 arguments</p>
 
 <ul>
 <li><strong>key</strong> To prevent duplicate requests, you pass in string that acts like a lock. If a query with that key is in progress, then the in progress query will be returned rather than creating a new one.</li>
-<li><strong>local query</strong> The local query is a function which, when invoked, will query the local state for the required information. If it returns a value, then the query will complete there. </li>
+<li><strong>local query</strong> The local query is a function which, when invoked, will query the local state for the required information. If it returns a value, then the query will complete there.</li>
 <li><strong>remote query</strong> If the remote query does not return a value then the remote query will be invoked. The remote query expects you to return a promise. If the promise is fulfilled, the query expects the data to be available locally so will re-invoke the local query.</li>
 </ul>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> 
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span>
       <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
         <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
       <span class="p">},</span>
@@ -347,6 +347,20 @@
   <span class="k">if</span> <span class="p">(</span><span class="nx">userQuery</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">userQuery</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span>
   <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>The <code>StoreQuery</code> offers a helper function for handling each of the states</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">component</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">when</span><span class="p">({</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">Loading</span> <span class="o">/&gt;</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">ErrorPage</span> <span class="nx">error</span><span class="o">=</span><span class="p">{</span><span class="nx">error</span><span class="p">}</span> <span class="sr">/&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
 <h3 id="waitFor">waitFor(*stores)</h3>
@@ -487,7 +501,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.1.0</li>
+        <li>v0.1.3</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
