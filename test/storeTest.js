@@ -245,13 +245,111 @@ describe('Store', function () {
   });
 
   describe('#waitFor()', function () {
+    var Marty = require('../index');
+    var store1, store2, store3, testActionCreators, actualResult, expectedResult, executionOrder;
+
+    beforeEach(function () {
+      executionOrder = [];
+      expectedResult = 6;
+    });
+
     describe('when I pass in an array of stores', function () {
-      it('should wait for the specified stores to complete');
+      beforeEach(function () {
+        executionOrder = waitFor(function (store) {
+          store.waitFor([store3, store2]);
+        });
+      });
+
+      it('should wait for the specified stores to complete', function () {
+        expect(actualResult).to.equal(expectedResult);
+      });
+
+      it('should execute the stores in the specified order', function () {
+        expect(executionOrder).to.eql(['store3', 'store2', 'store1']);
+      });
     });
 
     describe('when I pass in stores as arguments', function () {
-      it('should wait for the specified stores to complete');
+      beforeEach(function () {
+        executionOrder = waitFor(function (store) {
+          store.waitFor(store3, store2);
+        });
+      });
+
+      it('should wait for the specified stores to complete', function () {
+        expect(actualResult).to.equal(expectedResult);
+      });
+
+      it('should execute the stores in the specified order', function () {
+        expect(executionOrder).to.eql(['store3', 'store2', 'store1']);
+      });
     });
+
+    describe('when I pass in dispatch tokens', function () {
+      beforeEach(function () {
+        executionOrder = waitFor(function (store) {
+          store.waitFor(store3.dispatchToken);
+        });
+      });
+
+      it('should wait for the specified stores to complete', function () {
+        expect(actualResult).to.equal(expectedResult);
+      });
+
+      it('should execute the stores in the specified order', function () {
+        expect(executionOrder).to.eql(['store3', 'store2', 'store1']);
+      });
+    });
+
+
+    function waitFor(waitFor) {
+      var order = [];
+      testActionCreators = Marty.createActionCreators({
+        sum: function () {
+          this.dispatch(2);
+        }
+      });
+
+      store2 = Marty.createStore({
+        handlers: { sum: 'SUM'},
+        getInitialState: function () {
+          return 0;
+        },
+        sum: function (value) {
+          this.waitFor(store3);
+          this.state += store3.getState() + value;
+          order.push('store2');
+        }
+      });
+
+      store1 = Marty.createStore({
+        handlers: { sum: 'SUM'},
+        getInitialState: function () {
+          return 0;
+        },
+        sum: function (value) {
+          waitFor(this);
+          this.state = store2.getState() + value;
+          order.push('store1');
+        }
+      });
+
+      store3 = Marty.createStore({
+        handlers: { sum: 'SUM'},
+        getInitialState: function () {
+          return 0;
+        },
+        sum: function (value) {
+          this.state += value;
+          order.push('store3');
+        }
+      });
+
+      testActionCreators.sum();
+      actualResult = store1.getState();
+
+      return order;
+    }
   });
 
   describe('#handleAction()', function () {
