@@ -302,7 +302,7 @@ describe('Store', function () {
     });
 
 
-    function waitFor(waitFor) {
+    function waitFor(waitForCb) {
       var order = [];
       testActionCreators = Marty.createActionCreators({
         sum: function () {
@@ -328,7 +328,7 @@ describe('Store', function () {
           return 0;
         },
         sum: function (value) {
-          waitFor(this);
+          waitForCb(this);
           this.state = store2.getState() + value;
           order.push('store1');
         }
