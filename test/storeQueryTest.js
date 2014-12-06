@@ -138,7 +138,7 @@ describe('StoreQuery', function () {
     });
 
     it('should have a status of done', function () {
-      expect(query.status).to.equal('done');
+      expect(query.status).to.equal('DONE');
     });
 
     it('should say it is done', function () {
@@ -164,7 +164,7 @@ describe('StoreQuery', function () {
     });
 
     it('should have a status of failed', function () {
-      expect(query.status).to.equal('failed');
+      expect(query.status).to.equal('FAILED');
     });
 
     it('should say its failed', function () {
@@ -183,7 +183,7 @@ describe('StoreQuery', function () {
       });
 
       it('should have a status of failed', function () {
-        expect(query.status).to.equal('failed');
+        expect(query.status).to.equal('FAILED');
       });
 
       it('should say its failed', function () {
@@ -206,7 +206,7 @@ describe('StoreQuery', function () {
       });
 
       it('should have a status of done', function () {
-        expect(query.status).to.equal('done');
+        expect(query.status).to.equal('DONE');
       });
 
       it('should say it is done', function () {
@@ -232,7 +232,7 @@ describe('StoreQuery', function () {
       });
 
       it('should have a status of failed', function () {
-        expect(query.status).to.equal('failed');
+        expect(query.status).to.equal('FAILED');
       });
 
       it('should say its failed', function () {
@@ -259,7 +259,7 @@ describe('StoreQuery', function () {
         });
 
         it('should have a status of failed', function () {
-          expect(query.status).to.equal('failed');
+          expect(query.status).to.equal('FAILED');
         });
 
         it('should say its failed', function () {
@@ -292,7 +292,7 @@ describe('StoreQuery', function () {
           });
 
           it('should have a status of done', function () {
-            expect(query.status).to.equal('done');
+            expect(query.status).to.equal('DONE');
           });
 
           it('should say it is done', function () {
@@ -316,7 +316,7 @@ describe('StoreQuery', function () {
           });
 
           it('should have a status of failed', function () {
-            expect(query.status).to.equal('failed');
+            expect(query.status).to.equal('FAILED');
           });
 
           it('should say its failed', function () {

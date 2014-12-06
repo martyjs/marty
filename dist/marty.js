@@ -146,7 +146,7 @@ function Action(options) {
 
   var handlers = [];
   var rollbackHandlers = [];
-  var status = Statuses.pending;
+  var status = Statuses.PENDING;
 
   this.token = uuid();
   this.type = options.type;
@@ -917,7 +917,7 @@ var Statuses = require('./internalConstants').Statuses;
 function StoreQuery(store, localQuery, remoteQuery) {
   var error, result, remoteResult;
   var emitter = new EventEmitter();
-  var status = Statuses.pending;
+  var status = Statuses.PENDING;
 
   this.addChangeListener = addChangeListener;
 
@@ -929,7 +929,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
 
   Object.defineProperty(this, 'pending', {
     get: function () {
-      return status === Statuses.pending;
+      return status === Statuses.PENDING;
     }
   });
 
@@ -998,13 +998,13 @@ function StoreQuery(store, localQuery, remoteQuery) {
   function resolve(data) {
     if (!isUndefined(data)) {
       result = data;
-      setStatus(Statuses.done);
+      setStatus(Statuses.DONE);
     }
   }
 
   function reject(err) {
     error = err;
-    setStatus(Statuses.failed);
+    setStatus(Statuses.FAILED);
   }
 
   function isPromise(obj) {
@@ -1012,7 +1012,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
   }
 
   function isDone() {
-    return status === Statuses.error || status === Statuses.done;
+    return status === Statuses.error || status === Statuses.DONE;
   }
 
   function setStatus(newStatus) {
@@ -1055,7 +1055,7 @@ var ActionsStore = Marty.createStore({
     this.state[action.token] = {
       type: action.type,
       token: action.token,
-      status: Statuses.pending,
+      status: Statuses.PENDING,
       arguments: action.arguments
     };
     this.hasChanged(action.token);
@@ -1064,7 +1064,7 @@ var ActionsStore = Marty.createStore({
     var action = this.state[actionToken];
 
     if (action) {
-      action.status = Statuses.failed;
+      action.status = Statuses.FAILED;
       action.error = error;
       action.done = true;
       this.hasChanged(actionToken);
@@ -1074,7 +1074,7 @@ var ActionsStore = Marty.createStore({
     var action = this.state[actionToken];
 
     if (action) {
-      action.status = Statuses.done;
+      action.status = Statuses.DONE;
       action.done = true;
       this.hasChanged(actionToken);
     }
