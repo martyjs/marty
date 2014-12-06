@@ -45,7 +45,7 @@ describe('ActionStore', function () {
     });
 
     it('should have a \'pending\' status', function () {
-      expect(actualAction.status).to.equal('pending');
+      expect(actualAction.status).to.equal('PENDING');
     });
 
     it('should have the actions type', function () {
@@ -73,16 +73,12 @@ describe('ActionStore', function () {
       actualAction = ActionStore.getAction(token);
     });
 
-    it('should have a \'error\' status', function () {
-      expect(actualAction.status).to.equal('error');
+    it('should have a \'failed\' status', function () {
+      expect(actualAction.status).to.equal('FAILED');
     });
 
     it('should have the error', function () {
       expect(actualAction.error).to.equal(expectedError);
-    });
-
-    it('should say the action is done', function () {
-      expect(actualAction.done).to.be.true;
     });
 
     it('should emit a change to all listeners', function () {
@@ -99,7 +95,7 @@ describe('ActionStore', function () {
     });
 
     it('should have a \'done\' status', function () {
-      expect(actualAction.status).to.equal('done');
+      expect(actualAction.status).to.equal('DONE');
     });
 
     it('should say the action is done', function () {

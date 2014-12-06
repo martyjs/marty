@@ -193,18 +193,18 @@ var UsersStore = Marty.createStore({
 
 <h3 id="query">query(key, localQuery, remoteQuery)</h3>
 
-When requesting data from a store we should assume that it might require an async operation. ``Store#query`` provides a simple syntax that allows you to encapsulate that complexity. 
+When requesting data from a store we should assume that it might require an async operation. ``Store#query`` provides a simple syntax that allows you to encapsulate that complexity.
 
 A query accepts 3 arguments
 
 * **key** To prevent duplicate requests, you pass in string that acts like a lock. If a query with that key is in progress, then the in progress query will be returned rather than creating a new one.
-* **local query** The local query is a function which, when invoked, will query the local state for the required information. If it returns a value, then the query will complete there. 
+* **local query** The local query is a function which, when invoked, will query the local state for the required information. If it returns a value, then the query will complete there.
 * **remote query** If the remote query does not return a value then the remote query will be invoked. The remote query expects you to return a promise. If the promise is fulfilled, the query expects the data to be available locally so will re-invoke the local query.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
   getUser: function (id) {
-    return this.query(id, 
+    return this.query(id,
       function () {
         return this.state[id];
       },
@@ -251,6 +251,23 @@ UserStore.addChangeListener(function () {
   }
 });
 {% endhighlight %}
+
+The ``StoreQuery`` offers a helper function for handling each of the states
+
+{% highlight js %}
+var component = user.when({
+  pending: function () {
+    return <Loading />;
+  },
+  failed: function (error) {
+    return <ErrorPage error={error} />;
+  },
+  done: function (user) {
+    return <div className="user">{user.name}</div>;
+  }
+});
+{% endhighlight %}
+
 
 <h3 id="waitFor">waitFor(*stores)</h3>
 
