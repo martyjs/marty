@@ -140,6 +140,21 @@
 
 <div class="highlight"><pre><code class="language-bash" data-lang="bash">bower install --save marty</code></pre></div>
 
+<h2 id="yeoman" class="="page-header>Yeoman template</h2>
+
+<p>The quickest way to get started with marty is to use our <a href="http://yeoman.io/">yeoman generator</a>. To use it you first need to install yeoman and our generator</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">npm install -g yo generator-marty</code></pre></div>
+
+<p>To use the generator, create a directory and then <code>cd</code> into it. Next run <code>yo marty</code> which will create an empty marty project and install all dependencies. To start the application run <code>npm start</code>, you can view it in a browser at <a href="http://localhost:5000">http://localhost:5000</a>.</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">mkdir example <span class="o">&amp;&amp;</span> <span class="nb">cd </span>example
+yo marty
+npm start
+open http://localhost:5000</code></pre></div>
+
+<p>Initially it only generates the basic folder structure. You can use <code>yo marty:domain {domain name}</code> to automatically create an action creator, store, constants, HTTP API and component for the given domain.</p>
+
 <h2 id="module-loaders" class="page-header">Module loaders</h2>
 
 <p>Marty is built using <a href="https://github.com/umdjs/umd">UMD</a>. This means you can use it from <a href="nodejs.org">node.js</a> or <a href="browserify.org">Browserify</a></p>
