@@ -173,15 +173,24 @@ function Action(options) {
     }
   });
 
-  Object.defineProperty(this, 'done', {
+  Object.defineProperty(this, 'pending', {
     get: function () {
-      return isDone(status);
+      return status === Statuses.PENDING;
     }
   });
 
-  function isDone() {
-    return false;
-  }
+  Object.defineProperty(this, 'failed', {
+    get: function () {
+      return status === Statuses.FAILED;
+    }
+  });
+
+  Object.defineProperty(this, 'done', {
+    get: function () {
+      return status === Statuses.DONE;
+    }
+  });
+
 
   function toString() {
     return JSON.stringify(this.toJSON(), null, 2);
@@ -424,7 +433,7 @@ var constants = require('./constants');
 
 module.exports = constants({
   ActionSources: ['VIEW', 'SERVER'],
-  Statuses: ['pending', 'error', 'done'],
+  Statuses: ['PENDING', 'FAILED', 'DONE'],
   Actions: ['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']
 });
 },{"./constants":3}],12:[function(require,module,exports){
@@ -919,6 +928,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
   var emitter = new EventEmitter();
   var status = Statuses.PENDING;
 
+  this.when = when;
   this.addChangeListener = addChangeListener;
 
   Object.defineProperty(this, 'status', {
@@ -935,7 +945,13 @@ function StoreQuery(store, localQuery, remoteQuery) {
 
   Object.defineProperty(this, 'done', {
     get: function () {
-      return isDone(status);
+      return status === Statuses.DONE;
+    }
+  });
+
+  Object.defineProperty(this, 'failed', {
+    get: function () {
+      return !!error;
     }
   });
 
@@ -961,6 +977,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
     return;
   }
 
+
   try {
     remoteResult = remoteQuery.call(store);
   } catch (err) {
@@ -984,6 +1001,24 @@ function StoreQuery(store, localQuery, remoteQuery) {
       });
     } else {
       resolve(remoteResult);
+    }
+  }
+
+  function when(handlers) {
+    handlers || (handlers = {});
+    var handler = handlers[status.toLowerCase()];
+
+    if (!handler) {
+      throw new Error('Could not find a ' + status + ' handler');
+    }
+
+    switch (status) {
+      case Statuses.PENDING:
+        return handler();
+      case Statuses.FAILED:
+        return handler(error);
+      case Statuses.DONE:
+        return handler(result);
     }
   }
 
@@ -1012,7 +1047,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
   }
 
   function isDone() {
-    return status === Statuses.error || status === Statuses.DONE;
+    return status === Statuses.FAILED || status === Statuses.DONE;
   }
 
   function setStatus(newStatus) {
