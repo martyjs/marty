@@ -1,3 +1,4 @@
+var fs = require('fs');
 var yaml = require('js-yaml');
 var _ = require('lodash-node');
 
