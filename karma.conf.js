@@ -1,8 +1,9 @@
-var fs = require('fs');
 var yaml = require('js-yaml');
 var _ = require('lodash-node');
 
 module.exports = function (config) {
+  process.env.NODE_ENV = 'test'
+
   switch (process.env.ENV) {
     case 'CI':
       _.extend(process.env, saucelabsVariables());
@@ -86,7 +87,7 @@ module.exports = function (config) {
       basePath: '',
       frameworks: ['mocha', 'browserify'],
       browserify: {
-        transform: ['reactify'],
+        transform: ['reactify', 'envify'],
         debug: true
       },
       files: [
