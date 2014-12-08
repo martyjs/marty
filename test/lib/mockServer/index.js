@@ -15,13 +15,21 @@ app.use(function (req, res, next) {
 });
 
 ['GET', 'POST', 'PUT', 'DELETE'].forEach(function (method) {
-  app[method.toLowerCase()]('*', function (req, res) {
+  app[method.toLowerCase()]('/stub/*', function (req, res) {
     res.json({
       method: method,
       url: req.url,
       body: req.body
     }).end();
   });
+});
+
+app.get('/hello-world', function (req, res) {
+  res.send('<html><body><h1 id="message">hello world</h1></body></html>').end();
+});
+
+app.get('*', function (req, res) {
+  res.status(404).end();
 });
 
 app.listen(port, function () {

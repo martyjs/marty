@@ -8,7 +8,7 @@ describe('HttpMixin', function () {
   var API, baseUrl, response;
 
   beforeEach(function () {
-    baseUrl = format('http://localhost:%s/', MOCK_SERVER_PORT);
+    baseUrl = format('http://localhost:%s/stub/', MOCK_SERVER_PORT);
   });
 
 
@@ -23,7 +23,7 @@ describe('HttpMixin', function () {
 
     it('should start a get request with the given url', function () {
       expect(response).to.eql({
-        url: '/foos',
+        url: '/stub/foos',
         method: 'GET',
         body: {}
       });
@@ -38,7 +38,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'GET',
           body: {}
         });
@@ -54,7 +54,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           method: 'GET',
           body: {}
         });
@@ -70,7 +70,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'PUT',
           body: {}
         });
@@ -92,7 +92,7 @@ describe('HttpMixin', function () {
       it('should create some options which include the url', function () {
         expect(response).to.eql({
           method: 'PUT',
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           body: expectedBody
         });
       });
@@ -107,7 +107,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'POST',
           body: {}
         });
@@ -129,7 +129,7 @@ describe('HttpMixin', function () {
       it('should create some options which include the url', function () {
         expect(response).to.eql({
           method: 'POST',
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           body: expectedBody
         });
       });
@@ -144,7 +144,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'DELETE',
           body: {}
         });
@@ -160,7 +160,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           method: 'DELETE',
           body: {}
         });
@@ -183,7 +183,7 @@ describe('HttpMixin', function () {
 
       it('should add the / if its missing', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'GET',
           body: {}
         });
@@ -204,7 +204,7 @@ describe('HttpMixin', function () {
 
       it('should add the / if its missing', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'GET',
           body: {}
         });

@@ -94,8 +94,7 @@ module.exports = function (config) {
       files: [
         'index.js',
         'lib/*.js',
-        'test/**/*.js',
-        { pattern: 'test/fixtures/*.json', watched: true, served: true, included: false }
+        'test/**/*.js'
       ],
       exclude: [
         'test/lib/mockServer/*'
