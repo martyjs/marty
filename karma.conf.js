@@ -97,6 +97,9 @@ module.exports = function (config) {
         'test/**/*.js',
         { pattern: 'test/fixtures/*.json', watched: true, served: true, included: false }
       ],
+      exclude: [
+        'test/lib/mockServer/*'
+      ],
       preprocessors: {
         'lib/*': ['browserify'],
         'index.js': ['browserify'],
