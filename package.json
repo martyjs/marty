@@ -69,8 +69,9 @@
   },
   "homepage": "https://martyjs.org",
   "dependencies": {
+    "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
-    "reqwest": "^1.1.5",
-    "es6-promise": "^2.0.0"
+    "lodash-node": "^2.4.1",
+    "reqwest": "^1.1.5"
   }
 }
