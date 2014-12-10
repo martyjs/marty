@@ -408,7 +408,7 @@ describe('StateMixin', function () {
     var Marty = require('../index');
 
     beforeEach(function () {
-      token = uuid();
+      token = uuid.small();
     });
 
     afterEach(function () {
@@ -475,7 +475,7 @@ describe('StateMixin', function () {
       var stateToken, setState;
 
       beforeEach(function () {
-        stateToken = uuid();
+        stateToken = uuid.small();
         dispatch(new ActionPayload({
           type: ActionConstants.ACTION_STARTING,
           arguments: [{
