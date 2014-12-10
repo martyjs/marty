@@ -13,6 +13,7 @@ describe('StateMixin', function () {
   var element, mixin, initialState, getState, setState;
 
   beforeEach(function () {
+    Marty.Diagnostics.enabled = false;
     initialState = {
       name: 'hello'
     };
@@ -54,7 +55,10 @@ describe('StateMixin', function () {
     });
 
     describe('when diagnostics is enabled', function () {
+      var log;
       beforeEach(function () {
+        log = console.log;
+        console.log = function () {};
         Marty.Diagnostics.enabled = true;
       });
 
@@ -97,6 +101,7 @@ describe('StateMixin', function () {
       });
 
       afterEach(function () {
+        console.log = log;
         Marty.Diagnostics.enabled = false;
       });
     });

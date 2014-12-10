@@ -33,11 +33,6 @@ module.exports = function (config) {
         browserName: 'safari',
         version: '5'
       },
-      sl_opera: {
-        base: 'SauceLabs',
-        browserName: 'opera',
-        version: '12'
-      },
       sl_ie_9: {
         base: 'SauceLabs',
         browserName: 'internet explorer',
