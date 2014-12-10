@@ -10,7 +10,7 @@ describe('ActionStore', function () {
   var listener, expectedActionType, token, actualAction, expectedArguments;
 
   beforeEach(function () {
-    token = uuid();
+    token = uuid.small();
     listener = sinon.spy();
     expectedActionType = 'FOO_BAR';
   });
