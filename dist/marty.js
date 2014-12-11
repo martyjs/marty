@@ -442,6 +442,7 @@ module.exports = ActionPredicateUndefinedError;
 function NotFoundError(message) {
   this.name = 'Not found';
   this.message = message || '';
+  this.status = 404;
 }
 
 NotFoundError.prototype = Error.prototype;
@@ -543,11 +544,11 @@ module.exports = HttpMixin;
 var uuid = require('../utils/uuid');
 var _ = require('../utils/tinydash');
 var Diagnostics = require('../diagnostics');
-var reservedKeys = ['listenTo', 'getState'];
 var cloneState = require('../utils/cloneState');
+var reservedKeys = ['listenTo', 'getState', 'getInitialState', 'listenToActions'];
 
 function StateMixin(options) {
-  var config;
+  var config, instanceMethods;
   var listenToActions = shouldListenToActions(options);
 
   if (!options) {
@@ -558,9 +559,10 @@ function StateMixin(options) {
     config = storeMixinConfig(options);
   } else {
     config = simpleMixinConfig(options);
+    instanceMethods = _.omit(options, reservedKeys);
   }
 
-  var mixin = {
+  var mixin = _.extend({
     onStoreChanged: function (state, store) {
       Diagnostics.trace(
         store.name, 'store has changed. The', this.name, 'component (' + this._marty.id + ') is updating'
@@ -659,7 +661,7 @@ function StateMixin(options) {
       return config.getState(this);
     },
     getInitialState: function () {
-      var initialState = {};
+      this.state = {};
 
       this._marty = {
         listeners: [],
@@ -668,18 +670,18 @@ function StateMixin(options) {
       };
 
       if (options.getInitialState) {
-        initialState = options.getInitialState();
+        this.state = options.getInitialState();
       }
 
-      var state = _.extend({}, initialState, this.getState());
+      this.state = _.extend(this.state, this.getState());
 
       if (Diagnostics.enabled) {
-        this._marty.lastState = cloneState(state);
+        this._marty.lastState = cloneState(this.state);
       }
 
-      return state;
+      return this.state;
     }
-  };
+  }, instanceMethods);
 
   return mixin;
 
@@ -769,10 +771,13 @@ var Statuses = require('./internalConstants').Statuses;
 var ActionHandlerNotFoundError = require('./errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('./errors/actionPredicateUndefined');
 
+Store.defaultMaxListeners = 10000000;
+
 function Store(options) {
   var state;
   var queries = {};
   var store = this;
+  var queryErrors = {};
   var defaultState = {};
   var emitter = new EventEmitter();
   var dispatcher = options.dispatcher || Dispatcher.getCurrent();
@@ -793,6 +798,8 @@ function Store(options) {
   query.done = queryDone;
   query.failed = queryFailed;
   query.pending = queryPending;
+
+  emitter.setMaxListeners(options.maxListeners || Store.defaultMaxListeners);
 
   extendStore(this, options);
   validateHandlers(this);
@@ -851,9 +858,14 @@ function Store(options) {
 
   function query(key, localQuery, remoteQuery) {
     var storeQuery = queries[key];
+    var queryError = queryErrors[key];
 
     if (storeQuery && !storeQuery.done) {
       return storeQuery;
+    }
+
+    if (queryError) {
+      return queryFailed(queryError);
     }
 
     storeQuery = new StoreQuery(this, localQuery, remoteQuery);
@@ -862,6 +874,10 @@ function Store(options) {
       if (finished) {
         delete queries[key];
         listener.dispose();
+
+        if (status === Statuses.ERROR) {
+          queryErrors[key] = storeQuery.error;
+        }
       }
       this.hasChanged();
     }, this);
@@ -892,6 +908,8 @@ function Store(options) {
   }
 
   function clear() {
+    queries = {};
+    queryErrors = {};
     this.state = this.getInitialState();
   }
 
@@ -1085,7 +1103,7 @@ function StoreQuery(store, localQuery, remoteQuery) {
 
   if (remoteResult) {
     if (isPromise(remoteResult)) {
-      remoteResult.catch(reject).then(nowTryAndGetLocally);
+      remoteResult.then(nowTryAndGetLocally).catch(reject);
     } else {
       resolve(remoteResult);
     }
