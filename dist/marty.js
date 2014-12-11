@@ -1228,11 +1228,11 @@ function when(handlers) {
 
   switch (status) {
     case Statuses.PENDING:
-      return handler();
+      return handler.call(handlers);
     case Statuses.FAILED:
-      return handler(this.error);
+      return handler.call(handlers, this.error);
     case Statuses.DONE:
-      return handler(this.result);
+      return handler.call(handlers, this.result);
   }
 }
 
