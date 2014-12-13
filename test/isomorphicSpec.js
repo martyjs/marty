@@ -29,7 +29,7 @@ describe('Isomorphism', function () {
   });
 
   function get(url) {
-    return getHtml(url).then(function (res) {
+    return getHtml('iso/' + url).then(function (res) {
       $ = res.$;
       statusCode = res.statusCode;
     }).catch(function (err) {

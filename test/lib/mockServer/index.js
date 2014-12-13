@@ -1,4 +1,5 @@
 var express = require('express');
+var Router = reqiure('react-router');
 var bodyParser = require('body-parser');
 
 var app = express();
@@ -24,8 +25,10 @@ app.use(function (req, res, next) {
   });
 });
 
-app.get('/hello-world', function (req, res) {
-  res.send('<html><body><h1 id="message">hello world</h1></body></html>').end();
+app.get('/iso/*', function (req, res) {
+  app.get('/hello-world', function (req, res) {
+    res.send('<html><body><h1 id="message">hello world</h1></body></html>').end();
+  });
 });
 
 app.get('*', function (req, res) {
