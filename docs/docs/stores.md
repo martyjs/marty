@@ -298,7 +298,7 @@ Fetch returns a result object that repesents the current state of the fetch. It 
 {% highlight js %}
 var user = UserStore.getUser(id);
 
-console.log(user.status) // => pending
+console.log(user.status) // => PENDING
 {% endhighlight %}
 
 If the fetch has an error, then the error is accessible at ``result#error``
