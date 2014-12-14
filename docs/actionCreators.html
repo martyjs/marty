@@ -132,7 +132,7 @@
       <div class="bs-docs-section">
         <p>Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state.</p>
 
-<p>All actions have a type which is string which gives a terse description of what the action does (e.g. &quot;UPDATE_USER_EMAIL&quot;). Stores listen for new actions (using the <a href="/docs/dispatcher.html">dispatcher</a>) and use <a href="/docs/stores.html#handlers">action&#39;s type to determine whether to do something with it</a>. Using strings helps us build loosely coupled applications that can grow without increasing complexity. </p>
+<p>All actions have a type which is string which gives a terse description of what the action does (e.g. &quot;UPDATE_USER_EMAIL&quot;). Stores listen for new actions (using the <a href="/docs/dispatcher.html">dispatcher</a>) and use <a href="/docs/stores.html#handlers">action&#39;s type to determine whether to do something with it</a>. Using strings helps us build loosely coupled applications that can grow without increasing complexity.</p>
 
 <p>Lets look at how you define an action creator using marty:</p>
 
@@ -145,42 +145,47 @@
 <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
 
 <p>In this case the actions type is &quot;UPDATE_EMAIL&quot; and the second function in the array is the action which will be invoked when you call <code>updateEmail</code>. We found that more often than not the action type is the same as the actions function name so by convention we camelize, underscore and upper case it. In the above example, specifying the action type is superfluous because updateEmail becomes &quot;UPDATE_EMAIL&quot;.</p>
-<div class="highlight"><pre><code class="language-" data-lang="">var UserActionCreators = Marty.createActionCreators({
-  updateEmail: function (userId, email) {
-    ...
-  }
-});
-</code></pre></div>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
 <p>If you want to make a change locally, you can use <code>this.dispatch()</code>.</p>
-<div class="highlight"><pre><code class="language-" data-lang="">var UserActionCreators = Marty.createActionCreators({
-  updateEmail: function (userId, email) {
-    this.dispatch(userId, email);
-  }
-});
 
-Marty.dispatcher.register(function (action) {
-  console.log(action.type) // =&gt; "UPDATE_EMAIL"
-  console.log(action.arguments) // =&gt; [123, "foo@bar.com"];
-});
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
 
-UserActionCreators.updateEmail(123, "foo@bar.com");
-</code></pre></div>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="c1">// =&gt; "UPDATE_EMAIL"</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">arguments</span><span class="p">)</span> <span class="c1">// =&gt; [123, "foo@bar.com"];</span>
+<span class="p">});</span>
+
+<span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
+
 <p>Action creators become more complex when you start involving remote requests since they involve asynchronous calls and have the potential to fail. Traditionally you would pass in a callback or return a promise but comply with Flux&#39;s unidirectional data flow rule. So we need a different approach to ensure data is flowing in the right direction.</p>
 
-<p>Marty has an Actions store (<code>Marty.Stores.Actions</code>) which knows about all actions. When you create an action, it will return an <strong>action token</strong> which you can use to get the status of an action.</p>
-<div class="highlight"><pre><code class="language-" data-lang="">var UserActionCreators = Marty.createActionCreators({
-  createUser: function (user) {
-    return UserAPI.createUser(user);
-  }
-});
+<p>If an action fails then an extra action is dispatched with the type <code>{action type}_FAILED</code> (e.g. <code>CREATE_USER_FAILED</code>) that contains the error allowing you to update your state.</p>
 
-var createUserToken = UserActionCreators.createUser(user);
+<p>Marty also has an Actions store (<code>Marty.Stores.Actions</code>) which knows about all actions. When you create an action, it will return an <strong>action token</strong> which you can use to get the status of an action.</p>
 
-Marty.Stores.Actions.addChangeListener(function () {
-  var action = Marty.getAction(createUserAction); // Shortcut for Marty.Stores.Actions.getAction()
-  console.log(action.status)
-});
-</code></pre></div>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">createUserToken</span> <span class="o">=</span> <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">Stores</span><span class="p">.</span><span class="nx">Actions</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">getAction</span><span class="p">(</span><span class="nx">createUserAction</span><span class="p">);</span> <span class="c1">// Shortcut for Marty.Stores.Actions.getAction()</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span>
+<span class="p">});</span></code></pre></div>
+
 <p>Like <a href="/docs/stores.html#fetches">store fetches</a>, an action&#39;s status can either be <strong>pending</strong>, <strong>done</strong> or <strong>error</strong>. If you are using the <a href="/docs/stateMixin.html">state mixin</a> then it automatically listens to the actions store (<a href="/docs/stateMixin.html#listenToActions">unless you tell it not to</a>).</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserFormState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
@@ -190,19 +195,20 @@ Marty.Stores.Actions.addChangeListener(function () {
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">});</span>
+
 <span class="kd">var</span> <span class="nx">UserForm</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
   <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">createUser</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">status</span><span class="p">.</span><span class="nx">createUser</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">createUser</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">createUser</span><span class="p">.</span><span class="nx">pending</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'creating user'</span><span class="p">);</span>
-      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">createUser</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'creating user failed'</span><span class="p">,</span> <span class="nx">createUser</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span> 
-      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">createUser</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'creating user done'</span><span class="p">,</span> <span class="nx">createUser</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span> 
-      <span class="p">}</span>
-    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">createUser</span><span class="p">.</span><span class="nx">when</span><span class="p">({</span>
+      <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"pending"</span><span class="o">/&gt;</span><span class="p">;</span>
+      <span class="p">},</span>
+      <span class="na">failed</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"error"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>      <span class="p">},</span>
+      <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>      <span class="p">}</span>
+    <span class="p">});</span>
   <span class="p">},</span>
   <span class="nx">createUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
@@ -229,7 +235,7 @@ Marty.Stores.Actions.addChangeListener(function () {
 
 <h3 id="dispatch">dispatch([...])</h3>
 
-<p>Dispatches an action payload. Any <a href="/docs/stores.html#handleAction">action handlers</a> will be invoked with the given action handlers. </p>
+<p>Dispatches an action payload. Any <a href="/docs/stores.html#handleAction">action handlers</a> will be invoked with the given action handlers.</p>
 
 <p>Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.</p>
 
@@ -360,7 +366,7 @@ Marty.Stores.Actions.addChangeListener(function () {
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.5.0</li>
+        <li>v0.5.1</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
