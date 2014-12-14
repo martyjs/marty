@@ -91,7 +91,7 @@ var UsersStore = Marty.createStore({
 
 <h4 id="action-predicates">Action predicates</h4>
 
-An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where fetch</a>. Some examples of action predicates:
+An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where query</a>. Some examples of action predicates:
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
@@ -230,51 +230,49 @@ UsersStore.getUser(123).when({
 
 <h4>Options</h4>
 
-<div class="table-responsive">
-  <table class="table table-bordered table-striped">
-    <thead>
-     <tr>
-       <th style="width: 100px;">Name</th>
-       <th style="width: 100px;">type</th>
-       <th style="width: 50px;">required</th>
-       <th>description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-       <td>id</td>
-       <td>number | string | object</td>
-       <td>true</td>
-       <td>Uniquely identifies the bit of state you are fetching. Only one request for a given Id can be in progress at any time. If another request is in progress then a pending fetch result is returned</td>
-     </tr>
-     <tr>
-       <td>locally</td>
-       <td>function</td>
-       <td>true</td>
-       <td>Should try and fetch from the local state. If it returns a value then an done fetch result will be returned immediately</td>
-     </tr>
-     <tr>
-       <td>remotely</td>
-       <td>function</td>
-       <td>false</td>
-       <td>
-       If ``locally`` did not return a value then then ``remotely`` is invoked. When ``remotely`` has finished then ``locally`` will be reinvoked and should contain now contain the state. If ``remotely`` returns a promise then ``locally`` will be called if the promise is fulfilled</td>
-     </tr>
-     <tr>
-       <td>dependsOn</td>
-       <td>fetch result | array of fetch results</td>
-       <td>false</td>
-       <td>If a fetch depends on some other state being there already you can pass in their fetch results. It will only try and start fetching the data when all dependencies are done.</td>
-     </tr>
-     <tr>
-       <td>cacheError</td>
-       <td>boolean</td>
-       <td>false</td>
-       <td>If true (default) then if an error is thrown at any point during a fetch then that error is cached and returned immediately instead.</td>
-     </tr>
-    </tbody>
-  </table>
-</div>
+<table class="table table-bordered table-striped">
+  <thead>
+   <tr>
+     <th style="width: 100px;">Name</th>
+     <th style="width: 100px;">type</th>
+     <th style="width: 50px;">required</th>
+     <th>description</th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+     <td>id</td>
+     <td>number | string | object</td>
+     <td>true</td>
+     <td>Uniquely identifies the bit of state you are fetching. Only one request for a given Id can be in progress at any time. If another request is in progress then a pending fetch result is returned</td>
+   </tr>
+   <tr>
+     <td>locally</td>
+     <td>function</td>
+     <td>true</td>
+     <td>Should try and fetch from the local state. If it returns a value then an done fetch result will be returned immediately</td>
+   </tr>
+   <tr>
+     <td>remotely</td>
+     <td>function</td>
+     <td>false</td>
+     <td>
+     If ``locally`` did not return a value then then ``remotely`` is invoked. When ``remotely`` has finished then ``locally`` will be reinvoked and should contain now contain the state. If ``remotely`` returns a promise then ``locally`` will be called if the promise is fulfilled</td>
+   </tr>
+   <tr>
+     <td>dependsOn</td>
+     <td>fetch result | array of fetch results</td>
+     <td>false</td>
+     <td>If a fetch depends on some other state being there already you can pass in their fetch results. It will only try and start fetching the data when all dependencies are done.</td>
+   </tr>
+   <tr>
+     <td>cacheError</td>
+     <td>boolean</td>
+     <td>false</td>
+     <td>If true (default) then if an error is thrown at any point during a fetch then that error is cached and returned immediately instead.</td>
+   </tr>
+  </tbody>
+</table>
 
 Often you're only concerned with fetching locally and remotely so you use the second function signature ``fetch(id, locally, remotely)``:
 
