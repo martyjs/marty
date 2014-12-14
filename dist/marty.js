@@ -8,6 +8,7 @@ var ActionPayload = require('./lib/actionPayload');
 var ActionStore = require('./lib/stores/actionsStore');
 
 var Marty = _.extend({
+  version: '0.5.3',
   getAction: getAction,
   Diagnostics: Diagnostics,
   ActionPayload: ActionPayload,
@@ -63,6 +64,7 @@ function ActionCreators(options) {
 
       functions[name] = function () {
         var result;
+        var handlers = [];
         var token = uuid.small();
 
         dispatchStarting();
@@ -92,6 +94,7 @@ function ActionCreators(options) {
             dispatch: function () {
               return dispatch({
                 type: actionType,
+                handlers: handlers,
                 arguments: arguments
               });
             }
@@ -110,7 +113,8 @@ function ActionCreators(options) {
             type: Actions.ACTION_STARTING,
             arguments: [{
               token: token,
-              type: actionType
+              type: actionType,
+              handlers: handlers
             }]
           });
         }
@@ -162,9 +166,9 @@ var Statuses = require('./internalConstants').Statuses;
 function ActionPayload(options) {
   options || (options = {});
 
-  var handlers = [];
   var rollbackHandlers = [];
   var status = Statuses.PENDING;
+  var handlers = options.handlers || [];
 
   this.type = options.type;
   this.token = uuid.small();
@@ -1237,6 +1241,7 @@ function Store(options) {
 module.exports = Store;
 },{"./diagnostics":5,"./dispatcher":6,"./errors/actionHandlerNotFound":7,"./errors/actionPredicateUndefined":8,"./errors/compoundError":9,"./errors/notFound":10,"./internalConstants":13,"./utils/tinydash":20,"./utils/uuid":21,"events":22}],17:[function(require,module,exports){
 var Store = require('../store');
+var _ = require('../utils/tinydash');
 var Statuses = require('../internalConstants').Statuses;
 var ActionConstants = require('../internalConstants').Actions;
 
@@ -1247,7 +1252,7 @@ var ActionsStore = new Store({
     actionError: ActionConstants.ACTION_ERROR,
     actionStarting: ActionConstants.ACTION_STARTING
   },
-  getState: function () {
+  getInitialState: function () {
     return {};
   },
   actionStarting: function (action) {
@@ -1255,6 +1260,7 @@ var ActionsStore = new Store({
       type: action.type,
       token: action.token,
       status: Statuses.PENDING,
+      handlers: action.handlers,
       arguments: action.arguments
     };
     this.hasChanged(action.token);
@@ -1278,13 +1284,16 @@ var ActionsStore = new Store({
       this.hasChanged(actionToken);
     }
   },
+  getAll: function () {
+    return _.values(this.state);
+  },
   getAction: function (actionToken) {
     return this.state[actionToken];
   }
 });
 
 module.exports = ActionsStore;
-},{"../internalConstants":13,"../store":16}],18:[function(require,module,exports){
+},{"../internalConstants":13,"../store":16,"../utils/tinydash":20}],18:[function(require,module,exports){
 var _ = require('./tinydash');
 var isImmutable = require('./isImmutable');
 
