@@ -2,15 +2,14 @@ var MOCK_SERVER_PORT = 8956;
 var _ = require('lodash-node');
 var format = require('util').format;
 var expect = require('chai').expect;
-var HttpMixin = require('../lib/mixins/httpMixin');
+var HttpAPI = require('../lib/httpAPI');
 
-describe('HttpMixin', function () {
+describe('HttpAPI', function () {
   var API, baseUrl, response;
 
   beforeEach(function () {
-    baseUrl = format('http://localhost:%s/', MOCK_SERVER_PORT);
+    baseUrl = format('http://localhost:%s/stub/', MOCK_SERVER_PORT);
   });
-
 
   describe('when you dont specify a baseUrl', function () {
     var url;
@@ -18,12 +17,12 @@ describe('HttpMixin', function () {
     beforeEach(function () {
       url = baseUrl + 'foos';
 
-      return HttpMixin.get(url).then(storeResponse);
+      return new HttpAPI().get(url).then(storeResponse);
     });
 
     it('should start a get request with the given url', function () {
       expect(response).to.eql({
-        url: '/foos',
+        url: '/stub/foos',
         method: 'GET',
         body: {}
       });
@@ -38,7 +37,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'GET',
           body: {}
         });
@@ -54,7 +53,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           method: 'GET',
           body: {}
         });
@@ -70,7 +69,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'PUT',
           body: {}
         });
@@ -92,7 +91,7 @@ describe('HttpMixin', function () {
       it('should create some options which include the url', function () {
         expect(response).to.eql({
           method: 'PUT',
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           body: expectedBody
         });
       });
@@ -107,7 +106,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'POST',
           body: {}
         });
@@ -129,7 +128,7 @@ describe('HttpMixin', function () {
       it('should create some options which include the url', function () {
         expect(response).to.eql({
           method: 'POST',
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           body: expectedBody
         });
       });
@@ -144,7 +143,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'DELETE',
           body: {}
         });
@@ -160,7 +159,7 @@ describe('HttpMixin', function () {
 
       it('should create some options which include the url', function () {
         expect(response).to.eql({
-          url: '/bars/baz',
+          url: '/stub/bars/baz',
           method: 'DELETE',
           body: {}
         });
@@ -171,19 +170,19 @@ describe('HttpMixin', function () {
   describe('#baseUrl', function () {
     describe('when you have a baseUrl', function () {
       beforeEach(function () {
-        API = _.extend({
+        API = new HttpAPI({
           baseUrl: baseUrl,
           getUser: function () {
             return this.get('/foos').then(storeResponse);
           }
-        }, HttpMixin);
+        });
 
         return API.getUser();
       });
 
       it('should add the / if its missing', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'GET',
           body: {}
         });
@@ -192,19 +191,19 @@ describe('HttpMixin', function () {
 
     describe('when you dont specify a / in the baseUrl or url', function () {
       beforeEach(function () {
-        API = _.extend({
+        API = new HttpAPI({
           baseUrl: baseUrl.substring(0, baseUrl.length - 1),
           getUser: function () {
             return this.get('foos').then(storeResponse);
           }
-        }, HttpMixin);
+        });
 
         return API.getUser();
       });
 
       it('should add the / if its missing', function () {
         expect(response).to.eql({
-          url: '/foos',
+          url: '/stub/foos',
           method: 'GET',
           body: {}
         });
@@ -219,12 +218,12 @@ describe('HttpMixin', function () {
   function makeRequest(method) {
     var args = _.rest(arguments);
 
-    API = _.extend({
+    API = new HttpAPI({
       baseUrl: baseUrl,
       execute: function () {
         return this[method].apply(this, args).then(storeResponse);
       }
-    }, HttpMixin);
+    });
 
     return API.execute();
   }

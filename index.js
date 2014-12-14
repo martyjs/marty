@@ -1,3 +1,4 @@
+var state = require('./lib/state');
 var create = require('./lib/create');
 var _ = require('./lib/utils/tinydash');
 var Dispatcher = require('./lib/dispatcher');
@@ -13,7 +14,7 @@ var Marty = _.extend({
   Stores: {
     Actions: ActionStore
   }
-}, create);
+}, state, create);
 
 function getAction(token) {
   return ActionStore.getAction(token);
