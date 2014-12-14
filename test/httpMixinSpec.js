@@ -31,7 +31,7 @@ describe('HttpMixin', function () {
   });
 
   describe('#get()', function () {
-    describe('when you pass in a url', function () {
+    describe.only('when you pass in a url', function () {
       beforeEach(function () {
         return makeRequest('get', '/foos');
       });
