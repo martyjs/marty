@@ -67,7 +67,7 @@ Marty.Stores.Actions.addChangeListener(function () {
 });
 ```
 
-Like [store queries](/docs/stores.html#query), an action's status can either be **pending**, **done** or **error**. If you are using the [state mixin](/docs/stateMixin.html) then it automatically listens to the actions store ([unless you tell it not to](/docs/stateMixin.html#listenToActions)).
+Like [store fetches](/docs/stores.html#fetches), an action's status can either be **pending**, **done** or **error**. If you are using the [state mixin](/docs/stateMixin.html) then it automatically listens to the actions store ([unless you tell it not to](/docs/stateMixin.html#listenToActions)).
 
 {% highlight js %}
 var UserFormState = Marty.createStateMixin({
