@@ -17,17 +17,22 @@ var UsersStore = Marty.createStore({
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
+  getInitialState: function () {
+    return {};
+  },
   addUser: function (user) {
-    this.state.push(user);
+    this.state[user.id] = user;
     this.hasChanged();
   },
-  getInitialState: function () {
-    UsersAPI.getAll();
-    return [];
-  },
   getUser: function (id) {
-    return _.where(this.state, {
-      id: id
+    return this.fetch({
+      id: id,
+      locally: function () {
+        return this.state[id];
+      },
+      remotely: function () {
+        return UserAPI.getUser(id);
+      }
     });
   }
 });
@@ -37,7 +42,7 @@ A store is a singleton which is created using [<code>Marty.createStore</code>](#
 
 When an action is dispatched, the store will check its [``handlers`` hash](/docs/stores.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. If the handler updates the stores state state, it can call [<code>hasChanged</code>](#hasChanged) which will notify any listening views of its new state.
 
-If your view needs some data, it should request it from the relevant store. The store is responsible for sourcing it, either locally or from the server. The [query](/docs/stores.html#query) API helps simplify handling async operations.
+If your view needs some data, it should request it from the relevant store. The store is responsible for sourcing it, either locally or from the server. The [fetch](/docs/stores.html#fetch) API helps simplify handling async operations.
 
 
 <h2 id="api">API</h2>
@@ -86,7 +91,7 @@ var UsersStore = Marty.createStore({
 
 <h4 id="action-predicates">Action predicates</h4>
 
-An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where query</a>. Some examples of action predicates:
+An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where fetch</a>. Some examples of action predicates:
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
@@ -191,68 +196,142 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h3 id="query">query(key, localQuery, remoteQuery)</h3>
+<h3 id="fetch">fetch(options)</h3>
 
-When requesting data from a store we should assume that it might require an async operation. ``Store#query`` provides a simple syntax that allows you to encapsulate that complexity.
-
-A query accepts 3 arguments
-
-* **key** To prevent duplicate requests, you pass in string that acts like a lock. If a query with that key is in progress, then the in progress query will be returned rather than creating a new one.
-* **local query** The local query is a function which, when invoked, will query the local state for the required information. If it returns a value, then the query will complete there.
-* **remote query** If the remote query does not return a value then the remote query will be invoked. The remote query expects you to return a promise. If the promise is fulfilled, the query expects the data to be available locally so will re-invoke the local query.
+When requesting data from a store we should assume that it might require an async operation. <code>Store#fetch</code> provides a simple syntax that allows you to encapsulate that asynchronicity in a flux way. The <code>fetch</code> function allows you to specify how to get the state locally and remotely and returns an object that represents the current state of that request.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
   getUser: function (id) {
-    return this.query(id,
+    return this.fetch({
+      id: id,
+      locally: function () {
+        return this.state[id];
+      },
+      remotely: function () {
+        return UserAPI.getUser(id);
+      }
+    });
+  }
+});
+
+UsersStore.getUser(123).when({
+  pending: function () {
+    return <div className="pending"/>;
+  },
+  failed: function (error) {
+    return <div className="error">{error.message}</div>;
+  },
+  done: function (user) {
+    return <div className="user">{user.name}</div>;
+  }
+});
+{% endhighlight %}
+
+<h4>Options</h4>
+
+<div class="table-responsive">
+  <table class="table table-bordered table-striped">
+    <thead>
+     <tr>
+       <th style="width: 100px;">Name</th>
+       <th style="width: 100px;">type</th>
+       <th style="width: 50px;">required</th>
+       <th>description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+       <td>id</td>
+       <td>number | string | object</td>
+       <td>true</td>
+       <td>Uniquely identifies the bit of state you are fetching. Only one request for a given Id can be in progress at any time. If another request is in progress then a pending fetch result is returned</td>
+     </tr>
+     <tr>
+       <td>locally</td>
+       <td>function</td>
+       <td>true</td>
+       <td>Should try and fetch from the local state. If it returns a value then an done fetch result will be returned immediately</td>
+     </tr>
+     <tr>
+       <td>remotely</td>
+       <td>function</td>
+       <td>false</td>
+       <td>
+       If ``locally`` did not return a value then then ``remotely`` is invoked. When ``remotely`` has finished then ``locally`` will be reinvoked and should contain now contain the state. If ``remotely`` returns a promise then ``locally`` will be called if the promise is fulfilled</td>
+     </tr>
+     <tr>
+       <td>dependsOn</td>
+       <td>fetch result | array of fetch results</td>
+       <td>false</td>
+       <td>If a fetch depends on some other state being there already you can pass in their fetch results. It will only try and start fetching the data when all dependencies are done.</td>
+     </tr>
+     <tr>
+       <td>cacheError</td>
+       <td>boolean</td>
+       <td>false</td>
+       <td>If true (default) then if an error is thrown at any point during a fetch then that error is cached and returned immediately instead.</td>
+     </tr>
+    </tbody>
+  </table>
+</div>
+
+Often you're only concerned with fetching locally and remotely so you use the second function signature ``fetch(id, locally, remotely)``:
+
+{% highlight js %}
+var UsersStore = Marty.createStore({
+  getUser: function (id) {
+    return this.fetch(id,
       function () {
         return this.state[id];
       },
       function () {
         return UserAPI.getUser(id);
       }
-    );
+    });
   }
 });
 {% endhighlight %}
 
-``Store#query`` will return a ``StoreQuery`` which represents the current state of the query. A query can have one of 3 statuses **pending**, **done** or **error**. You can get the queries status by accessing ``StoreQuery#status`` or with the helpers ``StoreQuery#pending``, ``StoreQuery#error`` or ``StoreQuery#done``.
+<h4>Fetch Result</h4>
+
+Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either **PENDING**, **DONE** OR **ERROR**. You can get the status by accessing ``fetch.status`` or with the helpers ``fetch.pending``, ``fetch.failed`` or ``fetch.done``.
 
 {% highlight js %}
-var userQuery = UserStore.getUser(id);
+var user = UserStore.getUser(id);
 
-console.log(userQuery.status) // => pending
+console.log(user.status) // => pending
 {% endhighlight %}
 
-If the query has an error, then the error is accessible at ``StoreQuery#error``
+If the fetch has an error, then the error is accessible at ``result#error``
 
 {% highlight js %}
-if (userQuery.error) {
-  console.log('failed to get user', userQuery.error);
+if (user.error) {
+  console.log('failed to get user', user.error);
 }
 {% endhighlight %}
 
-If the query is done, then the result is accessible at ``StoreQuery#result``
+If the fetch is done, then the result is accessible at ``result#result``
 
 {% highlight js %}
-if (userQuery.done) {
-  console.log('got user', userQuery.result);
+if (user.done) {
+  console.log('got user', user.result);
 }
 {% endhighlight %}
 
-If you start a new query then the store will notify any listeners when the queries status changes
+If you start a new fetch then the store will notify any listeners when the fetch's status has changed.
 
 {% highlight js %}
 UserStore.addChangeListener(function () {
-  var userQuery = UserStore.getUser(id);
+  var user = UserStore.getUser(id);
 
-  if (userQuery.done) {
-    console.log(userQuery.result);
+  if (user.done) {
+    console.log(user.result);
   }
 });
 {% endhighlight %}
 
-The ``StoreQuery`` offers a helper function for handling each of the states
+The result offers the helper function ``when(statusHandlers)`` for handling each of the status
 
 {% highlight js %}
 var component = user.when({
@@ -268,6 +347,35 @@ var component = user.when({
 });
 {% endhighlight %}
 
+<h3 id="fetch_pending">fetch.pending()</h3>
+
+Returns a pending fetch result
+
+{% highlight js %}
+var fetch = Store.fetch.pending();
+
+console.log(fetch.status) // PENDING
+{% endhighlight %}
+
+<h3 id="fetch_failed">fetch.failed(error)</h3>
+
+Returns a failed fetch result
+
+{% highlight js %}
+var fetch = Store.fetch.failed(error);
+
+console.log(fetch.status, fetch.error) // FAILED, { ... }
+{% endhighlight %}
+
+<h3 id="fetch_done">fetch.done(result)</h3>
+
+Returns a done fetch result
+
+{% highlight js %}
+var fetch = Store.fetch.done(result);
+
+console.log(fetch.status, fetch.result) // DONE, { ... }
+{% endhighlight %}
 
 <h3 id="waitFor">waitFor(*stores)</h3>
 

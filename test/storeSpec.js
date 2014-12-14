@@ -2,8 +2,6 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
-var Promise = require('es6-promise').Promise;
-var StoreQuery = require('../lib/storeQuery');
 var ActionPayload = require('../lib/actionPayload');
 var ActionHandlerNotFoundError = require('../lib/errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../lib/errors/actionPredicateUndefined');
@@ -509,86 +507,6 @@ describe('Store', function () {
 
     it('should replace the state with the original state', function () {
       expect(store.state).to.eql({});
-    });
-  });
-
-  describe('#query()', function () {
-    var queryKey;
-    var Marty = require('../index');
-
-    beforeEach(function () {
-      queryKey = 'foo';
-      listener = sinon.spy();
-      store = Marty.createStore({});
-      changeListener = store.addChangeListener(listener);
-    });
-
-    afterEach(function () {
-      changeListener.dispose();
-    });
-
-    it('should return a StoreQuery', function () {
-      expect(store.query(queryKey, noop, noop)).to.be.an.instanceof(StoreQuery);
-    });
-
-    describe('when a query with the given key is in progress', function () {
-      var expectedQuery, endQuery;
-
-      beforeEach(function () {
-        expectedQuery = store.query(queryKey, noop, function () {
-          return new Promise(function (resolve) { endQuery = resolve; });
-        });
-      });
-
-      it('should return the in progress query', function () {
-        var actualQuery = store.query(queryKey, noop, noop);
-
-        expect(actualQuery).to.equal(expectedQuery);
-      });
-
-      afterEach(function () {
-        endQuery && endQuery();
-      });
-    });
-
-    describe('when a query is in progress and then completes', function () {
-      var query, endQuery;
-
-      beforeEach(function () {
-        query = store.query(queryKey, noop, function () {
-          return new Promise(function (resolve) {
-            endQuery = resolve;
-          });
-        });
-      });
-
-      it('should return a new query', function (done) {
-        var inProgressQuery = store.query(queryKey, noop, noop);
-
-        expect(inProgressQuery).to.equal(query);
-
-        endQuery();
-
-        setTimeout(function () {
-          var newQuery = store.query(queryKey, noop, noop);
-
-          expect(newQuery).to.not.equal(query, 'we should get a new query once the query has finished');
-
-          done();
-        }, 1);
-      });
-
-      it('should tell any listeners that it has changed', function (done) {
-        endQuery();
-        setTimeout(function () {
-          expect(listener).to.have.been.called;
-          done();
-        }, 1);
-      });
-
-      afterEach(function () {
-        endQuery && endQuery();
-      });
     });
   });
 
