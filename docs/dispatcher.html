@@ -134,12 +134,12 @@
 
 <p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a> which is a singleton accessible on <code>Marty</code>.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Action</span><span class="p">(</span><span class="s1">'ADD_FOO'</span><span class="p">,</span> <span class="p">[],</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">constants</span><span class="p">.</span><span class="nx">actionSources</span><span class="p">.</span><span class="nx">VIEW</span><span class="p">);</span>
-<span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span></code></pre></div>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span></code></pre></div>
 
 <h2 id="further-reading">Further reading</h2>
 
@@ -230,7 +230,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.1.3</li>
+        <li>v0.5.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

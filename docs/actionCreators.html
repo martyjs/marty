@@ -181,7 +181,7 @@ Marty.Stores.Actions.addChangeListener(function () {
   console.log(action.status)
 });
 </code></pre></div>
-<p>Like <a href="/docs/stores.html#query">store queries</a>, an action&#39;s status can either be <strong>pending</strong>, <strong>done</strong> or <strong>error</strong>. If you are using the <a href="/docs/stateMixin.html">state mixin</a> then it automatically listens to the actions store (<a href="/docs/stateMixin.html#listenToActions">unless you tell it not to</a>).</p>
+<p>Like <a href="/docs/stores.html#fetches">store fetches</a>, an action&#39;s status can either be <strong>pending</strong>, <strong>done</strong> or <strong>error</strong>. If you are using the <a href="/docs/stateMixin.html">state mixin</a> then it automatically listens to the actions store (<a href="/docs/stateMixin.html#listenToActions">unless you tell it not to</a>).</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserFormState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
   <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -360,7 +360,7 @@ Marty.Stores.Actions.addChangeListener(function () {
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.1.3</li>
+        <li>v0.5.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
