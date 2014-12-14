@@ -1,5 +1,5 @@
-var expect = require('chai').expect;
-var getHtml = require('./lib/getHtml');
+// var expect = require('chai').expect;
+// var getHtml = require('./lib/getHtml');
 
 // describe('Isomorphism', function () {
 //   var statusCode, $;
