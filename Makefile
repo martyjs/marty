@@ -33,6 +33,7 @@ release: test build
 	@npm publish
 
 build: lint
+	@mkdir -p dist
 	@$(BIN)/browserify --require ./index.js  --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 
