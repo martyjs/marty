@@ -9,7 +9,7 @@ order: 3
 
 Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state.
 
-All actions have a type which is string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/docs/dispatcher.html)) and use [action's type to determine whether to do something with it](/docs/stores.html#handlers). Using strings helps us build loosely coupled applications that can grow without increasing complexity. 
+All actions have a type which is string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/docs/dispatcher.html)) and use [action's type to determine whether to do something with it](/docs/stores.html#handlers). Using strings helps us build loosely coupled applications that can grow without increasing complexity.
 
 Lets look at how you define an action creator using marty:
 
@@ -25,16 +25,16 @@ UserActionCreators.updateEmail(123, "foo@bar.com");
 
 In this case the actions type is "UPDATE\_EMAIL" and the second function in the array is the action which will be invoked when you call ``updateEmail``. We found that more often than not the action type is the same as the actions function name so by convention we camelize, underscore and upper case it. In the above example, specifying the action type is superfluous because updateEmail becomes "UPDATE\_EMAIL".
 
-```
+{% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
   updateEmail: function (userId, email) {
     ...
   }
 });
-```
+{% endhighlight %}
 If you want to make a change locally, you can use ``this.dispatch()``.
 
-```
+{% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
   updateEmail: function (userId, email) {
     this.dispatch(userId, email);
@@ -47,12 +47,15 @@ Marty.dispatcher.register(function (action) {
 });
 
 UserActionCreators.updateEmail(123, "foo@bar.com");
-```
+{% endhighlight %}
+
 Action creators become more complex when you start involving remote requests since they involve asynchronous calls and have the potential to fail. Traditionally you would pass in a callback or return a promise but comply with Flux's unidirectional data flow rule. So we need a different approach to ensure data is flowing in the right direction.
 
-Marty has an Actions store (``Marty.Stores.Actions``) which knows about all actions. When you create an action, it will return an **action token** which you can use to get the status of an action.
+If an action fails then an extra action is dispatched with the type ``{action type}_FAILED`` (e.g. ``CREATE_USER_FAILED``) that contains the error allowing you to update your state.
 
-```
+Marty also has an Actions store (``Marty.Stores.Actions``) which knows about all actions. When you create an action, it will return an **action token** which you can use to get the status of an action.
+
+{% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
   createUser: function (user) {
     return UserAPI.createUser(user);
@@ -65,7 +68,7 @@ Marty.Stores.Actions.addChangeListener(function () {
   var action = Marty.getAction(createUserAction); // Shortcut for Marty.Stores.Actions.getAction()
   console.log(action.status)
 });
-```
+{% endhighlight %}
 
 Like [store fetches](/docs/stores.html#fetches), an action's status can either be **pending**, **done** or **error**. If you are using the [state mixin](/docs/stateMixin.html) then it automatically listens to the actions store ([unless you tell it not to](/docs/stateMixin.html#listenToActions)).
 
@@ -77,19 +80,20 @@ var UserFormState = Marty.createStateMixin({
     }
   }
 });
+
 var UserForm = Marty.createActionCreators({
   render: function () {
-    var createUser = this.status.createUser;
-
-    if (createUser) {
-      if (createUser.pending) {
-        console.log('creating user');
-      } else if (createUser.error) {
-        console.log('creating user failed', createUser.error); 
-      } else if (createUser.done) {
-        console.log('creating user done', createUser.result); 
+    return this.state.createUser.when({
+      pending: function () {
+        return <div className="pending"/>;
+      },
+      failed: function (error) {
+        return <div className="error">{error.message}</div>;
+      },
+      done: function (user) {
+        return <div className="user">{user.name}</div>;
       }
-    }
+    });
   },
   createUser: function (user) {
     this.setState({
@@ -119,7 +123,7 @@ An (optional) display name for the action creator. Used for richer debugging.
 
 <h3 id="dispatch">dispatch([...])</h3>
 
-Dispatches an action payload. Any [action handlers](/docs/stores.html#handleAction) will be invoked with the given action handlers. 
+Dispatches an action payload. Any [action handlers](/docs/stores.html#handleAction) will be invoked with the given action handlers.
 
 Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
 

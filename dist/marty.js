@@ -99,6 +99,13 @@ function ActionCreators(options) {
 
         function dispatchStarting() {
           dispatch({
+            type: actionType + '_STARTING',
+            arguments: [{
+              token: token
+            }]
+          });
+
+          dispatch({
             type: Actions.ACTION_STARTING,
             arguments: [{
               token: token,
@@ -115,6 +122,14 @@ function ActionCreators(options) {
         }
 
         function dispatchError(err) {
+          dispatch({
+            type: actionType + '_FAILED',
+            arguments: [{
+              token: token,
+              error: err
+            }]
+          });
+
           dispatch({
             type: Actions.ACTION_ERROR,
             arguments: [{
