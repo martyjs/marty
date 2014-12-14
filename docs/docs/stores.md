@@ -304,7 +304,7 @@ console.log(user.status) // => PENDING
 If the fetch has an error, then the error is accessible at ``result#error``
 
 {% highlight js %}
-if (user.error) {
+if (user.failed) {
   console.log('failed to get user', user.error);
 }
 {% endhighlight %}
