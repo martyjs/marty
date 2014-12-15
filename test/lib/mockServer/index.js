@@ -7,7 +7,7 @@ var port = process.env.PORT || 8956;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -15,13 +15,23 @@ app.use(function(req, res, next) {
 });
 
 ['GET', 'POST', 'PUT', 'DELETE'].forEach(function (method) {
-  app[method.toLowerCase()]('*', function (req, res) {
+  app[method.toLowerCase()]('/stub/*', function (req, res) {
     res.json({
       method: method,
       url: req.url,
       body: req.body
     }).end();
   });
+});
+
+app.get('/iso/*', function () {
+  app.get('/hello-world', function (req, res) {
+    res.send('<html><body><h1 id="message">hello world</h1></body></html>').end();
+  });
+});
+
+app.get('*', function (req, res) {
+  res.status(404).end();
 });
 
 app.listen(port, function () {

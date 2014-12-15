@@ -1,21 +1,21 @@
+var state = require('./lib/state');
 var create = require('./lib/create');
 var _ = require('./lib/utils/tinydash');
 var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
 var ActionPayload = require('./lib/actionPayload');
 var ActionStore = require('./lib/stores/actionsStore');
-var StoreQueryResult = require('./lib/storeQuery/result');
 
 var Marty = _.extend({
+  version: '0.5.3',
   getAction: getAction,
   Diagnostics: Diagnostics,
   ActionPayload: ActionPayload,
-  StoreQueryResult: StoreQueryResult,
   Dispatcher: Dispatcher.getCurrent(),
   Stores: {
     Actions: ActionStore
   }
-}, create);
+}, state, create);
 
 function getAction(token) {
   return ActionStore.getAction(token);

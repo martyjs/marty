@@ -47,6 +47,7 @@ describe('ActionCreators', function () {
             return promise;
           }
         });
+
         token = actionCreators.someAction();
 
         promise.catch(function () {
@@ -54,6 +55,10 @@ describe('ActionCreators', function () {
           payload = (actualAction || { arguments: [] }).arguments[0];
           done();
         });
+      });
+
+      it('should dispatch {action type}_FAILED', function () {
+        expect(dispatcher.getActionWithType('SOME_ACTION_FAILED')).to.exist;
       });
 
       it('should dispatch an ACTION_ERROR action', function () {
@@ -123,6 +128,10 @@ describe('ActionCreators', function () {
       payload = (actualAction || {}).arguments[0];
     });
 
+    it('should dispatch {action type}_FAILED', function () {
+      expect(dispatcher.getActionWithType('SOME_ACTION_FAILED')).to.exist;
+    });
+
     it('should dispatch an ACTION_ERROR action', function () {
       expect(actualAction).to.exist;
     });
@@ -152,6 +161,10 @@ describe('ActionCreators', function () {
       token = actionCreators.someAction();
       actualAction = dispatcher.getActionWithType('ACTION_ERROR');
       payload = (actualAction || {}).arguments[0];
+    });
+
+    it('should dispatch {action type}_FAILED', function () {
+      expect(dispatcher.getActionWithType('SOME_ACTION_FAILED')).to.exist;
     });
 
     it('should dispatch an ACTION_ERROR action', function () {
@@ -193,6 +206,10 @@ describe('ActionCreators', function () {
       beforeEach(function () {
         actualAction = dispatcher.getActionWithType('ACTION_STARTING');
         payload = (actualAction || {}).arguments[0];
+      });
+
+      it('should dispatch an {action type}_STARTING action', function () {
+        expect(dispatcher.getActionWithType('SOME_ACTION_STARTING')).to.exist;
       });
 
       it('should dispatch an ACTION_STARTING action', function () {

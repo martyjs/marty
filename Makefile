@@ -5,7 +5,7 @@ BIN = ./node_modules/.bin
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
-	@node build/lib/mockServer.js &
+	@node test/lib/mockServer &
 	@$(BIN)/karma start --single-run
 
 bootstrap: bootstrap-js bootstrap-ruby
@@ -18,7 +18,7 @@ bootstrap-ruby: docs/Gemfile
 	@cd docs && bundle install
 
 test-watch: lint
-	@node build/lib/mockServer.js &
+	@node test/lib/mockServer &
 	@$(BIN)/karma start
 
 lint: bootstrap-js
@@ -33,6 +33,7 @@ release: test build
 	@npm publish
 
 build: lint
+	@mkdir -p dist
 	@$(BIN)/browserify --require ./index.js  --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 
