@@ -8,7 +8,7 @@ var ActionPayload = require('./lib/actionPayload');
 var ActionStore = require('./lib/stores/actionsStore');
 
 var Marty = _.extend({
-  version: '0.5.3',
+  version: '0.5.5',
   getAction: getAction,
   Diagnostics: Diagnostics,
   ActionPayload: ActionPayload,
@@ -947,7 +947,7 @@ function Store(options) {
 
   function dispose() {
     emitter.removeAllListeners(CHANGE_EVENT);
-    this.clear();
+    store.clear();
   }
 
   function fetch(id, local, remote) {
@@ -1140,13 +1140,13 @@ function Store(options) {
   function clear() {
     failedFetches = {};
     fetchInProgress = {};
-    this.state = this.getInitialState();
+    store.state = store.getInitialState();
   }
 
   function setState(newState) {
     if (state !== newState) {
       state = newState;
-      this.hasChanged(state);
+      store.hasChanged(state);
     }
   }
 
@@ -1171,11 +1171,11 @@ function Store(options) {
   }
 
   function hasChanged(eventArgs) {
-    emitter.emit.call(emitter, CHANGE_EVENT, this.state, this, eventArgs);
+    emitter.emit.call(emitter, CHANGE_EVENT, store.state, store, eventArgs);
   }
 
   function handleAction(action) {
-    var handlers = _.object(_.map(this.handlers, getHandlerWithPredicates));
+    var handlers = _.object(_.map(store.handlers, getHandlerWithPredicates));
 
     _.each(handlers, function (predicates, handlerName) {
       _.each(predicates, function (predicate) {
