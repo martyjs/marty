@@ -1,6 +1,6 @@
+var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
-var _ = require('./lib/utils/tinydash');
 var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
 var ActionPayload = require('./lib/actionPayload');
