@@ -10,7 +10,7 @@ order: 5
 
 It's likely at some point that you will need to communicate with the server. HTTP APIs encapsulate that communication for you.
 
-HTTP APIs allow you to define functions that create HTTP requests. Internally we are using [reqwest](https://github.com/ded/reqwest) so anything you can do [reqwest](https://github.com/ded/reqwest#api) you can do with HTTP APIS.
+HTTP APIs allow you to define functions that create HTTP requests. We use the [fetch](https://github.com/github/fetch) polyfill for making requests but you can use easily roll your own if you like.
 
 All requests return a promise (Promises/A) that allow you to easily define what happens when a request has finished.
 
@@ -77,7 +77,7 @@ An (optional) base url to prepend to any urls.
 
 <h3 id="requestOptions">request(options)</h3>
 
-Starts an HTTP request with the given <code>method</code> and <code>options</code>. By default we used [reqwest](https://github.com/ded/reqwest) however you can override ``request()`` with your own implementation. The only requirement is it returns a <code>Promise</code>.
+Starts an HTTP request with the given <code>method</code> and <code>options</code>. We use the [fetch](https://github.com/github/fetch) polyfill however you can override ``request()`` with your own implementation. The only requirement is it returns a <code>Promise</code>.
 
 {% highlight js %}
 var UsersAPI = Marty.createHttpAPI({
@@ -112,7 +112,7 @@ var UsersAPI = Marty.createHttpAPI({
    <tr>
      <td>method</td>
      <td>string</td>
-     <td>GET</td>
+     <td>get</td>
      <td>http method</td>
    </tr>
    <tr>
@@ -122,16 +122,10 @@ var UsersAPI = Marty.createHttpAPI({
      <td>http headers</td>
    </tr>
    <tr>
-     <td>data</td>
+     <td>body</td>
      <td>string | object</td>
      <td></td>
      <td>entity body for `PATCH`, `POST` and `PUT` requests.</td>
-   </tr>
-   <tr>
-     <td>type</td>
-     <td>string (html | xml | json | jsonp)</td>
-     <td></td>
-     <td>Data type</td>
    </tr>
    <tr>
      <td>contentType</td>
