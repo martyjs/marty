@@ -84,7 +84,7 @@ describe('HttpAPI', function () {
 
         return makeRequest('put', {
           url: 'bars/baz',
-          data: expectedBody
+          body: expectedBody
         });
       });
 
@@ -121,7 +121,7 @@ describe('HttpAPI', function () {
 
         return makeRequest('post', {
           url: 'bars/baz',
-          data: expectedBody
+          body: expectedBody
         });
       });
 
@@ -212,7 +212,7 @@ describe('HttpAPI', function () {
   });
 
   function storeResponse(res) {
-    response = res;
+    response = res.data;
   }
 
   function makeRequest(method) {
