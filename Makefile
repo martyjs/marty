@@ -36,6 +36,7 @@ build: lint
 	@mkdir -p dist
 	@$(BIN)/browserify --require ./index.js  --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
+	@gzip dist/marty.min.js -c > dist/marty.min.js.gz
 
 docs: bootstrap-ruby
 	@cd docs && bundle exec jekyll serve -w
