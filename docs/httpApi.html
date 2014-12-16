@@ -132,7 +132,7 @@
       <div class="bs-docs-section">
         <p>It&#39;s likely at some point that you will need to communicate with the server. HTTP APIs encapsulate that communication for you.</p>
 
-<p>HTTP APIs allow you to define functions that create HTTP requests. Internally we are using <a href="https://github.com/ded/reqwest">reqwest</a> so anything you can do <a href="https://github.com/ded/reqwest#api">reqwest</a> you can do with HTTP APIS.</p>
+<p>HTTP APIs allow you to define functions that create HTTP requests. We use the <a href="https://github.com/github/fetch">fetch</a> polyfill for making requests but you can use easily roll your own if you like.</p>
 
 <p>All requests return a promise (Promises/A) that allow you to easily define what happens when a request has finished.</p>
 
@@ -193,7 +193,7 @@
 
 <h3 id="requestOptions">request(options)</h3>
 
-<p>Starts an HTTP request with the given <code>method</code> and <code>options</code>. By default we used <a href="https://github.com/ded/reqwest">reqwest</a> however you can override <code>request()</code> with your own implementation. The only requirement is it returns a <code>Promise</code>.</p>
+<p>Starts an HTTP request with the given <code>method</code> and <code>options</code>. We use the <a href="https://github.com/github/fetch">fetch</a> polyfill however you can override <code>request()</code> with your own implementation. The only requirement is it returns a <code>Promise</code>.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
@@ -226,7 +226,7 @@
    <tr>
      <td>method</td>
      <td>string</td>
-     <td>GET</td>
+     <td>get</td>
      <td>http method</td>
    </tr>
    <tr>
@@ -236,16 +236,10 @@
      <td>http headers</td>
    </tr>
    <tr>
-     <td>data</td>
+     <td>body</td>
      <td>string | object</td>
      <td></td>
      <td>entity body for `PATCH`, `POST` and `PUT` requests.</td>
-   </tr>
-   <tr>
-     <td>type</td>
-     <td>string (html | xml | json | jsonp)</td>
-     <td></td>
-     <td>Data type</td>
    </tr>
    <tr>
      <td>contentType</td>
@@ -371,7 +365,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.5.2</li>
+        <li>v0.6.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
