@@ -91,7 +91,7 @@ var UsersStore = Marty.createStore({
 
 <h4 id="action-predicates">Action predicates</h4>
 
-An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="https://lodash.com/docs#where">where query</a>. Some examples of action predicates:
+An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="http://underscorejs.org/#findWhere">where query</a>. Some examples of action predicates:
 
 {% highlight js %}
 var UsersStore = Marty.createStore({

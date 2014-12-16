@@ -76,7 +76,7 @@ describe('StateMixin', function () {
             name: 'bar',
             error: expectedError,
             state: {
-              after: {},
+              after: null,
               before: undefined
             }
           });
@@ -93,7 +93,7 @@ describe('StateMixin', function () {
             name: 'bar',
             error: null,
             state: {
-              after: expectedState,
+              after: null,
               before: undefined
             }
           });
