@@ -2,21 +2,35 @@ var expect = require('chai').expect;
 var constants = require('../lib/constants');
 
 describe('Constants', function () {
+  var input, actualResult;
+
   describe('when you pass in null', function () {
     it('should return an empty object literal', function () {
       expect(constants(null)).to.eql({});
     });
   });
 
-  describe('when you pass in an array', function () {
-    it('should return an object of constants', function () {
-      var input = ['foo', 'bar'];
-      var expectedResult = {
-        foo: 'foo',
-        bar: 'bar'
-      };
+  describe.only('when you pass in an array', function () {
+    beforeEach(function () {
+      input = ['foo', 'bar'];
 
-      expect(constants(input)).to.eql(expectedResult);
+      actualResult = constants(input);
+    });
+
+    it('should create an object with the given keys', function () {
+      expect(Object.keys(actualResult)).to.eql(input);
+    });
+
+    it('should create a function for each key', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key]).to.be.instanceof(Function);
+      });
+    });
+
+    it('should create a function that equals the input string', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key] == key).to.be.true; // jshint ignore:line
+      });
     });
   });
 
