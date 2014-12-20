@@ -1,3 +1,4 @@
+var sinon = require('sinon');
 var expect = require('chai').expect;
 var constants = require('../lib/constants');
 
@@ -10,7 +11,7 @@ describe('Constants', function () {
     });
   });
 
-  describe.only('when you pass in an array', function () {
+  describe('when you pass in an array', function () {
     beforeEach(function () {
       input = ['foo', 'bar'];
 
@@ -32,31 +33,57 @@ describe('Constants', function () {
         expect(actualResult[key] == key).to.be.true; // jshint ignore:line
       });
     });
+
+    describe('when you invoke the constant action creator', function () {
+      var actualArg, actionCreator, creatorFunction;
+
+      beforeEach(function () {
+        creatorFunction = sinon.spy();
+        actionCreator = actualResult.foo(creatorFunction);
+      });
+
+      it('should create an action creator', function () {
+        expect(actionCreator).to.be.instanceof(Function);
+      });
+
+      it('should have creators type as a property', function () {
+        expect(actionCreator.properties.type).to.eql('foo');
+      });
+
+      describe('when I call the action creator', function () {
+        var expectedArg;
+        beforeEach(function () {
+          expectedArg = 1;
+
+          actionCreator(expectedArg);
+        });
+
+        it('should have called the creator function', function () {
+          expect(creatorFunction).to.have.been.calledWith(expectedArg);
+        });
+      });
+    });
   });
 
   describe('when you pass in an object of arrays', function () {
-    it('should return an object of constants', function () {
+    beforeEach(function () {
       var input = {
         foo: ['bar', 'baz'],
         bim: ['bam']
       };
 
-      var expectedResult = {
-        foo: {
-          bar: 'bar',
-          baz: 'baz'
-        },
-        bim: {
-          bam: 'bam'
-        }
-      };
+      actualResult = constants(input);
+    });
 
-      expect(constants(input)).to.eql(expectedResult);
+    it('should return an object of constants', function () {
+      expect(Object.keys(actualResult)).to.eql(['foo', 'bim']);
+      expect(Object.keys(actualResult.foo)).to.eql(['bar', 'baz']);
+      expect(Object.keys(actualResult.bim)).to.eql(['bam']);
     });
   });
 
   describe('when I pass in a crazy combination of object literals and arrays', function () {
-    it('should return an object of constants', function () {
+    beforeEach(function () {
       var input = {
         foo: ['bar', 'baz'],
         bim: {
@@ -67,25 +94,13 @@ describe('Constants', function () {
         }
       };
 
-      var expectedResult = {
-        foo: {
-          bar: 'bar',
-          baz: 'baz'
-        },
-        bim: {
-          bam: {
-            what: 'what'
-          },
-          top: {
-            flop: {
-              bop: 'bop',
-              hot: 'hot'
-            }
-          }
-        }
-      };
+      actualResult = constants(input);
+    });
 
-      expect(constants(input)).to.eql(expectedResult);
+    it('should return an object of constants', function () {
+      expect(Object.keys(actualResult.bim)).to.eql(['bam', 'top']);
+      expect(Object.keys(actualResult.bim.bam)).to.eql(['what']);
+      expect(Object.keys(actualResult.bim.top.flop)).to.eql(['bop', 'hot']);
     });
   });
 });

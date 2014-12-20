@@ -22,4 +22,3 @@ function getAction(token) {
 }
 
 module.exports = Marty;
-
