@@ -165,8 +165,8 @@ describe('Store#fetch()', function () {
           });
 
           it('should have all the errors', function () {
-            expect(actualResult.errors).to.contain(expectedError);
-            expect(actualResult.errors).to.contain(expectedError2);
+            expect(actualResult.error.errors).to.contain(expectedError);
+            expect(actualResult.error.errors).to.contain(expectedError2);
           });
         });
 

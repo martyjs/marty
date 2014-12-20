@@ -10,6 +10,21 @@ module.exports = function (config) {
       _.extend(process.env, saucelabsVariables());
       config.set(saucelabs());
       break;
+    case 'IE':
+      _.extend(process.env, saucelabsVariables());
+
+      config.set(_.extend(saucelabs(), {
+        customLaunchers: {
+          sl_ie_11: {
+            base: 'SauceLabs',
+            browserName: 'internet explorer',
+            platform: 'Windows 8.1',
+            version: '11'
+          }
+        },
+        browsers: ['sl_ie_11']
+      }));
+      break;
     default:
       config.set(local());
       break;
