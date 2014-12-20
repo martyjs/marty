@@ -35,7 +35,7 @@ describe('Constants', function () {
     });
 
     describe('when you invoke the constant action creator', function () {
-      var actualArg, actionCreator, creatorFunction;
+      var actionCreator, creatorFunction;
 
       beforeEach(function () {
         creatorFunction = sinon.spy();
