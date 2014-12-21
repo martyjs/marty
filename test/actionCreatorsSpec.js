@@ -12,25 +12,6 @@ describe('ActionCreators', function () {
     dispatcher = new MockDispatcher();
   });
 
-  describe('when you override the action type', function () {
-    beforeEach(function () {
-      expectedArg = { a: 1 };
-      expectedActionType = 'FOO_BAR';
-      actionCreators = new ActionCreators({
-        dispatcher: dispatcher,
-        someAction: [expectedActionType, function (arg) {
-          this.dispatch(arg);
-        }]
-      });
-
-      actionCreators.someAction(expectedArg);
-    });
-
-    it('should dispatch the action with the given action type', function () {
-      expect(dispatcher.getActionWithType(expectedActionType));
-    });
-  });
-
   describe('when the action returns a promise', function () {
     describe('when the promise fails', function () {
       beforeEach(function (done) {

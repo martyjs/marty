@@ -45,7 +45,7 @@ describe('ActionStore', function () {
     });
 
     it('should have a \'pending\' status', function () {
-      expect(actualAction.status).to.equal('PENDING');
+      expect(actualAction.status.toString()).to.equal('PENDING');
     });
 
     it('should have the actions type', function () {
@@ -74,7 +74,7 @@ describe('ActionStore', function () {
     });
 
     it('should have a \'failed\' status', function () {
-      expect(actualAction.status).to.equal('FAILED');
+      expect(actualAction.status.toString()).to.equal('FAILED');
     });
 
     it('should have the error', function () {
@@ -95,7 +95,7 @@ describe('ActionStore', function () {
     });
 
     it('should have a \'done\' status', function () {
-      expect(actualAction.status).to.equal('DONE');
+      expect(actualAction.status.toString()).to.equal('DONE');
     });
 
     it('should say the action is done', function () {
