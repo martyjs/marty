@@ -25,14 +25,14 @@ You then reference the constants in the rest of your application
 
 ```
 var UserActionCreators = Marty.createActionCreators({
-  deleteUser: function (user) {
-    this.dispatch(Constants.Users.DELETE_USER, user);
-  }
+  deleteUser: UserConstants.DELETE_USER(function (user) {
+    this.dispatch(user);
+  })
 });
 
 var UsersStore = Marty.createStore({
   handlers: {
-    deleteUser: Constants.Users.DELETE_USER
+    deleteUser: UserConstants.DELETE_USER
   },
   deleteUser: function (user) {
     ...
@@ -53,8 +53,8 @@ var Constants = Marty.createConstants([
 
 //returns
 {
-  RECEIVE_USERS: 'RECEIVE_USERS',
-  DELETE_USER: 'DELETE_USER'
+  RECEIVE_USERS: function RECEIVE_USERS_CREATOR() { ... },
+  DELETE_USER: function DELETE_USER_CREATOR() { ... }
 }
 {% endhighlight %}
 
@@ -72,12 +72,12 @@ var Constants = Marty.createConstants([
 //returns
 {
   Users: {
-    RECEIVE_USERS: 'RECEIVE_USERS',
-    DELETE_USER: 'DELETE_USER'
+    RECEIVE_USERS: function RECEIVE_USERS_CREATOR() { ... },
+    DELETE_USER: function DELETE_USER_CREATOR() { ... }
   },
   Foos: {
     Bars: {
-      ADD_BAR: 'ADD_BAR'
+      ADD_BAR: function ADD_BAR_CREATOR() { ... }
     }
   }
 }
