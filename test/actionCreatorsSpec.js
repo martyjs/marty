@@ -1,4 +1,5 @@
 var expect = require('chai').expect;
+var constants = require('../lib/constants');
 var Promise = require('es6-promise').Promise;
 var MockDispatcher = require('./lib/mockDispatcher');
 var ActionCreators = require('../lib/actionCreators');
@@ -10,6 +11,38 @@ describe('ActionCreators', function () {
 
   beforeEach(function () {
     dispatcher = new MockDispatcher();
+  });
+
+  describe('when the action creator is created from a constant', function () {
+    var TestConstants;
+    beforeEach(function () {
+      TestConstants = constants(['TEST_CONSTANT']);
+
+      actionCreators = new ActionCreators({
+        dispatcher: dispatcher,
+        testConstant: TestConstants.TEST_CONSTANT(function (a, b, c) {
+          this.dispatch(a, b, c);
+        })
+      });
+    });
+
+    describe('when I create an action', function () {
+      var expectedArguments;
+
+      beforeEach(function () {
+        expectedArguments = [1, 2, 3];
+        actionCreators.testConstant.apply(actionCreators, expectedArguments);
+        actualAction = dispatcher.getActionWithType('TEST_CONSTANT');
+      });
+
+      it('should dispatch an action with the constant name', function () {
+        expect(actualAction).to.exist;
+      });
+
+      it('should pass through all the arguments', function () {
+        expect(actualAction.arguments).to.eql(expectedArguments);
+      });
+    });
   });
 
   describe('when the action returns a promise', function () {
