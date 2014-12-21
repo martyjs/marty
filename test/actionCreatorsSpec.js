@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var expect = require('chai').expect;
 var constants = require('../lib/constants');
 var Promise = require('es6-promise').Promise;
@@ -14,15 +15,20 @@ describe('ActionCreators', function () {
   });
 
   describe('when the action creator is created from a constant', function () {
-    var TestConstants;
+    var TestConstants, expectedProperties;
     beforeEach(function () {
+      expectedProperties = {
+        foo: 'bar',
+        baz: 'bam'
+      };
+
       TestConstants = constants(['TEST_CONSTANT']);
 
       actionCreators = new ActionCreators({
         dispatcher: dispatcher,
         testConstant: TestConstants.TEST_CONSTANT(function (a, b, c) {
           this.dispatch(a, b, c);
-        })
+        }, expectedProperties)
       });
     });
 
@@ -41,6 +47,11 @@ describe('ActionCreators', function () {
 
       it('should pass through all the arguments', function () {
         expect(actualAction.arguments).to.eql(expectedArguments);
+      });
+
+      it('should pass all properties through', function () {
+        var actualProperties = _.pick(actualAction, Object.keys(expectedProperties));
+        expect(actualProperties).to.eql(expectedProperties);
       });
     });
   });

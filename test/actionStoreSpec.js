@@ -1,4 +1,5 @@
 var sinon = require('sinon');
+var _ = require('underscore');
 var expect = require('chai').expect;
 var uuid = require('../lib/utils/uuid');
 var dispatch = require('./lib/dispatch');
@@ -32,11 +33,61 @@ describe('ActionStore', function () {
     });
   });
 
+  describe('when the action says it should NOT be stored', function () {
+    var Marty = require('../index');
+
+    describe('when an action is starting', function () {
+      beforeEach(function () {
+        dispatchStarting({store: false });
+      });
+
+      it('should add the action', function () {
+        expect(Marty.getAction(token)).to.not.exist;
+      });
+
+      it('should NOT emit a change to all listeners', function () {
+        expect(listener).to.not.have.been.called;
+      });
+    });
+
+    describe('when an action is done', function () {
+      beforeEach(function () {
+        dispatchStarting({store: false });
+        dispatchDone({store: false});
+      });
+
+      it('should add the action', function () {
+        expect(Marty.getAction(token)).to.not.exist;
+      });
+
+      it('should NOT emit a change to all listeners', function () {
+        expect(listener).to.not.have.been.called;
+      });
+    });
+
+    describe('when an action failed', function () {
+      beforeEach(function () {
+        dispatchStarting({store: false });
+        dispatchError({store: false});
+      });
+
+      it('should add the action', function () {
+        expect(Marty.getAction(token)).to.not.exist;
+      });
+
+      it('should NOT emit a change to all listeners', function () {
+        expect(listener).to.not.have.been.called;
+      });
+    });
+  });
+
   describe('when an action starts', function () {
     beforeEach(function () {
       expectedArguments = [1, 2];
       ActionStore.addChangeListener(listener);
-      dispatchStarting(expectedArguments);
+      dispatchStarting({
+        args: expectedArguments
+      });
       actualAction = ActionStore.getAction(token);
     });
 
@@ -69,7 +120,7 @@ describe('ActionStore', function () {
       dispatchStarting();
 
       ActionStore.addChangeListener(listener);
-      dispatchError(expectedError);
+      dispatchError({ error: expectedError });
       actualAction = ActionStore.getAction(token);
     });
 
@@ -107,27 +158,43 @@ describe('ActionStore', function () {
     });
   });
 
-  function dispatchDone() {
+  function dispatchDone(options) {
+    options = _.defaults(options || {}, {
+      store: true
+    });
+
     dispatch(new ActionPayload({
-      type: ActionConstants.ACTION_DONE,
-      arguments: [token]
+      store: options.store,
+      arguments: [token],
+      type: ActionConstants.ACTION_DONE
     }));
   }
 
-  function dispatchError(error) {
+  function dispatchError(options) {
+    options = _.defaults(options || {}, {
+      store: true
+    });
+
     dispatch(new ActionPayload({
-      type: ActionConstants.ACTION_ERROR,
-      arguments: [token, error]
+      store: options.store,
+      arguments: [token, options.error],
+      type: ActionConstants.ACTION_ERROR
     }));
   }
 
-  function dispatchStarting(args) {
+  function dispatchStarting(options) {
+    options = _.defaults(options || {}, {
+      store: true
+    });
+
     dispatch(new ActionPayload({
+      store: options.store,
       type: ActionConstants.ACTION_STARTING,
       arguments: [{
         token: token,
-        type: expectedActionType,
-        arguments: args
+        properties: options,
+        arguments: options.args,
+        type: expectedActionType
       }]
     }));
   }
