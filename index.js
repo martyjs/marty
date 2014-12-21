@@ -8,17 +8,14 @@ var ActionStore = require('./lib/stores/actionsStore');
 
 var Marty = _.extend({
   version: '0.6.0',
-  getAction: getAction,
+  Actions: ActionStore,
   Diagnostics: Diagnostics,
   ActionPayload: ActionPayload,
   Dispatcher: Dispatcher.getCurrent(),
-  Stores: {
-    Actions: ActionStore
+  Errors: {
+    NotFound: require('./lib/errors/notFound'),
+    CompoundError: require('./lib/errors/compoundError')
   }
 }, state, create);
-
-function getAction(token) {
-  return ActionStore.getAction(token);
-}
 
 module.exports = Marty;

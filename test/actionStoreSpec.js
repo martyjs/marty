@@ -20,29 +20,14 @@ describe('ActionStore', function () {
     ActionStore.dispose();
   });
 
-  describe('#Marty.getAction()', function () {
-    var Marty = require('../index');
-
-    beforeEach(function () {
-      dispatchStarting();
-      actualAction = Marty.getAction(token);
-    });
-
-    it('should return the action', function () {
-      expect(actualAction).to.exist;
-    });
-  });
-
   describe('when the action says it should NOT be stored', function () {
-    var Marty = require('../index');
-
     describe('when an action is starting', function () {
       beforeEach(function () {
         dispatchStarting({store: false });
       });
 
       it('should add the action', function () {
-        expect(Marty.getAction(token)).to.not.exist;
+        expect(ActionStore.getAction(token)).to.not.exist;
       });
 
       it('should NOT emit a change to all listeners', function () {
@@ -57,7 +42,7 @@ describe('ActionStore', function () {
       });
 
       it('should add the action', function () {
-        expect(Marty.getAction(token)).to.not.exist;
+        expect(ActionStore.getAction(token)).to.not.exist;
       });
 
       it('should NOT emit a change to all listeners', function () {
@@ -72,7 +57,7 @@ describe('ActionStore', function () {
       });
 
       it('should add the action', function () {
-        expect(Marty.getAction(token)).to.not.exist;
+        expect(ActionStore.getAction(token)).to.not.exist;
       });
 
       it('should NOT emit a change to all listeners', function () {
