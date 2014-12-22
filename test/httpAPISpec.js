@@ -212,7 +212,7 @@ describe('HttpAPI', function () {
   });
 
   function storeResponse(res) {
-    response = res.data;
+    response = res.body;
   }
 
   function makeRequest(method) {

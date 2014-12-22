@@ -7,7 +7,7 @@ var ActionPayload = require('./lib/actionPayload');
 var ActionStore = require('./lib/stores/actionsStore');
 
 var Marty = _.extend({
-  version: '0.6.0',
+  version: '0.6.1',
   getAction: getAction,
   Diagnostics: Diagnostics,
   ActionPayload: ActionPayload,
