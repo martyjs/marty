@@ -1,5 +1,6 @@
 var sinon = require('sinon');
 var _ = require('lodash-node');
+var Marty = require('../index');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
 var ActionPayload = require('../lib/actionPayload');
@@ -185,10 +186,73 @@ describe('Store', function () {
     });
   });
 
+  describe('#dispose()', function () {
+    var clear;
+
+    beforeEach(function () {
+      clear = sinon.spy();
+    });
+
+    describe('when you dont pass in a dispose function', function () {
+      beforeEach(function () {
+        store = Marty.createStore({
+          clear: clear,
+          getInitialState: function () {
+            return {};
+          }
+        });
+
+        store.addChangeListener(listener);
+        store.hasChanged();
+        store.dispose();
+        store.hasChanged();
+      });
+
+      it('should call clear', function () {
+        expect(clear).to.have.been.calledOnce;
+      });
+
+      it('should dispose of all listeners', function () {
+        expect(listener).to.have.been.calledOnce;
+      });
+    });
+
+    describe('when you pass in a dispose function', function () {
+      var dispose;
+
+      beforeEach(function () {
+        dispose = sinon.spy();
+        store = Marty.createStore({
+          clear: clear,
+          dispose: dispose,
+          getInitialState: function () {
+            return {};
+          }
+        });
+
+        store.addChangeListener(listener);
+        store.hasChanged();
+        store.dispose();
+        store.hasChanged();
+      });
+
+      it('should call the dispose function', function () {
+        expect(dispose).to.have.been.calledOnce;
+      });
+
+      it('should call clear', function () {
+        expect(clear).to.have.been.calledOnce;
+      });
+
+      it('should dispose of all listeners', function () {
+        expect(listener).to.have.been.calledOnce;
+      });
+    });
+  });
+
   describe('#createStore()', function () {
     var data = {};
     var actionType = 'foo';
-    var Marty = require('../index');
 
     beforeEach(function () {
       store = Marty.createStore({
@@ -243,7 +307,6 @@ describe('Store', function () {
   });
 
   describe('#waitFor()', function () {
-    var Marty = require('../index');
     var store1, store2, store3, testActionCreators, actualResult, expectedResult, executionOrder;
 
     beforeEach(function () {
@@ -419,7 +482,6 @@ describe('Store', function () {
     });
 
     describe('rollbacks', function () {
-      var Marty = require('../index');
       var Store, ActionCreators, interimState;
 
       beforeEach(function () {
@@ -492,21 +554,46 @@ describe('Store', function () {
   });
 
   describe('#clear()', function () {
-    var Marty = require('../index');
+    describe('when you do not pass in a clear function', function () {
+      beforeEach(function () {
+        store = Marty.createStore({
+          getInitialState: function () {
+            return {};
+          }
+        });
 
-    beforeEach(function () {
-      store = Marty.createStore({
-        getInitialState: function () {
-          return {};
-        }
+        store.state['foo'] = 'bar';
+        store.clear();
       });
 
-      store.state['foo'] = 'bar';
-      store.clear();
+      it('should replace the state with the original state', function () {
+        expect(store.state).to.eql({});
+      });
     });
 
-    it('should replace the state with the original state', function () {
-      expect(store.state).to.eql({});
+    describe('when you pass in a clear function', function () {
+      var clear;
+
+      beforeEach(function () {
+        clear = sinon.spy();
+        store = Marty.createStore({
+          clear: clear,
+          getInitialState: function () {
+            return {};
+          }
+        });
+
+        store.state['foo'] = 'bar';
+        store.clear();
+      });
+
+      it('should call the clear function', function () {
+        expect(clear).to.have.been.calledOnce;
+      });
+
+      it('should replace the state with the original state', function () {
+        expect(store.state).to.eql({});
+      });
     });
   });
 
