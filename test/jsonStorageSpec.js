@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var JsonStorageRepository = require("../lib/repositories/jsonStorage");
+var JsonStorageRepository = require('../lib/repositories/jsonStorage');
 
 describe('JsonStorageRepository', function () {
 

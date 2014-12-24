@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var SessionStorageRepository = require("../lib/repositories/sessionStorage");
+var SessionStorageRepository = require('../lib/repositories/sessionStorage');
 
 describe('SessionStorageRepository', function () {
 

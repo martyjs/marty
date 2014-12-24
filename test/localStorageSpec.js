@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var LocalStorageRepository = require("../lib/repositories/localStorage");
+var LocalStorageRepository = require('../lib/repositories/localStorage');
 
 describe('LocalStorageRepository', function () {
 
