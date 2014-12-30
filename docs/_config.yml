@@ -30,4 +30,4 @@ redcarpet:
 sass:
   style: :compressed
   sass_dir: _css
-current_version: 0.6.4
+current_version: 0.7.0-alpha
