@@ -30,11 +30,13 @@ UserActionCreators.updateUserEmail(122, "foo@bar.com");
 The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
 
 {% highlight js %}
-Marty.dispatcher.register(function (action) {
+var Dispatcher = require('marty/dispatcher');
+
+Dispatcher.register(function (action) {
   console.log('action with type', action.type', has been dispatched) ;
 });
 
-Marty.dispatcher.dispatch({
+Dispatcher.dispatch({
   type: 'foo'
 });
 {% endhighlight %}

@@ -2,6 +2,7 @@ var React = require('react');
 var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
+var Diagnostics = require('../diagnostics');
 var ActionPayload = require('../lib/actionPayload');
 var StateMixin = require('../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
@@ -10,7 +11,7 @@ describe('StateMixin', function () {
   var element, mixin, initialState;
 
   beforeEach(function () {
-    Marty.Diagnostics.enabled = false;
+    Diagnostics.enabled = false;
     initialState = {
       name: 'hello'
     };
@@ -56,7 +57,7 @@ describe('StateMixin', function () {
       beforeEach(function () {
         log = console.log;
         console.log = function () {};
-        Marty.Diagnostics.enabled = true;
+        Diagnostics.enabled = true;
       });
 
       describe('when the handler fails', function () {
@@ -99,13 +100,13 @@ describe('StateMixin', function () {
 
       afterEach(function () {
         console.log = log;
-        Marty.Diagnostics.enabled = false;
+        Diagnostics.enabled = false;
       });
     });
 
     describe('when diagnostics is disabled', function () {
       beforeEach(function () {
-        Marty.Diagnostics.enabled = false;
+        Diagnostics.enabled = false;
         element.onStoreChanged(null, store);
       });
 

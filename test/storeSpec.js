@@ -2,9 +2,10 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
+var Dispatcher = require('../dispatcher');
 var ActionPayload = require('../lib/actionPayload');
-var ActionHandlerNotFoundError = require('../lib/errors/actionHandlerNotFound');
-var ActionPredicateUndefinedError = require('../lib/errors/actionPredicateUndefined');
+var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
+var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
 
 describe('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
@@ -198,7 +199,7 @@ describe('Store', function () {
         one: sinon.spy()
       });
 
-      Marty.Dispatcher.dispatch(new ActionPayload({
+      Dispatcher.getCurrent().dispatch(new ActionPayload({
         type: actionType,
         arguments: [data]
       }));

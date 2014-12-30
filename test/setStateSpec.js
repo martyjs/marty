@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var UnknownStoreError = require('../lib/errors/unknownStore');
+var UnknownStoreError = require('../errors/unknownStore');
 
 describe('Marty#setState()', function () {
   var Marty = require('../index');

@@ -35,13 +35,15 @@ var UserActionCreators = Marty.createActionCreators({
 If you want to make a change locally, you can use ``this.dispatch()``.
 
 {% highlight js %}
+var Dispatcher = require('marty/dispatcher');
+
 var UserActionCreators = Marty.createActionCreators({
   updateEmail: function (userId, email) {
     this.dispatch(userId, email);
   }
 });
 
-Marty.dispatcher.register(function (action) {
+Dispatcher.register(function (action) {
   console.log(action.type) // => "UPDATE_EMAIL"
   console.log(action.arguments) // => [123, "foo@bar.com"];
 });
@@ -53,61 +55,11 @@ Action creators become more complex when you start involving remote requests sin
 
 If an action fails then an extra action is dispatched with the type ``{action type}_FAILED`` (e.g. ``CREATE_USER_FAILED``) that contains the error allowing you to update your state.
 
-Marty also has an Actions store (``Marty.Stores.Actions``) which knows about all actions. When you create an action, it will return an **action token** which you can use to get the status of an action.
-
-{% highlight js %}
-var UserActionCreators = Marty.createActionCreators({
-  createUser: function (user) {
-    return UserAPI.createUser(user);
-  }
-});
-
-var createUserToken = UserActionCreators.createUser(user);
-
-Marty.Stores.Actions.addChangeListener(function () {
-  var action = Marty.getAction(createUserAction); // Shortcut for Marty.Stores.Actions.getAction()
-  console.log(action.status)
-});
-{% endhighlight %}
-
-Like [store fetches](/docs/stores.html#fetches), an action's status can either be **pending**, **done** or **error**. If you are using the [state mixin](/docs/stateMixin.html) then it automatically listens to the actions store ([unless you tell it not to](/docs/stateMixin.html#listenToActions)).
-
-{% highlight js %}
-var UserFormState = Marty.createStateMixin({
-  getState: function () {
-    return {
-      createUser: Marty.getAction(this.state.createUserToken)
-    }
-  }
-});
-
-var UserForm = Marty.createActionCreators({
-  render: function () {
-    return this.state.createUser.when({
-      pending: function () {
-        return <div className="pending"/>;
-      },
-      failed: function (error) {
-        return <div className="error">{error.message}</div>;
-      },
-      done: function (user) {
-        return <div className="user">{user.name}</div>;
-      }
-    });
-  },
-  createUser: function (user) {
-    this.setState({
-      createUserToken: UserActionCreators.createUser(user)
-    })
-  }
-});
-{% endhighlight %}
-
 <h2 id="api">API</h2>
 
 <h3 id="createActionCreators">createActionCreators(props)</h3>
 
-To create some new action creators, you call <code>Marty.createActionCreators</code> passing in a set of properties. It returns your action creators as a singleton.
+To create some new action creators, you call <code>Marty.createActionCreators</code> passing in an object literal. It returns your action creators as a singleton.
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
@@ -126,10 +78,6 @@ An (optional) display name for the action creator. Used for richer debugging.
 Dispatches an action payload. Any [action handlers](/docs/stores.html#handleAction) will be invoked with the given action handlers.
 
 Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
-
-<h3 id="getActionType">getActionType(functionName)</h3>
-
-Returns the action type for a given function name. The default implementation will camelize, underscore and upper case the function name (fooBarBaz becomes "FOO\_BAR_BAZ"). To implement your own naming strategy you can re-implement this function.
 
 <h2 id="server-action-creators">Server Action Creators</h2>
 

@@ -8,29 +8,84 @@ var ActionPayload = require('./lib/actionPayload');
 var ActionStore = require('./lib/stores/actionsStore');
 
 var Marty = _.extend({
-  version: '0.5.5',
-  getAction: getAction,
+  version: '0.6.0',
+  Actions: ActionStore,
   Diagnostics: Diagnostics,
   ActionPayload: ActionPayload,
-  Dispatcher: Dispatcher.getCurrent(),
-  Stores: {
-    Actions: ActionStore
-  }
+  Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
-function getAction(token) {
-  return ActionStore.getAction(token);
+module.exports = Marty;
+},{"./lib/actionPayload":10,"./lib/create":12,"./lib/diagnostics":13,"./lib/dispatcher":14,"./lib/state":17,"./lib/stores/actionsStore":19,"underscore":33}],1:[function(require,module,exports){
+var constants = require('./index');
+
+module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']);
+},{"./index":2}],2:[function(require,module,exports){
+module.exports = require('../lib/constants');
+},{"../lib/constants":11}],3:[function(require,module,exports){
+var constants = require('./index');
+
+module.exports = constants(['PENDING', 'FAILED', 'DONE']);
+},{"./index":2}],4:[function(require,module,exports){
+function ActionHandlerNotFoundError(actionHandler, store) {
+  this.name = 'Action handler not found';
+  this.message = 'The action handler "' + actionHandler + '" could not be found';
+
+  if (store && store.name) {
+    this.message += ' in the ' + store.name + ' store';
+  }
 }
 
-module.exports = Marty;
+ActionHandlerNotFoundError.prototype = Error.prototype;
 
+module.exports = ActionHandlerNotFoundError;
+},{}],5:[function(require,module,exports){
+function ActionPredicateUndefinedError(actionHandler, store) {
+  this.name = 'Action predicate undefined';
+  this.message = 'The action predicate for "' + actionHandler + '" was undefined';
 
-},{"./lib/actionPayload":2,"./lib/create":4,"./lib/diagnostics":5,"./lib/dispatcher":6,"./lib/state":15,"./lib/stores/actionsStore":17,"underscore":31}],1:[function(require,module,exports){
+  if (store && store.name) {
+    this.message += ' in the ' + store.name + ' store';
+  }
+}
+
+ActionPredicateUndefinedError.prototype = Error.prototype;
+
+module.exports = ActionPredicateUndefinedError;
+},{}],6:[function(require,module,exports){
+function CompoundError(errors) {
+  this.errors = errors;
+  this.name = 'Compound error';
+}
+
+CompoundError.prototype = Error.prototype;
+
+module.exports = CompoundError;
+},{}],7:[function(require,module,exports){
+function NotFoundError(message) {
+  this.name = 'Not found';
+  this.message = message || '';
+  this.status = 404;
+}
+
+NotFoundError.prototype = Error.prototype;
+
+module.exports = NotFoundError;
+},{}],8:[function(require,module,exports){
+function UnkownStoreError(store) {
+  this.name = 'Unknown store';
+  this.message = 'Unknown store ' + store;
+}
+
+UnkownStoreError.prototype = Error.prototype;
+
+module.exports = UnkownStoreError;
+},{}],9:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var Dispatcher = require('./dispatcher');
 var ActionPayload = require('./actionPayload');
-var Actions = require('./internalConstants').Actions;
+var ActionConstants = require('../constants/actions');
 
 function ActionCreators(options) {
   var creator = this;
@@ -52,12 +107,19 @@ function ActionCreators(options) {
   function wrapFunctions(functions) {
     _.each(functions, function (func, name) {
       var actionType;
+      var properties = {};
 
       if (_.isFunction(func)) {
-        actionType = creator.getActionType(name);
-      } else if (_.isArray(func) && func.length === 2 && _.isFunction(func[1])) {
-        actionType = func[0];
-        func = func[1];
+        if (func.properties) {
+          if (!func.properties.type) {
+            throw new Error('Unknown action type');
+          }
+
+          actionType = func.properties.type;
+          properties = _.omit(func.properties, 'type');
+        } else {
+          actionType = creator.getActionType(name);
+        }
       } else {
         return;
       }
@@ -65,7 +127,7 @@ function ActionCreators(options) {
       functions[name] = function () {
         var result;
         var handlers = [];
-        var token = uuid.small();
+        var Id = uuid.small();
 
         dispatchStarting();
 
@@ -87,7 +149,7 @@ function ActionCreators(options) {
           dispatchError(e);
         }
 
-        return token;
+        return Id;
 
         function actionContext() {
           return _.extend({
@@ -96,7 +158,7 @@ function ActionCreators(options) {
                 type: actionType,
                 handlers: handlers,
                 arguments: arguments
-              });
+              }, properties);
             }
           }, this);
         }
@@ -105,43 +167,44 @@ function ActionCreators(options) {
           dispatch({
             type: actionType + '_STARTING',
             arguments: [{
-              token: token
+              Id: Id
             }]
-          });
+          }, properties);
 
           dispatch({
-            type: Actions.ACTION_STARTING,
+            type: ActionConstants.ACTION_STARTING,
             arguments: [{
-              token: token,
+              Id: Id,
               type: actionType,
-              handlers: handlers
+              handlers: handlers,
+              properties: properties
             }]
-          });
+          }, properties);
         }
 
         function dispatchDone() {
           dispatch({
-            type: Actions.ACTION_DONE,
-            arguments: [token]
-          });
+            type: ActionConstants.ACTION_DONE,
+            arguments: [Id]
+          }, properties);
         }
 
         function dispatchError(err) {
           dispatch({
             type: actionType + '_FAILED',
             arguments: [{
-              token: token,
+              Id: Id,
               error: err
             }]
-          });
+          }, properties);
 
           dispatch({
-            type: Actions.ACTION_ERROR,
+            type: ActionConstants.ACTION_ERROR,
             arguments: [{
-              token: token,
+              Id: Id,
               error: err
             }]
-          });
+          }, properties);
         }
       };
     });
@@ -149,31 +212,31 @@ function ActionCreators(options) {
     return functions;
   }
 
-  function dispatch(payload) {
-    var action = new ActionPayload(payload);
+  function dispatch(payload, properties) {
+    var action = new ActionPayload(_.extend({}, properties, payload));
     dispatcher.dispatch(action);
     return action;
   }
 }
 
 module.exports = ActionCreators;
-},{"./actionPayload":2,"./dispatcher":6,"./internalConstants":13,"./utils/uuid":19,"underscore":31}],2:[function(require,module,exports){
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/uuid":21,"underscore":33}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var cloneState = require('./utils/cloneState');
-var Statuses = require('./internalConstants').Statuses;
+var StatusConstants = require('../constants/status');
 
 function ActionPayload(options) {
   options || (options = {});
 
   var rollbackHandlers = [];
-  var status = Statuses.PENDING;
+  var status = StatusConstants.PENDING;
   var handlers = options.handlers || [];
 
-  this.type = options.type;
-  this.token = uuid.small();
-  this.source = options.source;
-  this.creator = options.creator;
+  _.extend(this, options);
+
+  this.Id = uuid.small();
+  this.type = actionType(options.type);
   this.arguments = _.toArray(options.arguments);
 
   this.toJSON = toJSON;
@@ -197,22 +260,29 @@ function ActionPayload(options) {
 
   Object.defineProperty(this, 'pending', {
     get: function () {
-      return status === Statuses.PENDING;
+      return status === StatusConstants.PENDING;
     }
   });
 
   Object.defineProperty(this, 'failed', {
     get: function () {
-      return status === Statuses.FAILED;
+      return status === StatusConstants.FAILED;
     }
   });
 
   Object.defineProperty(this, 'done', {
     get: function () {
-      return status === Statuses.DONE;
+      return status === StatusConstants.DONE;
     }
   });
 
+  function actionType(type) {
+    if (_.isFunction(type)) {
+      return type.toString();
+    }
+
+    return type;
+  }
 
   function toString() {
     return JSON.stringify(this.toJSON(), null, 2);
@@ -295,7 +365,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-},{"./internalConstants":13,"./utils/cloneState":18,"./utils/uuid":19,"underscore":31}],3:[function(require,module,exports){
+},{"../constants/status":3,"./utils/cloneState":20,"./utils/uuid":21,"underscore":33}],11:[function(require,module,exports){
 var _ = require('underscore');
 
 function constants(obj) {
@@ -318,22 +388,40 @@ function constants(obj) {
   function objectToConstants(obj) {
     return _.object(_.map(obj, valueToArray));
 
-    function valueToArray(value, key) {
-      return [key, toConstant(value)];
+    function valueToArray(value, actionType) {
+      return [actionType, toConstant(value)];
     }
   }
 
   function arrayToConstants(array) {
     return _.object(_.map(array, pair));
 
-    function pair(key) {
-      return [key, key];
+    function pair(actionType) {
+      return [actionType, createActionCreator(actionType)];
     }
+  }
+
+  function createActionCreator(actionType) {
+    var constantActionCreator = function (actionCreator, properties) {
+      actionCreator.properties = _.extend({}, properties, {
+        type: actionType
+      });
+
+      return actionCreator;
+    };
+
+    constantActionCreator.type = actionType;
+    constantActionCreator.isActionCreator = true;
+    constantActionCreator.toString = function () {
+      return actionType;
+    };
+
+    return constantActionCreator;
   }
 }
 
 module.exports = constants;
-},{"underscore":31}],4:[function(require,module,exports){
+},{"underscore":33}],12:[function(require,module,exports){
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
@@ -387,7 +475,7 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":1,"./constants":3,"./dispatcher":6,"./httpAPI":12,"./mixins/stateMixin":14,"./store":16}],5:[function(require,module,exports){
+},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":15,"./mixins/stateMixin":16,"./store":18}],13:[function(require,module,exports){
 var ACTION_STARTED = 'action-started';
 var EventEmitter = require('events').EventEmitter;
 var diagnosticEvents = new EventEmitter();
@@ -428,7 +516,7 @@ function onAction(callback) {
     }
   };
 }
-},{"events":20}],6:[function(require,module,exports){
+},{"events":22}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
@@ -440,61 +528,7 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-},{"./utils/uuid":19,"flux":26}],7:[function(require,module,exports){
-function ActionHandlerNotFoundError(actionHandler, store) {
-  this.name = 'Action handler not found';
-  this.message = 'The action handler "' + actionHandler + '" could not be found';
-
-  if (store && store.name) {
-    this.message += ' in the ' + store.name + ' store';
-  }
-}
-
-ActionHandlerNotFoundError.prototype = Error.prototype;
-
-module.exports = ActionHandlerNotFoundError;
-},{}],8:[function(require,module,exports){
-function ActionPredicateUndefinedError(actionHandler, store) {
-  this.name = 'Action predicate undefined';
-  this.message = 'The action predicate for "' + actionHandler + '" was undefined';
-
-  if (store && store.name) {
-    this.message += ' in the ' + store.name + ' store';
-  }
-}
-
-ActionPredicateUndefinedError.prototype = Error.prototype;
-
-module.exports = ActionPredicateUndefinedError;
-},{}],9:[function(require,module,exports){
-function CompoundError(errors) {
-  this.errors = errors;
-  this.name = 'Compound error';
-}
-
-CompoundError.prototype = Error.prototype;
-
-module.exports = CompoundError;
-},{}],10:[function(require,module,exports){
-function NotFoundError(message) {
-  this.name = 'Not found';
-  this.message = message || '';
-  this.status = 404;
-}
-
-NotFoundError.prototype = Error.prototype;
-
-module.exports = NotFoundError;
-},{}],11:[function(require,module,exports){
-function UnkownStoreError(store) {
-  this.name = 'Unknown store';
-  this.message = 'Unknown store ' + store;
-}
-
-UnkownStoreError.prototype = Error.prototype;
-
-module.exports = UnkownStoreError;
-},{}],12:[function(require,module,exports){
+},{"./utils/uuid":21,"flux":28}],15:[function(require,module,exports){
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
@@ -579,24 +613,15 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpAPI;
-},{"es6-promise":25,"isomorphic-fetch":29,"underscore":31}],13:[function(require,module,exports){
-var constants = require('./constants');
-
-module.exports = constants({
-  ActionSources: ['VIEW', 'SERVER'],
-  Statuses: ['PENDING', 'FAILED', 'DONE'],
-  Actions: ['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']
-});
-},{"./constants":3}],14:[function(require,module,exports){
+},{"es6-promise":27,"isomorphic-fetch":31,"underscore":33}],16:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
 var cloneState = require('../utils/cloneState');
-var reservedKeys = ['listenTo', 'getState', 'getInitialState', 'listenToActions'];
+var reservedKeys = ['listenTo', 'getState', 'getInitialState'];
 
 function StateMixin(options) {
   var config, instanceMethods;
-  var listenToActions = shouldListenToActions(options);
 
   if (!options) {
     throw new Error('The state mixin is expecting some options');
@@ -621,21 +646,6 @@ function StateMixin(options) {
         );
       } else {
         this.setState(this.tryGetState(store));
-      }
-    },
-    onActionChanged: function (state, store, actionToken) {
-      var nextState = this.tryGetState(store);
-
-      if (!nextState) {
-        return;
-      }
-
-      if (isActionThatChanged(nextState) || _.any(_.map(nextState, isActionThatChanged))) {
-        this.setState(nextState);
-      }
-
-      function isActionThatChanged(action) {
-        return action && action.token === actionToken;
       }
     },
     tryGetState: function (store) {
@@ -666,8 +676,6 @@ function StateMixin(options) {
         'component (' + this._marty.id + ') has mounted.'
       );
 
-      var ActionsStore = require('../stores/actionsStore');
-
       this._marty.listeners = _.map(config.stores, function (store) {
         Diagnostics.trace(
           'The', this.name,
@@ -676,12 +684,6 @@ function StateMixin(options) {
 
         return store.addChangeListener(this.onStoreChanged);
       }, this);
-
-      if (listenToActions) {
-        this._marty.listeners.push(
-          ActionsStore.addChangeListener(this.onActionChanged)
-        );
-      }
     },
     componentWillReceiveProps: function (nextProps) {
       var oldProps = this.props;
@@ -786,10 +788,6 @@ function StateMixin(options) {
     }
   }
 
-  function shouldListenToActions(options) {
-    return _.isUndefined(options.listenToActions) || !!options.listenToActions;
-  }
-
   function areStores(stores) {
     for (var i = stores.length - 1; i >= 0; i--) {
       if (!isStore(stores[i])) {
@@ -805,9 +803,9 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":5,"../stores/actionsStore":17,"../utils/cloneState":18,"../utils/uuid":19,"underscore":31}],15:[function(require,module,exports){
+},{"../diagnostics":13,"../utils/cloneState":20,"../utils/uuid":21,"underscore":33}],17:[function(require,module,exports){
 var _ = require('underscore');
-var UnknownStoreError = require('./errors/unknownStore');
+var UnknownStoreError = require('../errors/unknownStore');
 
 module.exports = {
   setState: setState,
@@ -852,18 +850,18 @@ function serializeState() {
 
   return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
 }
-},{"./errors/unknownStore":11,"underscore":31}],16:[function(require,module,exports){
+},{"../errors/unknownStore":8,"underscore":33}],18:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var Dispatcher = require('./dispatcher');
 var Diagnostics = require('./diagnostics');
-var NotFoundError = require('./errors/notFound');
+var CompoundError = require('../errors/compound');
+var NotFoundError = require('../errors/notFound');
 var EventEmitter = require('events').EventEmitter;
-var CompoundError = require('./errors/compoundError');
-var Statuses = require('./internalConstants').Statuses;
-var ActionHandlerNotFoundError = require('./errors/actionHandlerNotFound');
-var ActionPredicateUndefinedError = require('./errors/actionPredicateUndefined');
+var StatusConstants = require('../constants/status');
+var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
+var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
 
 Store.defaultMaxListeners = 10000000;
 
@@ -892,6 +890,7 @@ function Store(options) {
   fetch.done = fetchDone;
   fetch.failed = fetchFailed;
   fetch.pending = fetchPending;
+  fetch.notFound = fetchNotFound;
 
   emitter.setMaxListeners(options.maxListeners || Store.defaultMaxListeners);
 
@@ -1064,10 +1063,10 @@ function Store(options) {
           var dependency = options.dependsOn[i];
 
           switch (dependency.status) {
-            case Statuses.PENDING:
+            case StatusConstants.PENDING.toString():
               pending = true;
               break;
-            case Statuses.FAILED:
+            case StatusConstants.FAILED.toString():
               dependencyErrors.push(dependency.error);
               break;
           }
@@ -1111,6 +1110,10 @@ function Store(options) {
     });
   }
 
+  function fetchNotFound() {
+    return fetchFailed(new NotFoundError());
+  }
+
   function fetchResult(result) {
     result.when = when;
 
@@ -1128,12 +1131,12 @@ function Store(options) {
     }
 
     switch (status) {
-      case Statuses.PENDING:
-        return handler();
-      case Statuses.FAILED:
-        return handler(this.error);
-      case Statuses.DONE:
-        return handler(this.result);
+      case StatusConstants.PENDING.toString():
+        return handler.call(handlers);
+      case StatusConstants.FAILED.toString():
+        return handler.call(handlers, this.error);
+      case StatusConstants.DONE.toString():
+        return handler.call(handlers, this.result);
     }
   }
 
@@ -1216,7 +1219,11 @@ function Store(options) {
       return [handler, predicates];
 
       function toFunc(actionPredicate) {
-        if (_.isString(actionPredicate)) {
+        if (actionPredicate.isActionCreator) {
+          actionPredicate = {
+            type: actionPredicate.toString()
+          };
+        } else if (_.isString(actionPredicate)) {
           actionPredicate = {
             type: actionPredicate
           };
@@ -1259,11 +1266,11 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"./diagnostics":5,"./dispatcher":6,"./errors/actionHandlerNotFound":7,"./errors/actionPredicateUndefined":8,"./errors/compoundError":9,"./errors/notFound":10,"./internalConstants":13,"./utils/uuid":19,"events":20,"underscore":31}],17:[function(require,module,exports){
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./utils/uuid":21,"events":22,"underscore":33}],19:[function(require,module,exports){
 var _ = require('underscore');
 var Store = require('../store');
-var Statuses = require('../internalConstants').Statuses;
-var ActionConstants = require('../internalConstants').Actions;
+var StatusConstants = require('../../constants/status');
+var ActionConstants = require('../../constants/actions');
 
 var ActionsStore = new Store({
   name: 'Actions',
@@ -1276,12 +1283,17 @@ var ActionsStore = new Store({
     return {};
   },
   actionStarting: function (action) {
+    if (!action.properties.store) {
+      return;
+    }
+
     this.state[action.token] = {
       type: action.type,
       token: action.token,
-      status: Statuses.PENDING,
+      status: StatusConstants.PENDING,
       handlers: action.handlers,
-      arguments: action.arguments
+      arguments: action.arguments,
+      properties: action.properties
     };
     this.hasChanged(action.token);
   },
@@ -1289,7 +1301,7 @@ var ActionsStore = new Store({
     var action = this.state[actionToken];
 
     if (action) {
-      action.status = Statuses.FAILED;
+      action.status = StatusConstants.FAILED;
       action.error = error;
       action.done = true;
       this.hasChanged(actionToken);
@@ -1299,7 +1311,7 @@ var ActionsStore = new Store({
     var action = this.state[actionToken];
 
     if (action) {
-      action.status = Statuses.DONE;
+      action.status = StatusConstants.DONE;
       action.done = true;
       this.hasChanged(actionToken);
     }
@@ -1313,13 +1325,13 @@ var ActionsStore = new Store({
 });
 
 module.exports = ActionsStore;
-},{"../internalConstants":13,"../store":16,"underscore":31}],18:[function(require,module,exports){
+},{"../../constants/actions":1,"../../constants/status":3,"../store":18,"underscore":33}],20:[function(require,module,exports){
 function cloneState() {
   return null;
 }
 
 module.exports = cloneState;
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var format = require('util').format;
 
 function uuid() {
@@ -1336,7 +1348,7 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
-},{"util":24}],20:[function(require,module,exports){
+},{"util":26}],22:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1639,7 +1651,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1664,7 +1676,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1729,14 +1741,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2326,7 +2338,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":23,"_process":22,"inherits":21}],25:[function(require,module,exports){
+},{"./support/isBuffer":25,"_process":24,"inherits":23}],27:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3289,7 +3301,7 @@ function hasOwnProperty(obj, prop) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":22}],26:[function(require,module,exports){
+},{"_process":24}],28:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3301,7 +3313,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":27}],27:[function(require,module,exports){
+},{"./lib/Dispatcher":29}],29:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3553,7 +3565,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":28}],28:[function(require,module,exports){
+},{"./invariant":30}],30:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3608,14 +3620,14 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 require('fetch');
 
-},{"fetch":30}],30:[function(require,module,exports){
+},{"fetch":32}],32:[function(require,module,exports){
 (function() {
   'use strict';
 
-  if (window.fetch) {
+  if (self.fetch) {
     return
   }
 
@@ -3677,7 +3689,7 @@ require('fetch');
 
   function consumed(body) {
     if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Body already consumed'))
+      return Promise.reject(new TypeError('Already read'))
     }
     body.bodyUsed = true
   }
@@ -3817,12 +3829,12 @@ require('fetch');
 
   Body.call(Response.prototype)
 
-  window.fetch = function (url, options) {
+  self.fetch = function (url, options) {
     return new Request(url, options).fetch()
   }
 })();
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

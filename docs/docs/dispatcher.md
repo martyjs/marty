@@ -12,12 +12,14 @@ The dispatcher is the central hub in which all application data flows throw. Whe
 Marty uses [facebook's dispatcher](https://github.com/facebook/flux/) which is a singleton accessible on <code>Marty</code>.
 
 {% highlight js %}
-var dispatchToken = Marty.Dispatcher.register(function (action) {
+var Dispatcher = require('marty/dispatcher');
+
+var dispatchToken = Dispatcher.register(function (action) {
   console.log(action);
 });
 
-var action = new Action('ADD_FOO', [], Marty.constants.actionSources.VIEW);
-Marty.Dispatcher.dispatch(action);
+Dispatcher.dispatch({ type: 'CREATE_FOO' });
+
 {% endhighlight %}
 
 <h2 id="further-reading">Further reading</h2>
