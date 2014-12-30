@@ -11,23 +11,27 @@ State is a big problem in the UI. Most JS applications have few restrictions on 
 
 Flux is an answer to that problem. At its most basic level it's a set of rules about how to manage your applications state. Specifically who can change it, where they can change it and in what direction those changes should be propagated through your application.
 
-There are 3 things you will need to understand: How to tell the application to change its state ([Action creators](/docs/actionCreators.html)), How to change the applications state ([Stores](/docs/stores.html)) and how to tell the view that the state has changed ([State mixins](/docs/stateMixin.html)).
+There are 4 things you will need to understand: How to tell the application to change its state ([Action creators](/docs/actionCreators.html)), How to change the applications state ([Stores](/docs/stores.html)), how to tell the view that the state has changed ([State mixins](/docs/stateMixin.html)) and how to tie them all together ([Constants](/docs/constants.html)).
 
-Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. Actions have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL").
+Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. Actions have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL"). 
 
-If an action changes your local state then it can pass its type data along to something called a dispatcher.
+We want to be explicit about the action types in your application so we define them as ([Constants](/docs/constants.html)). Constants allow you to loosely couple your components as well as documenting what actions are available (Useful for understanding what your application can do). Constants are also responsible for creating action creators.
 
 {% highlight js %}
+var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
+
 var UserActionCreators = Marty.createActionCreators({
-  updateUserEmail: ["UPDATE_USER_EMAIL", function (userId, email) {
+  updateUserEmail: UserConstants.UPDATE_USER_EMAIL(function (userId, email) {
     this.dispatch(userId, email);
-  }
+  })
 });
 
 UserActionCreators.updateUserEmail(122, "foo@bar.com");
 {% endhighlight %}
 
-The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
+In the above scenario, ``UserConstants.UPDATE_USER_EMAIL`` creates an action creator which, when invoked, will create an action with type `UPDATE_USER_EMAIL`.
+
+If an action is making a change to your local state then it can pass its type data along to something called a dispatcher. The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
 
 {% highlight js %}
 var Dispatcher = require('marty/dispatcher');
@@ -46,7 +50,7 @@ Normally you don't manually register callbacks with the dispatcher, instead you 
 {% highlight js %}
 var UserStore = Marty.createStore({
   handlers: {
-    updateEmail: "UPDATE_USER_EMAIL"
+    updateEmail: UserConstants.UPDATE_USER_EMAIL
   },
   getInitialState: function () {
     return {};

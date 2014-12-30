@@ -96,8 +96,8 @@ An action predicate can either be a single value or an array of either action ty
 {% highlight js %}
 var UsersStore = Marty.createStore({
   handlers: {
-    foo: 'ADD_USER',
-    bar: ['ADD_USER', 'UPDATE_USER'],
+    foo: UserConstants.ADD_USER,
+    bar: [UserConstants.ADD_USER, 'UPDATE_USER'],
     baz: { source: 'VIEW' },
     bam: [{ source: 'VIEW' }, 'USER_DELETED']
   },

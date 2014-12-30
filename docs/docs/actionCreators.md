@@ -9,38 +9,31 @@ order: 3
 
 Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state.
 
-All actions have a type which is string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/docs/dispatcher.html)) and use [action's type to determine whether to do something with it](/docs/stores.html#handlers). Using strings helps us build loosely coupled applications that can grow without increasing complexity.
-
-Lets look at how you define an action creator using marty:
+All actions have a type which is string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/docs/dispatcher.html)) and use [action's type to determine whether to do something with it](/docs/stores.html#handlers). Action types help us build loosely coupled applications that can grow without increasing complexity.
+ 
+[Constants](/docs/constants.html) provide a simple way of creating action creators for a type
 
 {% highlight js %}
+var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
+
 var UserActionCreators = Marty.createActionCreators({
-  updateEmail: ["UPDATE_EMAIL", function (userId, email) {
+  updateEmail: UserConstants.UPDATE_EMAIL(function (userId, email) {
     ...
-  }]
+  })
 });
 
 UserActionCreators.updateEmail(123, "foo@bar.com");
 {% endhighlight %}
 
-In this case the actions type is "UPDATE\_EMAIL" and the second function in the array is the action which will be invoked when you call ``updateEmail``. We found that more often than not the action type is the same as the actions function name so by convention we camelize, underscore and upper case it. In the above example, specifying the action type is superfluous because updateEmail becomes "UPDATE\_EMAIL".
-
-{% highlight js %}
-var UserActionCreators = Marty.createActionCreators({
-  updateEmail: function (userId, email) {
-    ...
-  }
-});
-{% endhighlight %}
-If you want to make a change locally, you can use ``this.dispatch()``.
+If your action wants to make a change to the local state, you can use ``this.dispatch()``.
 
 {% highlight js %}
 var Dispatcher = require('marty/dispatcher');
 
 var UserActionCreators = Marty.createActionCreators({
-  updateEmail: function (userId, email) {
+  updateEmail: UserConstants.UPDATE_EMAIL(function (userId, email) {
     this.dispatch(userId, email);
-  }
+  })
 });
 
 Dispatcher.register(function (action) {
@@ -51,9 +44,19 @@ Dispatcher.register(function (action) {
 UserActionCreators.updateEmail(123, "foo@bar.com");
 {% endhighlight %}
 
-Action creators become more complex when you start involving remote requests since they involve asynchronous calls and have the potential to fail. Traditionally you would pass in a callback or return a promise but comply with Flux's unidirectional data flow rule. So we need a different approach to ensure data is flowing in the right direction.
+You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:
 
-If an action fails then an extra action is dispatched with the type ``{action type}_FAILED`` (e.g. ``CREATE_USER_FAILED``) that contains the error allowing you to update your state.
+* When an action is about to start
+  * ``ACTION_STARTING`` (see ``require('marty/constants/actions')``)
+  * ``{Action Type}_STARTING`` (e.g. ``UPDATE_EMAIL_STARTING``)
+* When an action is done
+  * ``ACTION_DONE`` (see ``require('marty/constants/actions')``)
+  * ``{Action Type}_DONE`` (e.g. ``UPDATE_EMAIL_DONE``)
+* When an action has failed
+  * ``ACTION_FAILED`` (see ``require('marty/constants/actions')``)
+  * ``{Action Type}_FAILED`` (e.g. ``UPDATE_EMAIL_FAILED``)
+
+If the action creator returns a promise then Marty will wait for the promise to resolve or be rejected before dispatching done/failed actions.
 
 <h2 id="api">API</h2>
 
@@ -63,9 +66,9 @@ To create some new action creators, you call <code>Marty.createActionCreators</c
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
-  addUser: function (name, email) {
+  addUser: UserActions.ADD_USER(function (name, email) {
     this.dispatch(name, email);
-  }
+  })
 });
 {% endhighlight %}
 
@@ -87,15 +90,15 @@ The way to get around this is to have a seperate action creator, called a Server
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
-  saveUser: function (user) {
+  saveUser: UserActions.SAVE_USER(function (user) {
     return UserAPI.saveUser(user);
-  }
+  })
 });
 
 var UserServerActionCreators = Marty.createActionCreators({
-  addUser: function (user) {
+  addUser: UserActions.ADD_USER(function (user) {
     this.dispatch(user);
-  }
+  })
 });
 
 var UserAPI = Marty.createHttpAPI({
