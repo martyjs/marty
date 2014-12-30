@@ -94,7 +94,7 @@ var TodoStore = Marty.createStore({
    * Delete a TODO item.
    * @param  {string} id
    */
-  destroy: function (id) {
+  destroyTodo: function (id) {
     delete this.state[id];
     this.hasChanged();
   },
@@ -105,7 +105,7 @@ var TodoStore = Marty.createStore({
   destroyCompleted: function () {
     for (var id in this.state) {
       if (this.state[id].complete) {
-        this.destroy(id);
+        this.destroyTodo(id);
       }
     }
   },
