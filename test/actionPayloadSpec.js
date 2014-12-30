@@ -1,4 +1,5 @@
 var sinon = require('sinon');
+var _ = require('underscore');
 var expect = require('chai').expect;
 var ActionPayload = require('../lib/actionPayload');
 
@@ -32,25 +33,14 @@ describe('ActionPayload', function () {
 
   describe('#toJSON()', function () {
     it('should return the action as an object literal', function () {
-      expect(action.toJSON()).to.eql({
+      expect(_.omit(action.toJSON(), 'id')).to.eql({
         type: actionType,
         source: source,
         creator: creator,
         handlers: [],
+        status: 'PENDING',
         arguments: args
       });
-    });
-  });
-
-  describe('#toString()', function () {
-    it('should return a string of the actions JSON representation', function () {
-      expect(action.toString()).to.eql(JSON.stringify({
-        type: actionType,
-        source: source,
-        creator: creator,
-        handlers: [],
-        arguments: args
-      }, null, 2));
     });
   });
 
