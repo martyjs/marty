@@ -3,7 +3,7 @@ var state = require('./lib/state');
 var create = require('./lib/create');
 
 var Marty = _.extend({
-  version: '0.7.0-alpha',
+  version: '0.7.0-alpha1',
 }, state, create);
 
 module.exports = Marty;

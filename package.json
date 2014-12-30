@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.7.0-alpha",
+  "version": "0.7.0-alpha1",
   "description": "A React.js/Flux Framework",
   "main": "index.js",
   "directories": {
@@ -62,12 +62,6 @@
   "bugs": {
     "url": "https://github.com/jhollingworth/marty/issues"
   },
-  "files": [
-    "dist",
-    "lib",
-    "index.js",
-    "LICENSE"
-  ],
   "browserify": {
     "transform": [
       "reactify"
