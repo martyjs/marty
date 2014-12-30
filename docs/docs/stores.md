@@ -96,8 +96,8 @@ An action predicate can either be a single value or an array of either action ty
 {% highlight js %}
 var UsersStore = Marty.createStore({
   handlers: {
-    foo: 'ADD_USER',
-    bar: ['ADD_USER', 'UPDATE_USER'],
+    foo: UserConstants.ADD_USER,
+    bar: [UserConstants.ADD_USER, 'UPDATE_USER'],
     baz: { source: 'VIEW' },
     bam: [{ source: 'VIEW' }, 'USER_DELETED']
   },
@@ -355,6 +355,16 @@ var fetch = Store.fetch.pending();
 console.log(fetch.status) // PENDING
 {% endhighlight %}
 
+<h3 id="fetch_done">fetch.done(result)</h3>
+
+Returns a done fetch result
+
+{% highlight js %}
+var fetch = Store.fetch.done(result);
+
+console.log(fetch.status, fetch.result) // DONE, { ... }
+{% endhighlight %}
+
 <h3 id="fetch_failed">fetch.failed(error)</h3>
 
 Returns a failed fetch result
@@ -365,14 +375,14 @@ var fetch = Store.fetch.failed(error);
 console.log(fetch.status, fetch.error) // FAILED, { ... }
 {% endhighlight %}
 
-<h3 id="fetch_done">fetch.done(result)</h3>
+<h3 id="fetch_notFound">fetch.notFound()</h3>
 
-Returns a done fetch result
+Returns a failed fetch result with a NotFound error
 
 {% highlight js %}
-var fetch = Store.fetch.done(result);
+var fetch = Store.fetch.notFound();
 
-console.log(fetch.status, fetch.result) // DONE, { ... }
+console.log(fetch.failed, fetch.error) // FAILED, { status: 404 }
 {% endhighlight %}
 
 <h3 id="waitFor">waitFor(*stores)</h3>

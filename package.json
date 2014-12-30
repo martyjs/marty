@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.6.4",
+  "version": "0.7.0-alpha1",
   "description": "A React.js/Flux Framework",
   "main": "index.js",
   "directories": {
@@ -17,6 +17,10 @@
     "react",
     "flux"
   ],
+  "directories": {
+    "doc": "./doc",
+    "lib": "./lib"
+  },
   "devDependencies": {
     "bluebird": "^2.3.11",
     "body-parser": "^1.9.3",
@@ -58,12 +62,6 @@
   "bugs": {
     "url": "https://github.com/jhollingworth/marty/issues"
   },
-  "files": [
-    "dist",
-    "lib",
-    "index.js",
-    "LICENSE"
-  ],
   "browserify": {
     "transform": [
       "reactify"

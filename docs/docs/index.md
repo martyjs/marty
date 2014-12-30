@@ -2,40 +2,46 @@
 layout: docs
 title: Overview
 id: overview
-description: Explaining the core concepts of Marty and how it all fits together
+description: Explaining the Flux architecture and how Marty works
 group: docs
 order: 1
 ---
 
-State is a big problem in the UI. Most JS applications have little or no restrictions on who or how its state can be changed. This makes it difficult to understand why something happens. Anyone who's spent late nights trying to understand why your application has suddenly stopped working after removing an innocuous line will understand this.
+State is a big problem in the UI. Most JS applications have few restrictions on how state is changed. This makes it difficult to understand why something happens. Anyone who's spent late nights trying to understand why their application suddenly stopped working after removing an innocuous line should understand this.
 
 Flux is an answer to that problem. At its most basic level it's a set of rules about how to manage your applications state. Specifically who can change it, where they can change it and in what direction those changes should be propagated through your application.
- 
-There are 3 things you will need to understand: How to tell the application to change its state ([Action creators](/docs/actionCreators.html)), How to change the applications state ([Stores](/docs/stores.html)) and how to tell the view that the state has changed ([State mixins](/docs/stateMixin.html)).
 
-Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. All actions must have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL"). 
+There are 4 things you will need to understand: How to tell the application to change its state ([Action creators](/docs/actionCreators.html)), How to change the applications state ([Stores](/docs/stores.html)), how to tell the view that the state has changed ([State mixins](/docs/stateMixin.html)) and how to tie them all together ([Constants](/docs/constants.html)).
 
-If an action is making a change to your local state then it can pass its type data along to something called a dispatcher.
+Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. Actions have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL"). 
+
+We want to be explicit about the action types in your application so we define them as ([Constants](/docs/constants.html)). Constants allow you to loosely couple your application as well as documenting what actions are available (Useful for understanding what your application can do). Constants are also responsible for creating action creators.
 
 {% highlight js %}
+var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
+
 var UserActionCreators = Marty.createActionCreators({
-  updateUserEmail: ["UPDATE_USER_EMAIL", function (userId, email) {
+  updateUserEmail: UserConstants.UPDATE_USER_EMAIL(function (userId, email) {
     this.dispatch(userId, email);
-  }
+  })
 });
 
 UserActionCreators.updateUserEmail(122, "foo@bar.com");
 {% endhighlight %}
 
-The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
+In the above scenario, ``UserConstants.UPDATE_USER_EMAIL`` creates an action creator which, when invoked, will create an action with type `UPDATE_USER_EMAIL`.
+
+If an action is making a change to your local state then it can pass its type data along to something called a dispatcher. The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
 
 {% highlight js %}
-Marty.dispatcher.register(function (action) {
+var Dispatcher = require('marty/dispatcher');
+
+Dispatcher.register(function (action) {
   console.log('action with type', action.type', has been dispatched) ;
 });
 
-Marty.dispatcher.dispatch({
-  type: 'foo' 
+Dispatcher.dispatch({
+  type: 'foo'
 });
 {% endhighlight %}
 
@@ -44,7 +50,7 @@ Normally you don't manually register callbacks with the dispatcher, instead you 
 {% highlight js %}
 var UserStore = Marty.createStore({
   handlers: {
-    updateEmail: "UPDATE_USER_EMAIL"
+    updateEmail: UserConstants.UPDATE_USER_EMAIL
   },
   getInitialState: function () {
     return {};
@@ -59,9 +65,9 @@ var UserStore = Marty.createStore({
 });
 {% endhighlight %}
 
-When your application starts, each store will automatically start listening to the dispatcher. When an action is dispatched, each store will check its [``handlers`` hash](/docs/stores.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler should then update its internal state (all stored in ``this.state``). 
+When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its [``handlers`` hash](/docs/stores.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in ``this.state``).
 
-The next (and final) step is how to notify views that theres new data. Like the dispatcher, you can register to be notified of any changes to a store.
+The next (and final) step is to notify views about the new data. Like the dispatcher, you can register to be notified of any changes to a store.
 
 {% highlight js %}
 UserStore.addChangeListener(function (state) {
@@ -69,14 +75,14 @@ UserStore.addChangeListener(function (state) {
 });
 {% endhighlight %}
 
-So if you have a view thats interested in a domain it ask the store to notify it of any changes. When the store updates, your view just rerenders itself with whatever the new state of the store is. You might be asking what if the store changed something your view isn't interested in (e.g. a different entity)? Thanks to Reacts virtual DOM it doesn't really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views *significantly simpler* since you just render whatever the store tells you to render.
+If you have a view thats interested in a domain, it can ask the store to notify it of any changes. When the store updates, your view just rerenders itself with the new state. You might ask, "what if the store changed something your view isn't interested in (e.g. a different entity)?". Thanks to Reacts virtual DOM it doesn't really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views *significantly simpler* since you just render whatever the store tells you to render.
 
 {% highlight js %}
 var User = React.createClass({
   render: function () {
     return (
       <div className="user">
-        <input type="text" 
+        <input type="text"
                onChange={this.updateEmail}
                value={this.state.user.email}></input>
       </div>
@@ -105,7 +111,7 @@ var User = React.createClass({
 });
 {% endhighlight %}
 
-As your application grows you start to find that there is a lot of boiler plate code to get views to listen to stores. [State mixins](/docs/stateMixin.html) are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:
+As your application grows you start to find that there is a lot of boilerplate code to get views to listen to stores. [State mixins](/docs/stateMixin.html) are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:
 
 {% highlight js %}
 var UserStateMixin = Marty.createStateMixin({
@@ -122,7 +128,7 @@ var User = React.createClass({
   render: function () {
     return (
       <div className="user">
-        <input type="text" 
+        <input type="text"
                onChange={this.updateEmail}
                value={this.state.user.email}></input>
       </div>
@@ -135,13 +141,13 @@ var User = React.createClass({
 });
 {% endhighlight %}
 
-Whenever you want to change value within your application your data must follow this flow of [Action creator](/docs/actionCreators.html) **->** [Dispatcher](/docs/dispatcher.html) **->** [Store](/docs/stores.html) **->** [State mixin](/docs/stateMixin.html) **->** View. Known as a **unidirectional data flow**
+Whenever you want to change a value within your application your data must follow this flow of [Action creator](/docs/actionCreators.html) **->** [Dispatcher](/docs/dispatcher.html) **->** [Store](/docs/stores.html) **->** [State mixin](/docs/stateMixin.html) **->** View. This is known as a **unidirectional data flow**.
 
 <center>
   <img src="/img/data-flow.png" alt="Data flow"/>
 </center>
 
-While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There's only one place your application state can change so if you don't have to dig into all the views to work out what changed a value (Its even easier if you're using [immutable data collections](/docs/stores.html#immutable)). Thanks to action types being stings you have a loosely coupled [Law of Demeter](http://en.wikipedia.org/wiki/Law_of_Demeter) architecture which is easy to grow without increasing the complexity of the code base.
+While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There's only one place your application state can change so you don't have to dig into all the views to work out where a value was changed (it's even easier if you're using [immutable data collections](/docs/stores.html#immutable)). Thanks to action types being strings you have a loosely coupled [Law of Demeter](http://en.wikipedia.org/wiki/Law_of_Demeter) architecture which is easy to grow without increasing the complexity of the code base.
 
 
 <h2 id="further-reading">Further reading</h2>

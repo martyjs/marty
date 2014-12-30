@@ -2,18 +2,16 @@ var React = require('react');
 var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
-var uuid = require('../lib/utils/uuid');
-var dispatch = require('./lib/dispatch');
+var Diagnostics = require('../diagnostics');
 var ActionPayload = require('../lib/actionPayload');
 var StateMixin = require('../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
-var ActionConstants = require('../lib/internalConstants').Actions;
 
 describe('StateMixin', function () {
-  var element, mixin, initialState, getState, setState;
+  var element, mixin, initialState;
 
   beforeEach(function () {
-    Marty.Diagnostics.enabled = false;
+    Diagnostics.enabled = false;
     initialState = {
       name: 'hello'
     };
@@ -59,7 +57,7 @@ describe('StateMixin', function () {
       beforeEach(function () {
         log = console.log;
         console.log = function () {};
-        Marty.Diagnostics.enabled = true;
+        Diagnostics.enabled = true;
       });
 
       describe('when the handler fails', function () {
@@ -102,13 +100,13 @@ describe('StateMixin', function () {
 
       afterEach(function () {
         console.log = log;
-        Marty.Diagnostics.enabled = false;
+        Diagnostics.enabled = false;
       });
     });
 
     describe('when diagnostics is disabled', function () {
       beforeEach(function () {
-        Marty.Diagnostics.enabled = false;
+        Diagnostics.enabled = false;
         element.onStoreChanged(null, store);
       });
 
@@ -400,118 +398,6 @@ describe('StateMixin', function () {
 
     afterEach(function () {
       store.dispose();
-    });
-  });
-
-  describe('when the action store changes', function () {
-    var token;
-    var Marty = require('../index');
-
-    beforeEach(function () {
-      token = uuid.small();
-    });
-
-    afterEach(function () {
-      Marty.Stores.Actions.dispose();
-    });
-
-    describe('when you have disabled listening to actions', function () {
-      beforeEach(function () {
-        getState = sinon.spy();
-        mixin = Marty.createStateMixin({
-          listenToActions: false,
-          getState: getState
-        });
-
-        element = renderClassWithMixin(mixin);
-
-        dispatch(new ActionPayload({
-          type: ActionConstants.ACTION_STARTING,
-          arguments: [{
-            token: token
-          }]
-        }));
-      });
-
-      it('should not listen to the action store', function () {
-        expect(getState).to.have.been.calledOnce;
-      });
-    });
-
-    describe('when the action that changed was the one you are interested in', function () {
-      beforeEach(function () {
-        dispatch(new ActionPayload({
-          type: ActionConstants.ACTION_STARTING,
-          arguments: [{
-            token: token
-          }]
-        }));
-
-        getState = sinon.spy(function () {
-          return {
-            action: Marty.getAction(token)
-          };
-        });
-
-        mixin = Marty.createStateMixin({
-          getState: getState
-        });
-
-        element = renderClassWithMixin(mixin);
-        setState = sinon.spy(element, 'setState');
-
-        dispatch(new ActionPayload({
-          type: ActionConstants.ACTION_DONE,
-          arguments: [token]
-        }));
-      });
-
-      it('should not listen to the action store', function () {
-        expect(setState).to.have.been.calledOnce;
-      });
-    });
-
-    describe('when the action that changed was NOT the one you are interested in', function () {
-      var stateToken, setState;
-
-      beforeEach(function () {
-        stateToken = uuid.small();
-        dispatch(new ActionPayload({
-          type: ActionConstants.ACTION_STARTING,
-          arguments: [{
-            token: token
-          }]
-        }));
-
-        dispatch(new ActionPayload({
-          type: ActionConstants.ACTION_STARTING,
-          arguments: [{
-            token: stateToken
-          }]
-        }));
-
-        getState = sinon.spy(function () {
-          return {
-            action: Marty.getAction(stateToken)
-          };
-        });
-
-        mixin = Marty.createStateMixin({
-          getState: getState
-        });
-
-        element = renderClassWithMixin(mixin);
-        setState = sinon.spy(element, 'setState');
-
-        dispatch(new ActionPayload({
-          type: ActionConstants.ACTION_DONE,
-          arguments: [token]
-        }));
-      });
-
-      it('should not listen to the action store', function () {
-        expect(setState).to.have.not.been.called;
-      });
     });
   });
 

@@ -1,33 +1,58 @@
+var _ = require('underscore');
 var expect = require('chai').expect;
+var constants = require('../lib/constants');
 var Promise = require('es6-promise').Promise;
 var MockDispatcher = require('./lib/mockDispatcher');
 var ActionCreators = require('../lib/actionCreators');
 
 describe('ActionCreators', function () {
-  var actionCreators, dispatcher;
-  var token, expectedActionType, expectedOtherArg, expectedArg;
+  var actionCreators, dispatcher, actualResult, actualError;
+  var expectedActionType, expectedOtherArg, expectedArg;
   var actualAction, payload, expectedError, promise;
 
   beforeEach(function () {
     dispatcher = new MockDispatcher();
   });
 
-  describe('when you override the action type', function () {
+  describe('when the action creator is created from a constant', function () {
+    var TestConstants, expectedProperties;
     beforeEach(function () {
-      expectedArg = { a: 1 };
-      expectedActionType = 'FOO_BAR';
+      expectedProperties = {
+        foo: 'bar',
+        baz: 'bam'
+      };
+
+      TestConstants = constants(['TEST_CONSTANT']);
+
       actionCreators = new ActionCreators({
         dispatcher: dispatcher,
-        someAction: [expectedActionType, function (arg) {
-          this.dispatch(arg);
-        }]
+        testConstant: TestConstants.TEST_CONSTANT(function (a, b, c) {
+          this.dispatch(a, b, c);
+        }, expectedProperties)
       });
-
-      actionCreators.someAction(expectedArg);
     });
 
-    it('should dispatch the action with the given action type', function () {
-      expect(dispatcher.getActionWithType(expectedActionType));
+    describe('when I create an action', function () {
+      var expectedArguments;
+
+      beforeEach(function () {
+        expectedArguments = [1, 2, 3];
+        actionCreators.testConstant.apply(actionCreators, expectedArguments);
+        actualAction = dispatcher.getActionWithType('TEST_CONSTANT');
+      });
+
+      it('should dispatch an action with the constant name', function () {
+        expect(actualAction).to.exist;
+      });
+
+      it('should pass through all the arguments', function () {
+        expect(actualAction.arguments).to.eql(expectedArguments);
+      });
+
+      it('should pass all properties through', function () {
+        var actualProperties = _.pick(actualAction, Object.keys(expectedProperties));
+        expect(actualProperties).to.eql(expectedProperties);
+      });
     });
   });
 
@@ -48,7 +73,7 @@ describe('ActionCreators', function () {
           }
         });
 
-        token = actionCreators.someAction();
+        actualResult = actionCreators.someAction();
 
         promise.catch(function () {
           actualAction = dispatcher.getActionWithType('ACTION_ERROR');
@@ -65,8 +90,8 @@ describe('ActionCreators', function () {
         expect(actualAction).to.exist;
       });
 
-      it('should include the actions token', function () {
-        expect(payload.token).to.equal(token);
+      it('should return the promise', function () {
+        expect(actualResult).to.equal(promise);
       });
 
       it('should include the error', function () {
@@ -123,7 +148,12 @@ describe('ActionCreators', function () {
           throw expectedError;
         }
       });
-      token = actionCreators.someAction();
+      try {
+        actionCreators.someAction();
+      } catch (e) {
+        actualError = e;
+      }
+
       actualAction = dispatcher.getActionWithType('ACTION_ERROR');
       payload = (actualAction || {}).arguments[0];
     });
@@ -136,43 +166,8 @@ describe('ActionCreators', function () {
       expect(actualAction).to.exist;
     });
 
-    it('should include the actions token', function () {
-      expect(payload.token).to.equal(token);
-    });
-
-    it('should include the error', function () {
-      expect(payload.error).to.equal(expectedError);
-    });
-
-    it('should NOT dispatch an ACTION_DONE action', function () {
-      expect(dispatcher.getActionWithType('ACTION_DONE')).to.not.exist;
-    });
-  });
-
-  describe('when the action returns an error', function () {
-    beforeEach(function () {
-      expectedError = new Error('foo');
-      actionCreators = new ActionCreators({
-        dispatcher: dispatcher,
-        someAction: function () {
-          return expectedError;
-        }
-      });
-      token = actionCreators.someAction();
-      actualAction = dispatcher.getActionWithType('ACTION_ERROR');
-      payload = (actualAction || {}).arguments[0];
-    });
-
-    it('should dispatch {action type}_FAILED', function () {
-      expect(dispatcher.getActionWithType('SOME_ACTION_FAILED')).to.exist;
-    });
-
-    it('should dispatch an ACTION_ERROR action', function () {
-      expect(actualAction).to.exist;
-    });
-
-    it('should include the actions token', function () {
-      expect(payload.token).to.equal(token);
+    it('should throw the error', function () {
+      expect(actualError).to.equal(expectedError);
     });
 
     it('should include the error', function () {
@@ -195,11 +190,11 @@ describe('ActionCreators', function () {
           this.dispatch(expectedOtherArg, arg);
         }
       });
-      token = actionCreators.someAction(expectedArg);
+      actualResult = actionCreators.someAction(expectedArg);
     });
 
-    it('should return an action token', function () {
-      expect(token).to.be.a('string');
+    it('should not return anything', function () {
+      expect(actualResult).to.not.be.defined;
     });
 
     describe('when the action is about to start', function () {
@@ -217,7 +212,7 @@ describe('ActionCreators', function () {
       });
 
       it('should include the actions token', function () {
-        expect(payload.token).to.equal(token);
+        expect(payload.token).to.be.defined;
       });
 
       it('should include the actions type', function () {
@@ -249,7 +244,7 @@ describe('ActionCreators', function () {
       });
 
       it('should include the actions token', function () {
-        expect(actualAction.arguments).to.eql([token]);
+        expect(actualAction.arguments[0]).to.be.defined;
       });
     });
   });
