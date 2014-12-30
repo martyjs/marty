@@ -15,7 +15,7 @@ There are 4 things you will need to understand: How to tell the application to c
 
 Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. Actions have a type which is a string describing the action (e.g. "UPDATE\_USER_EMAIL"). 
 
-We want to be explicit about the action types in your application so we define them as ([Constants](/docs/constants.html)). Constants allow you to loosely couple your components as well as documenting what actions are available (Useful for understanding what your application can do). Constants are also responsible for creating action creators.
+We want to be explicit about the action types in your application so we define them as ([Constants](/docs/constants.html)). Constants allow you to loosely couple your application as well as documenting what actions are available (Useful for understanding what your application can do). Constants are also responsible for creating action creators.
 
 {% highlight js %}
 var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
