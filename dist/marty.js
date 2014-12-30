@@ -2,21 +2,13 @@
 var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
-var Dispatcher = require('./lib/dispatcher');
-var Diagnostics = require('./lib/diagnostics');
-var ActionPayload = require('./lib/actionPayload');
-var ActionStore = require('./lib/stores/actionsStore');
 
 var Marty = _.extend({
-  version: '0.6.0',
-  Actions: ActionStore,
-  Diagnostics: Diagnostics,
-  ActionPayload: ActionPayload,
-  Dispatcher: Dispatcher.getCurrent()
+  version: '0.6.0'
 }, state, create);
 
 module.exports = Marty;
-},{"./lib/actionPayload":10,"./lib/create":12,"./lib/diagnostics":13,"./lib/dispatcher":14,"./lib/state":17,"./lib/stores/actionsStore":19,"underscore":33}],1:[function(require,module,exports){
+},{"./lib/create":12,"./lib/state":17,"underscore":32}],1:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']);
@@ -127,7 +119,7 @@ function ActionCreators(options) {
       functions[name] = function () {
         var result;
         var handlers = [];
-        var Id = uuid.small();
+        var actionId = uuid.small();
 
         dispatchStarting();
 
@@ -135,9 +127,7 @@ function ActionCreators(options) {
           result = func.apply(actionContext(), arguments);
 
           if (result) {
-            if (result instanceof Error) {
-              dispatchError(result);
-            } else if (_.isFunction(result.then)) {
+            if (_.isFunction(result.then)) {
               result.then(dispatchDone, dispatchError);
             } else {
               dispatchDone();
@@ -145,11 +135,13 @@ function ActionCreators(options) {
           } else {
             dispatchDone();
           }
+
+          return result;
         } catch (e) {
           dispatchError(e);
-        }
 
-        return Id;
+          throw e;
+        }
 
         function actionContext() {
           return _.extend({
@@ -167,14 +159,14 @@ function ActionCreators(options) {
           dispatch({
             type: actionType + '_STARTING',
             arguments: [{
-              Id: Id
+              id: actionId
             }]
           }, properties);
 
           dispatch({
             type: ActionConstants.ACTION_STARTING,
             arguments: [{
-              Id: Id,
+              id: actionId,
               type: actionType,
               handlers: handlers,
               properties: properties
@@ -185,7 +177,7 @@ function ActionCreators(options) {
         function dispatchDone() {
           dispatch({
             type: ActionConstants.ACTION_DONE,
-            arguments: [Id]
+            arguments: [actionId]
           }, properties);
         }
 
@@ -193,7 +185,7 @@ function ActionCreators(options) {
           dispatch({
             type: actionType + '_FAILED',
             arguments: [{
-              Id: Id,
+              id: actionId,
               error: err
             }]
           }, properties);
@@ -201,7 +193,7 @@ function ActionCreators(options) {
           dispatch({
             type: ActionConstants.ACTION_ERROR,
             arguments: [{
-              Id: Id,
+              id: actionId,
               error: err
             }]
           }, properties);
@@ -220,7 +212,7 @@ function ActionCreators(options) {
 }
 
 module.exports = ActionCreators;
-},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/uuid":21,"underscore":33}],10:[function(require,module,exports){
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/uuid":20,"underscore":32}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var cloneState = require('./utils/cloneState');
@@ -235,7 +227,7 @@ function ActionPayload(options) {
 
   _.extend(this, options);
 
-  this.Id = uuid.small();
+  this.id = options.id || uuid.small();
   this.type = actionType(options.type);
   this.arguments = _.toArray(options.arguments);
 
@@ -365,7 +357,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-},{"../constants/status":3,"./utils/cloneState":20,"./utils/uuid":21,"underscore":33}],11:[function(require,module,exports){
+},{"../constants/status":3,"./utils/cloneState":19,"./utils/uuid":20,"underscore":32}],11:[function(require,module,exports){
 var _ = require('underscore');
 
 function constants(obj) {
@@ -421,7 +413,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"underscore":33}],12:[function(require,module,exports){
+},{"underscore":32}],12:[function(require,module,exports){
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
@@ -516,7 +508,7 @@ function onAction(callback) {
     }
   };
 }
-},{"events":22}],14:[function(require,module,exports){
+},{"events":21}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
@@ -528,7 +520,7 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-},{"./utils/uuid":21,"flux":28}],15:[function(require,module,exports){
+},{"./utils/uuid":20,"flux":27}],15:[function(require,module,exports){
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
@@ -613,7 +605,7 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpAPI;
-},{"es6-promise":27,"isomorphic-fetch":31,"underscore":33}],16:[function(require,module,exports){
+},{"es6-promise":26,"isomorphic-fetch":30,"underscore":32}],16:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
@@ -803,7 +795,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":13,"../utils/cloneState":20,"../utils/uuid":21,"underscore":33}],17:[function(require,module,exports){
+},{"../diagnostics":13,"../utils/cloneState":19,"../utils/uuid":20,"underscore":32}],17:[function(require,module,exports){
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -850,7 +842,7 @@ function serializeState() {
 
   return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
 }
-},{"../errors/unknownStore":8,"underscore":33}],18:[function(require,module,exports){
+},{"../errors/unknownStore":8,"underscore":32}],18:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
@@ -1266,72 +1258,13 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./utils/uuid":21,"events":22,"underscore":33}],19:[function(require,module,exports){
-var _ = require('underscore');
-var Store = require('../store');
-var StatusConstants = require('../../constants/status');
-var ActionConstants = require('../../constants/actions');
-
-var ActionsStore = new Store({
-  name: 'Actions',
-  handlers: {
-    actionDone: ActionConstants.ACTION_DONE,
-    actionError: ActionConstants.ACTION_ERROR,
-    actionStarting: ActionConstants.ACTION_STARTING
-  },
-  getInitialState: function () {
-    return {};
-  },
-  actionStarting: function (action) {
-    if (!action.properties.store) {
-      return;
-    }
-
-    this.state[action.token] = {
-      type: action.type,
-      token: action.token,
-      status: StatusConstants.PENDING,
-      handlers: action.handlers,
-      arguments: action.arguments,
-      properties: action.properties
-    };
-    this.hasChanged(action.token);
-  },
-  actionError: function (actionToken, error) {
-    var action = this.state[actionToken];
-
-    if (action) {
-      action.status = StatusConstants.FAILED;
-      action.error = error;
-      action.done = true;
-      this.hasChanged(actionToken);
-    }
-  },
-  actionDone: function (actionToken) {
-    var action = this.state[actionToken];
-
-    if (action) {
-      action.status = StatusConstants.DONE;
-      action.done = true;
-      this.hasChanged(actionToken);
-    }
-  },
-  getAll: function () {
-    return _.values(this.state);
-  },
-  getAction: function (actionToken) {
-    return this.state[actionToken];
-  }
-});
-
-module.exports = ActionsStore;
-},{"../../constants/actions":1,"../../constants/status":3,"../store":18,"underscore":33}],20:[function(require,module,exports){
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./utils/uuid":20,"events":21,"underscore":32}],19:[function(require,module,exports){
 function cloneState() {
   return null;
 }
 
 module.exports = cloneState;
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var format = require('util').format;
 
 function uuid() {
@@ -1348,7 +1281,7 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
-},{"util":26}],22:[function(require,module,exports){
+},{"util":25}],21:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1651,7 +1584,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1676,7 +1609,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1741,14 +1674,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2338,7 +2271,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":25,"_process":24,"inherits":23}],27:[function(require,module,exports){
+},{"./support/isBuffer":24,"_process":23,"inherits":22}],26:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3301,7 +3234,7 @@ function hasOwnProperty(obj, prop) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":24}],28:[function(require,module,exports){
+},{"_process":23}],27:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3313,7 +3246,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":29}],29:[function(require,module,exports){
+},{"./lib/Dispatcher":28}],28:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3565,7 +3498,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":30}],30:[function(require,module,exports){
+},{"./invariant":29}],29:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3620,10 +3553,10 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 require('fetch');
 
-},{"fetch":32}],32:[function(require,module,exports){
+},{"fetch":31}],31:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3834,7 +3767,7 @@ require('fetch');
   }
 })();
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
