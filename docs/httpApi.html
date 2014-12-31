@@ -140,32 +140,25 @@
   <span class="na">baseUrl</span><span class="p">:</span> <span class="s1">'http://foo.com'</span>
   <span class="na">getAll</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/users'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveAll</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+      <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveAll</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
     <span class="p">});</span>
   <span class="p">},</span>
   <span class="nx">createUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">data</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
         <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+          <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
         <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>One scenario to consider is what happens if an HTTP request fails. It&#39;s already possible to <a href="/docs/stores.html#rollback">rollback changes to stores</a> so the recommend approach is to pass the rollback function through to the API call so that it can be invoked if an error occurs.</p>
+<p>If the request is successful then the promise resolves with a response object. If the response content type is <code>application/json</code> then Marty will attempt to deserialize the body which is accessible at <code>res.body</code>.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
-  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">rollback</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">data</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
-        <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">rollback</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-
-<span class="kd">var</span> <span class="nx">UserActions</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="s1">'ADD_USER'</span><span class="p">,</span> <span class="nx">user</span><span class="p">);</span>
-
-    <span class="nx">UsersAPI</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">rollback</span><span class="p">);</span>
-  <span class="p">}</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/foo'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'Content-Type'</span><span class="p">));</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'Date'</span><span class="p">));</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">statusText</span><span class="p">);</span>
 <span class="p">})</span></code></pre></div>
 
 <h2 id="api">API</h2>
@@ -178,7 +171,7 @@
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">data</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
         <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+          <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
         <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
