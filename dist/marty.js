@@ -2,13 +2,15 @@
 var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
+var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.6.0'
+  version: '0.7.0',
+  Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
-},{"./lib/create":12,"./lib/state":17,"underscore":32}],1:[function(require,module,exports){
+},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":17,"underscore":32}],1:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']);
@@ -152,11 +154,12 @@ function ActionCreators(options) {
                 arguments: arguments
               }, properties);
             }
-          }, this);
+          }, creator);
         }
 
         function dispatchStarting() {
           dispatch({
+            verbose: true,
             type: actionType + '_STARTING',
             arguments: [{
               id: actionId
@@ -164,6 +167,7 @@ function ActionCreators(options) {
           }, properties);
 
           dispatch({
+            verbose: true,
             type: ActionConstants.ACTION_STARTING,
             arguments: [{
               id: actionId,
@@ -176,6 +180,15 @@ function ActionCreators(options) {
 
         function dispatchDone() {
           dispatch({
+            verbose: true,
+            type: actionType + '_DONE',
+            arguments: [{
+              id: actionId
+            }]
+          }, properties);
+
+          dispatch({
+            verbose: true,
             type: ActionConstants.ACTION_DONE,
             arguments: [actionId]
           }, properties);
@@ -183,6 +196,7 @@ function ActionCreators(options) {
 
         function dispatchError(err) {
           dispatch({
+            verbose: true,
             type: actionType + '_FAILED',
             arguments: [{
               id: actionId,
@@ -191,6 +205,7 @@ function ActionCreators(options) {
           }, properties);
 
           dispatch({
+            verbose: true,
             type: ActionConstants.ACTION_ERROR,
             arguments: [{
               id: actionId,
@@ -234,9 +249,11 @@ function ActionPayload(options) {
   this.toJSON = toJSON;
   this.toString = toString;
   this.rollback = rollback;
+  this.verbose = !!options.verbose;
   this.addViewHandler = addViewHandler;
   this.addStoreHandler = addStoreHandler;
   this.addRollbackHandler = addRollbackHandler;
+  this.timestamp = options.timestamp || new Date();
 
   Object.defineProperty(this, 'handlers', {
     get: function () {
@@ -281,13 +298,20 @@ function ActionPayload(options) {
   }
 
   function toJSON() {
-    return {
-      type: this.type,
-      source: this.source,
-      creator: this.creator,
-      handlers: this.handlers,
-      arguments: this.arguments
-    };
+    var json = _.pick(this,
+      'id',
+      'type',
+      'source',
+      'creator',
+      'verbose',
+      'handlers',
+      'arguments',
+      'timestamp'
+    );
+
+    json.status = this.status.toString();
+
+    return json;
   }
 
   function rollback() {
@@ -325,7 +349,7 @@ function ActionPayload(options) {
       views: [],
       type: 'Store',
       error: null,
-      store: store.name,
+      store: store.displayName,
       name: handlerName,
       state: {
         before: cloneState(store.getState()),
@@ -395,11 +419,22 @@ function constants(obj) {
 
   function createActionCreator(actionType) {
     var constantActionCreator = function (actionCreator, properties) {
+      if (!actionCreator) {
+        actionCreator = dispatchActionCreator;
+      } else if (!_.isFunction(actionCreator)) {
+        properties = actionCreator;
+        actionCreator = dispatchActionCreator;
+      }
+
       actionCreator.properties = _.extend({}, properties, {
         type: actionType
       });
 
       return actionCreator;
+
+      function dispatchActionCreator() {
+        this.dispatch.apply(this, arguments);
+      }
     };
 
     constantActionCreator.type = actionType;
@@ -554,20 +589,32 @@ _.extend(HttpAPI.prototype, {
     }
 
     if (contentType() === JSON_CONTENT_TYPE && _.isObject(options.body)) {
-      options.headers[CONTENT_TYPE] = JSON_CONTENT_TYPE;
       options.body = JSON.stringify(options.body);
+      options.headers[CONTENT_TYPE] = JSON_CONTENT_TYPE;
     }
 
     return fetch(options.url, options).then(function (res) {
       if (isJson(res)) {
-        res.data = JSON.parse(res._body);
+        res.body = JSON.parse(res._body);
       }
 
       return res;
     });
 
     function isJson(res) {
-      return res.headers.get(CONTENT_TYPE).indexOf(JSON_CONTENT_TYPE) !== -1;
+      var contentTypes = getHeader(res, CONTENT_TYPE);
+
+      _.isArray(contentTypes) || (contentTypes = [contentTypes]);
+
+      return _.any(contentTypes, function (contentType) {
+        return contentType.indexOf(JSON_CONTENT_TYPE) !== -1;
+      });
+    }
+
+    function getHeader(res, name) {
+      return _.find(res.headers.map, function (value, key) {
+        return key.toLowerCase() === name.toLowerCase();
+      });
     }
 
     function contentType() {
@@ -629,12 +676,12 @@ function StateMixin(options) {
   var mixin = _.extend({
     onStoreChanged: function (state, store) {
       Diagnostics.trace(
-        store.name, 'store has changed. The', this.name, 'component (' + this._marty.id + ') is updating'
+        store.displayName, 'store has changed. The', this.displayName, 'component (' + this._marty.id + ') is updating'
       );
 
       if (this._lifeCycleState === 'UNMOUNTED') {
         Diagnostics.warn(
-          'Trying to set the state of ', this.name, 'component (' + this._marty.id + ') which is unmounted'
+          'Trying to set the state of ', this.displayName, 'component (' + this._marty.id + ') which is unmounted'
         );
       } else {
         this.setState(this.tryGetState(store));
@@ -644,7 +691,7 @@ function StateMixin(options) {
       var handler;
 
       if (Diagnostics.enabled && store && store.action) {
-        handler = store.action.addViewHandler(options.name, this, this._marty.lastState);
+        handler = store.action.addViewHandler(this.displayName, this, this._marty.lastState);
       }
 
       try {
@@ -664,14 +711,14 @@ function StateMixin(options) {
     },
     componentDidMount: function () {
       Diagnostics.trace(
-        'The', this.name,
+        'The', this.displayName,
         'component (' + this._marty.id + ') has mounted.'
       );
 
       this._marty.listeners = _.map(config.stores, function (store) {
         Diagnostics.trace(
-          'The', this.name,
-          'component  (' + this._marty.id + ') is listening to the', store.name, 'store'
+          'The', this.displayName,
+          'component  (' + this._marty.id + ') is listening to the', store.displayName, 'store'
         );
 
         return store.addChangeListener(this.onStoreChanged);
@@ -688,7 +735,7 @@ function StateMixin(options) {
     },
     componentWillUnmount: function () {
       Diagnostics.trace(
-        'The', this.name, 'component (' + this._marty.id + ') is unmounting.',
+        'The', this.displayName, 'component (' + this._marty.id + ') is unmounting.',
         'It is listening to', this._marty.listeners.length, 'stores'
       );
 
@@ -702,6 +749,12 @@ function StateMixin(options) {
       return config.getState(this);
     },
     getInitialState: function () {
+      var el = this._currentElement;
+
+      if (!this.displayName && el && el.type) {
+        this.displayName = el.type.displayName;
+      }
+
       this.state = {};
 
       this._marty = {
@@ -826,7 +879,7 @@ function setState(states) {
 
   function indexByName(stores) {
     return _.object(_.map(stores, function (store) {
-      return store.name;
+      return store.displayName;
     }), stores);
   }
 }
@@ -835,8 +888,8 @@ function serializeState() {
   var state = {};
 
   _.each(this.getStores(), function (store) {
-    if (store.name) {
-      state[store.name] = (store.serialize || store.getState)();
+    if (store.displayName) {
+      state[store.displayName] = (store.serialize || store.getState)();
     }
   });
 
@@ -854,6 +907,7 @@ var EventEmitter = require('events').EventEmitter;
 var StatusConstants = require('../constants/status');
 var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
+var RESERVED_FUNCTIONS = ['dispose', 'clear'];
 
 Store.defaultMaxListeners = 10000000;
 
@@ -886,7 +940,7 @@ function Store(options) {
 
   emitter.setMaxListeners(options.maxListeners || Store.defaultMaxListeners);
 
-  extendStore(this, options);
+  extendStore(this, _.omit(options, RESERVED_FUNCTIONS));
   validateHandlers(this);
 
   this.dispatchToken = dispatcher.register(_.bind(this.handleAction, this));
@@ -939,6 +993,10 @@ function Store(options) {
   function dispose() {
     emitter.removeAllListeners(CHANGE_EVENT);
     store.clear();
+
+    if (_.isFunction(options.dispose)) {
+      options.dispose.call(store);
+    }
   }
 
   function fetch(id, local, remote) {
@@ -1136,6 +1194,10 @@ function Store(options) {
     failedFetches = {};
     fetchInProgress = {};
     store.state = store.getInitialState();
+
+    if (_.isFunction(options.clear)) {
+      options.clear.call(store);
+    }
   }
 
   function setState(newState) {
@@ -1154,12 +1216,12 @@ function Store(options) {
       callback = _.bind(callback, context);
     }
 
-    Diagnostics.trace('The', store.name, 'store (' + store.id + ') is adding a change listener');
+    Diagnostics.trace('The', store.displayName, 'store (' + store.id + ') is adding a change listener');
     emitter.on(CHANGE_EVENT, callback);
 
     return {
       dispose: function () {
-        Diagnostics.trace('The', store.name, 'store (' + store.id + ') is disposing of a change listener');
+        Diagnostics.trace('The', store.displayName, 'store (' + store.id + ') is disposing of a change listener');
         emitter.removeListener(CHANGE_EVENT, callback);
       }
     };
