@@ -62,6 +62,19 @@ var FooStore = Marty.createStore({
 })
 {% endhighlight %}
 
+We found that a lot of the time action creators just dispatched any arguments it was invoked with. Constants can automatically generate that function for you, all you need to do is not pass in a function as the first argument
+
+{% highlight js %}
+var UserActionCreators = Marty.createActionCreators({
+  deleteUser: UserConstants.DELETE_USER(),
+
+  // Same as
+  deleteUser: UserConstants.DELETE_USER(function (user) {
+    this.dispatch(user);
+  })
+});
+{% endhighlight %}
+
 
 <h2 id="api">API</h2>
 

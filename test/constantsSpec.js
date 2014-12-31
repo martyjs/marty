@@ -1,4 +1,5 @@
 var sinon = require('sinon');
+var _ = require('underscore');
 var expect = require('chai').expect;
 var constants = require('../lib/constants');
 
@@ -35,31 +36,105 @@ describe('Constants', function () {
     });
 
     describe('when you invoke the constant action creator', function () {
-      var actionCreator, creatorFunction;
+      describe('when you pass in a function', function () {
+        var actionCreator, creatorFunction;
 
-      beforeEach(function () {
-        creatorFunction = sinon.spy();
-        actionCreator = actualResult.foo(creatorFunction);
-      });
-
-      it('should create an action creator', function () {
-        expect(actionCreator).to.be.instanceof(Function);
-      });
-
-      it('should have creators type as a property', function () {
-        expect(actionCreator.properties.type).to.eql('foo');
-      });
-
-      describe('when I call the action creator', function () {
-        var expectedArg;
         beforeEach(function () {
-          expectedArg = 1;
-
-          actionCreator(expectedArg);
+          creatorFunction = sinon.spy();
+          actionCreator = actualResult.foo(creatorFunction);
         });
 
-        it('should have called the creator function', function () {
-          expect(creatorFunction).to.have.been.calledWith(expectedArg);
+        it('should create an action creator', function () {
+          expect(actionCreator).to.be.instanceof(Function);
+        });
+
+        it('should have creators type as a property', function () {
+          expect(actionCreator.properties.type).to.eql('foo');
+        });
+
+        describe('when I call the action creator', function () {
+          var expectedArg;
+          beforeEach(function () {
+            expectedArg = 1;
+
+            actionCreator(expectedArg);
+          });
+
+          it('should have called the creator function', function () {
+            expect(creatorFunction).to.have.been.calledWith(expectedArg);
+          });
+        });
+      });
+
+      describe('when I dont pass in a function as the first argument', function () {
+        var actionCreator, actionCreatorContext;
+
+        beforeEach(function () {
+          actionCreator = actualResult.foo();
+          actionCreatorContext = { dispatch: sinon.spy() };
+        });
+
+        it('should create an action creator', function () {
+          expect(actionCreator).to.be.instanceof(Function);
+        });
+
+        it('should have creators type as a property', function () {
+          expect(actionCreator.properties.type).to.eql('foo');
+        });
+
+        describe('when I call the action creator', function () {
+          var expectedArg1, expectedArg2;
+          beforeEach(function () {
+            expectedArg1 = 1;
+            expectedArg2 = 'foo';
+
+            actionCreator.call(actionCreatorContext, expectedArg1, expectedArg2);
+          });
+
+          it('should have called the creator function', function () {
+            expect(actionCreatorContext.dispatch).to.have.been.calledWith(expectedArg1, expectedArg2);
+          });
+        });
+      });
+
+      describe('when I pass in an object literal as the first argument', function () {
+        var actionCreator, actionCreatorContext, customProperties;
+
+        beforeEach(function () {
+          customProperties = {
+            foo: 'bar',
+            bar: 'baz'
+          };
+          actionCreatorContext = { dispatch: sinon.spy() };
+          actionCreator = actualResult.foo(customProperties);
+        });
+
+        it('should create an action creator', function () {
+          expect(actionCreator).to.be.instanceof(Function);
+        });
+
+        it('should have creators type as a property', function () {
+          expect(actionCreator.properties.type).to.eql('foo');
+        });
+
+        it('should include the custom properties', function () {
+          _.each(customProperties, function (value, key) {
+            expect(actionCreator.properties[key]).to.eql(value);
+          });
+        });
+
+        describe('when I call the action creator', function () {
+          var expectedArg1, expectedArg2;
+          beforeEach(function () {
+            expectedArg1 = 1;
+            expectedArg2 = 'foo';
+
+            actionCreator.call(actionCreatorContext, expectedArg1, expectedArg2);
+          });
+
+          it('should have called the creator function', function () {
+            expect(actionCreatorContext.dispatch).to.have.been.calledWith(expectedArg1, expectedArg2);
+          });
         });
       });
     });

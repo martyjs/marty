@@ -5,13 +5,16 @@ var ActionPayload = require('../lib/actionPayload');
 
 describe('ActionPayload', function () {
   var action, store, storeState, actionType, args, source, creator;
-  var name, nextState, view, viewHandler, storeHandler, lastState, expectedError;
+  var id, timestamp, name, nextState, view, viewHandler, storeHandler, lastState, expectedError;
 
   beforeEach(function () {
-    actionType = 'foo';
-    args = [1, 2, 3];
+    id = '123';
+    verbose = true;
     source = 'VIEW';
+    args = [1, 2, 3];
+    actionType = 'foo';
     creator = 'createFoo';
+    timestamp = new Date();
     storeState = { store: 1 };
 
     store = {
@@ -24,6 +27,9 @@ describe('ActionPayload', function () {
     };
 
     action = new ActionPayload({
+      id: id,
+      verbose: verbose,
+      timestamp: timestamp,
       type: actionType,
       arguments: args,
       source: source,
@@ -33,12 +39,15 @@ describe('ActionPayload', function () {
 
   describe('#toJSON()', function () {
     it('should return the action as an object literal', function () {
-      expect(_.omit(action.toJSON(), 'id')).to.eql({
+      expect(action.toJSON()).to.eql({
+        id: id,
         type: actionType,
         source: source,
         creator: creator,
+        verbose: verbose,
         handlers: [],
         status: 'PENDING',
+        timestamp: timestamp,
         arguments: args
       });
     });
