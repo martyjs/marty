@@ -9,14 +9,14 @@ describe('Marty#serializeState()', function () {
     store1ExpectedState = { initial: 'store1' };
 
     Store1 = Marty.createStore({
-      name: 'store1',
+      displayName: 'store1',
       serialize: function () {
         return store1ExpectedState;
       }
     });
 
     Store2 = Marty.createStore({
-      name: 'store2',
+      displayName: 'store2',
       serialize: function () {
         return storeSerializedState;
       }

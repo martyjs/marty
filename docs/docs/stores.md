@@ -67,7 +67,7 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h3 id="name">name</h3>
+<h3 id="displayName">displayName</h3>
 
 An (optional) display name for the store. Used for richer debugging.
 

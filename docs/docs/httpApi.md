@@ -67,10 +67,6 @@ var UsersAPI = Marty.createHttpAPI({
 });
 {% endhighlight %}
 
-<h3 id="name">name</h3>
-
-An (optional) display name for the HTTP API. Used for richer debugging.
-
 <h3 id="baseUrl">baseUrl</h3>
 
 An (optional) base url to prepend to any urls.

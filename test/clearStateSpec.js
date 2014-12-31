@@ -9,14 +9,14 @@ describe('Marty#clearState()', function () {
     store2ExpectedState = { initial: 'store2' };
 
     Store1 = Marty.createStore({
-      name: 'store1',
+      displayName: 'store1',
       getInitialState: function () {
         return store1ExpectedState;
       }
     });
 
     Store2 = Marty.createStore({
-      name: 'store2',
+      displayName: 'store2',
       getInitialState: function () {
         return store2ExpectedState;
       }
