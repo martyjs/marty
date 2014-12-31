@@ -185,7 +185,7 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h3 id="name">name</h3>
+<h3 id="displayName">displayName</h3>
 
 <p>An (optional) display name for the store. Used for richer debugging.</p>
 
@@ -211,8 +211,8 @@
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">foo</span><span class="p">:</span> <span class="s1">'ADD_USER'</span><span class="p">,</span>
-    <span class="na">bar</span><span class="p">:</span> <span class="p">[</span><span class="s1">'ADD_USER'</span><span class="p">,</span> <span class="s1">'UPDATE_USER'</span><span class="p">],</span>
+    <span class="na">foo</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">,</span>
+    <span class="na">bar</span><span class="p">:</span> <span class="p">[</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">,</span> <span class="s1">'UPDATE_USER'</span><span class="p">],</span>
     <span class="na">baz</span><span class="p">:</span> <span class="p">{</span> <span class="na">source</span><span class="p">:</span> <span class="s1">'VIEW'</span> <span class="p">},</span>
     <span class="na">bam</span><span class="p">:</span> <span class="p">[{</span> <span class="na">source</span><span class="p">:</span> <span class="s1">'VIEW'</span> <span class="p">},</span> <span class="s1">'USER_DELETED'</span><span class="p">]</span>
   <span class="p">},</span>
@@ -444,6 +444,14 @@
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span> <span class="c1">// PENDING</span></code></pre></div>
 
+<h3 id="fetch_done">fetch.done(result)</h3>
+
+<p>Returns a done fetch result</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">result</span><span class="p">)</span> <span class="c1">// DONE, { ... }</span></code></pre></div>
+
 <h3 id="fetch_failed">fetch.failed(error)</h3>
 
 <p>Returns a failed fetch result</p>
@@ -452,13 +460,13 @@
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { ... }</span></code></pre></div>
 
-<h3 id="fetch_done">fetch.done(result)</h3>
+<h3 id="fetch_notFound">fetch.notFound()</h3>
 
-<p>Returns a done fetch result</p>
+<p>Returns a failed fetch result with a NotFound error</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">notFound</span><span class="p">();</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">result</span><span class="p">)</span> <span class="c1">// DONE, { ... }</span></code></pre></div>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">failed</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { status: 404 }</span></code></pre></div>
 
 <h3 id="waitFor">waitFor(*stores)</h3>
 
@@ -598,7 +606,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.6.0</li>
+        <li>v0.7.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

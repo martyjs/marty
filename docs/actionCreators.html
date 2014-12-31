@@ -132,104 +132,75 @@
       <div class="bs-docs-section">
         <p>Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state.</p>
 
-<p>All actions have a type which is string which gives a terse description of what the action does (e.g. &quot;UPDATE_USER_EMAIL&quot;). Stores listen for new actions (using the <a href="/docs/dispatcher.html">dispatcher</a>) and use <a href="/docs/stores.html#handlers">action&#39;s type to determine whether to do something with it</a>. Using strings helps us build loosely coupled applications that can grow without increasing complexity.</p>
+<p>All actions have a type which is string which gives a terse description of what the action does (e.g. &quot;UPDATE_USER_EMAIL&quot;). Stores listen for new actions (using the <a href="/docs/dispatcher.html">dispatcher</a>) and use <a href="/docs/stores.html#handlers">action&#39;s type to determine whether to do something with it</a>. Action types help us build loosely coupled applications that can grow without increasing complexity.</p>
 
-<p>Lets look at how you define an action creator using marty:</p>
+<p><a href="/docs/constants.html">Constants</a> provide a simple way of creating action creators for a type</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">updateEmail</span><span class="p">:</span> <span class="p">[</span><span class="s2">"UPDATE_EMAIL"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_EMAIL"</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
     <span class="p">...</span>
-  <span class="p">}]</span>
+  <span class="p">})</span>
 <span class="p">});</span>
 
 <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
 
-<p>In this case the actions type is &quot;UPDATE_EMAIL&quot; and the second function in the array is the action which will be invoked when you call <code>updateEmail</code>. We found that more often than not the action type is the same as the actions function name so by convention we camelize, underscore and upper case it. In the above example, specifying the action type is superfluous because updateEmail becomes &quot;UPDATE_EMAIL&quot;.</p>
+<p>If your action wants to make a change to the local state, you can use <code>this.dispatch()</code>.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">updateEmail</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">...</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/dispatcher'</span><span class="p">);</span>
 
-<p>If you want to make a change locally, you can use <code>this.dispatch()</code>.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">updateEmail</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="p">})</span>
 <span class="p">});</span>
 
-<span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="c1">// =&gt; "UPDATE_EMAIL"</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">arguments</span><span class="p">)</span> <span class="c1">// =&gt; [123, "foo@bar.com"];</span>
 <span class="p">});</span>
 
 <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
 
-<p>Action creators become more complex when you start involving remote requests since they involve asynchronous calls and have the potential to fail. Traditionally you would pass in a callback or return a promise but comply with Flux&#39;s unidirectional data flow rule. So we need a different approach to ensure data is flowing in the right direction.</p>
+<p>You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:</p>
 
-<p>If an action fails then an extra action is dispatched with the type <code>{action type}_FAILED</code> (e.g. <code>CREATE_USER_FAILED</code>) that contains the error allowing you to update your state.</p>
+<ul>
+<li>When an action is about to start
 
-<p>Marty also has an Actions store (<code>Marty.Stores.Actions</code>) which knows about all actions. When you create an action, it will return an <strong>action token</strong> which you can use to get the status of an action.</p>
+<ul>
+<li><code>ACTION_STARTING</code> (see <code>require(&#39;marty/constants/actions&#39;)</code>)</li>
+<li><code>{Action Type}_STARTING</code> (e.g. <code>UPDATE_EMAIL_STARTING</code>)</li>
+</ul></li>
+<li>When an action is done
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">});</span>
+<ul>
+<li><code>ACTION_DONE</code> (see <code>require(&#39;marty/constants/actions&#39;)</code>)</li>
+<li><code>{Action Type}_DONE</code> (e.g. <code>UPDATE_EMAIL_DONE</code>)</li>
+</ul></li>
+<li>When an action has failed
 
-<span class="kd">var</span> <span class="nx">createUserToken</span> <span class="o">=</span> <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+<ul>
+<li><code>ACTION_FAILED</code> (see <code>require(&#39;marty/constants/actions&#39;)</code>)</li>
+<li><code>{Action Type}_FAILED</code> (e.g. <code>UPDATE_EMAIL_FAILED</code>)</li>
+</ul></li>
+</ul>
 
-<span class="nx">Marty</span><span class="p">.</span><span class="nx">Stores</span><span class="p">.</span><span class="nx">Actions</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">getAction</span><span class="p">(</span><span class="nx">createUserAction</span><span class="p">);</span> <span class="c1">// Shortcut for Marty.Stores.Actions.getAction()</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span>
-<span class="p">});</span></code></pre></div>
-
-<p>Like <a href="/docs/stores.html#fetches">store fetches</a>, an action&#39;s status can either be <strong>pending</strong>, <strong>done</strong> or <strong>error</strong>. If you are using the <a href="/docs/stateMixin.html">state mixin</a> then it automatically listens to the actions store (<a href="/docs/stateMixin.html#listenToActions">unless you tell it not to</a>).</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserFormState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
-  <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="na">createUser</span><span class="p">:</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">getAction</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">createUserToken</span><span class="p">)</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-
-<span class="kd">var</span> <span class="nx">UserForm</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">createUser</span><span class="p">.</span><span class="nx">when</span><span class="p">({</span>
-      <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"pending"</span><span class="o">/&gt;</span><span class="p">;</span>
-      <span class="p">},</span>
-      <span class="na">failed</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"error"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
-</span>      <span class="p">},</span>
-      <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
-</span>      <span class="p">}</span>
-    <span class="p">});</span>
-  <span class="p">},</span>
-  <span class="nx">createUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-      <span class="na">createUserToken</span><span class="p">:</span> <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span>
-    <span class="p">})</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
+<p>If the action creator returns a promise then Marty will wait for the promise to resolve or be rejected before dispatching done/failed actions.</p>
 
 <h2 id="api">API</h2>
 
 <h3 id="createActionCreators">createActionCreators(props)</h3>
 
-<p>To create some new action creators, you call <code>Marty.createActionCreators</code> passing in a set of properties. It returns your action creators as a singleton.</p>
+<p>To create some new action creators, you call <code>Marty.createActionCreators</code> passing in an object literal. It returns your action creators as a singleton.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="nx">UserActions</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="p">})</span>
 <span class="p">});</span></code></pre></div>
 
-<h3 id="name">name</h3>
+<h3 id="displayName">displayName</h3>
 
 <p>An (optional) display name for the action creator. Used for richer debugging.</p>
 
@@ -239,10 +210,6 @@
 
 <p>Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.</p>
 
-<h3 id="getActionType">getActionType(functionName)</h3>
-
-<p>Returns the action type for a given function name. The default implementation will camelize, underscore and upper case the function name (fooBarBaz becomes &quot;FOO_BAR_BAZ&quot;). To implement your own naming strategy you can re-implement this function.</p>
-
 <h2 id="server-action-creators">Server Action Creators</h2>
 
 <p>Action creators often will call an <a href="/docs/httpApi.html">Http API</a> which, when complete, will then call another action creator with the new data. If you are using a module loader (e.g. CommonJS, AMD) it can cause a cyclic dependency between the Action Creator and the HTTP API.</p>
@@ -250,15 +217,15 @@
 <p>The way to get around this is to have a seperate action creator, called a Server Action Creator, that is responsible for handling responses from Http APIs.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">saveUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="na">saveUser</span><span class="p">:</span> <span class="nx">UserActions</span><span class="p">.</span><span class="nx">SAVE_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">saveUser</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="p">})</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">UserServerActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="nx">UserActions</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="p">})</span>
 <span class="p">});</span>
 
 <span class="kd">var</span> <span class="nx">UserAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
@@ -366,7 +333,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.6.0</li>
+        <li>v0.7.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

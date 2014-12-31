@@ -123,46 +123,52 @@
   <div class="bs-docs-header" id="content" >
   <div class="container">
     <h1>Overview</h1>
-    <p>Explaining the core concepts of Marty and how it all fits together</p>
+    <p>Explaining the Flux architecture and how Marty works</p>
   </div>
 </div>
 <div class="container bs-docs-container">
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <p>State is a big problem in the UI. Most JS applications have little or no restrictions on who or how its state can be changed. This makes it difficult to understand why something happens. Anyone who&#39;s spent late nights trying to understand why your application has suddenly stopped working after removing an innocuous line will understand this.</p>
+        <p>State is a big problem in the UI. Most JS applications have few restrictions on how state is changed. This makes it difficult to understand why something happens. Anyone who&#39;s spent late nights trying to understand why their application suddenly stopped working after removing an innocuous line should understand this.</p>
 
 <p>Flux is an answer to that problem. At its most basic level it&#39;s a set of rules about how to manage your applications state. Specifically who can change it, where they can change it and in what direction those changes should be propagated through your application.</p>
 
-<p>There are 3 things you will need to understand: How to tell the application to change its state (<a href="/docs/actionCreators.html">Action creators</a>), How to change the applications state (<a href="/docs/stores.html">Stores</a>) and how to tell the view that the state has changed (<a href="/docs/stateMixin.html">State mixins</a>).</p>
+<p>There are 4 things you will need to understand: How to tell the application to change its state (<a href="/docs/actionCreators.html">Action creators</a>), How to change the applications state (<a href="/docs/stores.html">Stores</a>), how to tell the view that the state has changed (<a href="/docs/stateMixin.html">State mixins</a>) and how to tie them all together (<a href="/docs/constants.html">Constants</a>).</p>
 
-<p>Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. All actions must have a type which is a string describing the action (e.g. &quot;UPDATE_USER_EMAIL&quot;). </p>
+<p>Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. Actions have a type which is a string describing the action (e.g. &quot;UPDATE_USER_EMAIL&quot;). </p>
 
-<p>If an action is making a change to your local state then it can pass its type data along to something called a dispatcher.</p>
+<p>We want to be explicit about the action types in your application so we define them as (<a href="/docs/constants.html">Constants</a>). Constants allow you to loosely couple your application as well as documenting what actions are available (Useful for understanding what your application can do). Constants are also responsible for creating action creators.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">updateUserEmail</span><span class="p">:</span> <span class="p">[</span><span class="s2">"UPDATE_USER_EMAIL"</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_USER_EMAIL"</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateUserEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_USER_EMAIL</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="p">})</span>
 <span class="p">});</span>
 
 <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
 
-<p>The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.</p>
+<p>In the above scenario, <code>UserConstants.UPDATE_USER_EMAIL</code> creates an action creator which, when invoked, will create an action with type <code>UPDATE_USER_EMAIL</code>.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Marty</span><span class="p">.</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+<p>If an action is making a change to your local state then it can pass its type data along to something called a dispatcher. The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/dispatcher'</span><span class="p">);</span>
+
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'action with type'</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="s1">', has been dispatched) ;
 });
 
-Marty.dispatcher.dispatch({
-  type: '</span><span class="nx">foo</span><span class="err">'</span> 
+Dispatcher.dispatch({
+  type: '</span><span class="nx">foo</span><span class="err">'</span>
 <span class="p">});</span></code></pre></div>
 
 <p>Normally you don&#39;t manually register callbacks with the dispatcher, instead you create stores which do this for you. Stores hold information about a domain. That domain could be a collection of entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could be some information about something specific (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">updateEmail</span><span class="p">:</span> <span class="s2">"UPDATE_USER_EMAIL"</span>
+    <span class="na">updateEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_USER_EMAIL</span>
   <span class="p">},</span>
   <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{};</span>
@@ -176,21 +182,21 @@ Marty.dispatcher.dispatch({
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>When your application starts, each store will automatically start listening to the dispatcher. When an action is dispatched, each store will check its <a href="/docs/stores.html#handlers"><code>handlers</code> hash</a> to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler should then update its internal state (all stored in <code>this.state</code>). </p>
+<p>When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its <a href="/docs/stores.html#handlers"><code>handlers</code> hash</a> to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in <code>this.state</code>).</p>
 
-<p>The next (and final) step is how to notify views that theres new data. Like the dispatcher, you can register to be notified of any changes to a store.</p>
+<p>The next (and final) step is to notify views about the new data. Like the dispatcher, you can register to be notified of any changes to a store.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'User store has changed'</span><span class="p">,</span> <span class="nx">state</span><span class="p">);</span>
 <span class="p">});</span></code></pre></div>
 
-<p>So if you have a view thats interested in a domain it ask the store to notify it of any changes. When the store updates, your view just rerenders itself with whatever the new state of the store is. You might be asking what if the store changed something your view isn&#39;t interested in (e.g. a different entity)? Thanks to Reacts virtual DOM it doesn&#39;t really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views <em>significantly simpler</em> since you just render whatever the store tells you to render.</p>
+<p>If you have a view thats interested in a domain, it can ask the store to notify it of any changes. When the store updates, your view just rerenders itself with the new state. You might ask, &quot;what if the store changed something your view isn&#39;t interested in (e.g. a different entity)?&quot;. Thanks to Reacts virtual DOM it doesn&#39;t really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views <em>significantly simpler</em> since you just render whatever the store tells you to render.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
   <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span>
       <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span> 
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span>
                <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">}</span>
                <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="sr">/input</span><span class="err">&gt;
 </span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
@@ -218,7 +224,7 @@ Marty.dispatcher.dispatch({
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>As your application grows you start to find that there is a lot of boiler plate code to get views to listen to stores. <a href="/docs/stateMixin.html">State mixins</a> are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:</p>
+<p>As your application grows you start to find that there is a lot of boilerplate code to get views to listen to stores. <a href="/docs/stateMixin.html">State mixins</a> are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStateMixin</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
   <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
@@ -234,7 +240,7 @@ Marty.dispatcher.dispatch({
   <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span>
       <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span> 
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span>
                <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">}</span>
                <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="sr">/input</span><span class="err">&gt;
 </span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
@@ -246,13 +252,13 @@ Marty.dispatcher.dispatch({
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>Whenever you want to change value within your application your data must follow this flow of <a href="/docs/actionCreators.html">Action creator</a> <strong>-&gt;</strong> <a href="/docs/dispatcher.html">Dispatcher</a> <strong>-&gt;</strong> <a href="/docs/stores.html">Store</a> <strong>-&gt;</strong> <a href="/docs/stateMixin.html">State mixin</a> <strong>-&gt;</strong> View. Known as a <strong>unidirectional data flow</strong></p>
+<p>Whenever you want to change a value within your application your data must follow this flow of <a href="/docs/actionCreators.html">Action creator</a> <strong>-&gt;</strong> <a href="/docs/dispatcher.html">Dispatcher</a> <strong>-&gt;</strong> <a href="/docs/stores.html">Store</a> <strong>-&gt;</strong> <a href="/docs/stateMixin.html">State mixin</a> <strong>-&gt;</strong> View. This is known as a <strong>unidirectional data flow</strong>.</p>
 
 <p><center>
   <img src="/img/data-flow.png" alt="Data flow"/>
 </center></p>
 
-<p>While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There&#39;s only one place your application state can change so if you don&#39;t have to dig into all the views to work out what changed a value (Its even easier if you&#39;re using <a href="/docs/stores.html#immutable">immutable data collections</a>). Thanks to action types being stings you have a loosely coupled <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a> architecture which is easy to grow without increasing the complexity of the code base.</p>
+<p>While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There&#39;s only one place your application state can change so you don&#39;t have to dig into all the views to work out where a value was changed (it&#39;s even easier if you&#39;re using <a href="/docs/stores.html#immutable">immutable data collections</a>). Thanks to action types being strings you have a loosely coupled <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a> architecture which is easy to grow without increasing the complexity of the code base.</p>
 
 <h2 id="further-reading">Further reading</h2>
 
@@ -344,7 +350,7 @@ Marty.dispatcher.dispatch({
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.6.0</li>
+        <li>v0.7.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

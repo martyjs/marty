@@ -132,14 +132,24 @@
       <div class="bs-docs-section">
         <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> with the dispatcher a callback with the dispatcher. Whenever an <a href="/docs/actionCreators.html">action creators</a> create actions it is passed to the dispatcher which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
 
-<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a> which is a singleton accessible on <code>Marty</code>.</p>
+<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/dispatcher'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
 <span class="p">});</span>
 
-<span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Action</span><span class="p">(</span><span class="s1">'ADD_FOO'</span><span class="p">,</span> <span class="p">[],</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">constants</span><span class="p">.</span><span class="nx">actionSources</span><span class="p">.</span><span class="nx">VIEW</span><span class="p">);</span>
-<span class="nx">Marty</span><span class="p">.</span><span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span></code></pre></div>
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_FOO'</span> <span class="p">});</span></code></pre></div>
+
+<p>Normally <a href="/docs/actionCreators.html">action creators</a> are responsible for calling the dispatcher. However if you feel the need to dispatch an action elsewhere, Marty expects the dispatch payload to be an instance of <a href="https://github.com/jhollingworth/marty/blob/master/lib/actionPayload.js"><code>ActionPayload</code></a>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/dispatcher'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">ActionPayload</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/actionPayload'</span><span class="p">);</span>
+
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="k">new</span> <span class="nx">ActionPayload</span><span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_FOO'</span>
+<span class="p">}));</span></code></pre></div>
 
 <h2 id="further-reading">Further reading</h2>
 
@@ -230,7 +240,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.6.0</li>
+        <li>v0.7.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

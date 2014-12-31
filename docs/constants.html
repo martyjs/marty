@@ -130,34 +130,65 @@
   <div class="row">
     <div class="col-md-9" role="main">
       <div class="bs-docs-section">
-        <p>When an action creator creates an action, that action has an action type which is just a string identifier (e.g. <code>&#39;DELETE_USER&#39;</code>). The action type is what your stores use to decided whether to handle the action. One of their major benefits is this allows you to loosely couple your actions to your stores (<a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Dementer</a>). This approach does make it difficult to understand at a high level what the application is capable of doing. The solution to this is <strong>Constants</strong>.</p>
+        <p><a href="/docs/actionCreators.html">Actions</a> must have a type which is a terse description of what the action does (e.g. <code>&quot;DELETE_USER&quot;</code>). The main of action types is that they allow you to loosely couple your actions to your stores (<a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Dementer</a>).</p>
 
-<p>Constants are simple object literals where the key and the value are the same. They become a useful reference to help you understand the application (especially useful as the application grows).</p>
+<p>As your application grows you might find it becomes littered with these strings making it difficult to refactor and understand at a high level what actions are available. Marty provides <strong>Constants</strong> as a solution to this problem. </p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">Users</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">DELETE_USER</span><span class="p">:</span> <span class="s1">'DELETE_USER'</span><span class="p">,</span>
-    <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="s1">'RECEIVE_USERS'</span>
-  <span class="p">}</span>
+<p><code>Marty.createConstants</code> will create an object literal where the key is the action type</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span>
+  <span class="s2">"ADD_USER"</span><span class="p">,</span>
+  <span class="s2">"DELETE_USER"</span><span class="p">,</span>
+  <span class="s2">"UPDATE_USER_EMAIL"</span>
+<span class="p">]);</span>
+
+<span class="c1">// returns</span>
+<span class="p">{</span>
+  <span class="na">ADD_USER</span><span class="p">:</span> <span class="p">..,</span>
+  <span class="na">DELETE_USER</span><span class="p">:</span> <span class="p">..,</span>
+  <span class="na">UPDATE_USER_EMAIL</span><span class="p">:</span> <span class="p">..,</span>
 <span class="p">}</span></code></pre></div>
 
-<p>You then reference the constants in the rest of your application</p>
-<div class="highlight"><pre><code class="language-" data-lang="">var UserActionCreators = Marty.createActionCreators({
-  deleteUser: function (user) {
-    this.dispatch(Constants.Users.DELETE_USER, user);
-  }
-});
+<p>The value for each constant is a little more complex. It can be treated as a string however they are actually helper functions for creating action creators</p>
 
-var UsersStore = Marty.createStore({
-  handlers: {
-    deleteUser: Constants.Users.DELETE_USER
-  },
-  deleteUser: function (user) {
-    ...
-  }
-})
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">ADD_USER</span> <span class="o">==</span> <span class="s2">"ADD_USER"</span> <span class="c1">// =&gt; true</span>
 
-</code></pre></div>
+<span class="kd">var</span> <span class="nx">addUser</span> <span class="o">=</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">addUser</span><span class="p">.</span><span class="nx">properties</span><span class="p">)</span> <span class="c1">// =&gt; { type: "ADD_USER" }</span>
+
+<span class="nx">addUser</span><span class="p">({</span> <span class="na">name</span><span class="p">:</span> <span class="s2">"Foo"</span> <span class="p">});</span></code></pre></div>
+
+<p>You can pass in custom properties as the second argument to action creator helper function</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">deleteUser</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">DELETE_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="p">},</span> <span class="p">{</span> <span class="na">foo</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">FooStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">fooAction</span><span class="p">:</span> <span class="p">{</span> <span class="na">foo</span><span class="p">:</span> <span class="kc">true</span> <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="na">fooAction</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<p>We found that a lot of the time action creators just dispatched any arguments it was invoked with. Constants can automatically generate that function for you, all you need to do is not pass in a function as the first argument</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">deleteUser</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">DELETE_USER</span><span class="p">(),</span>
+
+  <span class="c1">// Same as</span>
+  <span class="na">deleteUser</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">DELETE_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="p">})</span>
+<span class="p">});</span></code></pre></div>
+
 <h2 id="api">API</h2>
 
 <h3 id="createConstantsArray">createConstants(<i>Array</i>)</h3>
@@ -169,8 +200,8 @@ var UsersStore = Marty.createStore({
 
 <span class="c1">//returns</span>
 <span class="p">{</span>
-  <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="s1">'RECEIVE_USERS'</span><span class="p">,</span>
-  <span class="na">DELETE_USER</span><span class="p">:</span> <span class="s1">'DELETE_USER'</span>
+  <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="kd">function</span> <span class="nx">RECEIVE_USERS_CREATOR</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+  <span class="nx">DELETE_USER</span><span class="err">:</span> <span class="kd">function</span> <span class="nx">DELETE_USER_CREATOR</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
 <span class="p">}</span></code></pre></div>
 
 <h3 id="createConstantsObj">Marty.createConstants(<i>Object</i>)</h3>
@@ -185,12 +216,12 @@ var UsersStore = Marty.createStore({
 <span class="c1">//returns</span>
 <span class="p">{</span>
   <span class="na">Users</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="s1">'RECEIVE_USERS'</span><span class="p">,</span>
-    <span class="na">DELETE_USER</span><span class="p">:</span> <span class="s1">'DELETE_USER'</span>
+    <span class="na">RECEIVE_USERS</span><span class="p">:</span> <span class="kd">function</span> <span class="nx">RECEIVE_USERS_CREATOR</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+    <span class="na">DELETE_USER</span><span class="p">:</span> <span class="kd">function</span> <span class="nx">DELETE_USER_CREATOR</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
   <span class="p">},</span>
-  <span class="na">Foos</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">Bars</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">ADD_BAR</span><span class="p">:</span> <span class="s1">'ADD_BAR'</span>
+  <span class="nx">Foos</span><span class="err">:</span> <span class="p">{</span>
+    <span class="nl">Bars</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">ADD_BAR</span><span class="p">:</span> <span class="kd">function</span> <span class="nx">ADD_BAR_CREATOR</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></div>
@@ -278,7 +309,7 @@ var UsersStore = Marty.createStore({
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.6.0</li>
+        <li>v0.7.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
