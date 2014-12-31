@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.0',
+  version: '0.7.1',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -1099,6 +1099,8 @@ function Store(options) {
       if (cacheError) {
         failedFetches[options.id] = error;
       }
+
+      fetchFinished();
 
       return fetch.failed(error);
     }

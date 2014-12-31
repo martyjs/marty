@@ -355,6 +355,8 @@ describe('Store#fetch()', function () {
 
     describe('when the remote fetch returns a promise', function () {
       describe('when the promise fails', function () {
+        var remoteFetch;
+
         beforeEach(function (done) {
           expectedError = new Error();
 
@@ -380,6 +382,22 @@ describe('Store#fetch()', function () {
 
         it('should have the error', function () {
           expect(actualResult.error).to.equal(expectedError);
+        });
+
+        describe('when I try to call the fetch again', function () {
+          beforeEach(function () {
+            remoteFetch = sinon.spy();
+            store.fetch({
+              id: 'foo',
+              locally: noop,
+              cacheError: false,
+              remotely: remoteFetch
+            });
+          });
+
+          it('should call the remote fetch again', function () {
+            expect(remoteFetch).to.have.been.calledOnce;
+          });
         });
       });
 
