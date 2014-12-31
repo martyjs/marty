@@ -23,7 +23,7 @@ var UsersAPI = Marty.createHttpAPI({
     });
   },
   createUser: function (user) {
-    this.post({ url: '/users', data: user })
+    this.post({ url: '/users', body: user })
         .then(function (res) {
           UserActionCreators.receiveUser(res.body);
         });
@@ -52,7 +52,7 @@ To create a new HTTP API, you call <code>Marty.createHttpAPI</code> passing in a
 {% highlight js %}
 var UsersAPI = Marty.createHttpAPI({
   createUser: function (user) {
-    this.post({ url: '/users', data: user })
+    this.post({ url: '/users', body: user })
         .then(function (res) {
           UserActionCreators.receiveUser(res.body);
         });
@@ -74,7 +74,7 @@ var UsersAPI = Marty.createHttpAPI({
     this.request({
       url: '/users',
       method: 'POST',
-      data: { name: 'foo' }
+      body: { name: 'foo' }
     });
   }
 });
