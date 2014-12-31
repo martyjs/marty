@@ -19,34 +19,27 @@ var UsersAPI = Marty.createHttpAPI({
   baseUrl: 'http://foo.com'
   getAll: function (users) {
     return this.get('/users').then(function (res) {
-      UserActionCreators.receiveAll(res.content);
+      UserActionCreators.receiveAll(res.body);
     });
   },
   createUser: function (user) {
     this.post({ url: '/users', data: user })
         .then(function (res) {
-          UserActionCreators.receiveUser(res.content);
+          UserActionCreators.receiveUser(res.body);
         });
   }
 });
 {% endhighlight %}
 
-One scenario to consider is what happens if an HTTP request fails. It's already possible to [rollback changes to stores](/docs/stores.html#rollback) so the recommend approach is to pass the rollback function through to the API call so that it can be invoked if an error occurs.
+If the request is successful then the promise resolves with a response object. If the response content type is ``application/json`` then Marty will attempt to deserialize the body which is accessible at ``res.body``.
 
 {% highlight js %}
-var UsersAPI = Marty.createHttpAPI({
-  createUser: function (user, rollback) {
-    this.post({ url: '/users', data: user })
-        .catch(rollback);
-  }
-});
-
-var UserActions = Marty.createActionCreators({
-  createUser: function (user) {
-    var action = this.dispatch('ADD_USER', user);
-
-    UsersAPI.createUser(user, action.rollback);
-  }
+this.get('/foo').then(function(res) {
+  console.log(res.body);
+  console.log(res.headers.get('Content-Type'));
+  console.log(res.headers.get('Date'));
+  console.log(res.status);
+  console.log(res.statusText);
 })
 {% endhighlight %}
 
@@ -61,7 +54,7 @@ var UsersAPI = Marty.createHttpAPI({
   createUser: function (user) {
     this.post({ url: '/users', data: user })
         .then(function (res) {
-          UserActionCreators.receiveUser(res.content);
+          UserActionCreators.receiveUser(res.body);
         });
   }
 });
