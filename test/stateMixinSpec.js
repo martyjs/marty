@@ -34,14 +34,14 @@ describe('StateMixin', function () {
       action = new ActionPayload();
       expectedState = {};
       store = {
-        name: 'foo',
+        displayName: 'foo',
         action: action,
         addChangeListener: sinon.spy(),
         getState: sinon.stub().returns(expectedState),
       };
 
       mixin = new StateMixin({
-        name: 'bar',
+        displayName: 'bar',
         listenTo: store,
         getState: function () {
           return store.getState();
@@ -412,6 +412,7 @@ describe('StateMixin', function () {
   function renderClassWithMixin(mixin, render) {
     return TestUtils.renderIntoDocument(React.createElement(React.createClass({
       mixins: [mixin],
+      displayName: mixin.displayName,
       render: render || function () {
         return React.createElement('div', null, this.state.name);
       }

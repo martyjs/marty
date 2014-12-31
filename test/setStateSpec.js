@@ -7,11 +7,11 @@ describe('Marty#setState()', function () {
 
   beforeEach(function () {
     Store1 = Marty.createStore({
-      name: 'store1'
+      displayName: 'store1'
     });
 
     Store2 = Marty.createStore({
-      name: 'store2'
+      displayName: 'store2'
     });
   });
 

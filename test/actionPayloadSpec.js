@@ -1,10 +1,9 @@
 var sinon = require('sinon');
-var _ = require('underscore');
 var expect = require('chai').expect;
 var ActionPayload = require('../lib/actionPayload');
 
 describe('ActionPayload', function () {
-  var action, store, storeState, actionType, args, source, creator;
+  var action, store, storeState, actionType, args, source, creator, verbose;
   var id, timestamp, name, nextState, view, viewHandler, storeHandler, lastState, expectedError;
 
   beforeEach(function () {
@@ -19,7 +18,7 @@ describe('ActionPayload', function () {
 
     store = {
       action: action,
-      name: 'foo-store',
+      displayName: 'foo-store',
       addChangeListener: sinon.spy(),
       getState: function () {
         return storeState;
@@ -135,7 +134,7 @@ describe('ActionPayload', function () {
     });
 
     it('should store the name of the store', function () {
-      expect(action.handlers[0].store).to.equal(store.name);
+      expect(action.handlers[0].store).to.equal(store.displayName);
     });
 
     it('should store the name of the action handler', function () {
