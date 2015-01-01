@@ -30,4 +30,11 @@ redcarpet:
 sass:
   style: :compressed
   sass_dir: _css
+collections:
+  guides:
+    title: Guides
+    output: true
+  api:
+    title: API
+    output: true
 current_version: 0.7.1

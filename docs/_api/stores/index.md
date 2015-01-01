@@ -1,53 +1,11 @@
 ---
-layout: docs
-title: Stores
-id: stores
-group: docs
-header_colour: 1DACA8
-order: 2
+layout: page
+id: api-stores
+title: Stores API
+section: Stores
 ---
 
-Stores hold information about a domain. That domain could be a collection of entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or it could be some information about something specific (Like a [Backbone Model](http://backbonejs.org/#Model)). It is responsible for processing actions from the [dispatcher](/docs/dispatcher.html), updating its own state and notifying interested parties when its state changes.
-
-The store should be the **only** place where your applications state changes. If your views want to update its state, it should call an [action creator](/docs/actionCreators.html) which dispatches an action that stores listen to and update themselves and then notify the views about their new state.
-
-{% highlight js %}
-var UsersStore = Marty.createStore({
-  name: 'Users',
-  handlers: {
-    addUser: Constants.RECEIVE_USER
-  },
-  getInitialState: function () {
-    return {};
-  },
-  addUser: function (user) {
-    this.state[user.id] = user;
-    this.hasChanged();
-  },
-  getUser: function (id) {
-    return this.fetch({
-      id: id,
-      locally: function () {
-        return this.state[id];
-      },
-      remotely: function () {
-        return UserAPI.getUser(id);
-      }
-    });
-  }
-});
-{% endhighlight %}
-
-A store is a singleton which is created using [<code>Marty.createStore</code>](#createStore). When the store is created it will call [<code>getInitialState</code>](#getInitialState) which should return an object that all the stores state will live in. This state is accessible by calling <code>this.state</code>.
-
-When an action is dispatched, the store will check its [``handlers`` hash](/docs/stores.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. If the handler updates the stores state state, it can call [<code>hasChanged</code>](#hasChanged) which will notify any listening views of its new state.
-
-If your view needs some data, it should request it from the relevant store. The store is responsible for sourcing it, either locally or from the server. The [fetch](/docs/stores.html#fetch) API helps simplify handling async operations.
-
-
-<h2 id="api">API</h2>
-
-<h3 id="createStore">createStore(props)</h3>
+<h2 id="createStore">Marty.createStore(props)</h2>
 
 To create a new store, you call <code>Marty.createStore</code> passing in a set of instance properties. It returns a singleton store which is listening to the dispatcher.
 
@@ -67,15 +25,15 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h3 id="displayName">displayName</h3>
+<h2 id="displayName">displayName</h2>
 
 An (optional) display name for the store. Used for richer debugging.
 
-<h3 id="handlers">handlers</h3>
+<h2 id="handlers">handlers</h2>
 
 The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an [action predicate](#action-predicates).
 
-When invoked the handlers arguments are [the arguments passed to the dispatcher](/docs/actionCreators.html#dispatch). The original action is available by calling <code>this.action</code>.
+When invoked the handlers arguments are [the arguments passed to the dispatcher](/api/action-creators/index.html#dispatch). The original action is available by calling <code>this.action</code>.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
@@ -89,7 +47,7 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h4 id="action-predicates">Action predicates</h4>
+<h3 id="action-predicates">Action predicates</h3>
 
 An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="http://underscorejs.org/#findWhere">where query</a>. Some examples of action predicates:
 
@@ -115,11 +73,11 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h4 id="rollback">Rollback</h4>
+<h3 id="rollback">Rollback</h3>
 
 There are a number of cases where it would be useful to be able to rollback an action (e.g. if you've optimistically added an entity to your locally store but the associated request to the server failed).
 
-To provide a rollback to an action handler, simply return a function from the action handler. If an [action is rolled back](/docs/actionCreators.html#dispatch), the function you return will be called.
+To provide a rollback to an action handler, simply return a function from the action handler. If an action is rolled back, the function you return will be called.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
@@ -139,17 +97,17 @@ var UsersStore = Marty.createStore({
 {% endhighlight %}
 
 
-<h3 id="getInitialState">getInitialState()</h3>
+<h2 id="getInitialState">getInitialState()</h2>
 
 <code>getInitialState</code> is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the [state](#state) property.
 
 If you do not implement getInitialState or you do not return anything then the default state is an empty object literal (<code>{}</code>).
 
-<h3 id="state">state</h3>
+<h2 id="state">state</h2>
 
 The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.
 
-If you want to change the state to a new instance (or if you are using [immutable data collections](immutable)) you can set the states value or call <code>this.setState(state)</code>
+If you want to change the state to a new instance (or if you are using [immutable data collections](/guides/stores/immutable-data-collections.html)) you can set the states value or call <code>this.setState(state)</code>
 
 {% highlight js %}
 addUsers: function (users) {
@@ -163,7 +121,7 @@ addUsers: function (users) {
 
 If the new state does not equal the current state then [hasChanged](#hasChanged) will be called after updating the stores state.
 
-<h3 id="addChangeListener">addChangeListener(callback, [context])</h3>
+<h2 id="addChangeListener">addChangeListener(callback, [context])</h2>
 
 If you want to be notified of changes to a store, you can register a callback by calling <code>Store.addChangeListener</code>. You can optionally pass the functions context as a second argument.
 
@@ -180,7 +138,7 @@ var listener = UserStore.addChangeListener(function (state, store) {
 listener.dispose();
 {% endhighlight %}
 
-<h3 id="hasChanged">hasChanged()</h3>
+<h2 id="hasChanged">hasChanged()</h2>
 
 Calls any [registered callbacks](#addChangeListener).
 
@@ -196,7 +154,7 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h3 id="fetch">fetch(options)</h3>
+<h2 id="fetch">fetch(options)</h2>
 
 When requesting data from a store we should assume that it might require an async operation. <code>Store#fetch</code> provides a simple syntax that allows you to encapsulate that asynchronicity in a flux way. The <code>fetch</code> function allows you to specify how to get the state locally and remotely and returns an object that represents the current state of that request.
 
@@ -204,7 +162,7 @@ When requesting data from a store we should assume that it might require an asyn
 var UsersStore = Marty.createStore({
   getUser: function (id) {
     return this.fetch({
-      id: id,
+      id: api-id,
       locally: function () {
         return this.state[id];
       },
@@ -228,7 +186,7 @@ UsersStore.getUser(123).when({
 });
 {% endhighlight %}
 
-<h4>Options</h4>
+<h3>Options</h3>
 
 <table class="table table-bordered table-striped">
   <thead>
@@ -291,7 +249,7 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h4>Fetch Result</h4>
+<h3>Fetch Result</h3>
 
 Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either **PENDING**, **DONE** OR **ERROR**. You can get the status by accessing ``fetch.status`` or with the helpers ``fetch.pending``, ``fetch.failed`` or ``fetch.done``.
 
@@ -345,7 +303,7 @@ var component = user.when({
 });
 {% endhighlight %}
 
-<h3 id="fetch_pending">fetch.pending()</h3>
+<h2 id="fetch_pending">fetch.pending()</h2>
 
 Returns a pending fetch result
 
@@ -355,7 +313,7 @@ var fetch = Store.fetch.pending();
 console.log(fetch.status) // PENDING
 {% endhighlight %}
 
-<h3 id="fetch_done">fetch.done(result)</h3>
+<h2 id="fetch_done">fetch.done(result)</h2>
 
 Returns a done fetch result
 
@@ -365,7 +323,7 @@ var fetch = Store.fetch.done(result);
 console.log(fetch.status, fetch.result) // DONE, { ... }
 {% endhighlight %}
 
-<h3 id="fetch_failed">fetch.failed(error)</h3>
+<h2 id="fetch_failed">fetch.failed(error)</h2>
 
 Returns a failed fetch result
 
@@ -375,7 +333,7 @@ var fetch = Store.fetch.failed(error);
 console.log(fetch.status, fetch.error) // FAILED, { ... }
 {% endhighlight %}
 
-<h3 id="fetch_notFound">fetch.notFound()</h3>
+<h2 id="fetch_notFound">fetch.notFound()</h2>
 
 Returns a failed fetch result with a NotFound error
 
@@ -385,7 +343,7 @@ var fetch = Store.fetch.notFound();
 console.log(fetch.failed, fetch.error) // FAILED, { status: 404 }
 {% endhighlight %}
 
-<h3 id="waitFor">waitFor(*stores)</h3>
+<h2 id="waitFor">waitFor(*stores)</h2>
 
 If an action handler is dependant on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.
 
@@ -404,42 +362,6 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h3 id="#dispatchToken">dispatchToken</h3>
+<h2 id="#dispatchToken">dispatchToken</h2>
 
 Dispatch token that is returned from [<code>Dispatcher.register()</code>](http://facebook.github.io/flux/docs/dispatcher.html#api). Used by [<code>waitFor()</code>](#waitFor).
-
-<h2 id="immutable">Immutable data collections</h2>
-
-Within a Flux application you want the stores to be the **only** place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.
-
-The solution this is to use immutable data collections like [immutable.js](http://facebook.github.io/immutable-js/) or [mori](http://swannodette.github.io/mori/). Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.
-
-{% highlight js %}
-var users = Immutable.List.of("foo");
-var users2 = users.push("bar");
-
-console.log(users) // ["foo"]
-console.log(users2) // ["foo", "bar"]
-{% endhighlight %}
-
-Using immutable data collections help you sleep soundly with knowledge that nothing outside of stores will be able to change its state.
-
-While immutable data collections are not required, we try to make it as easy to use as possible. For example, you can simple call this.state with the mutated collection and internally it will check if the collection has changed and handle notifying and listeners.
-
-{% highlight js %}
-var UsersStore = Marty.createStore({
-  handlers: {
-    addUser: Constants.RECEIVE_USER
-  },
-  getInitialState: function () {
-    return Immutable.List();
-  },
-  addUser: function (user) {
-    this.state = this.state.push(user);
-  }
-});
-{% endhighlight %}
-
-<h2 id="further-reading">Further reading</h2>
-
-* [Original article about Flux](http://facebook.github.io/flux/docs/overview.html#stores)

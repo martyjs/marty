@@ -89,6 +89,19 @@ body {
   border: 1px solid white;
 }
 
+.page-title {
+  border-bottom: solid 1px #CCC;
+  padding-bottom: 10px;
+  margin-top: 0;
+}
+
+.bs-docs-container {
+  margin-top: 15px;
+}
+
+.bs-docs-content {
+  padding-right: 0;
+}
 
 /*
  * Main navigation
@@ -98,8 +111,8 @@ body {
 
 .bs-docs-nav {
   margin-bottom: 0;
-  background-color: #fff;
-  border-bottom: 0;
+  /*background-color: #F5F5F5;*/
+  border-bottom: solid 1px #CCC;
 }
 .bs-home-nav .bs-nav-b {
   display: none;
@@ -107,19 +120,28 @@ body {
 .bs-docs-nav .navbar-brand,
 .bs-docs-nav .navbar-nav > li  a {
   font-weight: 500;
-  color: #2a2a2a;
+  color: #777;
+  border-bottom: 2px solid white;
 }
 
 .bs-docs-nav .navbar-brand {
   font-weight: bold;
+  color: black;
 }
 
 .bs-docs-nav .navbar-nav > li > a:hover,
 .bs-docs-nav .navbar-nav .active > a,
 .bs-docs-nav .navbar-nav .active > a:hover {
   color: black;
-  background-color: #f9f9f9;
+  background-color: white;
+  border-bottom: 2px solid #d26911;
 }
+
+/*.bs-docs-nav .navbar-nav .active > a {
+  border-left: solid 1px #ccc;
+  border-right: solid 1px #CCC;
+}*/
+
 .bs-docs-nav .navbar-toggle .icon-bar {
   background-color: #2a2a2a;
 }
@@ -467,41 +489,44 @@ body {
 .bs-docs-sidebar.affix {
   position: static;
 }
-@media (min-width: 768px) {
-  .bs-docs-sidebar {
-    padding-left: 20px;
-  }
-}
 
 /* First level of nav */
 .bs-docs-sidenav {
   margin-bottom: 20px;
 }
 
+.bs-docs-sidebar {
+  padding: 0;
+}
+
 /* All levels of nav */
 .bs-docs-sidebar .nav > li > a {
   display: block;
-  padding: 4px 20px;
+  padding: 4px 0;
   font-size: 13px;
   font-weight: 500;
-  color: #999;
+  color: #777;
 }
 .bs-docs-sidebar .nav > li > a:hover,
 .bs-docs-sidebar .nav > li > a:focus {
-  padding-left: 19px;
   color: #2a2a2a;
   text-decoration: none;
   background-color: transparent;
-  border-left: 1px solid #2a2a2a;
 }
-.bs-docs-sidebar .nav > .active > a,
-.bs-docs-sidebar .nav > .active:hover > a,
-.bs-docs-sidebar .nav > .active:focus > a {
-  padding-left: 18px;
+.bs-docs-sidebar > .nav > .nav-section > a.active,
+.bs-docs-sidebar > .nav > .nav-section > a.active:hover,
+.bs-docs-sidebar > .nav > .nav-section > a.active:focus {
   font-weight: bold;
   color: #2a2a2a;
   background-color: transparent;
-  border-left: 2px solid #2a2a2a;
+}
+
+.bs-docs-sidebar .nav > .nav-section > .nav > li > a.active,
+.bs-docs-sidebar .nav > .nav-section > .nav > li > a.active:hover,
+.bs-docs-sidebar .nav > .nav-section > .nav > li > a.active:focus {
+  font-weight: bold;
+  color: #2a2a2a;
+  background-color: transparent;
 }
 
 /* Nav: second level (shown on .active) */
@@ -512,18 +537,14 @@ body {
 .bs-docs-sidebar .nav .nav > li > a {
   padding-top: 1px;
   padding-bottom: 1px;
-  padding-left: 30px;
+  padding-left: 15px;
   font-size: 12px;
   font-weight: normal;
 }
-.bs-docs-sidebar .nav .nav > li > a:hover,
-.bs-docs-sidebar .nav .nav > li > a:focus {
-  padding-left: 29px;
-}
+
 .bs-docs-sidebar .nav .nav > .active > a,
 .bs-docs-sidebar .nav .nav > .active:hover > a,
 .bs-docs-sidebar .nav .nav > .active:focus > a {
-  padding-left: 28px;
   font-weight: 500;
 }
 

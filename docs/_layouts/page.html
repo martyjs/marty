@@ -3,17 +3,51 @@ layout: default
 sectionid: page
 ---
 
-<div class="bs-docs-header" id="content">
-  <div class="container">
-    <h1>{{page.title}}</h1>
-    <p>{{page.description}}</p>
-  </div>
-</div>
 <div class="container bs-docs-container">
-  <div class="row">
-    <div class="col-md-12" role="main">
-      <div class="bs-docs-section">
-        {{content}}
-      </div>
+  <div class="bs-docs-sidebar hidden-print col-md-2">
+    <ul class="sections-nav nav" role="navigation">
+      {% assign sections = site[page.collection] | group_by:"section" %}
+      {% capture order_data %}{{page.collection}}_section_order{% endcapture %}
+      {% assign section_names = site.data[order_data] %}
+
+      {% for section_name in section_names %}
+        {% capture section_slug %}{{section_name | slugify}}{% endcapture %}
+
+        {% for section in sections %}
+          {% if (section.name == section_name %}
+            {% assign section_items = section.items %}
+          {% endif %}
+        {% endfor %}
+
+        <li {% if page.section == section_name %} class="nav-section active"{% else %} class="nav-section" {% endif %}>
+          {% capture section_url %}/{{page.collection}}/{{section_slug}}/index.html{% endcapture %}
+
+          <a {% if page.url == section_url %} class="active"{% endif %} href="{{section_url}}">
+              {{section_name}}
+          </a>
+          {% if section_items.size > 1 %}
+            <ul class="nav">
+            {% for section_page in section_items %}
+              {% if section_page.path contains "index" %}
+              {% else %}
+                <li>
+                  <a {% if page.url == section_page.url %} class="active"{% endif %}
+                      href="{{section_page.url}}">{{section_page.title}}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10" role="main">
+    {% if page.title != null %}
+      <h1 class="page-title">{{page.title}}</h1>
+    {% endif %}
+    <div class="content">
+      {{content}}
     </div>
+  </div>
 </div>
