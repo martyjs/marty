@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Stores | marty.js</title>
+  <title>Stores API | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -17,6 +17,7 @@
   <script type="text/javascript" src="/js/codemirror.js"></script>
 </head>
 <body>
+
   <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
     <div class="container">
       <div class="navbar-header">
@@ -31,9 +32,12 @@
       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
           <li>
-            <a href="/getting-started/">Getting started</a>
+            <a href="/guides/getting-started">Guides</a>
           </li>
-          <li>
+          <li class="active">
+            <a href="/api/stores">API</a>
+          </li>
+          <!-- <li>
             <a href="/docs">Documentation</a>
 
             <ul class="nav sub-nav visible-xs-block">
@@ -44,70 +48,10 @@
                   
                 
               
-                
-                  
-                
-              
-                
-                  
-                    
-                    <li><a href="/docs/index.html">Overview</a></li>
-                    
-                  
-                
-              
-                
-                  
-                    
-                    <li class="active"><a href="/docs/stores.html" class="active">Stores</a></li>
-                    
-                  
-                
-              
-                
-                  
-                    
-                    <li><a href="/docs/actionCreators.html">Action Creators</a></li>
-                    
-                  
-                
-              
-                
-                  
-                    
-                    <li><a href="/docs/stateMixin.html">State mixin</a></li>
-                    
-                  
-                
-              
-                
-                  
-                    
-                    <li><a href="/docs/httpApi.html">HTTP API</a></li>
-                    
-                  
-                
-              
-                
-                  
-                    
-                    <li><a href="/docs/constants.html">Constants</a></li>
-                    
-                  
-                
-              
-                
-                  
-                    
-                    <li><a href="/docs/dispatcher.html">Dispatcher</a></li>
-                    
-                  
-                
-              
               
               
             </ul>
-          </li>
+          </li> -->
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>
@@ -120,54 +64,122 @@
       </nav>
     </div>
   </header>
-  <div class="bs-docs-header" id="content"  style="background-color: #1DACA8">
-  <div class="container">
-    <h1>Stores</h1>
-    <p></p>
+  <div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+      
+      
+
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  class="active" href="/api/stores/index.html">
+              Stores
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/action-creators/index.html">
+              Action Creators
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/state-mixin/index.html">
+              State Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/constants/index.html">
+              Constants
+          </a>
+          
+        </li>
+      
+    </ul>
   </div>
-</div>
-<div class="container bs-docs-container">
-  <div class="row">
-    <div class="col-md-9" role="main">
-      <div class="bs-docs-section">
-        <p>Stores hold information about a domain. That domain could be a collection of entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could be some information about something specific (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>). It is responsible for processing actions from the <a href="/docs/dispatcher.html">dispatcher</a>, updating its own state and notifying interested parties when its state changes.</p>
-
-<p>The store should be the <strong>only</strong> place where your applications state changes. If your views want to update its state, it should call an <a href="/docs/actionCreators.html">action creator</a> which dispatches an action that stores listen to and update themselves and then notify the views about their new state.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
-  <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
-  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
-  <span class="p">},</span>
-  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{};</span>
-  <span class="p">},</span>
-  <span class="nx">addUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">user</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
-  <span class="p">},</span>
-  <span class="nx">getUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span>
-      <span class="na">id</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
-      <span class="na">locally</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
-      <span class="p">},</span>
-      <span class="nx">remotely</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-
-<p>A store is a singleton which is created using <a href="#createStore"><code>Marty.createStore</code></a>. When the store is created it will call <a href="#getInitialState"><code>getInitialState</code></a> which should return an object that all the stores state will live in. This state is accessible by calling <code>this.state</code>.</p>
-
-<p>When an action is dispatched, the store will check its <a href="/docs/stores.html#handlers"><code>handlers</code> hash</a> to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. If the handler updates the stores state state, it can call <a href="#hasChanged"><code>hasChanged</code></a> which will notify any listening views of its new state.</p>
-
-<p>If your view needs some data, it should request it from the relevant store. The store is responsible for sourcing it, either locally or from the server. The <a href="/docs/stores.html#fetch">fetch</a> API helps simplify handling async operations.</p>
-
-<h2 id="api">API</h2>
-
-<h3 id="createStore">createStore(props)</h3>
+  <div class="bs-docs-content col-md-10" role="main">
+    
+      <h1 class="page-title">Stores API</h1>
+    
+    <div class="content">
+      <h2 id="createStore">Marty.createStore(props)</h2>
 
 <p>To create a new store, you call <code>Marty.createStore</code> passing in a set of instance properties. It returns a singleton store which is listening to the dispatcher.</p>
 
@@ -185,15 +197,15 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h3 id="displayName">displayName</h3>
+<h2 id="displayName">displayName</h2>
 
 <p>An (optional) display name for the store. Used for richer debugging.</p>
 
-<h3 id="handlers">handlers</h3>
+<h2 id="handlers">handlers</h2>
 
 <p>The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an <a href="#action-predicates">action predicate</a>.</p>
 
-<p>When invoked the handlers arguments are <a href="/docs/actionCreators.html#dispatch">the arguments passed to the dispatcher</a>. The original action is available by calling <code>this.action</code>.</p>
+<p>When invoked the handlers arguments are <a href="/api/action-creators/index.html#dispatch">the arguments passed to the dispatcher</a>. The original action is available by calling <code>this.action</code>.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
@@ -205,7 +217,7 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h4 id="action-predicates">Action predicates</h4>
+<h3 id="action-predicates">Action predicates</h3>
 
 <p>An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="http://underscorejs.org/#findWhere">where query</a>. Some examples of action predicates:</p>
 
@@ -229,11 +241,11 @@
   <span class="nx">bam</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="p">..</span> <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h4 id="rollback">Rollback</h4>
+<h3 id="rollback">Rollback</h3>
 
 <p>There are a number of cases where it would be useful to be able to rollback an action (e.g. if you&#39;ve optimistically added an entity to your locally store but the associated request to the server failed).</p>
 
-<p>To provide a rollback to an action handler, simply return a function from the action handler. If an <a href="/docs/actionCreators.html#dispatch">action is rolled back</a>, the function you return will be called.</p>
+<p>To provide a rollback to an action handler, simply return a function from the action handler. If an action is rolled back, the function you return will be called.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
@@ -250,17 +262,17 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h3 id="getInitialState">getInitialState()</h3>
+<h2 id="getInitialState">getInitialState()</h2>
 
 <p><code>getInitialState</code> is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the <a href="#state">state</a> property.</p>
 
 <p>If you do not implement getInitialState or you do not return anything then the default state is an empty object literal (<code>{}</code>).</p>
 
-<h3 id="state">state</h3>
+<h2 id="state">state</h2>
 
 <p>The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.</p>
 
-<p>If you want to change the state to a new instance (or if you are using <a href="immutable">immutable data collections</a>) you can set the states value or call <code>this.setState(state)</code></p>
+<p>If you want to change the state to a new instance (or if you are using <a href="/guides/stores/immutable-data-collections.html">immutable data collections</a>) you can set the states value or call <code>this.setState(state)</code></p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">addUsers</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">users</span><span class="p">);</span>
@@ -272,7 +284,7 @@
 
 <p>If the new state does not equal the current state then <a href="#hasChanged">hasChanged</a> will be called after updating the stores state.</p>
 
-<h3 id="addChangeListener">addChangeListener(callback, [context])</h3>
+<h2 id="addChangeListener">addChangeListener(callback, [context])</h2>
 
 <p>If you want to be notified of changes to a store, you can register a callback by calling <code>Store.addChangeListener</code>. You can optionally pass the functions context as a second argument.</p>
 
@@ -287,7 +299,7 @@
 
 <span class="nx">listener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span></code></pre></div>
 
-<h3 id="hasChanged">hasChanged()</h3>
+<h2 id="hasChanged">hasChanged()</h2>
 
 <p>Calls any <a href="#addChangeListener">registered callbacks</a>.</p>
 
@@ -301,14 +313,14 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h3 id="fetch">fetch(options)</h3>
+<h2 id="fetch">fetch(options)</h2>
 
 <p>When requesting data from a store we should assume that it might require an async operation. <code>Store#fetch</code> provides a simple syntax that allows you to encapsulate that asynchronicity in a flux way. The <code>fetch</code> function allows you to specify how to get the state locally and remotely and returns an object that represents the current state of that request.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span>
-      <span class="na">id</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">api</span><span class="o">-</span><span class="nx">id</span><span class="p">,</span>
       <span class="na">locally</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
         <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
       <span class="p">},</span>
@@ -331,7 +343,7 @@
 </span>  <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h4>Options</h4>
+<h3>Options</h3>
 
 <table class="table table-bordered table-striped">
   <thead>
@@ -392,7 +404,7 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h4>Fetch Result</h4>
+<h3>Fetch Result</h3>
 
 <p>Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either <strong>PENDING</strong>, <strong>DONE</strong> OR <strong>ERROR</strong>. You can get the status by accessing <code>fetch.status</code> or with the helpers <code>fetch.pending</code>, <code>fetch.failed</code> or <code>fetch.done</code>.</p>
 
@@ -436,7 +448,7 @@
 </span>  <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h3 id="fetch_pending">fetch.pending()</h3>
+<h2 id="fetch_pending">fetch.pending()</h2>
 
 <p>Returns a pending fetch result</p>
 
@@ -444,7 +456,7 @@
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span> <span class="c1">// PENDING</span></code></pre></div>
 
-<h3 id="fetch_done">fetch.done(result)</h3>
+<h2 id="fetch_done">fetch.done(result)</h2>
 
 <p>Returns a done fetch result</p>
 
@@ -452,7 +464,7 @@
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">result</span><span class="p">)</span> <span class="c1">// DONE, { ... }</span></code></pre></div>
 
-<h3 id="fetch_failed">fetch.failed(error)</h3>
+<h2 id="fetch_failed">fetch.failed(error)</h2>
 
 <p>Returns a failed fetch result</p>
 
@@ -460,7 +472,7 @@
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { ... }</span></code></pre></div>
 
-<h3 id="fetch_notFound">fetch.notFound()</h3>
+<h2 id="fetch_notFound">fetch.notFound()</h2>
 
 <p>Returns a failed fetch result with a NotFound error</p>
 
@@ -468,7 +480,7 @@
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">failed</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { status: 404 }</span></code></pre></div>
 
-<h3 id="waitFor">waitFor(*stores)</h3>
+<h2 id="waitFor">waitFor(*stores)</h2>
 
 <p>If an action handler is dependant on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.</p>
 
@@ -485,128 +497,19 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h3 id="#dispatchToken">dispatchToken</h3>
+<h2 id="#dispatchToken">dispatchToken</h2>
 
 <p>Dispatch token that is returned from <a href="http://facebook.github.io/flux/docs/dispatcher.html#api"><code>Dispatcher.register()</code></a>. Used by <a href="#waitFor"><code>waitFor()</code></a>.</p>
 
-<h2 id="immutable">Immutable data collections</h2>
-
-<p>Within a Flux application you want the stores to be the <strong>only</strong> place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.</p>
-
-<p>The solution this is to use immutable data collections like <a href="http://facebook.github.io/immutable-js/">immutable.js</a> or <a href="http://swannodette.github.io/mori/">mori</a>. Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nx">of</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">users2</span> <span class="o">=</span> <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">);</span>
-
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="c1">// ["foo"]</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users2</span><span class="p">)</span> <span class="c1">// ["foo", "bar"]</span></code></pre></div>
-
-<p>Using immutable data collections help you sleep soundly with knowledge that nothing outside of stores will be able to change its state.</p>
-
-<p>While immutable data collections are not required, we try to make it as easy to use as possible. For example, you can simple call this.state with the mutated collection and internally it will check if the collection has changed and handle notifying and listeners.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
-  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
-  <span class="p">},</span>
-  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">();</span>
-  <span class="p">},</span>
-  <span class="nx">addUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-
-<h2 id="further-reading">Further reading</h2>
-
-<ul>
-<li><a href="http://facebook.github.io/flux/docs/overview.html#stores">Original article about Flux</a></li>
-</ul>
-
-      </div>
     </div>
-    <div class="col-md-3">
-      <div class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top" role="complementary">
-        <ul class="nav bs-docs-sidenav">
-          
-          
-          
-            
-              
-            
-          
-            
-              
-            
-          
-            
-              
-                
-                <li><a href="/docs/index.html">Overview</a></li>
-                
-              
-            
-          
-            
-              
-                
-                <li class="active"><a href="/docs/stores.html" class="active">Stores</a></li>
-                
-              
-            
-          
-            
-              
-                
-                <li><a href="/docs/actionCreators.html">Action Creators</a></li>
-                
-              
-            
-          
-            
-              
-                
-                <li><a href="/docs/stateMixin.html">State mixin</a></li>
-                
-              
-            
-          
-            
-              
-                
-                <li><a href="/docs/httpApi.html">HTTP API</a></li>
-                
-              
-            
-          
-            
-              
-                
-                <li><a href="/docs/constants.html">Constants</a></li>
-                
-              
-            
-          
-            
-              
-                
-                <li><a href="/docs/dispatcher.html">Dispatcher</a></li>
-                
-              
-            
-          
-          
-          
-        </ul>
-      </div>
-    </div>
+  </div>
 </div>
 
   <footer class="bs-docs-footer" role="contentinfo">
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.7.0</li>
+        <li>v0.7.1</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
