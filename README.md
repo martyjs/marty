@@ -6,17 +6,17 @@
 ## Quick start
 
 ```
+make build        # rebuild source
 make test         # lint & run tests
-make release      # builds, inc's npm version, pushes build and tags to master then publishes to npm
-make release-docs # builds documentation and copies into ../marty-gh-pages
 make docs         # show documentation on http://localhost:4000
 ```
 
-## Installation
+## Releasing
 
 ```
-npm install --save marty
-bower install --save marty
+make release           # inc's patch, builds, creates tag, pushes to github and then publishes to npm
+make release inc={inc} # specify what to version part to increment (major, premajor, minor, preminor, patch, prepatch, prerelease)
+make release-docs      # builds documentation and copies into ../marty-gh-pages
 ```
 
 ##Browser Support
