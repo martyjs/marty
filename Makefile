@@ -5,8 +5,10 @@ BIN = ./node_modules/.bin
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint
-	@node test/lib/mockServer &
-	@$(BIN)/karma start --single-run
+	@./build/test.sh
+
+test-watch: lint
+	@./build/test-watch.sh
 
 bootstrap: bootstrap-js bootstrap-ruby
 
@@ -16,10 +18,6 @@ bootstrap-js: package.json
 bootstrap-ruby: docs/Gemfile
 	@which bundle > /dev/null || gem install bundler
 	@cd docs && bundle install
-
-test-watch: lint
-	@node test/lib/mockServer &
-	@$(BIN)/karma start
 
 lint: bootstrap-js
 	@$(BIN)/jsxcs $(SRC);
