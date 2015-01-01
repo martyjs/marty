@@ -103,6 +103,12 @@ body {
   padding-right: 0;
 }
 
+@media (max-width: 767px) {
+  .bs-docs-content {
+    padding-left: 0 !important;
+  }
+}
+
 /*
  * Main navigation
  *
