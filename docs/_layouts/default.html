@@ -33,31 +33,34 @@
         <ul class="nav navbar-nav">
           <li{% if page.collection == "guides" %} class="active"{% endif %}>
             <a href="/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              {% assign sections = site.guides | group_by:"section" %}
+              {% for section_name in site.data.guides_section_order %}
+                <li {% if page.section == section_name and page.collection == "guides" %} class="active"{% endif %}>
+                  {% capture section_url %}/guides/{{section_name | slugify}}/index.html{% endcapture %}
+
+                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{section_url}}">
+                    {{section_name}}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
           </li>
           <li{% if page.collection == "api" %} class="active"{% endif %}>
             <a href="/api/stores">API</a>
-          </li>
-          <!-- <li{% if page.id == "overview" %} class="active"{% endif %}>
-            <a href="/docs">Documentation</a>
-
             <ul class="nav sub-nav visible-xs-block">
-              {% assign pages_list = site.pages | sort:"order" %}
-              {% assign group = 'docs' %}
-              {% for node in pages_list %}
-                {% if node.title != null %}
-                  {% if group == null or group == node.group %}
-                    {% if page.url == node.url %}
-                    <li class="active"><a href="{{ BASE_PATH }}{{node.url}}" class="active">{{node.title}}</a></li>
-                    {% else %}
-                    <li><a href="{{ BASE_PATH }}{{node.url}}">{{node.title}}</a></li>
-                    {% endif %}
-                  {% endif %}
-                {% endif %}
+              {% assign sections = site.api | group_by:"section" %}
+              {% for section_name in site.data.api_section_order %}
+                <li {% if page.section == section_name and page.collection == "api" %} class="active"{% endif %}>
+                  {% capture section_url %}/api/{{section_name | slugify}}/index.html{% endcapture %}
+
+                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{section_url}}">
+                    {{section_name}}
+                  </a>
+                </li>
               {% endfor %}
-              {% assign pages_list = nil %}
-              {% assign group = nil %}
             </ul>
-          </li> -->
+          </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>
