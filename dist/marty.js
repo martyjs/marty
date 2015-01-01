@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.1',
+  version: '0.7.2',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -3624,7 +3624,7 @@ require('fetch');
 (function() {
   'use strict';
 
-  if (self.fetch) {
+  if (window.fetch) {
     return
   }
 
@@ -3686,7 +3686,7 @@ require('fetch');
 
   function consumed(body) {
     if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
+      return Promise.reject(new TypeError('Body already consumed'))
     }
     body.bodyUsed = true
   }
@@ -3826,7 +3826,7 @@ require('fetch');
 
   Body.call(Response.prototype)
 
-  self.fetch = function (url, options) {
+  window.fetch = function (url, options) {
     return new Request(url, options).fetch()
   }
 })();
