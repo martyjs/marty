@@ -5,6 +5,8 @@ var expect = require('chai').expect;
 var HttpAPI = require('../lib/httpAPI');
 
 describe('HttpAPI', function () {
+  this.timeout(10000);
+
   var API, baseUrl, response;
 
   beforeEach(function () {
