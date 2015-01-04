@@ -4,6 +4,7 @@ var constants = require('../lib/constants');
 var Promise = require('es6-promise').Promise;
 var MockDispatcher = require('./lib/mockDispatcher');
 var ActionCreators = require('../lib/actionCreators');
+var serializeError = require('../lib/utils/serializeError');
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, actualResult, actualError;
@@ -76,7 +77,7 @@ describe('ActionCreators', function () {
         actualResult = actionCreators.someAction();
 
         promise.catch(function () {
-          actualAction = dispatcher.getActionWithType('ACTION_ERROR');
+          actualAction = dispatcher.getActionWithType('ACTION_FAILED');
           payload = (actualAction || { arguments: [] }).arguments[0];
           done();
         });
@@ -86,7 +87,7 @@ describe('ActionCreators', function () {
         expect(dispatcher.getActionWithType('SOME_ACTION_FAILED')).to.exist;
       });
 
-      it('should dispatch an ACTION_ERROR action', function () {
+      it('should dispatch an ACTION_FAILED action', function () {
         expect(actualAction).to.exist;
       });
 
@@ -95,7 +96,7 @@ describe('ActionCreators', function () {
       });
 
       it('should include the error', function () {
-        expect(payload.error).to.equal(expectedError);
+        expect(payload.error).to.eql(serializeError(expectedError));
       });
 
       it('should NOT dispatch an ACTION_DONE action', function () {
@@ -154,7 +155,7 @@ describe('ActionCreators', function () {
         actualError = e;
       }
 
-      actualAction = dispatcher.getActionWithType('ACTION_ERROR');
+      actualAction = dispatcher.getActionWithType('ACTION_FAILED');
       payload = (actualAction || {}).arguments[0];
     });
 
@@ -162,7 +163,7 @@ describe('ActionCreators', function () {
       expect(dispatcher.getActionWithType('SOME_ACTION_FAILED')).to.exist;
     });
 
-    it('should dispatch an ACTION_ERROR action', function () {
+    it('should dispatch an ACTION_FAILED action', function () {
       expect(actualAction).to.exist;
     });
 
@@ -171,7 +172,7 @@ describe('ActionCreators', function () {
     });
 
     it('should include the error', function () {
-      expect(payload.error).to.equal(expectedError);
+      expect(payload.error).to.eql(serializeError(expectedError));
     });
 
     it('should NOT dispatch an ACTION_DONE action', function () {

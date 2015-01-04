@@ -33,7 +33,7 @@ describe('aliases', function () {
 
   describe('marty/constants/actions', function () {
     it('should resolve to action constants', function () {
-      expect(Object.keys(require('../constants/actions'))).to.eql(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']);
+      expect(Object.keys(require('../constants/actions'))).to.eql(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
     });
   });
 

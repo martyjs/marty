@@ -15,7 +15,7 @@ git add -A
 git commit -m "v$version"
 
 echo "creating tag v$version"
-git tag $version
+git tag v$version
 git push origin master
 git push origin --tags
 
