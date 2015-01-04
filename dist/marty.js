@@ -5,15 +5,15 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.2',
+  version: '0.7.3',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
-},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":17,"underscore":32}],1:[function(require,module,exports){
+},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":17,"underscore":33}],1:[function(require,module,exports){
 var constants = require('./index');
 
-module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_ERROR']);
+module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
 },{"./index":2}],2:[function(require,module,exports){
 module.exports = require('../lib/constants');
 },{"../lib/constants":11}],3:[function(require,module,exports){
@@ -80,6 +80,7 @@ var uuid = require('./utils/uuid');
 var Dispatcher = require('./dispatcher');
 var ActionPayload = require('./actionPayload');
 var ActionConstants = require('../constants/actions');
+var serializeError = require('./utils/serializeError');
 
 function ActionCreators(options) {
   var creator = this;
@@ -190,11 +191,15 @@ function ActionCreators(options) {
           dispatch({
             verbose: true,
             type: ActionConstants.ACTION_DONE,
-            arguments: [actionId]
+            arguments: [{
+              id: actionId
+            }]
           }, properties);
         }
 
         function dispatchError(err) {
+          err = serializeError(err);
+
           dispatch({
             verbose: true,
             type: actionType + '_FAILED',
@@ -206,7 +211,7 @@ function ActionCreators(options) {
 
           dispatch({
             verbose: true,
-            type: ActionConstants.ACTION_ERROR,
+            type: ActionConstants.ACTION_FAILED,
             arguments: [{
               id: actionId,
               error: err
@@ -227,7 +232,7 @@ function ActionCreators(options) {
 }
 
 module.exports = ActionCreators;
-},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/uuid":20,"underscore":32}],10:[function(require,module,exports){
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":20,"./utils/uuid":21,"underscore":33}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var cloneState = require('./utils/cloneState');
@@ -381,7 +386,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-},{"../constants/status":3,"./utils/cloneState":19,"./utils/uuid":20,"underscore":32}],11:[function(require,module,exports){
+},{"../constants/status":3,"./utils/cloneState":19,"./utils/uuid":21,"underscore":33}],11:[function(require,module,exports){
 var _ = require('underscore');
 
 function constants(obj) {
@@ -448,7 +453,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"underscore":32}],12:[function(require,module,exports){
+},{"underscore":33}],12:[function(require,module,exports){
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
@@ -543,7 +548,7 @@ function onAction(callback) {
     }
   };
 }
-},{"events":21}],14:[function(require,module,exports){
+},{"events":22}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
@@ -555,7 +560,7 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-},{"./utils/uuid":20,"flux":27}],15:[function(require,module,exports){
+},{"./utils/uuid":21,"flux":28}],15:[function(require,module,exports){
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
@@ -652,7 +657,7 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpAPI;
-},{"es6-promise":26,"isomorphic-fetch":30,"underscore":32}],16:[function(require,module,exports){
+},{"es6-promise":27,"isomorphic-fetch":31,"underscore":33}],16:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
@@ -848,7 +853,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":13,"../utils/cloneState":19,"../utils/uuid":20,"underscore":32}],17:[function(require,module,exports){
+},{"../diagnostics":13,"../utils/cloneState":19,"../utils/uuid":21,"underscore":33}],17:[function(require,module,exports){
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -895,7 +900,7 @@ function serializeState() {
 
   return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
 }
-},{"../errors/unknownStore":8,"underscore":32}],18:[function(require,module,exports){
+},{"../errors/unknownStore":8,"underscore":33}],18:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
@@ -1322,13 +1327,30 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./utils/uuid":20,"events":21,"underscore":32}],19:[function(require,module,exports){
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./utils/uuid":21,"events":22,"underscore":33}],19:[function(require,module,exports){
 function cloneState() {
   return null;
 }
 
 module.exports = cloneState;
 },{}],20:[function(require,module,exports){
+function serializeError(error) {
+  if (!error) {
+    return null;
+  }
+
+  var result = {
+    name: error.name
+  };
+
+  Object.getOwnPropertyNames(error).forEach(function (key) {
+    result[key] = error[key];
+  });
+  return result;
+}
+
+module.exports = serializeError;
+},{}],21:[function(require,module,exports){
 var format = require('util').format;
 
 function uuid() {
@@ -1345,7 +1367,7 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
-},{"util":25}],21:[function(require,module,exports){
+},{"util":26}],22:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1648,7 +1670,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1673,7 +1695,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1738,14 +1760,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2335,7 +2357,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":24,"_process":23,"inherits":22}],26:[function(require,module,exports){
+},{"./support/isBuffer":25,"_process":24,"inherits":23}],27:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3298,7 +3320,7 @@ function hasOwnProperty(obj, prop) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":23}],27:[function(require,module,exports){
+},{"_process":24}],28:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3310,7 +3332,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":28}],28:[function(require,module,exports){
+},{"./lib/Dispatcher":29}],29:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3562,7 +3584,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":29}],29:[function(require,module,exports){
+},{"./invariant":30}],30:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3617,10 +3639,10 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 require('fetch');
 
-},{"fetch":31}],31:[function(require,module,exports){
+},{"fetch":32}],32:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3831,7 +3853,7 @@ require('fetch');
   }
 })();
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

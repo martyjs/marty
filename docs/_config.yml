@@ -37,4 +37,4 @@ collections:
   api:
     title: API
     output: true
-current_version: 0.7.2
+current_version: 0.7.3
