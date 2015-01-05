@@ -2,16 +2,17 @@ var React = require('react');
 var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
+var uuid = require('../lib/utils/uuid');
 var Diagnostics = require('../diagnostics');
 var ActionPayload = require('../lib/actionPayload');
 var StateMixin = require('../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {
-  var element, mixin, initialState;
+  var element, sandbox, mixin, initialState;
 
   beforeEach(function () {
-    Diagnostics.enabled = false;
+    sandbox = sinon.sandbox.create();
     initialState = {
       name: 'hello'
     };
@@ -23,16 +24,24 @@ describe('StateMixin', function () {
     });
   });
 
+  afterEach(function () {
+    sandbox.restore();
+  });
+
   it('should throw an error if you dont pass in an object literal', function () {
     expect(function () { StateMixin(); }).to.throw(Error);
   });
 
   describe('when a store changes', function () {
-    var expectedState, action, store;
+    var expectedState, expectedId, action, store, log;
 
     beforeEach(function () {
+      expectedId = '123';
+      sandbox.stub(uuid, 'small').returns(expectedId);
       action = new ActionPayload();
       expectedState = {};
+      log = console.log;
+      console.log = function () {};
       store = {
         displayName: 'foo',
         action: action,
@@ -52,67 +61,48 @@ describe('StateMixin', function () {
       element = renderClassWithMixin(mixin);
     });
 
-    describe('when diagnostics is enabled', function () {
-      var log;
+    describe('when the handler fails', function () {
+      var expectedError;
+
       beforeEach(function () {
-        log = console.log;
-        console.log = function () {};
-        Diagnostics.enabled = true;
-      });
-
-      describe('when the handler fails', function () {
-        var expectedError;
-
-        beforeEach(function () {
-          expectedError = new Error();
-          store.getState = sinon.stub().throws(expectedError);
-          element.onStoreChanged(null, store);
-        });
-
-        it('should add a view to the handler', function () {
-          expect(action.handlers[0].views[0]).to.eql({
-            name: 'bar',
-            error: expectedError,
-            state: {
-              after: null,
-              before: undefined
-            }
-          });
-        });
-      });
-
-      describe('when the handler is successful', function () {
-        beforeEach(function () {
-          element.onStoreChanged(null, store);
-        });
-
-        it('should add a view to the handler', function () {
-          expect(action.handlers[0].views[0]).to.eql({
-            name: 'bar',
-            error: null,
-            state: {
-              after: null,
-              before: undefined
-            }
-          });
-        });
-      });
-
-      afterEach(function () {
-        console.log = log;
-        Diagnostics.enabled = false;
-      });
-    });
-
-    describe('when diagnostics is disabled', function () {
-      beforeEach(function () {
-        Diagnostics.enabled = false;
+        expectedError = new Error();
+        store.getState = sinon.stub().throws(expectedError);
         element.onStoreChanged(null, store);
       });
 
-      it('should not add a view handler', function () {
-        expect(action.handlers[0].views).to.be.empty;
+      it('should add a view to the handler', function () {
+        expect(action.handlers[0].views[0]).to.eql({
+          name: 'bar',
+          id: expectedId,
+          error: expectedError,
+          state: {
+            after: null,
+            before: undefined
+          }
+        });
       });
+    });
+
+    describe('when the handler is successful', function () {
+      beforeEach(function () {
+        element.onStoreChanged(null, store);
+      });
+
+      it('should add a view to the handler', function () {
+        expect(action.handlers[0].views[0]).to.eql({
+          name: 'bar',
+          error: null,
+          id: expectedId,
+          state: {
+            after: null,
+            before: undefined
+          }
+        });
+      });
+    });
+
+    afterEach(function () {
+      console.log = log;
     });
   });
 
