@@ -13,6 +13,12 @@ describe('aliases', function () {
     });
   });
 
+  describe('marty/fetch', function () {
+    it('should resolve to fetch', function () {
+      expect(require('../fetch')).to.equal(require('../lib/fetch'));
+    });
+  });
+
   describe('marty/constants', function () {
     it('should resolve to constants', function () {
       expect(require('../constants')).to.equal(require('../lib/constants'));

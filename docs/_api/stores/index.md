@@ -251,7 +251,7 @@ var UsersStore = Marty.createStore({
 
 <h3>Fetch Result</h3>
 
-Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either **PENDING**, **DONE** OR **ERROR**. You can get the status by accessing ``fetch.status`` or with the helpers ``fetch.pending``, ``fetch.failed`` or ``fetch.done``.
+Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either **PENDING**, **DONE** OR **FAILED**. You can get the status by accessing ``fetch.status`` or with the helpers ``fetch.pending``, ``fetch.failed`` or ``fetch.done``.
 
 {% highlight js %}
 var user = UserStore.getUser(id);
@@ -310,6 +310,9 @@ Returns a pending fetch result
 {% highlight js %}
 var fetch = Store.fetch.pending();
 
+// or
+var fetch = require('marty/fetch').pending();
+
 console.log(fetch.status) // PENDING
 {% endhighlight %}
 
@@ -319,6 +322,9 @@ Returns a done fetch result
 
 {% highlight js %}
 var fetch = Store.fetch.done(result);
+
+// or
+var fetch = require('marty/fetch').done(result);
 
 console.log(fetch.status, fetch.result) // DONE, { ... }
 {% endhighlight %}
@@ -330,6 +336,9 @@ Returns a failed fetch result
 {% highlight js %}
 var fetch = Store.fetch.failed(error);
 
+// or
+var fetch = require('marty/fetch').failed(error);
+
 console.log(fetch.status, fetch.error) // FAILED, { ... }
 {% endhighlight %}
 
@@ -339,6 +348,9 @@ Returns a failed fetch result with a NotFound error
 
 {% highlight js %}
 var fetch = Store.fetch.notFound();
+
+// or
+var fetch = require('marty/fetch').notFound();
 
 console.log(fetch.failed, fetch.error) // FAILED, { status: 404 }
 {% endhighlight %}
