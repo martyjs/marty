@@ -5,12 +5,12 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.3',
+  version: '0.7.4',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
-},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":17,"underscore":33}],1:[function(require,module,exports){
+},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":18,"underscore":34}],1:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
@@ -232,7 +232,7 @@ function ActionCreators(options) {
 }
 
 module.exports = ActionCreators;
-},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":20,"./utils/uuid":21,"underscore":33}],10:[function(require,module,exports){
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":21,"./utils/uuid":22,"underscore":34}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var cloneState = require('./utils/cloneState');
@@ -386,7 +386,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-},{"../constants/status":3,"./utils/cloneState":19,"./utils/uuid":21,"underscore":33}],11:[function(require,module,exports){
+},{"../constants/status":3,"./utils/cloneState":20,"./utils/uuid":22,"underscore":34}],11:[function(require,module,exports){
 var _ = require('underscore');
 
 function constants(obj) {
@@ -453,7 +453,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"underscore":33}],12:[function(require,module,exports){
+},{"underscore":34}],12:[function(require,module,exports){
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
@@ -507,7 +507,7 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":15,"./mixins/stateMixin":16,"./store":18}],13:[function(require,module,exports){
+},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":16,"./mixins/stateMixin":17,"./store":19}],13:[function(require,module,exports){
 var ACTION_STARTED = 'action-started';
 var EventEmitter = require('events').EventEmitter;
 var diagnosticEvents = new EventEmitter();
@@ -548,7 +548,7 @@ function onAction(callback) {
     }
   };
 }
-},{"events":22}],14:[function(require,module,exports){
+},{"events":23}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
@@ -560,7 +560,70 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-},{"./utils/uuid":21,"flux":28}],15:[function(require,module,exports){
+},{"./utils/uuid":22,"flux":29}],15:[function(require,module,exports){
+var NotFoundError = require('../errors/notFound');
+var StatusConstants = require('../constants/status');
+
+module.exports = {
+  done: done,
+  failed: failed,
+  pending: pending,
+  notFound: notFound
+};
+
+function pending() {
+  return fetchResult({
+    pending: true,
+    status: 'PENDING'
+  });
+}
+
+function failed(error) {
+  return fetchResult({
+    error: error,
+    failed: true,
+    status: 'FAILED'
+  });
+}
+
+function done(result) {
+  return fetchResult({
+    done: true,
+    status: 'DONE',
+    result: result
+  });
+}
+
+function notFound() {
+  return failed(new NotFoundError());
+}
+
+function fetchResult(result) {
+  result.when = when;
+
+  return result;
+}
+
+function when(handlers) {
+  handlers || (handlers = {});
+
+  var status = this.status;
+  var handler = handlers[status.toLowerCase()];
+
+  if (!handler) {
+    throw new Error('Could not find a ' + status + ' handler');
+  }
+
+  switch (status) {
+    case StatusConstants.PENDING.toString():
+      return handler.call(handlers);
+    case StatusConstants.FAILED.toString():
+      return handler.call(handlers, this.error);
+    case StatusConstants.DONE.toString():
+      return handler.call(handlers, this.result);
+  }
+}
+},{"../constants/status":3,"../errors/notFound":7}],16:[function(require,module,exports){
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
@@ -657,7 +720,7 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpAPI;
-},{"es6-promise":27,"isomorphic-fetch":31,"underscore":33}],16:[function(require,module,exports){
+},{"es6-promise":28,"isomorphic-fetch":32,"underscore":34}],17:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
@@ -853,7 +916,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":13,"../utils/cloneState":19,"../utils/uuid":21,"underscore":33}],17:[function(require,module,exports){
+},{"../diagnostics":13,"../utils/cloneState":20,"../utils/uuid":22,"underscore":34}],18:[function(require,module,exports){
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -900,10 +963,11 @@ function serializeState() {
 
   return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
 }
-},{"../errors/unknownStore":8,"underscore":33}],18:[function(require,module,exports){
+},{"../errors/unknownStore":8,"underscore":34}],19:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
+var fetchResult = require('./fetch');
 var Dispatcher = require('./dispatcher');
 var Diagnostics = require('./diagnostics');
 var CompoundError = require('../errors/compound');
@@ -938,10 +1002,10 @@ function Store(options) {
   this.getInitialState = getInitialState;
   this.addChangeListener = addChangeListener;
 
-  fetch.done = fetchDone;
-  fetch.failed = fetchFailed;
-  fetch.pending = fetchPending;
-  fetch.notFound = fetchNotFound;
+  this.fetch.done = fetchResult.done;
+  this.fetch.failed = fetchResult.failed;
+  this.fetch.pending = fetchResult.pending;
+  this.fetch.notFound = fetchResult.notFound;
 
   emitter.setMaxListeners(options.maxListeners || Store.defaultMaxListeners);
 
@@ -1144,58 +1208,7 @@ function Store(options) {
     }
   }
 
-  function fetchPending() {
-    return fetchResult({
-      pending: true,
-      status: 'PENDING'
-    });
-  }
 
-  function fetchFailed(error) {
-    return fetchResult({
-      error: error,
-      failed: true,
-      status: 'FAILED'
-    });
-  }
-
-  function fetchDone(result) {
-    return fetchResult({
-      done: true,
-      status: 'DONE',
-      result: result
-    });
-  }
-
-  function fetchNotFound() {
-    return fetchFailed(new NotFoundError());
-  }
-
-  function fetchResult(result) {
-    result.when = when;
-
-    return result;
-  }
-
-  function when(handlers) {
-    handlers || (handlers = {});
-
-    var status = this.status;
-    var handler = handlers[status.toLowerCase()];
-
-    if (!handler) {
-      throw new Error('Could not find a ' + status + ' handler');
-    }
-
-    switch (status) {
-      case StatusConstants.PENDING.toString():
-        return handler.call(handlers);
-      case StatusConstants.FAILED.toString():
-        return handler.call(handlers, this.error);
-      case StatusConstants.DONE.toString():
-        return handler.call(handlers, this.result);
-    }
-  }
 
   function clear() {
     failedFetches = {};
@@ -1327,13 +1340,13 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./utils/uuid":21,"events":22,"underscore":33}],19:[function(require,module,exports){
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":22,"events":23,"underscore":34}],20:[function(require,module,exports){
 function cloneState() {
   return null;
 }
 
 module.exports = cloneState;
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 function serializeError(error) {
   if (!error) {
     return null;
@@ -1350,7 +1363,7 @@ function serializeError(error) {
 }
 
 module.exports = serializeError;
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var format = require('util').format;
 
 function uuid() {
@@ -1367,7 +1380,7 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
-},{"util":26}],22:[function(require,module,exports){
+},{"util":27}],23:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1670,7 +1683,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1695,7 +1708,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1760,14 +1773,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2357,7 +2370,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":25,"_process":24,"inherits":23}],27:[function(require,module,exports){
+},{"./support/isBuffer":26,"_process":25,"inherits":24}],28:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3320,7 +3333,7 @@ function hasOwnProperty(obj, prop) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":24}],28:[function(require,module,exports){
+},{"_process":25}],29:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3332,7 +3345,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":29}],29:[function(require,module,exports){
+},{"./lib/Dispatcher":30}],30:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3584,7 +3597,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":30}],30:[function(require,module,exports){
+},{"./invariant":31}],31:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3639,14 +3652,14 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 require('fetch');
 
-},{"fetch":32}],32:[function(require,module,exports){
+},{"fetch":33}],33:[function(require,module,exports){
 (function() {
   'use strict';
 
-  if (window.fetch) {
+  if (self.fetch) {
     return
   }
 
@@ -3708,7 +3721,7 @@ require('fetch');
 
   function consumed(body) {
     if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Body already consumed'))
+      return Promise.reject(new TypeError('Already read'))
     }
     body.bodyUsed = true
   }
@@ -3848,12 +3861,12 @@ require('fetch');
 
   Body.call(Response.prototype)
 
-  window.fetch = function (url, options) {
+  self.fetch = function (url, options) {
     return new Request(url, options).fetch()
   }
 })();
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
