@@ -495,7 +495,7 @@
 
 <h3>Fetch Result</h3>
 
-<p>Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either <strong>PENDING</strong>, <strong>DONE</strong> OR <strong>ERROR</strong>. You can get the status by accessing <code>fetch.status</code> or with the helpers <code>fetch.pending</code>, <code>fetch.failed</code> or <code>fetch.done</code>.</p>
+<p>Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either <strong>PENDING</strong>, <strong>DONE</strong> OR <strong>FAILED</strong>. You can get the status by accessing <code>fetch.status</code> or with the helpers <code>fetch.pending</code>, <code>fetch.failed</code> or <code>fetch.done</code>.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
 
@@ -543,6 +543,9 @@
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">pending</span><span class="p">();</span>
 
+<span class="c1">// or</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">pending</span><span class="p">();</span>
+
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span> <span class="c1">// PENDING</span></code></pre></div>
 
 <h2 id="fetch_done">fetch.done(result)</h2>
@@ -550,6 +553,9 @@
 <p>Returns a done fetch result</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+<span class="c1">// or</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">result</span><span class="p">)</span> <span class="c1">// DONE, { ... }</span></code></pre></div>
 
@@ -559,6 +565,9 @@
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">failed</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
 
+<span class="c1">// or</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">failed</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { ... }</span></code></pre></div>
 
 <h2 id="fetch_notFound">fetch.notFound()</h2>
@@ -566,6 +575,9 @@
 <p>Returns a failed fetch result with a NotFound error</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">Store</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">notFound</span><span class="p">();</span>
+
+<span class="c1">// or</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">notFound</span><span class="p">();</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">failed</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { status: 404 }</span></code></pre></div>
 
@@ -598,7 +610,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.7.1</li>
+        <li>v0.7.4</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
