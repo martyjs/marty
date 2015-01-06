@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.4',
+  version: '0.7.5',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -184,7 +184,8 @@ function ActionCreators(options) {
             verbose: true,
             type: actionType + '_DONE',
             arguments: [{
-              id: actionId
+              id: actionId,
+              handlers: handlers
             }]
           }, properties);
 
@@ -192,7 +193,8 @@ function ActionCreators(options) {
             verbose: true,
             type: ActionConstants.ACTION_DONE,
             arguments: [{
-              id: actionId
+              id: actionId,
+              handlers: handlers
             }]
           }, properties);
         }
@@ -204,8 +206,9 @@ function ActionCreators(options) {
             verbose: true,
             type: actionType + '_FAILED',
             arguments: [{
+              error: err,
               id: actionId,
-              error: err
+              handlers: handlers
             }]
           }, properties);
 
@@ -213,8 +216,9 @@ function ActionCreators(options) {
             verbose: true,
             type: ActionConstants.ACTION_FAILED,
             arguments: [{
+              error: err,
               id: actionId,
-              error: err
+              handlers: handlers
             }]
           }, properties);
         }
@@ -331,6 +335,7 @@ function ActionPayload(options) {
     var viewHandler = {
       name: name,
       error: null,
+      id: uuid.small(),
       state: {
         after: null,
         before: lastState
@@ -352,8 +357,9 @@ function ActionPayload(options) {
   function addStoreHandler(store, handlerName) {
     var handler = {
       views: [],
-      type: 'Store',
       error: null,
+      type: 'Store',
+      id: uuid.small(),
       store: store.displayName,
       name: handlerName,
       state: {
@@ -454,13 +460,19 @@ function constants(obj) {
 
 module.exports = constants;
 },{"underscore":34}],12:[function(require,module,exports){
+var _ = require('underscore');
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
 var Dispatcher = require('./dispatcher');
 var StateMixin = require('./mixins/stateMixin');
 var ActionCreators = require('./actionCreators');
+var EventEmitter = require('events').EventEmitter;
+
+var STORE_CHANGED_EVENT = 'store-changed';
+
 var stores = [];
+var emitter = new EventEmitter();
 
 module.exports = {
   getStores: getStores,
@@ -469,8 +481,23 @@ module.exports = {
   createHTTPAPI: createHttpAPI, // For those who really care about correct casing
   createConstants: createConstants,
   createStateMixin: createStateMixin,
-  createActionCreators: createActionCreators
+  createActionCreators: createActionCreators,
+  addStoreChangeListener: addStoreChangeListener
 };
+
+function addStoreChangeListener(callback, context) {
+  if (context) {
+    callback = _.bind(callback, context);
+  }
+
+  emitter.on(STORE_CHANGED_EVENT, callback);
+
+  return {
+    dispose: function () {
+      emitter.removeListener(STORE_CHANGED_EVENT, callback);
+    }
+  };
+}
 
 function getStores() {
   return stores;
@@ -478,8 +505,19 @@ function getStores() {
 
 function createStore(options) {
   var store = new Store(defaults(this, options));
+
+  store.addChangeListener(onStoreChanged);
   stores.push(store);
+
   return store;
+}
+
+function onStoreChanged() {
+  var args = _.toArray(arguments);
+
+  args.unshift(STORE_CHANGED_EVENT);
+
+  emitter.emit.apply(emitter, args);
 }
 
 function createHttpAPI(options) {
@@ -507,7 +545,7 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":16,"./mixins/stateMixin":17,"./store":19}],13:[function(require,module,exports){
+},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":16,"./mixins/stateMixin":17,"./store":19,"events":23,"underscore":34}],13:[function(require,module,exports){
 var ACTION_STARTED = 'action-started';
 var EventEmitter = require('events').EventEmitter;
 var diagnosticEvents = new EventEmitter();
@@ -758,7 +796,7 @@ function StateMixin(options) {
     tryGetState: function (store) {
       var handler;
 
-      if (Diagnostics.enabled && store && store.action) {
+      if (store && store.action) {
         handler = store.action.addViewHandler(this.displayName, this, this._marty.lastState);
       }
 
@@ -961,7 +999,11 @@ function serializeState() {
     }
   });
 
-  return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
+  state.toString = function () {
+    return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
+  };
+
+  return state;
 }
 },{"../errors/unknownStore":8,"underscore":34}],19:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
@@ -3659,7 +3701,7 @@ require('fetch');
 (function() {
   'use strict';
 
-  if (self.fetch) {
+  if (window.fetch) {
     return
   }
 
@@ -3721,7 +3763,7 @@ require('fetch');
 
   function consumed(body) {
     if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
+      return Promise.reject(new TypeError('Body already consumed'))
     }
     body.bodyUsed = true
   }
@@ -3861,7 +3903,7 @@ require('fetch');
 
   Body.call(Response.prototype)
 
-  self.fetch = function (url, options) {
+  window.fetch = function (url, options) {
     return new Request(url, options).fetch()
   }
 })();
