@@ -28,7 +28,7 @@ describe('Marty#serializeState()', function () {
   });
 
   it('should serialze all the stores', function () {
-    expect(_.omit(serializedState, 'toString')).to.eql({
+    expect(serializedState.toJSON()).to.eql({
       store1: store1ExpectedState,
       store2: storeSerializedState
     });
