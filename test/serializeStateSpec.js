@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var expect = require('chai').expect;
 
 describe('Marty#serializeState()', function () {
@@ -26,10 +27,19 @@ describe('Marty#serializeState()', function () {
     serializedState = Marty.serializeState();
   });
 
-  it('should serialize all stores', function () {
-    expect(serializedState).to.equal('(window.__marty||(window.__marty={})).state=' + JSON.stringify({
+  it('should serialze all the stores', function () {
+    expect(_.omit(serializedState, 'toString')).to.eql({
       store1: store1ExpectedState,
       store2: storeSerializedState
-    }));
+    });
+  });
+
+  describe('#toString()', function () {
+    it('should create a string that can be injected into the page', function () {
+      expect(serializedState.toString()).to.equal('(window.__marty||(window.__marty={})).state=' + JSON.stringify({
+        store1: store1ExpectedState,
+        store2: storeSerializedState
+      }));
+    });
   });
 });
