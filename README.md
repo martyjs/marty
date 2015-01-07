@@ -28,6 +28,10 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 * [James Hollingworth](http://github.com/jhollingworth)
 
+## Sponsors
+
+[![Qubit](docs/img/qubit.png)](http://qubitproducts.com)
+
 ## License
 
 * [MIT](https://raw.github.com/jhollingworth/marty/master/LICENSE)
