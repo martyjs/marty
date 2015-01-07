@@ -1,4 +1,3 @@
-var _ = require('underscore');
 var expect = require('chai').expect;
 
 describe('Marty#serializeState()', function () {
