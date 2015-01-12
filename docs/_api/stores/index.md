@@ -186,6 +186,28 @@ UsersStore.getUser(123).when({
 });
 {% endhighlight %}
 
+If you need to wait for multiple fetch results to be finished, you can use ``when.all()``. You pass in an array of fetch results and it will execute the appropriate handler (e.g. if any of the handlers failed then it will execute the failed handler).
+
+{% highlight js %}
+var when = require('marty/when');
+
+var foo = FooStore.getFoo(123);
+var bar = BarStore.getBar(456);
+
+when.all([foo, bar], {
+  pending: function () {
+    return <div className="pending"/>;
+  },
+  failed: function (error) {
+    return <div className="error">{error.message}</div>;
+  },
+  done: function (user) {
+    return <div className="user">{user.name}</div>;
+  }
+});
+{% endhighlight %}
+
+
 <h3>Options</h3>
 
 <table class="table table-bordered table-striped">
@@ -353,6 +375,50 @@ var fetch = Store.fetch.notFound();
 var fetch = require('marty/fetch').notFound();
 
 console.log(fetch.failed, fetch.error) // FAILED, { status: 404 }
+{% endhighlight %}
+
+<h2 id="when.all">when.all([fetchResult*], handlers)</h2>
+
+``when.all`` will wait for all fetch results to be done before invoked the ``done`` status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
+
+{% highlight js %}
+var when = require('marty/when');
+var fetch = require('marty/fetch');
+
+when.all([fetch.done("foo"), fetch.done("bar")], {
+  pending: function () {
+    console.log("pending");
+  },
+  done: function (results) {
+    console.log("all done", results); // foo, bar
+  },
+  failed: function (error) {
+    console.log("failed", error); // first error
+  }
+})
+
+{% endhighlight %}
+
+<h2 id="when.join">when.join(fetchResult*, handlers)</h2>
+
+``when.join`` will wait for all fetch results to be done before invoked the ``done`` status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
+
+{% highlight js %}
+var when = require('marty/when');
+var fetch = require('marty/fetch');
+
+when.join(fetch.done("foo"), fetch.done("bar"), {
+  pending: function () {
+    console.log("pending");
+  },
+  done: function (results) {
+    console.log("all done", results); // foo, bar
+  },
+  failed: function (error) {
+    console.log("failed", error); // first error
+  }
+})
+
 {% endhighlight %}
 
 <h2 id="waitFor">waitFor(*stores)</h2>

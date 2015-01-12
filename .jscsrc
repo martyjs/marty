@@ -35,7 +35,6 @@
   "disallowTrailingWhitespace": true,
   "disallowKeywords": ["with"],
   "disallowKeywordsOnNewLine": ["else"],
-  
   "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", "return", "try", "catch"],
   "requireSpaceAfterLineComment": true,
   "requireSpaceAfterBinaryOperators": true,
