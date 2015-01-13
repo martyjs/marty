@@ -4,7 +4,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.5',
+  version: '0.7.6',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 

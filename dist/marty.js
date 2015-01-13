@@ -5,12 +5,12 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.5',
+  version: '0.7.6',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
-},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":18,"underscore":34}],1:[function(require,module,exports){
+},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":18,"underscore":35}],1:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
@@ -127,7 +127,8 @@ function ActionCreators(options) {
         dispatchStarting();
 
         try {
-          result = func.apply(actionContext(), arguments);
+          var context = actionContext();
+          result = func.apply(context, arguments);
 
           if (result) {
             if (_.isFunction(result.then)) {
@@ -236,7 +237,7 @@ function ActionCreators(options) {
 }
 
 module.exports = ActionCreators;
-},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":21,"./utils/uuid":22,"underscore":34}],10:[function(require,module,exports){
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":21,"./utils/uuid":22,"underscore":35}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var cloneState = require('./utils/cloneState');
@@ -392,7 +393,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-},{"../constants/status":3,"./utils/cloneState":20,"./utils/uuid":22,"underscore":34}],11:[function(require,module,exports){
+},{"../constants/status":3,"./utils/cloneState":20,"./utils/uuid":22,"underscore":35}],11:[function(require,module,exports){
 var _ = require('underscore');
 
 function constants(obj) {
@@ -459,7 +460,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"underscore":34}],12:[function(require,module,exports){
+},{"underscore":35}],12:[function(require,module,exports){
 var _ = require('underscore');
 var Store = require('./store');
 var HttpAPI = require('./httpAPI');
@@ -545,7 +546,7 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":16,"./mixins/stateMixin":17,"./store":19,"events":23,"underscore":34}],13:[function(require,module,exports){
+},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":16,"./mixins/stateMixin":17,"./store":19,"events":24,"underscore":35}],13:[function(require,module,exports){
 var ACTION_STARTED = 'action-started';
 var EventEmitter = require('events').EventEmitter;
 var diagnosticEvents = new EventEmitter();
@@ -586,7 +587,7 @@ function onAction(callback) {
     }
   };
 }
-},{"events":23}],14:[function(require,module,exports){
+},{"events":24}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
@@ -598,9 +599,9 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-},{"./utils/uuid":22,"flux":29}],15:[function(require,module,exports){
+},{"./utils/uuid":22,"flux":30}],15:[function(require,module,exports){
+var when = require('./when');
 var NotFoundError = require('../errors/notFound');
-var StatusConstants = require('../constants/status');
 
 module.exports = {
   done: done,
@@ -638,34 +639,14 @@ function notFound() {
 
 function fetchResult(result) {
   result.when = when;
+  result._isFetchResult = true;
 
   return result;
 }
-
-function when(handlers) {
-  handlers || (handlers = {});
-
-  var status = this.status;
-  var handler = handlers[status.toLowerCase()];
-
-  if (!handler) {
-    throw new Error('Could not find a ' + status + ' handler');
-  }
-
-  switch (status) {
-    case StatusConstants.PENDING.toString():
-      return handler.call(handlers);
-    case StatusConstants.FAILED.toString():
-      return handler.call(handlers, this.error);
-    case StatusConstants.DONE.toString():
-      return handler.call(handlers, this.result);
-  }
-}
-},{"../constants/status":3,"../errors/notFound":7}],16:[function(require,module,exports){
+},{"../errors/notFound":7,"./when":23}],16:[function(require,module,exports){
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
-var fetch = window.fetch;
 var _ = require('underscore');
 var CONTENT_TYPE = 'Content-Type';
 var JSON_CONTENT_TYPE = 'application/json';
@@ -700,6 +681,10 @@ _.extend(HttpAPI.prototype, {
     }
 
     return fetch(options.url, options).then(function (res) {
+      if (res.status >= 400) {
+        throw res;
+      }
+
       if (isJson(res)) {
         res.body = JSON.parse(res._body);
       }
@@ -758,7 +743,7 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpAPI;
-},{"es6-promise":28,"isomorphic-fetch":32,"underscore":34}],17:[function(require,module,exports){
+},{"es6-promise":29,"isomorphic-fetch":33,"underscore":35}],17:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
@@ -954,7 +939,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":13,"../utils/cloneState":20,"../utils/uuid":22,"underscore":34}],18:[function(require,module,exports){
+},{"../diagnostics":13,"../utils/cloneState":20,"../utils/uuid":22,"underscore":35}],18:[function(require,module,exports){
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -1003,9 +988,13 @@ function serializeState() {
     return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
   };
 
+  state.toJSON = function () {
+    return _.omit(state, 'toString', 'toJSON');
+  };
+
   return state;
 }
-},{"../errors/unknownStore":8,"underscore":34}],19:[function(require,module,exports){
+},{"../errors/unknownStore":8,"underscore":35}],19:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
@@ -1032,11 +1021,11 @@ function Store(options) {
   var dispatcher = options.dispatcher || Dispatcher.getCurrent();
 
   this.handlers = {};
-  this.fetch = fetch;
   this.clear = clear;
   this.dispose = dispose;
   this.waitFor = waitFor;
   this.id = uuid.small();
+  this.fetch = fetchState;
   this.setState = setState;
   this.getState = getState;
   this.hasChanged = hasChanged;
@@ -1110,7 +1099,7 @@ function Store(options) {
     }
   }
 
-  function fetch(id, local, remote) {
+  function fetchState(id, local, remote) {
     var options, result, error, cacheError;
 
     if (_.isObject(id)) {
@@ -1139,12 +1128,12 @@ function Store(options) {
       error = failedFetches[options.id];
 
       if (error) {
-        return fetch.failed(error);
+        return fetchResult.failed(error);
       }
     }
 
     if (fetchInProgress[options.id]) {
-      return fetch.pending();
+      return fetchResult.pending();
     }
 
     return tryAndGetLocally() || tryAndGetRemotely();
@@ -1154,12 +1143,12 @@ function Store(options) {
         var result = options.locally.call(store);
 
         if (result) {
-          return fetch.done(result);
+          return fetchResult.done(result);
         }
       } catch (error) {
         failedFetches[options.id] = error;
 
-        return fetch.failed(error);
+        return fetchResult.failed(error);
       }
     }
 
@@ -1186,7 +1175,7 @@ function Store(options) {
               hasChanged();
             });
 
-            return fetch.pending();
+            return fetchResult.pending();
           } else {
             result = tryAndGetLocally();
 
@@ -1213,7 +1202,7 @@ function Store(options) {
 
       fetchFinished();
 
-      return fetch.failed(error);
+      return fetchResult.failed(error);
     }
   }
 
@@ -1236,11 +1225,11 @@ function Store(options) {
         }
 
         if (dependencyErrors.length) {
-          return fetch.failed(new CompoundError(dependencyErrors));
+          return fetchResult.failed(new CompoundError(dependencyErrors));
         }
 
         if (pending) {
-          return fetch.pending();
+          return fetchResult.pending();
         }
       } else {
         if (!options.dependsOn.done) {
@@ -1382,7 +1371,7 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":22,"events":23,"underscore":34}],20:[function(require,module,exports){
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":22,"events":24,"underscore":35}],20:[function(require,module,exports){
 function cloneState() {
   return null;
 }
@@ -1422,7 +1411,91 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
-},{"util":27}],23:[function(require,module,exports){
+},{"util":28}],23:[function(require,module,exports){
+var _ = require('underscore');
+var StatusConstants = require('../constants/status');
+
+when.all = all;
+when.join = join;
+
+function when(handlers) {
+  handlers || (handlers = {});
+
+  var handler = handlers[this.status.toLowerCase()];
+
+  if (!handler) {
+    throw new Error('Could not find a ' + this.status + ' handler');
+  }
+
+  switch (this.status) {
+    case StatusConstants.PENDING.toString():
+      return handler.call(handlers);
+    case StatusConstants.FAILED.toString():
+      return handler.call(handlers, this.error);
+    case StatusConstants.DONE.toString():
+      return handler.call(handlers, this.result);
+    default:
+      throw new Error('Unknown fetch result status');
+  }
+}
+
+function join(/* fetchResults, handlers */) {
+  return all(_.initial(arguments), _.last(arguments));
+}
+
+function all(fetchResults, handlers) {
+  if (!fetchResults || !handlers) {
+    throw new Error('No fetch results or handlers specified');
+  }
+
+  if (!_.isArray(fetchResults) || _.any(fetchResults, notFetchResult)) {
+    throw new Error('Must specify a set of fetch results');
+  }
+
+  var context = {
+    result: results(fetchResults),
+    error: firstError(fetchResults),
+    status: aggregateStatus(fetchResults)
+  };
+
+  return when.call(context, handlers);
+}
+
+function results(fetchResults) {
+  return fetchResults.map(function (result) {
+    return result.result;
+  });
+}
+
+function firstError(fetchResults) {
+  var failedResult = _.find(fetchResults, {
+    status: StatusConstants.FAILED.toString()
+  });
+
+  if (failedResult) {
+    return failedResult.error;
+  }
+}
+
+function notFetchResult(result) {
+  return !result._isFetchResult;
+}
+
+function aggregateStatus(fetchResults) {
+  for (var i = fetchResults.length - 1; i >= 0; i--) {
+    var status = fetchResults[i].status;
+
+    if (status === StatusConstants.FAILED.toString() ||
+        status === StatusConstants.PENDING.toString()) {
+      return status;
+    }
+  }
+
+  return StatusConstants.DONE.toString();
+}
+
+module.exports = when;
+},{"../constants/status":3,"underscore":35}],24:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1725,7 +1798,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1750,7 +1823,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1815,14 +1888,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2412,7 +2485,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":26,"_process":25,"inherits":24}],28:[function(require,module,exports){
+},{"./support/isBuffer":27,"_process":26,"inherits":25}],29:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3375,7 +3448,7 @@ function hasOwnProperty(obj, prop) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":25}],29:[function(require,module,exports){
+},{"_process":26}],30:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3387,7 +3460,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":30}],30:[function(require,module,exports){
+},{"./lib/Dispatcher":31}],31:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3639,7 +3712,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":31}],31:[function(require,module,exports){
+},{"./invariant":32}],32:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3694,10 +3767,10 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 require('fetch');
 
-},{"fetch":33}],33:[function(require,module,exports){
+},{"fetch":34}],34:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3908,7 +3981,7 @@ require('fetch');
   }
 })();
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
