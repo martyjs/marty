@@ -432,6 +432,25 @@
 </span>  <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
+<p>If you need to wait for multiple fetch results to be finished, you can use <code>when.all()</code>. You pass in an array of fetch results and it will execute the appropriate handler (e.g. if any of the handlers failed then it will execute the failed handler).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">when</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/when'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">FooStore</span><span class="p">.</span><span class="nx">getFoo</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">bar</span> <span class="o">=</span> <span class="nx">BarStore</span><span class="p">.</span><span class="nx">getBar</span><span class="p">(</span><span class="mi">456</span><span class="p">);</span>
+
+<span class="nx">when</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">],</span> <span class="p">{</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"pending"</span><span class="o">/&gt;</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"error"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
 <h3>Options</h3>
 
 <table class="table table-bordered table-striped">
@@ -581,6 +600,44 @@
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">failed</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { status: 404 }</span></code></pre></div>
 
+<h2 id="when.all">when.all([fetchResult*], handlers)</h2>
+
+<p><code>when.all</code> will wait for all fetch results to be done before invoked the <code>done</code> status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">when</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/when'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">);</span>
+
+<span class="nx">when</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">),</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">)],</span> <span class="p">{</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"pending"</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"all done"</span><span class="p">,</span> <span class="nx">results</span><span class="p">);</span> <span class="c1">// foo, bar</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"failed"</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span> <span class="c1">// first error</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+<h2 id="when.join">when.join(fetchResult*, handlers)</h2>
+
+<p><code>when.join</code> will wait for all fetch results to be done before invoked the <code>done</code> status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">when</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/when'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">);</span>
+
+<span class="nx">when</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">),</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">),</span> <span class="p">{</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"pending"</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"all done"</span><span class="p">,</span> <span class="nx">results</span><span class="p">);</span> <span class="c1">// foo, bar</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"failed"</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span> <span class="c1">// first error</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
 <h2 id="waitFor">waitFor(*stores)</h2>
 
 <p>If an action handler is dependant on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.</p>
@@ -610,7 +667,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.7.4</li>
+        <li>v0.7.6</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
