@@ -15,6 +15,21 @@ describe('ActionCreators', function () {
     dispatcher = new MockDispatcher();
   });
 
+  describe('when you create an action creator called \'dispatch\'', function () {
+    it('should throw an error', function () {
+      expect(createADispatchActionCreator).to.throw(Error);
+
+      function createADispatchActionCreator() {
+        var TestConstants = constants(['DISPATCH']);
+
+        return new ActionCreators({
+          dispatcher: dispatcher,
+          dispatch: TestConstants.DISPATCH()
+        });
+      }
+    });
+  });
+
   describe('when the action creator is created from a constant', function () {
     var TestConstants, expectedProperties;
     beforeEach(function () {
