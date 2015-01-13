@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.6',
+  version: '0.7.7',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -77,16 +77,25 @@ module.exports = UnkownStoreError;
 },{}],9:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
+var RESERVED_KEYWORDS = ['dispatch'];
 var Dispatcher = require('./dispatcher');
 var ActionPayload = require('./actionPayload');
 var ActionConstants = require('../constants/actions');
 var serializeError = require('./utils/serializeError');
+
 
 function ActionCreators(options) {
   var creator = this;
   var dispatcher = options.dispatcher || Dispatcher.getCurrent();
 
   options || (options = {});
+
+  _.each(RESERVED_KEYWORDS, function (keyword) {
+    if (options[keyword]) {
+      throw new Error(keyword + ' is a reserved keyword');
+    }
+  });
+
 
   this.getActionType = getActionType;
 
