@@ -54,7 +54,7 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 ## Sponsors
 
-[![Qubit](docs/img/qubit.png)](http://qubitproducts.com)
+* [![Qubit](docs/img/qubit.png)](http://qubitproducts.com)
 
 ## License
 
