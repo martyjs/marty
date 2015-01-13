@@ -19,6 +19,12 @@ describe('aliases', function () {
     });
   });
 
+  describe('marty/when', function () {
+    it('should resolve to when', function () {
+      expect(require('../when')).to.equal(require('../lib/when'));
+    });
+  });
+
   describe('marty/constants', function () {
     it('should resolve to constants', function () {
       expect(require('../constants')).to.equal(require('../lib/constants'));

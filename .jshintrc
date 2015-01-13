@@ -32,6 +32,7 @@
     "after": true,
     "beforeEach": true,
     "afterEach": true,
-    "Promise": true
+    "Promise": true,
+    "fetch": true
   }
 }

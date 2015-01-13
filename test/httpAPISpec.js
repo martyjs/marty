@@ -1,8 +1,11 @@
 var MOCK_SERVER_PORT = 8956;
+var sinon = require('sinon');
 var _ = require('lodash-node');
 var format = require('util').format;
 var expect = require('chai').expect;
 var HttpAPI = require('../lib/httpAPI');
+
+require('es6-promise').polyfill();
 
 describe('HttpAPI', function () {
   this.timeout(10000);
@@ -28,6 +31,33 @@ describe('HttpAPI', function () {
         method: 'GET',
         body: {}
       });
+    });
+  });
+
+  describe('when a request fails', function () {
+    var fetch, expectedResponse, actualError;
+    beforeEach(function () {
+      expectedResponse = {
+        status: 400
+      };
+
+      var fetchResult =  new Promise(function (resolve) {
+        resolve(expectedResponse);
+      });
+
+      fetch = sinon.stub(window, 'fetch').returns(fetchResult);
+
+      return new HttpAPI().get('/foo').catch(function (error) {
+        actualError = error;
+      });
+    });
+
+    afterEach(function () {
+      fetch.restore();
+    });
+
+    it('should reject with the response object', function () {
+      expect(actualError).to.eql(expectedResponse);
     });
   });
 
