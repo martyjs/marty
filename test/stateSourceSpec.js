@@ -80,7 +80,7 @@ describe('StateSource', function () {
   describe('#mixins', function () {
     describe('when you have multiple mixins', function () {
       beforeEach(function () {
-        repo = new StateSource({
+        stateSource = new StateSource({
           mixins: [{
             foo: function () { return 'foo'; }
           }, {
@@ -90,8 +90,8 @@ describe('StateSource', function () {
       });
 
       it('should allow you to mixin object literals', function () {
-        expect(repo.foo()).to.equal('foo');
-        expect(repo.bar()).to.equal('bar');
+        expect(stateSource.foo()).to.equal('foo');
+        expect(stateSource.bar()).to.equal('bar');
       });
     });
   });
