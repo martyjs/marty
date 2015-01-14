@@ -2,7 +2,7 @@
 - Stores
 - Action Creators
 - State Mixin
-- HTTP API
+- State Sources
 - Constants
 - Dispatcher
 - Further reading

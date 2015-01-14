@@ -3,11 +3,12 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var format = require('util').format;
 var expect = require('chai').expect;
-var HttpAPI = require('../lib/httpAPI');
+var HttpAPI = require('../lib/repositories/httpAPI');
 
 require('es6-promise').polyfill();
 
-describe('HttpAPI', function () {
+describe('HttpAPIRepository', function () {
+
   this.timeout(10000);
 
   var API, baseUrl, response;
@@ -22,7 +23,7 @@ describe('HttpAPI', function () {
     beforeEach(function () {
       url = baseUrl + 'foos';
 
-      return new HttpAPI().get(url).then(storeResponse);
+      return HttpAPI().get(url).then(storeResponse);
     });
 
     it('should start a get request with the given url', function () {
@@ -202,14 +203,11 @@ describe('HttpAPI', function () {
   describe('#baseUrl', function () {
     describe('when you have a baseUrl', function () {
       beforeEach(function () {
-        API = new HttpAPI({
-          baseUrl: baseUrl,
-          getUser: function () {
-            return this.get('/foos').then(storeResponse);
-          }
+        API = HttpAPI({
+          baseUrl: baseUrl
         });
 
-        return API.getUser();
+        return API.get('/foos').then(storeResponse);
       });
 
       it('should add the / if its missing', function () {
@@ -223,14 +221,11 @@ describe('HttpAPI', function () {
 
     describe('when you dont specify a / in the baseUrl or url', function () {
       beforeEach(function () {
-        API = new HttpAPI({
-          baseUrl: baseUrl.substring(0, baseUrl.length - 1),
-          getUser: function () {
-            return this.get('foos').then(storeResponse);
-          }
+        API = HttpAPI({
+          baseUrl: baseUrl.substring(0, baseUrl.length - 1)
         });
 
-        return API.getUser();
+        return API.get('foos').then(storeResponse);
       });
 
       it('should add the / if its missing', function () {
@@ -250,13 +245,10 @@ describe('HttpAPI', function () {
   function makeRequest(method) {
     var args = _.rest(arguments);
 
-    API = new HttpAPI({
-      baseUrl: baseUrl,
-      execute: function () {
-        return this[method].apply(this, args).then(storeResponse);
-      }
+    API = HttpAPI({
+      baseUrl: baseUrl
     });
 
-    return API.execute();
+    return API[method].apply(API, args).then(storeResponse);
   }
 });
