@@ -1,19 +1,79 @@
+var Marty = require('../index');
 var expect = require('chai').expect;
 var StateSource = require('../lib/stateSource');
 
 describe('StateSource', function () {
-
-  var repo;
+  var stateSource;
 
   describe('#createStateSource()', function () {
-    beforeEach(function () {
-      repo = new StateSource({
-        foo: 'foo'
+    describe('when you pass in a function', function () {
+      var expectedResult;
+
+      beforeEach(function () {
+        expectedResult = 'foo';
+        stateSource = Marty.createStateSource({
+          foo: function () {
+            return this.bar();
+          },
+          bar: function () {
+            return expectedResult;
+          }
+        });
+      });
+
+      it('should expose the function', function () {
+        expect(stateSource.foo()).to.equal(expectedResult);
       });
     });
 
-    it('should apply options to instance', function () {
-      expect(repo.foo).to.equal('foo');
+    describe('#type', function () {
+      describe('jsonStorage', function () {
+        beforeEach(function () {
+          stateSource = Marty.createStateSource({
+            type: 'jsonStorage'
+          });
+        });
+
+        it('should mixin the JSONStorageStateSource', function () {
+          expect(stateSource._isJSONStorageStateSource).to.be.true;
+        });
+      });
+
+      describe('localStorage', function () {
+        beforeEach(function () {
+          stateSource = Marty.createStateSource({
+            type: 'localStorage'
+          });
+        });
+
+        it('should mixin the LocalStorageStateSource', function () {
+          expect(stateSource._isLocalStorageStateSource).to.be.true;
+        });
+      });
+
+      describe('sessionStorage', function () {
+        beforeEach(function () {
+          stateSource = Marty.createStateSource({
+            type: 'sessionStorage'
+          });
+        });
+
+        it('should mixin the SessionStorageStateSource', function () {
+          expect(stateSource._isSessionStorageStateSource).to.be.true;
+        });
+      });
+
+      describe('http', function () {
+        beforeEach(function () {
+          stateSource = Marty.createStateSource({
+            type: 'http'
+          });
+        });
+
+        it('should mixin the HttpStateSource', function () {
+          expect(stateSource._isHttpStateSource).to.be.true;
+        });
+      });
     });
   });
 
@@ -35,5 +95,4 @@ describe('StateSource', function () {
       });
     });
   });
-
 });

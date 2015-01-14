@@ -1,13 +1,13 @@
 var expect = require('chai').expect;
-var SessionStorageStateSource = require('../lib/stateSources/sessionStorage');
+var LocalStorageStateSource = require('../../lib/stateSources/localStorage');
 
-describe('SessionStorageStateSource', function () {
+describe('LocalStorageStateSource', function () {
 
   var mixin;
 
   beforeEach(function () {
-    sessionStorage.clear();
-    mixin = new SessionStorageStateSource();
+    localStorage.clear();
+    mixin = new LocalStorageStateSource();
   });
 
   describe('#createRepository()', function () {
@@ -21,24 +21,24 @@ describe('SessionStorageStateSource', function () {
       mixin.set('foo', 'bar');
     });
 
-    it('should store data under key in sessionStorage', function () {
-      expect(sessionStorage.getItem('foo')).to.equal('bar');
+    it('should store data under key in localStorage', function () {
+      expect(localStorage.getItem('foo')).to.equal('bar');
     });
   });
 
   describe('#get()', function () {
     beforeEach(function () {
-      sessionStorage.setItem('foo', 'bar');
+      localStorage.setItem('foo', 'bar');
     });
 
-    it('should retrieve data under key in sessionStorage', function () {
+    it('should retrieve data under key in localStorage', function () {
       expect(mixin.get('foo')).to.equal('bar');
     });
   });
 
   describe('#namespace', function () {
     beforeEach(function () {
-      mixin = new SessionStorageStateSource({
+      mixin = new LocalStorageStateSource({
         namespace: 'baz'
       });
     });
@@ -46,7 +46,7 @@ describe('SessionStorageStateSource', function () {
     describe('when you pass in a namespace', function () {
       describe('when retrieving data', function () {
         beforeEach(function () {
-          sessionStorage.setItem('bazfoo', 'bar');
+          localStorage.setItem('bazfoo', 'bar');
         });
 
         it('should prepend namespace to key', function () {
@@ -60,7 +60,7 @@ describe('SessionStorageStateSource', function () {
         });
 
         it('should prepend namespace to key', function () {
-          expect(sessionStorage.getItem('bazfoo')).to.equal('bar');
+          expect(localStorage.getItem('bazfoo')).to.equal('bar');
         });
       });
     });

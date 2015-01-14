@@ -3,11 +3,11 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var format = require('util').format;
 var expect = require('chai').expect;
-var HttpAPI = require('../lib/stateSources/httpAPI');
+var HttpStateSource = require('../../lib/stateSources/http');
 
 require('es6-promise').polyfill();
 
-describe('HttpAPIStateSource', function () {
+describe('HttpStateSource', function () {
 
   this.timeout(10000);
 
@@ -23,7 +23,7 @@ describe('HttpAPIStateSource', function () {
     beforeEach(function () {
       url = baseUrl + 'foos';
 
-      return HttpAPI().get(url).then(storeResponse);
+      return HttpStateSource().get(url).then(storeResponse);
     });
 
     it('should start a get request with the given url', function () {
@@ -48,7 +48,7 @@ describe('HttpAPIStateSource', function () {
 
       fetch = sinon.stub(window, 'fetch').returns(fetchResult);
 
-      return new HttpAPI().get('/foo').catch(function (error) {
+      return new HttpStateSource().get('/foo').catch(function (error) {
         actualError = error;
       });
     });
@@ -203,7 +203,7 @@ describe('HttpAPIStateSource', function () {
   describe('#baseUrl', function () {
     describe('when you have a baseUrl', function () {
       beforeEach(function () {
-        API = HttpAPI({
+        API = HttpStateSource({
           baseUrl: baseUrl
         });
 
@@ -221,7 +221,7 @@ describe('HttpAPIStateSource', function () {
 
     describe('when you dont specify a / in the baseUrl or url', function () {
       beforeEach(function () {
-        API = HttpAPI({
+        API = HttpStateSource({
           baseUrl: baseUrl.substring(0, baseUrl.length - 1)
         });
 
@@ -245,7 +245,7 @@ describe('HttpAPIStateSource', function () {
   function makeRequest(method) {
     var args = _.rest(arguments);
 
-    API = HttpAPI({
+    API = HttpStateSource({
       baseUrl: baseUrl
     });
 

@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var JSONStorageStateSource = require('../lib/stateSources/jsonStorage');
+var JSONStorageStateSource = require('../../lib/stateSources/jsonStorage');
 
 describe('JSONStorageStateSource', function () {
 
