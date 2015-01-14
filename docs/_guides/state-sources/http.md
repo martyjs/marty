@@ -1,8 +1,8 @@
 ---
 layout: page
-title: HTTP API
-id: http-api
-section: HTTP API
+title: HTTP
+id: http-state-source
+section: State Sources
 ---
 
 It's likely at some point that you will need to communicate with the server. HTTP APIs encapsulate that communication for you.
@@ -12,7 +12,8 @@ HTTP APIs allow you to define functions that create HTTP requests. We use the [f
 All requests return a promise (Promises/A) that allow you to easily define what happens when a request has finished.
 
 {% highlight js %}
-var UsersAPI = Marty.createHttpAPI({
+var UsersAPI = Marty.createStateSource({
+  type: "http",
   baseUrl: 'http://foo.com'
   getAll: function (users) {
     return this.get('/users').then(function (res) {
