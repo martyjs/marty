@@ -3,11 +3,11 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var format = require('util').format;
 var expect = require('chai').expect;
-var HttpAPI = require('../lib/repositories/httpAPI');
+var HttpAPI = require('../lib/stateSources/httpAPI');
 
 require('es6-promise').polyfill();
 
-describe('HttpAPIRepository', function () {
+describe('HttpAPIStateSource', function () {
 
   this.timeout(10000);
 

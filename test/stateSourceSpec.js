@@ -1,13 +1,13 @@
 var expect = require('chai').expect;
-var Repository = require('../lib/repository');
+var StateSource = require('../lib/stateSource');
 
-describe('Repository', function () {
+describe('StateSource', function () {
 
   var repo;
 
-  describe('#createRepository()', function () {
+  describe('#createStateSource()', function () {
     beforeEach(function () {
-      repo = new Repository({
+      repo = new StateSource({
         foo: 'foo'
       });
     });
@@ -20,7 +20,7 @@ describe('Repository', function () {
   describe('#mixins', function () {
     describe('when you have multiple mixins', function () {
       beforeEach(function () {
-        repo = new Repository({
+        repo = new StateSource({
           mixins: [{
             foo: function () { return 'foo'; }
           }, {

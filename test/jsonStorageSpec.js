@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
-var JsonStorageRepository = require('../lib/repositories/jsonStorage');
+var JSONStorageStateSource = require('../lib/stateSources/jsonStorage');
 
-describe('JsonStorageRepository', function () {
+describe('JSONStorageStateSource', function () {
 
   var mixin, payload, serializedPayload;
 
@@ -15,7 +15,7 @@ describe('JsonStorageRepository', function () {
   beforeEach(function () {
     localStorage.clear();
     sessionStorage.clear();
-    mixin = JsonStorageRepository();
+    mixin = new JSONStorageStateSource();
   });
 
   describe('#createRepository()', function () {
@@ -48,7 +48,7 @@ describe('JsonStorageRepository', function () {
   describe('#storage', function () {
     describe('when you pass in a custom web storage object', function () {
       beforeEach(function () {
-        mixin = JsonStorageRepository({
+        mixin = new JSONStorageStateSource({
           storage: sessionStorage
         });
         mixin.set('foo', payload.value);
@@ -61,7 +61,7 @@ describe('JsonStorageRepository', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      mixin = JsonStorageRepository({
+      mixin = new JSONStorageStateSource({
         namespace: 'baz'
       });
     });

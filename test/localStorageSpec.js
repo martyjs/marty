@@ -1,13 +1,13 @@
 var expect = require('chai').expect;
-var LocalStorageRepository = require('../lib/repositories/localStorage');
+var LocalStorageStateSource = require('../lib/stateSources/localStorage');
 
-describe('LocalStorageRepository', function () {
+describe('LocalStorageStateSource', function () {
 
   var mixin;
 
   beforeEach(function () {
     localStorage.clear();
-    mixin = LocalStorageRepository();
+    mixin = new LocalStorageStateSource();
   });
 
   describe('#createRepository()', function () {
@@ -38,7 +38,7 @@ describe('LocalStorageRepository', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      mixin = LocalStorageRepository({
+      mixin = new LocalStorageStateSource({
         namespace: 'baz'
       });
     });

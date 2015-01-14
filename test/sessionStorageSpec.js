@@ -1,13 +1,13 @@
 var expect = require('chai').expect;
-var SessionStorageRepository = require('../lib/repositories/sessionStorage');
+var SessionStorageStateSource = require('../lib/stateSources/sessionStorage');
 
-describe('SessionStorageRepository', function () {
+describe('SessionStorageStateSource', function () {
 
   var mixin;
 
   beforeEach(function () {
     sessionStorage.clear();
-    mixin = SessionStorageRepository();
+    mixin = new SessionStorageStateSource();
   });
 
   describe('#createRepository()', function () {
@@ -38,7 +38,7 @@ describe('SessionStorageRepository', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      mixin = SessionStorageRepository({
+      mixin = new SessionStorageStateSource({
         namespace: 'baz'
       });
     });
