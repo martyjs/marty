@@ -75,7 +75,6 @@ var TodoActions = Marty.createActionCreators({
    * Delete all the completed ToDos
    */
   destroyCompleted: TodoConstants.TODO_DESTROY_COMPLETED(function () {
-    console.log("destroyCompleted")
     this.dispatch();
   })
 
