@@ -37,6 +37,12 @@ describe('aliases', function () {
     });
   });
 
+  describe('marty/stateSource', function () {
+    it('should resolve to stateSource', function () {
+      expect(require('../stateSource')).to.equal(require('../lib/stateSource'));
+    });
+  });
+
   describe('marty/diagnostics', function () {
     it('should resolve to diagnostics', function () {
       expect(require('../diagnostics')).to.equal(require('../lib/diagnostics'));
