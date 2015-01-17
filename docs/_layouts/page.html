@@ -4,7 +4,7 @@ sectionid: page
 ---
 
 <div class="container bs-docs-container">
-  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
     <ul class="sections-nav nav" role="navigation">
       {% assign sections = site[page.collection] | group_by:"section" %}
       {% capture order_data %}{{page.collection}}_section_order{% endcapture %}
@@ -42,7 +42,7 @@ sectionid: page
       {% endfor %}
     </ul>
   </div>
-  <div class="bs-docs-content col-md-10" role="main">
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     {% if page.title != null %}
       <h1 class="page-title">{{page.title}}</h1>
     {% endif %}
