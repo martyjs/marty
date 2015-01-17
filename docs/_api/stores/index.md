@@ -40,6 +40,9 @@ var UsersStore = Marty.createStore({
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
+  getInitialState: function () {
+    return {};
+  },
   addUser: function (user) {
     console.log(this.action) // { type: 'RECEIVE_USER', arguments: [{ name: ...}] }
     ...
@@ -84,6 +87,9 @@ var UsersStore = Marty.createStore({
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
+  getInitialState: function () {
+    return {};
+  },
   addUser: function (user) {
     this.state.push(user);
     this.hasChanged();
@@ -99,9 +105,7 @@ var UsersStore = Marty.createStore({
 
 <h2 id="getInitialState">getInitialState()</h2>
 
-<code>getInitialState</code> is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the [state](#state) property.
-
-If you do not implement getInitialState or you do not return anything then the default state is an empty object literal (<code>{}</code>).
+<code>getInitialState</code> (*required*) is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the [state](#state) property.
 
 <h2 id="state">state</h2>
 
