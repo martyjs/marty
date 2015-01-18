@@ -1,4 +1,3 @@
-killall node
 if [ -f tmp/mock-server.pid ];
 then
   kill $(cat tmp/mock-server.pid)
