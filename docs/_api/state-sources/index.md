@@ -20,7 +20,7 @@ var UserRepository = Marty.createStateSource({
 
 <h3 id="type">type</h3>
 
-The type of the state source (e.g. 'http')
+The type of the state source (e.g. 'http').
 
 <h3 id="mixins">mixins</h3>
 
