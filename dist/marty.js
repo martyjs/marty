@@ -5,12 +5,12 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.7.7',
+  version: '0.8.0-beta',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
-},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":18,"underscore":35}],1:[function(require,module,exports){
+},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":17,"underscore":39}],1:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
@@ -246,7 +246,7 @@ function ActionCreators(options) {
 }
 
 module.exports = ActionCreators;
-},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":21,"./utils/uuid":22,"underscore":35}],10:[function(require,module,exports){
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":25,"./utils/uuid":26,"underscore":39}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var cloneState = require('./utils/cloneState');
@@ -402,7 +402,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-},{"../constants/status":3,"./utils/cloneState":20,"./utils/uuid":22,"underscore":35}],11:[function(require,module,exports){
+},{"../constants/status":3,"./utils/cloneState":24,"./utils/uuid":26,"underscore":39}],11:[function(require,module,exports){
 var _ = require('underscore');
 
 function constants(obj) {
@@ -469,12 +469,12 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"underscore":35}],12:[function(require,module,exports){
+},{"underscore":39}],12:[function(require,module,exports){
 var _ = require('underscore');
 var Store = require('./store');
-var HttpAPI = require('./httpAPI');
 var constants = require('./constants');
 var Dispatcher = require('./dispatcher');
+var StateSource = require('./stateSource');
 var StateMixin = require('./mixins/stateMixin');
 var ActionCreators = require('./actionCreators');
 var EventEmitter = require('events').EventEmitter;
@@ -487,10 +487,9 @@ var emitter = new EventEmitter();
 module.exports = {
   getStores: getStores,
   createStore: createStore,
-  createHttpAPI: createHttpAPI,
-  createHTTPAPI: createHttpAPI, // For those who really care about correct casing
   createConstants: createConstants,
   createStateMixin: createStateMixin,
+  createStateSource: createStateSource,
   createActionCreators: createActionCreators,
   addStoreChangeListener: addStoreChangeListener
 };
@@ -530,10 +529,6 @@ function onStoreChanged() {
   emitter.emit.apply(emitter, args);
 }
 
-function createHttpAPI(options) {
-  return new HttpAPI(defaults(this, options));
-}
-
 function createConstants(obj) {
   return constants(obj);
 }
@@ -546,6 +541,10 @@ function createStateMixin(options) {
   return new StateMixin(defaults(this, options));
 }
 
+function createStateSource(options) {
+  return new StateSource(defaults(this, options));
+}
+
 function defaults(marty, options) {
   options || (options = {});
 
@@ -555,7 +554,7 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./httpAPI":16,"./mixins/stateMixin":17,"./store":19,"events":24,"underscore":35}],13:[function(require,module,exports){
+},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./mixins/stateMixin":16,"./stateSource":18,"./store":23,"events":28,"underscore":39}],13:[function(require,module,exports){
 var ACTION_STARTED = 'action-started';
 var EventEmitter = require('events').EventEmitter;
 var diagnosticEvents = new EventEmitter();
@@ -596,7 +595,7 @@ function onAction(callback) {
     }
   };
 }
-},{"events":24}],14:[function(require,module,exports){
+},{"events":28}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
@@ -608,7 +607,7 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-},{"./utils/uuid":22,"flux":30}],15:[function(require,module,exports){
+},{"./utils/uuid":26,"flux":34}],15:[function(require,module,exports){
 var when = require('./when');
 var NotFoundError = require('../errors/notFound');
 
@@ -652,107 +651,7 @@ function fetchResult(result) {
 
   return result;
 }
-},{"../errors/notFound":7,"./when":23}],16:[function(require,module,exports){
-require('isomorphic-fetch');
-require('es6-promise').polyfill();
-
-var _ = require('underscore');
-var CONTENT_TYPE = 'Content-Type';
-var JSON_CONTENT_TYPE = 'application/json';
-
-function HttpAPI(options) {
-  options || (options = {});
-
-  _.extend(this, options);
-}
-
-_.extend(HttpAPI.prototype, {
-  get: function (options) {
-    return this.request(requestOptions('GET', this.baseUrl, options));
-  },
-  put: function (options) {
-    return this.request(requestOptions('PUT', this.baseUrl, options));
-  },
-  post: function (options) {
-    return this.request(requestOptions('POST', this.baseUrl, options));
-  },
-  delete: function (options) {
-    return this.request(requestOptions('DELETE', this.baseUrl, options));
-  },
-  request: function (options) {
-    if (!options.headers) {
-      options.headers = {};
-    }
-
-    if (contentType() === JSON_CONTENT_TYPE && _.isObject(options.body)) {
-      options.body = JSON.stringify(options.body);
-      options.headers[CONTENT_TYPE] = JSON_CONTENT_TYPE;
-    }
-
-    return fetch(options.url, options).then(function (res) {
-      if (res.status >= 400) {
-        throw res;
-      }
-
-      if (isJson(res)) {
-        res.body = JSON.parse(res._body);
-      }
-
-      return res;
-    });
-
-    function isJson(res) {
-      var contentTypes = getHeader(res, CONTENT_TYPE);
-
-      _.isArray(contentTypes) || (contentTypes = [contentTypes]);
-
-      return _.any(contentTypes, function (contentType) {
-        return contentType.indexOf(JSON_CONTENT_TYPE) !== -1;
-      });
-    }
-
-    function getHeader(res, name) {
-      return _.find(res.headers.map, function (value, key) {
-        return key.toLowerCase() === name.toLowerCase();
-      });
-    }
-
-    function contentType() {
-      return options.headers[CONTENT_TYPE] || JSON_CONTENT_TYPE;
-    }
-  }
-});
-
-function requestOptions(method, baseUrl, options) {
-  if (_.isString(options)) {
-    options = _.extend({
-      url: options
-    });
-  }
-
-  options.method = method.toLowerCase();
-
-  if (baseUrl) {
-    var separator = '';
-    var firstCharOfUrl = options.url[0];
-    var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
-
-    // Do some text wrangling to make sure concatenation of base url
-    // stupid people (i.e. me)
-    if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
-      separator = '/';
-    } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
-      options.url = options.url.substring(1);
-    }
-
-    options.url = baseUrl + separator + options.url;
-  }
-
-  return options;
-}
-
-module.exports = HttpAPI;
-},{"es6-promise":29,"isomorphic-fetch":33,"underscore":35}],17:[function(require,module,exports){
+},{"../errors/notFound":7,"./when":27}],16:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
@@ -948,7 +847,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":13,"../utils/cloneState":20,"../utils/uuid":22,"underscore":35}],18:[function(require,module,exports){
+},{"../diagnostics":13,"../utils/cloneState":24,"../utils/uuid":26,"underscore":39}],17:[function(require,module,exports){
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -1003,7 +902,242 @@ function serializeState() {
 
   return state;
 }
-},{"../errors/unknownStore":8,"underscore":35}],19:[function(require,module,exports){
+},{"../errors/unknownStore":8,"underscore":39}],18:[function(require,module,exports){
+var _ = require('underscore');
+var HttpStateSource = require('./stateSources/http');
+var JSONStorageStateSource = require('./stateSources/jsonStorage');
+var LocalStorageStateSource = require('./stateSources/localStorage');
+var SessionStorageStateSource = require('./stateSources/sessionStorage');
+
+function StateSource(options) {
+  options = options || {};
+  extendStateSource(this, options);
+
+  function extendStateSource(stateSource, options) {
+    _.extend.apply(_, [stateSource].concat(
+      options,
+      options.mixins,
+      stateSourceMixin(options))
+    );
+  }
+
+  function stateSourceMixin(options) {
+    switch (options.type) {
+      case 'http':
+        return HttpStateSource(options);
+      case 'jsonStorage':
+        return JSONStorageStateSource(options);
+      case 'localStorage':
+        return LocalStorageStateSource(options);
+      case 'sessionStorage':
+        return SessionStorageStateSource(options);
+    }
+  }
+}
+
+module.exports = StateSource;
+},{"./stateSources/http":19,"./stateSources/jsonStorage":20,"./stateSources/localStorage":21,"./stateSources/sessionStorage":22,"underscore":39}],19:[function(require,module,exports){
+require('isomorphic-fetch');
+require('es6-promise').polyfill();
+
+var _ = require('underscore');
+var CONTENT_TYPE = 'Content-Type';
+var JSON_CONTENT_TYPE = 'application/json';
+
+function HttpStateSource(mixinOptions) {
+
+  mixinOptions = mixinOptions || {};
+
+  var defaultBaseUrl = '';
+  var methods = ['get', 'put', 'post', 'delete'];
+
+  var mixin = {
+    _isHttpStateSource: true,
+    request: function (options) {
+      if (!options.headers) {
+        options.headers = {};
+      }
+
+      if (contentType() === JSON_CONTENT_TYPE && _.isObject(options.body)) {
+        options.body = JSON.stringify(options.body);
+        options.headers[CONTENT_TYPE] = JSON_CONTENT_TYPE;
+      }
+
+      return fetch(options.url, options).then(function (res) {
+        if (res.status >= 400) {
+          throw res;
+        }
+
+        if (isJson(res)) {
+          res.body = JSON.parse(res._body);
+        }
+
+        return res;
+      });
+
+      function isJson(res) {
+        var contentTypes = getHeader(res, CONTENT_TYPE);
+
+        _.isArray(contentTypes) || (contentTypes = [contentTypes]);
+
+        return _.any(contentTypes, function (contentType) {
+          return contentType.indexOf(JSON_CONTENT_TYPE) !== -1;
+        });
+      }
+
+      function getHeader(res, name) {
+        return _.find(res.headers.map, function (value, key) {
+          return key.toLowerCase() === name.toLowerCase();
+        });
+      }
+
+      function contentType() {
+        return options.headers[CONTENT_TYPE] || JSON_CONTENT_TYPE;
+      }
+    }
+  };
+
+  // Sugar methods for common HTTP methods
+  _.each(methods, function (method) {
+    mixin[method] = function (options) {
+      return this.request(requestOptions(method.toUpperCase(), mixinOptions.baseUrl || defaultBaseUrl, options));
+    };
+  });
+
+  return mixin;
+}
+
+function requestOptions(method, baseUrl, options) {
+  if (_.isString(options)) {
+    options = _.extend({
+      url: options
+    });
+  }
+
+  options.method = method.toLowerCase();
+
+  if (baseUrl) {
+    var separator = '';
+    var firstCharOfUrl = options.url[0];
+    var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
+
+    // Do some text wrangling to make sure concatenation of base url
+    // stupid people (i.e. me)
+    if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
+      separator = '/';
+    } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
+      options.url = options.url.substring(1);
+    }
+
+    options.url = baseUrl + separator + options.url;
+  }
+
+  return options;
+}
+
+module.exports = HttpStateSource;
+},{"es6-promise":33,"isomorphic-fetch":37,"underscore":39}],20:[function(require,module,exports){
+function JSONStorageStateSource(options) {
+  options = options || {};
+
+  var defaultNamespace = '';
+  var defaultStorage = localStorage;
+
+  var mixin  = {
+    _isJSONStorageStateSource: true,
+    get: function (key) {
+      var raw = getStorage().getItem(getNamespacedKey(key));
+      try {
+        var payload = JSON.parse(raw);
+        return payload.value;
+      } catch (e) {
+        throw new Error('Unable to parse JSON from storage');
+      }
+    },
+    set: function (key, value) {
+      // Wrap the value in an object so as to preserve it's type
+      // during serialization.
+      var payload = {
+        value: value
+      };
+      var raw = JSON.stringify(payload);
+      getStorage().setItem(getNamespacedKey(key), raw);
+    }
+  };
+
+  return mixin;
+
+  function getNamespacedKey(key) {
+    return getNamespace() + key;
+  }
+
+  function getStorage() {
+    return options.storage || defaultStorage;
+  }
+
+  function getNamespace() {
+    return options.namespace || defaultNamespace;
+  }
+}
+
+module.exports = JSONStorageStateSource;
+},{}],21:[function(require,module,exports){
+function LocalStorageStateSource(options) {
+  options = options || {};
+
+  var defaultNamespace = '';
+
+  var mixin  = {
+    _isLocalStorageStateSource: true,
+    get: function (key) {
+      return localStorage.getItem(getNamespacedKey(key));
+    },
+    set: function (key, value) {
+      localStorage.setItem(getNamespacedKey(key), value);
+    }
+  };
+
+  return mixin;
+
+  function getNamespacedKey(key) {
+    return getNamespace() + key;
+  }
+
+  function getNamespace() {
+    return options.namespace || defaultNamespace;
+  }
+}
+
+module.exports = LocalStorageStateSource;
+},{}],22:[function(require,module,exports){
+function SessionStorageStateSource(options) {
+
+  options = options || {};
+  var defaultNamespace = '';
+
+  var mixin  = {
+    _isSessionStorageStateSource: true,
+    get: function (key) {
+      return sessionStorage.getItem(getNamespacedKey(key));
+    },
+    set: function (key, value) {
+      sessionStorage.setItem(getNamespacedKey(key), value);
+    }
+  };
+
+  return mixin;
+
+  function getNamespacedKey(key) {
+    return getNamespace() + key;
+  }
+
+  function getNamespace() {
+    return options.namespace || defaultNamespace;
+  }
+}
+
+module.exports = SessionStorageStateSource;
+},{}],23:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
@@ -1380,13 +1514,13 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":22,"events":24,"underscore":35}],20:[function(require,module,exports){
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":26,"events":28,"underscore":39}],24:[function(require,module,exports){
 function cloneState() {
   return null;
 }
 
 module.exports = cloneState;
-},{}],21:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 function serializeError(error) {
   if (!error) {
     return null;
@@ -1403,7 +1537,7 @@ function serializeError(error) {
 }
 
 module.exports = serializeError;
-},{}],22:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var format = require('util').format;
 
 function uuid() {
@@ -1420,7 +1554,7 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
-},{"util":28}],23:[function(require,module,exports){
+},{"util":32}],27:[function(require,module,exports){
 var _ = require('underscore');
 var StatusConstants = require('../constants/status');
 
@@ -1504,7 +1638,7 @@ function aggregateStatus(fetchResults) {
 }
 
 module.exports = when;
-},{"../constants/status":3,"underscore":35}],24:[function(require,module,exports){
+},{"../constants/status":3,"underscore":39}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1807,7 +1941,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],25:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1832,7 +1966,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],26:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1897,14 +2031,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],27:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],28:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2494,7 +2628,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":27,"_process":26,"inherits":25}],29:[function(require,module,exports){
+},{"./support/isBuffer":31,"_process":30,"inherits":29}],33:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3457,7 +3591,7 @@ function hasOwnProperty(obj, prop) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":26}],30:[function(require,module,exports){
+},{"_process":30}],34:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3469,7 +3603,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":31}],31:[function(require,module,exports){
+},{"./lib/Dispatcher":35}],35:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3721,7 +3855,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":32}],32:[function(require,module,exports){
+},{"./invariant":36}],36:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3776,10 +3910,10 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],33:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 require('fetch');
 
-},{"fetch":34}],34:[function(require,module,exports){
+},{"fetch":38}],38:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3990,7 +4124,7 @@ require('fetch');
   }
 })();
 
-},{}],35:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

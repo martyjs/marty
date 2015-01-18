@@ -1,20 +1,17 @@
 ---
 layout: page
-title: HTTP API
-id: api-http-api
-section: HTTP API
+title: HTTP State Source
+id: state-source-http
+section: State Sources
 ---
 
-<h2 id="createHttpAPI">Marty.createHttpAPI(props)</h2>
-
-To create a new HTTP API, you call <code>Marty.createHttpAPI</code> passing in a set of properties. It returns your HTTP API as a singleton.
-
 {% highlight js %}
-var UsersAPI = Marty.createHttpAPI({
+var UsersAPI = Marty.createStateSource({
+  type: 'http',
   createUser: function (user) {
     this.post({ url: '/users', body: user })
         .then(function (res) {
-          UserActionCreators.receiveUser(res.body);
+          UserSourceActionCreators.receiveUser(res.body);
         });
   }
 });
@@ -29,7 +26,8 @@ An (optional) base url to prepend to any urls.
 Starts an HTTP request with the given <code>method</code> and <code>options</code>. We use the [fetch](https://github.com/github/fetch) polyfill however you can override ``request()`` with your own implementation. The only requirement is it returns a <code>Promise</code>.
 
 {% highlight js %}
-var UsersAPI = Marty.createHttpAPI({
+var UsersAPI = Marty.createStateSource({
+  type: 'http',
   createUser: function (user) {
     this.request({
       url: '/users',

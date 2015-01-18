@@ -1,18 +1,17 @@
 ---
 layout: page
-title: HTTP API
-id: http-api
-section: HTTP API
+title: HTTP State Source
+id: http-state-source
+section: State Sources
 ---
 
-It's likely at some point that you will need to communicate with the server. HTTP APIs encapsulate that communication for you.
-
-HTTP APIs allow you to define functions that create HTTP requests. We use the [fetch](https://github.com/github/fetch) polyfill for making requests but you can use easily roll your own if you like.
+The HTTP state source makes it easy to talk to remote servers over HTTP. We use the [fetch](https://github.com/github/fetch) polyfill for making requests but you can use easily roll your own if you like.
 
 All requests return a promise (Promises/A) that allow you to easily define what happens when a request has finished.
 
 {% highlight js %}
-var UsersAPI = Marty.createHttpAPI({
+var UsersAPI = Marty.createStateSource({
+  type: "http",
   baseUrl: 'http://foo.com'
   getAll: function (users) {
     return this.get('/users').then(function (res) {

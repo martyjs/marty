@@ -275,7 +275,7 @@ var UsersStore = Marty.createStore({
 });
 {% endhighlight %}
 
-<h3>Fetch Result</h3>
+<h3 id="fetch-result">Fetch Result</h3>
 
 Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either **PENDING**, **DONE** OR **FAILED**. You can get the status by accessing ``fetch.status`` or with the helpers ``fetch.pending``, ``fetch.failed`` or ``fetch.done``.
 
