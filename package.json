@@ -1,7 +1,7 @@
 {
   "name": "marty",
   "version": "0.8.0",
-  "description": "A React.js/Flux Framework",
+  "description": "A Javascript library for state management in React applications",
   "main": "index.js",
   "directories": {
     "doc": "./doc",
