@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.8.0-beta',
+  version: '0.8.0',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -968,7 +968,7 @@ function HttpStateSource(mixinOptions) {
           throw res;
         }
 
-        if (isJson(res)) {
+        if (isJson(res) && res._body) {
           res.body = JSON.parse(res._body);
         }
 
@@ -1150,6 +1150,8 @@ var EventEmitter = require('events').EventEmitter;
 var StatusConstants = require('../constants/status');
 var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
+
+var REQUIRED_FUNCTIONS = ['getInitialState'];
 var RESERVED_FUNCTIONS = ['dispose', 'clear'];
 
 Store.defaultMaxListeners = 10000000;
@@ -1173,7 +1175,6 @@ function Store(options) {
   this.getState = getState;
   this.hasChanged = hasChanged;
   this.handleAction = handleAction;
-  this.getInitialState = getInitialState;
   this.addChangeListener = addChangeListener;
 
   this.fetch.done = fetchResult.done;
@@ -1183,6 +1184,7 @@ function Store(options) {
 
   emitter.setMaxListeners(options.maxListeners || Store.defaultMaxListeners);
 
+  validateOptions(options);
   extendStore(this, _.omit(options, RESERVED_FUNCTIONS));
   validateHandlers(this);
 
@@ -1201,6 +1203,20 @@ function Store(options) {
       this.setState(value);
     }
   });
+
+  function validateOptions(options) {
+    var errors = [];
+
+    _.each(REQUIRED_FUNCTIONS, function (functionName) {
+      if (!_.has(options, functionName)) {
+        errors.push('You must implement ' + functionName);
+      }
+    });
+
+    if (errors.length) {
+      throw new Error(errors.join('. '));
+    }
+  }
 
   function validateHandlers(store) {
     _.each(store.handlers, function (actionPredicate, handlerName) {
@@ -1227,10 +1243,6 @@ function Store(options) {
 
     _.extend.apply(_, [store, options].concat(mixins));
     _.extend.apply(_, [store.handlers].concat(handlers));
-  }
-
-  function getInitialState() {
-    return defaultState;
   }
 
   function dispose() {
