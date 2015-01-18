@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/jhollingworth/marty.svg?branch=master)](https://travis-ci.org/jhollingworth/marty)
 
-
-[Marty](http://martyjs.org) helps you build web applications that follow the [Flux architecture](http://facebook.github.io/flux/docs/overview.html).
+[Marty](http://martyjs.org) is a Javascript library for state management in React applications. It is an implementation of the [Flux architecture](http://facebook.github.io/flux/docs/overview.html).
 
 ## Quick start
 
@@ -46,7 +45,6 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 ##Browser Support
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/jhollingworth.svg)](https://saucelabs.com/u/jhollingworth)
-
 
 ## Maintainers
 
