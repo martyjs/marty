@@ -71,8 +71,8 @@
                 <li >
                   
 
-                  <a  href="/guides/http-api/index.html">
-                    HTTP API
+                  <a  href="/guides/state-sources/index.html">
+                    State Sources
                   </a>
                 </li>
               
@@ -134,6 +134,14 @@
                 <li >
                   
 
+                  <a  href="/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/api/constants/index.html">
                     Constants
                   </a>
@@ -154,7 +162,7 @@
     </div>
   </header>
   <div class="container bs-docs-container">
-  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
     <ul class="sections-nav nav" role="navigation">
       
       
@@ -219,9 +227,9 @@
           
         
           
-        
-          
             
+          
+        
           
         
           
@@ -233,6 +241,66 @@
           <a  href="/api/state-mixin/index.html">
               State Mixin
           </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/state-sources/index.html">
+              State Sources
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/api/state-sources/http.html">HTTP State Source</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/api/state-sources/json-storage.html">JSON Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/api/state-sources/local-storage.html">Local Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/api/state-sources/session-storage.html">Session Storage State Source</a>
+                </li>
+              
+            
+            </ul>
           
         </li>
       
@@ -263,7 +331,7 @@
       
     </ul>
   </div>
-  <div class="bs-docs-content col-md-10" role="main">
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
       <h1 class="page-title">Stores API</h1>
     
@@ -300,7 +368,10 @@
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
   <span class="p">},</span>
-  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{};</span>
+  <span class="p">},</span>
+  <span class="nx">addUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">action</span><span class="p">)</span> <span class="c1">// { type: 'RECEIVE_USER', arguments: [{ name: ...}] }</span>
     <span class="p">...</span>
   <span class="p">}</span>
@@ -340,7 +411,10 @@
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
   <span class="p">},</span>
-  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{};</span>
+  <span class="p">},</span>
+  <span class="nx">addUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
 
@@ -353,9 +427,7 @@
 
 <h2 id="getInitialState">getInitialState()</h2>
 
-<p><code>getInitialState</code> is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the <a href="#state">state</a> property.</p>
-
-<p>If you do not implement getInitialState or you do not return anything then the default state is an empty object literal (<code>{}</code>).</p>
+<p><code>getInitialState</code> (<em>required</em>) is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the <a href="#state">state</a> property.</p>
 
 <h2 id="state">state</h2>
 
@@ -512,7 +584,7 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h3>Fetch Result</h3>
+<h3 id="fetch-result">Fetch Result</h3>
 
 <p>Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either <strong>PENDING</strong>, <strong>DONE</strong> OR <strong>FAILED</strong>. You can get the status by accessing <code>fetch.status</code> or with the helpers <code>fetch.pending</code>, <code>fetch.failed</code> or <code>fetch.done</code>.</p>
 
@@ -667,7 +739,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.7.6</li>
+        <li>v0.8.0-beta</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

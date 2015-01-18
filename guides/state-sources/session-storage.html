@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>HTTP API | marty.js</title>
+  <title>Session Storage State Source | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -31,7 +31,7 @@
       </div>
       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
-          <li>
+          <li class="active">
             <a href="/guides/getting-started">Guides</a>
             <ul class="nav sub-nav visible-xs-block">
               
@@ -68,11 +68,11 @@
                   </a>
                 </li>
               
-                <li >
+                <li  class="active">
                   
 
-                  <a  href="/guides/http-api/index.html">
-                    HTTP API
+                  <a  href="/guides/state-sources/index.html">
+                    State Sources
                   </a>
                 </li>
               
@@ -102,7 +102,7 @@
               
             </ul>
           </li>
-          <li class="active">
+          <li>
             <a href="/api/stores">API</a>
             <ul class="nav sub-nav visible-xs-block">
               
@@ -134,6 +134,14 @@
                 <li >
                   
 
+                  <a  href="/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/api/constants/index.html">
                     Constants
                   </a>
@@ -154,7 +162,7 @@
     </div>
   </header>
   <div class="container bs-docs-container">
-  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
     <ul class="sections-nav nav" role="navigation">
       
       
@@ -176,14 +184,93 @@
             
           
         
+          
+        
+          
+        
+          
+        
 
         <li  class="nav-section" >
           
 
-          <a  href="/api/stores/index.html">
+          <a  href="/guides/getting-started/index.html">
+              Getting Started
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/getting-started/getting-marty.html">Getting Marty</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/getting-started/module-loaders.html">Module Loaders</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/getting-started/yeoman-template.html">Yeoman template</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/stores/index.html">
               Stores
           </a>
           
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/stores/immutable-data-collections.html">Immutable data collections</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
         </li>
       
         
@@ -201,18 +288,49 @@
         
           
         
+          
+        
+          
+        
+          
+        
 
         <li  class="nav-section" >
           
 
-          <a  href="/api/action-creators/index.html">
+          <a  href="/guides/action-creators/index.html">
               Action Creators
           </a>
           
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/action-creators/actions-vs-action-creators.html">Actions vs. Action Creators</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/action-creators/source-action-creators.html">Source Action Creators</a>
+                </li>
+              
+            
+            </ul>
+          
         </li>
       
         
 
+        
+          
+        
+          
         
           
         
@@ -226,11 +344,13 @@
         
           
         
+          
+        
 
         <li  class="nav-section" >
           
 
-          <a  href="/api/state-mixin/index.html">
+          <a  href="/guides/state-mixin/index.html">
               State Mixin
           </a>
           
@@ -242,7 +362,79 @@
           
         
           
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
             
+          
+        
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  href="/guides/state-sources/index.html">
+              State Sources
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/state-sources/http.html">HTTP State Source</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/state-sources/json-storage.html">JSON Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/state-sources/local-storage.html">Local Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a  class="active"
+                      href="/guides/state-sources/session-storage.html">Session Storage State Source</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
           
         
           
@@ -255,126 +447,94 @@
         <li  class="nav-section" >
           
 
-          <a  href="/api/constants/index.html">
+          <a  href="/guides/constants/index.html">
               Constants
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/dispatcher/index.html">
+              Dispatcher
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/further-reading/index.html">
+              Further reading
           </a>
           
         </li>
       
     </ul>
   </div>
-  <div class="bs-docs-content col-md-10" role="main">
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">HTTP API</h1>
+      <h1 class="page-title">Session Storage State Source</h1>
     
     <div class="content">
-      <h2 id="createHttpAPI">Marty.createHttpAPI(props)</h2>
+      <p>The Session Storage State Source allows you to persist data to <a href="https://developer.mozilla.org/en/docs/Web/Guide/API/DOM/Storage#sessionStorage">sessionStorage</a>.</p>
 
-<p>To create a new HTTP API, you call <code>Marty.createHttpAPI</code> passing in a set of properties. It returns your HTTP API as a singleton.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
-  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">body</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
-        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
-        <span class="p">});</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">FooStorage</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateSource</span><span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'sessionStorage'</span><span class="p">,</span>
+  <span class="na">saveFoo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="nx">foo</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">getFoo</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
+<span class="p">});</span>
 
-<h2 id="baseUrl">baseUrl</h2>
-
-<p>An (optional) base url to prepend to any urls.</p>
-
-<h2 id="requestOptions">request(options)</h2>
-
-<p>Starts an HTTP request with the given <code>method</code> and <code>options</code>. We use the <a href="https://github.com/github/fetch">fetch</a> polyfill however you can override <code>request()</code> with your own implementation. The only requirement is it returns a <code>Promise</code>.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createHttpAPI</span><span class="p">({</span>
-  <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span>
-      <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span>
-      <span class="na">method</span><span class="p">:</span> <span class="s1">'POST'</span><span class="p">,</span>
-      <span class="na">body</span><span class="p">:</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'foo'</span> <span class="p">}</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-
-<h3>Options</h3>
-
-<table class="table table-bordered table-striped">
-  <thead>
-   <tr>
-     <th style="width: 100px;">Name</th>
-     <th style="width: 100px;">type</th>
-     <th style="width: 50px;">default</th>
-     <th>description</th>
-   </tr>
-  </thead>
-  <tbody>
-   <tr>
-     <td>url</td>
-     <td>string</td>
-     <td></td>
-     <td>Url of resource</td>
-   </tr>
-   <tr>
-     <td>method</td>
-     <td>string</td>
-     <td>get</td>
-     <td>http method</td>
-   </tr>
-   <tr>
-     <td>headers</td>
-     <td>object</td>
-     <td>{}</td>
-     <td>http headers</td>
-   </tr>
-   <tr>
-     <td>body</td>
-     <td>string | object</td>
-     <td></td>
-     <td>entity body for `PATCH`, `POST` and `PUT` requests.</td>
-   </tr>
-   <tr>
-     <td>contentType</td>
-     <td>string</td>
-     <td>application/json</td>
-     <td>Content type of request</td>
-   </tr>
-  </tbody>
-</table>
-
-<h2 id="getUrl">get(url)</h2>
-
-<p>Same as <code>request({ method: &#39;GET&#39;, url: url })</code></p>
-
-<h2 id="getOptions">get(options)</h2>
-
-<p>Same as <code>request(_.extend(options, { method: &#39;GET&#39;})</code></p>
-
-<h2 id="postUrl">post(url)</h2>
-
-<p>Same as <code>request({ method: &#39;POST&#39;, url: url })</code></p>
-
-<h2 id="postOptions">post(options)</h2>
-
-<p>Same as <code>request(_.extend(options, { method: &#39;POST&#39;})</code></p>
-
-<h2 id="putUrl">put(url)</h2>
-
-<p>Same as <code>request({ method: &#39;PUT&#39;, url: url })</code></p>
-
-<h2 id="putOptions">put(options)</h2>
-
-<p>Same as <code>request(_.extend(options, { method: &#39;PUT&#39;})</code></p>
-
-<h2 id="deleteUrl">delete(url)</h2>
-
-<p>Same as <code>request({ method: &#39;DELETE&#39;, url: url })</code></p>
-
-<h2 id="deleteOptions">delete(options)</h2>
-
-<p>Same as <code>request(_.extend(options, { method: &#39;DELETE&#39;})</code></p>
+<span class="nx">FooStorage</span><span class="p">.</span><span class="nx">saveFoo</span><span class="p">(</span><span class="s1">'Foo'</span><span class="p">);</span></code></pre></div>
 
     </div>
   </div>
@@ -384,7 +544,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.7.6</li>
+        <li>v0.8.0-beta</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

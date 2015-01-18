@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Action Creators API | marty.js</title>
+  <title>Session Storage State Source | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -115,10 +115,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/api/action-creators/index.html">
+                  <a  href="/api/action-creators/index.html">
                     Action Creators
                   </a>
                 </li>
@@ -131,7 +131,7 @@
                   </a>
                 </li>
               
-                <li >
+                <li  class="active">
                   
 
                   <a  href="/api/state-sources/index.html">
@@ -210,10 +210,10 @@
           
         
 
-        <li  class="nav-section active">
+        <li  class="nav-section" >
           
 
-          <a  class="active" href="/api/action-creators/index.html">
+          <a  href="/api/action-creators/index.html">
               Action Creators
           </a>
           
@@ -260,7 +260,7 @@
           
         
 
-        <li  class="nav-section" >
+        <li  class="nav-section active">
           
 
           <a  href="/api/state-sources/index.html">
@@ -295,7 +295,7 @@
             
               
                 <li>
-                  <a 
+                  <a  class="active"
                       href="/api/state-sources/session-storage.html">Session Storage State Source</a>
                 </li>
               
@@ -333,28 +333,31 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Action Creators API</h1>
+      <h1 class="page-title">Session Storage State Source</h1>
     
     <div class="content">
-      <h2 id="createActionCreators">Marty.createActionCreators(props)</h2>
-
-<p>To create some new action creators, you call <code>Marty.createActionCreators</code> passing in an object literal. It returns your action creators as a singleton.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">addUser</span><span class="p">:</span> <span class="nx">UserActions</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
-  <span class="p">})</span>
+      <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">FooStorage</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateSource</span><span class="p">({</span>
+  <span class="na">namespace</span><span class="p">:</span> <span class="s1">'foos'</span><span class="p">,</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'sessionStorage'</span><span class="p">,</span>
+  <span class="na">saveFoo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">,</span> <span class="nx">foo</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">getFoo</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<h2 id="displayName">displayName</h2>
+<h2 id="namespace">namespace</h2>
 
-<p>An (optional) display name for the action creator. Used for richer debugging.</p>
+<p>An (optional) prefix for keys.</p>
 
-<h2 id="dispatch">dispatch([...])</h2>
+<h2 id="get">get(key)</h2>
 
-<p>Dispatches an action payload. Any <a href="/api/stores/index.html#handleAction">action handlers</a> will be invoked with the given action handlers.</p>
+<p>Gets the item in the storage with the given key. If the item exists, it will deserialize it.</p>
 
-<p>Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.</p>
+<h2 id="set">set(key, obj)</h2>
+
+<p>Serializes the object to a JSON string before and then inserts into the storage with the given key.</p>
 
     </div>
   </div>
