@@ -23,6 +23,11 @@ body {
   font-family: 'PT Serif', serif;
 }
 
+.devtools img {
+  width: 100%;
+  margin: 20px 0;
+}
+
 /* Keep code small in tables on account of limited space */
 .table code {
   font-size: 13px;

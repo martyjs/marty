@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Action Creators API | marty.js</title>
+  <title> | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -102,7 +102,7 @@
               
             </ul>
           </li>
-          <li class="active">
+          <li>
             <a href="/api/stores">API</a>
             <ul class="nav sub-nav visible-xs-block">
               
@@ -115,10 +115,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/api/action-creators/index.html">
+                  <a  href="/api/action-creators/index.html">
                     Action Creators
                   </a>
                 </li>
@@ -149,7 +149,7 @@
               
             </ul>
           </li>
-          <li>
+          <li class="active">
             <a href="/devtools">Developer Tools</a>
           </li>
         </ul>
@@ -164,203 +164,18 @@
       </nav>
     </div>
   </header>
-  <div class="container bs-docs-container">
-  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
-    <ul class="sections-nav nav" role="navigation">
-      
-      
-      
+  <div class="container devtools">
+  <h1>Marty Developer Tools</h1>
+  <a href="https://chrome.google.com/webstore/detail/marty-developer-tools/fifcikknnbggajppebgolpkaambnkpae?hl=en">Marty Developer Tools</a> is an extension to Chrome's developer tools. It shows you the current state of your stores and how actions flow through the stores to the views.
 
-      
-        
+  <p style="text-align:center">
+    <a class="btn btn-default" href="https://chrome.google.com/webstore/detail/marty-developer-tools/fifcikknnbggajppebgolpkaambnkpae?hl=en">Download from Chrome Web Store</a>
+  </p>
 
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-            
-          
-        
+  <img src="/img/devtools-data-flow.png" alt="Marty Developer Tools"/>
 
-        <li  class="nav-section" >
-          
+  For Marty Developer Tools to work, you add Marty to the window object (<code>window.Marty = require('marty')</code>). Once you've done that, open your app in Chrome and open Chrome Developer Tools. You should see a new 'Marty' tab which gives you a view into what your application is doing.
 
-          <a  href="/api/stores/index.html">
-              Stores
-          </a>
-          
-        </li>
-      
-        
-
-        
-          
-            
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-
-        <li  class="nav-section active">
-          
-
-          <a  class="active" href="/api/action-creators/index.html">
-              Action Creators
-          </a>
-          
-        </li>
-      
-        
-
-        
-          
-        
-          
-        
-          
-            
-          
-        
-          
-        
-          
-        
-
-        <li  class="nav-section" >
-          
-
-          <a  href="/api/state-mixin/index.html">
-              State Mixin
-          </a>
-          
-        </li>
-      
-        
-
-        
-          
-        
-          
-        
-          
-        
-          
-            
-          
-        
-          
-        
-
-        <li  class="nav-section" >
-          
-
-          <a  href="/api/state-sources/index.html">
-              State Sources
-          </a>
-          
-            <ul class="nav">
-            
-              
-                <li>
-                  <a 
-                      href="/api/state-sources/http.html">HTTP State Source</a>
-                </li>
-              
-            
-              
-              
-            
-              
-                <li>
-                  <a 
-                      href="/api/state-sources/json-storage.html">JSON Storage State Source</a>
-                </li>
-              
-            
-              
-                <li>
-                  <a 
-                      href="/api/state-sources/local-storage.html">Local Storage State Source</a>
-                </li>
-              
-            
-              
-                <li>
-                  <a 
-                      href="/api/state-sources/session-storage.html">Session Storage State Source</a>
-                </li>
-              
-            
-            </ul>
-          
-        </li>
-      
-        
-
-        
-          
-        
-          
-            
-          
-        
-          
-        
-          
-        
-          
-        
-
-        <li  class="nav-section" >
-          
-
-          <a  href="/api/constants/index.html">
-              Constants
-          </a>
-          
-        </li>
-      
-    </ul>
-  </div>
-  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
-    
-      <h1 class="page-title">Action Creators API</h1>
-    
-    <div class="content">
-      <h2 id="createActionCreators">Marty.createActionCreators(props)</h2>
-
-<p>To create some new action creators, you call <code>Marty.createActionCreators</code> passing in an object literal. It returns your action creators as a singleton.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">addUser</span><span class="p">:</span> <span class="nx">UserActions</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
-  <span class="p">})</span>
-<span class="p">});</span></code></pre></div>
-
-<h2 id="displayName">displayName</h2>
-
-<p>An (optional) display name for the action creator. Used for richer debugging.</p>
-
-<h2 id="dispatch">dispatch([...])</h2>
-
-<p>Dispatches an action payload. Any <a href="/api/stores/index.html#handleAction">action handlers</a> will be invoked with the given action handlers.</p>
-
-<p>Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.</p>
-
-    </div>
-  </div>
 </div>
 
   <footer class="bs-docs-footer" role="contentinfo">
