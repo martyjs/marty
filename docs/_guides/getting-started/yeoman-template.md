@@ -20,4 +20,4 @@ npm start
 open http://localhost:5000
 {% endhighlight %}
 
-Initially it only generates the basic folder structure. You can use <code>yo marty:domain {domain name}</code> to automatically create an action creator, store, constants, HTTP API and component for the given domain.
+Initially it only generates the basic folder structure. You can use <code>yo marty:domain {domain name}</code> to automatically create an action creator, store, constants, state source and component for the given domain.

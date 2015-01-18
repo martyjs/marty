@@ -17,14 +17,11 @@ var UserRepository = Marty.createStateSource({
 });
 {% endhighlight %}
 
-<h3 id="mixins">mixins</h3>
-
-An (optional) array of mixins that can be passed in through the createStateSource method.
-
-<h3 id="name">name</h3>
-
-An (optional) display name for the repository. Used for richer debugging.
 
 <h3 id="type">type</h3>
 
-An (optional) type for the repository (e.g. 'http'). Used for richer debugging.
+The type of the state source (e.g. 'http')
+
+<h3 id="mixins">mixins</h3>
+
+An (optional) array of mixins that can be passed in through the createStateSource method.
