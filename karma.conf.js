@@ -72,6 +72,12 @@ module.exports = function (config) {
       sauceLabs: {
         testName: 'Marty Tests'
       },
+      username: 'jhollingworth',
+      accessKey: '4938c9e3-26ce-4661-b09b-785e49f3e892',
+      verbose: true,
+      doctor: true,
+      startConnect: false,
+      verboseDebugging: true,
       browserDisconnectTimeout : 10000,
       browserDisconnectTolerance : 1,
       browserNoActivityTimeout : 4 * 60 * 1000,
