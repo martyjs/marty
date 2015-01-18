@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var expect = require('chai').expect;
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -7,11 +8,13 @@ describe('Marty#setState()', function () {
 
   beforeEach(function () {
     Store1 = Marty.createStore({
-      displayName: 'store1'
+      displayName: 'store1',
+      getInitialState: _.noop
     });
 
     Store2 = Marty.createStore({
-      displayName: 'store2'
+      displayName: 'store2',
+      getInitialState: _.noop
     });
   });
 

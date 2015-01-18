@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var expect = require('chai').expect;
 
 describe('Marty#serializeState()', function () {
@@ -10,6 +11,7 @@ describe('Marty#serializeState()', function () {
 
     Store1 = Marty.createStore({
       displayName: 'store1',
+      getInitialState: _.noop,
       serialize: function () {
         return store1ExpectedState;
       }
@@ -17,12 +19,15 @@ describe('Marty#serializeState()', function () {
 
     Store2 = Marty.createStore({
       displayName: 'store2',
+      getInitialState: _.noop,
       serialize: function () {
         return storeSerializedState;
       }
     });
 
-    Store3 = Marty.createStore({});
+    Store3 = Marty.createStore({
+      getInitialState: _.noop
+    });
     serializedState = Marty.serializeState();
   });
 

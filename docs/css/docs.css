@@ -106,6 +106,7 @@ body {
 @media (max-width: 767px) {
   .bs-docs-content {
     padding-left: 0 !important;
+    width: 100% !important;
   }
 }
 

@@ -49,6 +49,20 @@ describe('Store', function () {
     expect(dispatcher.register).to.have.been.called;
   });
 
+  describe('when you don\'t pass in getInitialState', function () {
+    it('should throw an error', function () {
+      expect(storeWithoutGetInitialState).to.throw(Error);
+
+      function storeWithoutGetInitialState() {
+        return new Store({
+          foo: function () {
+            return 'bar';
+          }
+        });
+      }
+    });
+  });
+
   describe('#mixins', function () {
     describe('when you have multiple mixins', function () {
       var mixin1, mixin2;
@@ -64,6 +78,7 @@ describe('Store', function () {
 
         store = new Store({
           dispatcher: dispatcher,
+          getInitialState: _.noop,
           mixins: [mixin1, mixin2]
         });
       });
@@ -91,6 +106,7 @@ describe('Store', function () {
             foo: 'FOO',
             bar: 'BAR'
           },
+          getInitialState: _.noop,
           mixins: [handlerMixin],
           foo: noop,
           bar: noop
@@ -260,7 +276,8 @@ describe('Store', function () {
         handlers: {
           one: actionType,
         },
-        one: sinon.spy()
+        one: sinon.spy(),
+        getInitialState: _.noop
       });
 
       Dispatcher.getCurrent().dispatch(new ActionPayload({
