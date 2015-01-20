@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.8.0',
+  version: '0.8.1',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -1159,8 +1159,9 @@ Store.defaultMaxListeners = 10000000;
 function Store(options) {
   var state;
   var store = this;
-  var failedFetches = {};
   var defaultState = {};
+  var fetchHistory = {};
+  var failedFetches = {};
   var fetchInProgress = {};
   var emitter = new EventEmitter();
   var dispatcher = options.dispatcher || Dispatcher.getCurrent();
@@ -1175,6 +1176,7 @@ function Store(options) {
   this.getState = getState;
   this.hasChanged = hasChanged;
   this.handleAction = handleAction;
+  this.hasAlreadyFetched = hasAlreadyFetched;
   this.addChangeListener = addChangeListener;
 
   this.fetch.done = fetchResult.done;
@@ -1254,6 +1256,10 @@ function Store(options) {
     }
   }
 
+  function hasAlreadyFetched(fetchId) {
+    return !!fetchHistory[fetchId];
+  }
+
   function fetchState(id, local, remote) {
     var options, result, error, cacheError;
 
@@ -1298,10 +1304,11 @@ function Store(options) {
         var result = options.locally.call(store);
 
         if (result) {
+          finished();
           return fetchResult.done(result);
         }
       } catch (error) {
-        failedFetches[options.id] = error;
+        failed(error);
 
         return fetchResult.failed(error);
       }
@@ -1319,7 +1326,7 @@ function Store(options) {
               result = tryAndGetLocally();
 
               if (result) {
-                fetchFinished();
+                finished();
                 hasChanged();
               } else {
                 failed(new NotFoundError());
@@ -1346,7 +1353,8 @@ function Store(options) {
       }
     }
 
-    function fetchFinished() {
+    function finished() {
+      fetchHistory[options.id] = true;
       delete fetchInProgress[options.id];
     }
 
@@ -1355,7 +1363,7 @@ function Store(options) {
         failedFetches[options.id] = error;
       }
 
-      fetchFinished();
+      finished();
 
       return fetchResult.failed(error);
     }
