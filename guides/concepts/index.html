@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Overview of Marty | marty.js</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/css/docs.css">
+
+  <script type="text/javascript" src="/js/codemirror.js"></script>
+</head>
+<body>
+
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li class="active">
+            <a href="/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li  class="active">
+                  
+
+                  <a  class="active" href="/guides/concepts/index.html">
+                    Concepts
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/api/stores">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/devtools">Developer Tools</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/jhollingworth/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+      
+      
+
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/getting-started/index.html">
+              Getting Started
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  class="active" href="/guides/concepts/index.html">
+              Concepts
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/stores/index.html">
+              Stores
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/stores/immutable-data-collections.html">Immutable data collections</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/action-creators/index.html">
+              Action Creators
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/action-creators/actions-vs-action-creators.html">Actions vs. Action Creators</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/action-creators/source-action-creators.html">Source Action Creators</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/state-mixin/index.html">
+              State Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/state-sources/index.html">
+              State Sources
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/state-sources/http.html">HTTP State Source</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/state-sources/json-storage.html">JSON Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/state-sources/local-storage.html">Local Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/state-sources/session-storage.html">Session Storage State Source</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/constants/index.html">
+              Constants
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/dispatcher/index.html">
+              Dispatcher
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/guides/further-reading/index.html">
+              Further reading
+          </a>
+          
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    
+      <h1 class="page-title">Overview of Marty</h1>
+    
+    <div class="content">
+      <p>State is a big problem in the UI. Most JS applications have few restrictions on how state is changed. This makes it difficult to understand why something happens. Anyone who&#39;s spent late nights trying to understand why their application suddenly stopped working after removing an innocuous line should understand this.</p>
+
+<p>Flux is an answer to that problem. At its most basic level it&#39;s a set of rules about how to manage your applications state. Specifically who can change it, where they can change it and in what direction those changes should be propagated through your application.</p>
+
+<p>There are 4 things you will need to understand: How to tell the application to change its state (<a href="/guides/action-creators/index.html">Action creators</a>), How to change the applications state (<a href="/guides/stores/index.html">Stores</a>), how to tell the view that the state has changed (<a href="/guides/state-mixin/index.html">State mixins</a>) and how to tie them all together (<a href="/guides/constants/index.html">Constants</a>).</p>
+
+<p>Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state. Actions have a type which is a string describing the action (e.g. &quot;UPDATE_USER_EMAIL&quot;).</p>
+
+<p>We want to be explicit about the action types in your application so we define them as (<a href="/guides/constants/index.html">Constants</a>). Constants allow you to loosely couple your application as well as documenting what actions are available (Useful for understanding what your application can do). Constants are also responsible for creating action creators.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_USER_EMAIL"</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateUserEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_USER_EMAIL</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">})</span>
+<span class="p">});</span>
+
+<span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
+
+<p>In the above scenario, <code>UserConstants.UPDATE_USER_EMAIL</code> creates an action creator which, when invoked, will create an action with type <code>UPDATE_USER_EMAIL</code>.</p>
+
+<p>If an action is making a change to your local state then it can pass its type data along to something called a dispatcher. The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/dispatcher'</span><span class="p">);</span>
+
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'action with type'</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="s1">', has been dispatched) ;
+});
+
+Dispatcher.dispatch({
+  type: '</span><span class="nx">foo</span><span class="err">'</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Normally you don&#39;t manually register callbacks with the dispatcher, instead you create stores which do this for you. Stores hold information about a domain. That domain could be a collection of entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could be some information about something specific (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">updateEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_USER_EMAIL</span>
+  <span class="p">},</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{};</span>
+  <span class="p">},</span>
+  <span class="nx">getUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">userId</span><span class="p">];</span>
+  <span class="p">},</span>
+  <span class="nx">updateEmail</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">userId</span><span class="p">].</span><span class="nx">email</span> <span class="o">=</span> <span class="nx">email</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its <a href="/api/stores/index.html#handlers"><code>handlers</code> hash</a> to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in <code>this.state</code>).</p>
+
+<p>The next (and final) step is to notify views about the new data. Like the dispatcher, you can register to be notified of any changes to a store.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'User store has changed'</span><span class="p">,</span> <span class="nx">state</span><span class="p">);</span>
+<span class="p">});</span></code></pre></div>
+
+<p>If you have a view thats interested in a domain, it can ask the store to notify it of any changes. When the store updates, your view just rerenders itself with the new state. You might ask, &quot;what if the store changed something your view isn&#39;t interested in (e.g. a different entity)?&quot;. Thanks to Reacts virtual DOM it doesn&#39;t really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views <em>significantly simpler</em> since you just render whatever the store tells you to render.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span>
+               <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">}</span>
+               <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="sr">/input</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">updateEmail</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmailthis</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nl">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+  <span class="nx">componentDidMount</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">userStoreListener</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onUserStoreChanged</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">componentWillUnmount</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">nextProps</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">userStoreListener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span>
+  <span class="p">},</span>
+  <span class="nx">onUserStoreChanged</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>As your application grows you start to find that there is a lot of boilerplate code to get views to listen to stores. <a href="/guides/state-mixin/index.html">State mixins</a> are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStateMixin</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+  <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
+  <span class="na">getState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">UserStateMixin</span><span class="p">],</span>
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text"</span>
+               <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">}</span>
+               <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="sr">/input</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">updateEmail</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmailthis</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Whenever you want to change a value within your application your data must follow this flow of <a href="/guides/action-creators/index.html">Action creator</a> <strong>-&gt;</strong> <a href="/guides/dispatcher/index.html">Dispatcher</a> <strong>-&gt;</strong> <a href="/guides/stores/index.html">Store</a> <strong>-&gt;</strong> <a href="/guides/state-mixin/index.html">State mixin</a> <strong>-&gt;</strong> View. This is known as a <strong>unidirectional data flow</strong>.</p>
+
+<p><center>
+  <img src="/img/data-flow.png" alt="Data flow"/>
+</center></p>
+
+<p>While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There&#39;s only one place your application state can change so you don&#39;t have to dig into all the views to work out where a value was changed (it&#39;s even easier if you&#39;re using <a href="/guides/stores/immutable-data-collections.html">immutable data collections</a>). Thanks to action types being strings you have a loosely coupled <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a> architecture which is easy to grow without increasing the complexity of the code base.</p>
+
+    </div>
+  </div>
+</div>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.8.3</li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>
