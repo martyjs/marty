@@ -713,6 +713,26 @@
   <span class="p">}</span>
 <span class="p">})</span></code></pre></div>
 
+<h2 id="hasAlreadyFetched">hasAlreadyFetched(fetchId)</h2>
+
+<p>For when you want to know if you have already tried fetching something. Given a fetch Id it will return true or false depending on whether you have previously tried a fetch for that Id (Irrelevant of whether it was successful or not). Useful if you want to distinguish between an empty collection and needing to fetch state from a remote source.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">getUsers</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span>
+      <span class="na">id</span><span class="p">:</span> <span class="s1">'users'</span><span class="p">,</span>
+      <span class="na">locally</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hasAlreadyFetched</span><span class="p">(</span><span class="s1">'users'</span><span class="p">))</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nx">remotely</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">UsersHttpAPI</span><span class="p">.</span><span class="nx">getAll</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
 <h2 id="waitFor">waitFor(*stores)</h2>
 
 <p>If an action handler is dependant on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.</p>
@@ -742,7 +762,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.0</li>
+        <li>v0.8.1</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
