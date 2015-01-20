@@ -234,14 +234,14 @@ when.all([foo, bar], {
      <td>locally</td>
      <td>function</td>
      <td>true</td>
-     <td>Should try and fetch from the local state. If it returns a value then an done fetch result will be returned immediately</td>
+     <td>Should try and fetch from the local state. If it returns a value then an done fetch result will be returned immediately. If it returns undefined then the remotely function will be called. If it returns null then it will return a not found fetch result.</td>
    </tr>
    <tr>
      <td>remotely</td>
      <td>function</td>
      <td>false</td>
      <td>
-     If ``locally`` did not return a value then then ``remotely`` is invoked. When ``remotely`` has finished then ``locally`` will be reinvoked and should contain now contain the state. If ``remotely`` returns a promise then ``locally`` will be called if the promise is fulfilled</td>
+     If ``locally`` returned undefined then ``remotely`` is invoked. When ``remotely`` has finished then ``locally`` will be reinvoked and should contain now contain the state. If ``remotely`` returns a promise then ``locally`` will be called if the promise is fulfilled</td>
    </tr>
    <tr>
      <td>dependsOn</td>

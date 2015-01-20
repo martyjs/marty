@@ -344,8 +344,27 @@ describe('Store#fetch()', function () {
     });
   });
 
-  describe('when the local fetch does not return a value', function () {
-    describe('when the remote fetch returns null', function () {
+  describe('when the local fetch returns null', function () {
+    var remotely;
+
+    beforeEach(function () {
+      remotely = sinon.spy();
+      actualResult = store.fetch('bar', function () {
+        return null;
+      }, remotely);
+    });
+
+    it('should return a fetch not found result', function () {
+      expect(actualResult).to.eql(store.fetch.notFound());
+    });
+
+    it('should not call remotely', function () {
+      expect(remotely).to.not.be.called;
+    });
+  });
+
+  describe('when the local fetch returns undefined', function () {
+    describe('when the remote fetch returns undefined', function () {
       beforeEach(function () {
         actualResult = store.fetch('foo', noop, noop);
       });
@@ -442,7 +461,9 @@ describe('Store#fetch()', function () {
             expectedResult = { foo: 'bar' };
 
             store.fetch('foo', function () {
-              return localResult;
+              if (localResult) {
+                return localResult;
+              }
             }, function () {
               remoteFetch = new Promise(function (resolve) {
                 localResult = expectedResult;
