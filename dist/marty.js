@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.8.1',
+  version: '0.8.2',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -1323,6 +1323,7 @@ function Store(options) {
             fetchInProgress[options.id] = true;
 
             result.then(function () {
+              fetchHistory[options.id] = true;
               result = tryAndGetLocally();
 
               if (result) {
@@ -1339,6 +1340,7 @@ function Store(options) {
 
             return fetchResult.pending();
           } else {
+            fetchHistory[options.id] = true;
             result = tryAndGetLocally();
 
             if (result) {
