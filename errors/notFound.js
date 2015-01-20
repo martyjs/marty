@@ -1,6 +1,6 @@
 function NotFoundError(message) {
   this.name = 'Not found';
-  this.message = message || '';
+  this.message = message || 'Not found';
   this.status = 404;
 }
 
