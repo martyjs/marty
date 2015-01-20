@@ -425,6 +425,28 @@ when.join(fetch.done("foo"), fetch.done("bar"), {
 
 {% endhighlight %}
 
+<h2 id="hasAlreadyFetched">hasAlreadyFetched(fetchId)</h2>
+
+For when you want to know if you have already tried fetching something. Given a fetch Id it will return true or false depending on whether you have previously tried a fetch for that Id (Irrelevant of whether it was successful or not). Useful if you want to distinguish between an empty collection and needing to fetch state from a remote source.
+
+{% highlight js %}
+var UsersStore = Marty.createStore({
+  getUsers: function () {
+    return this.fetch(
+      id: 'users',
+      locally: function () {
+        if (this.hasAlreadyFetched('users')) {
+          return this.state;
+        }
+      },
+      remotely: function () {
+        return UsersHttpAPI.getAll()
+      }
+    })
+  }
+});
+{% endhighlight %}
+
 <h2 id="waitFor">waitFor(*stores)</h2>
 
 If an action handler is dependant on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.

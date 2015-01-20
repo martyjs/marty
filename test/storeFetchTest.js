@@ -23,6 +23,35 @@ describe('Store#fetch()', function () {
     changeListener.dispose();
   });
 
+  describe('#hasAlreadyFetched()', function () {
+    beforeEach(function () {
+      store = Marty.createStore({
+        getInitialState: _.noop,
+        fetchFoo: function () {
+          return this.fetch(fetchId, function () {
+            return 'foo';
+          });
+        }
+      });
+    });
+
+    describe('when you have never fetched that key before', function () {
+      it('should return false', function () {
+        expect(store.hasAlreadyFetched(fetchId)).to.be.false;
+      });
+    });
+
+    describe('when a fetch has previously completed', function () {
+      beforeEach(function () {
+        store.fetchFoo();
+      });
+
+      it('should return true', function () {
+        expect(store.hasAlreadyFetched(fetchId)).to.be.true;
+      });
+    });
+  });
+
   describe('when you pass in an object literal', function () {
     var locally;
 
