@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.8.2',
+  version: '0.8.3',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -1303,10 +1303,16 @@ function Store(options) {
       try {
         var result = options.locally.call(store);
 
-        if (result) {
-          finished();
-          return fetchResult.done(result);
+        if (_.isUndefined(result)) {
+          return;
         }
+
+        if (_.isNull(result)) {
+          return notFound();
+        }
+
+        finished();
+        return fetchResult.done(result);
       } catch (error) {
         failed(error);
 
@@ -1330,7 +1336,7 @@ function Store(options) {
                 finished();
                 hasChanged();
               } else {
-                failed(new NotFoundError());
+                notFound();
                 hasChanged();
               }
             }).catch(function (error) {
@@ -1349,7 +1355,7 @@ function Store(options) {
           }
         }
 
-        return failed(new NotFoundError());
+        return notFound();
       } catch (error) {
         return failed(error);
       }
@@ -1368,6 +1374,10 @@ function Store(options) {
       finished();
 
       return fetchResult.failed(error);
+    }
+
+    function notFound() {
+      return failed(new NotFoundError());
     }
   }
 

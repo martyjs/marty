@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "A Javascript library for state management in React applications",
   "main": "index.js",
   "directories": {
