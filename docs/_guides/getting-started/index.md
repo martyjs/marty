@@ -7,10 +7,10 @@ section: Getting Started
 
 Welcome to Marty! This guide will help you learn how to use it. If you've never heard of Flux before I suggest you read about the [basic concepts](/guides/concepts/index.html). Or if you prefer you can look at some examples:
 
-* [Marty Todo MVC](https://github.com/jhollingworth/marty/tree/master/examples/flux-todomvc)
+* [Marty Todo MVC](https://github.com/jhollingworth/marty-todo-mvc)
 * [Marty Chat Example](https://github.com/jhollingworth/marty-chat-example)
 
-The quickest way to start writing some code is to use our [yeoman generator](http://yeoman.io/). First you will need to install yeoman and the marty generator
+The quickest way to start writing some code is to use our [yeoman generator](https://github.com/jhollingworth/generator-marty). First you will need to install yeoman and the marty generator
 
 {% highlight bash %}
 npm install -g yo generator-marty
