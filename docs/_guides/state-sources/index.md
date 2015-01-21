@@ -9,7 +9,7 @@ State sources are how you get state into and out of your application. State can 
 
 {% highlight js %}
 var UserAPI = Marty.createStateSource({
-  type: 'socket.io',
+  type: 'http',
   baseUrl: 'http://foo.com',
   getUsers: function () {
     return this.get('/users').then(function (res) {
