@@ -9,8 +9,8 @@
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
 
-  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
   <link rel="stylesheet" type="text/css" href="/css/docs.css">
 
@@ -47,8 +47,8 @@
                 <li >
                   
 
-                  <a  href="/guides/concepts/index.html">
-                    Concepts
+                  <a  href="/guides/flux/index.html">
+                    Flux
                   </a>
                 </li>
               
@@ -219,11 +219,11 @@
           
         
           
+        
+          
+        
+          
             
-          
-        
-          
-        
           
         
           
@@ -240,8 +240,8 @@
         <li  class="nav-section" >
           
 
-          <a  href="/guides/concepts/index.html">
-              Concepts
+          <a  href="/guides/flux/index.html">
+              Flux
           </a>
           
         </li>
@@ -278,6 +278,13 @@
           </a>
           
             <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/guides/stores/fetching-data.html">Fetching data</a>
+                </li>
+              
             
               
                 <li>
@@ -454,9 +461,9 @@
           
         
           
-        
-          
             
+          
+        
           
         
           
@@ -489,9 +496,9 @@
           
         
           
-        
-          
             
+          
+        
           
         
           
@@ -557,7 +564,7 @@
       <p>State sources are how you get state into and out of your application. State can come from many different places (e.g. API&#39;s, Web sockets, Local Storage), State sources encapsulate a lot of complexities in connecting to these sources and provides a uniform, easy to test interface for the rest of your application to use.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateSource</span><span class="p">({</span>
-  <span class="na">type</span><span class="p">:</span> <span class="s1">'socket.io'</span><span class="p">,</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'http'</span><span class="p">,</span>
   <span class="na">baseUrl</span><span class="p">:</span> <span class="s1">'http://foo.com'</span><span class="p">,</span>
   <span class="na">getUsers</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/users'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
