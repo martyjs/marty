@@ -5,7 +5,7 @@ id: getting-started
 section: Getting Started
 ---
 
-Welcome to Marty! This guide will help you learn how to use it. If you've never heard of Flux before I suggest you read about the [basic concepts](/guides/concepts/index.html). Or if you prefer you can look at some examples:
+Welcome to Marty! This guide will help you learn how to use it. If you've never heard of Flux before I suggest you read an [overview of Flux](/guides/flux). Or if you prefer you can look at some examples:
 
 * [Marty Todo MVC](https://github.com/jhollingworth/marty-todo-mvc)
 * [Marty Chat Example](https://github.com/jhollingworth/marty-chat-example)

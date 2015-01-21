@@ -4,7 +4,7 @@ sectionid: devtools
 ---
 
 <div class="container devtools">
-  <h1>Marty Developer Tools</h1>
+  <h1>Marty Developer Tools (Beta)</h1>
   <a href="https://chrome.google.com/webstore/detail/marty-developer-tools/fifcikknnbggajppebgolpkaambnkpae?hl=en">Marty Developer Tools</a> is an extension to Chrome's developer tools. It shows you the current state of your stores and how actions flow through the stores to the views.
 
   <p style="text-align:center; margin-top: 20px">

@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Overview of Marty
-id: concepts-overview
-section: Concepts
+title: Flux
+id: flux
+section: Flux
 ---
 
 State is a big problem in the UI. Most JS applications have few restrictions on how state is changed. This makes it difficult to understand why something happens. Anyone who's spent late nights trying to understand why their application suddenly stopped working after removing an innocuous line should understand this.
