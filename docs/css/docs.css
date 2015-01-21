@@ -20,7 +20,7 @@
 
 body {
   position: relative; /* For scrollspy */
-  font-family: 'PT Serif', serif;
+  font-family: 'PT Serif', Cambria, Georgia, serif;
 }
 
 .devtools img {
