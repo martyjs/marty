@@ -34,7 +34,7 @@ npm install --save marty
 bower install --save marty
 {% endhighlight %}
 
-Marty is built using [UMD](https://github.com/umdjs/umd). This means you can use it from [node.js](nodejs.org) or [Browserify](browserify.org)
+Marty is built using [UMD](https://github.com/umdjs/umd). This means you can use it from [node.js](https://nodejs.org) or [Browserify](http://browserify.org)
 
 {% highlight js %}
 var Marty = require('marty');
@@ -44,7 +44,7 @@ module.exports = Marty.createStore({
 })
 {% endhighlight %}
 
-Or [require.js](requirejs.org) ([Working example](https://github.com/jhollingworth/marty/tree/master/examples/requirejs))
+Or [require.js](http://requirejs.org) ([Working example](https://github.com/jhollingworth/marty/tree/master/examples/requirejs))
 
 {% highlight js %}
 require(['marty'], function (Marty) {
