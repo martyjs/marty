@@ -134,7 +134,7 @@ var User = React.createClass({
   },
   updateEmail: function (e) {
     var email = e.target.value;
-    UserActionCreators.updateUserEmailthis.props.userId, email);
+    UserActionCreators.updateUserEmail(this.props.userId, email);
   }
 });
 {% endhighlight %}
