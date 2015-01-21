@@ -34,7 +34,7 @@ When you call fetch, Marty will first try calling the ``locally`` function. It t
 Using the example of getting a user, you would have a UserHttpAPI (Which is an [HTTP State Source](/guides/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should push the user into the store with a [source action creator](/guides/action-creators/source-action-creators.html). You then return this promise chain to ``remotely``.
 
 {% highlight js %}
-var UserHttpAPI = Mary.createStateSource({
+var UserHttpAPI = Marty.createStateSource({
   getUser: function (userId) {
     return this.get('/users/' + userId).then(function (res) {
       UserSourceActionCreators.receiveUser(res.body);
