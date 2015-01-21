@@ -35,7 +35,7 @@ If an action is making a change to your local state then it can pass its type da
 var Dispatcher = require('marty/dispatcher');
 
 Dispatcher.register(function (action) {
-  console.log('action with type', action.type', has been dispatched) ;
+  console.log('action with type', action.type, 'has been dispatched') ;
 });
 
 Dispatcher.dispatch({
