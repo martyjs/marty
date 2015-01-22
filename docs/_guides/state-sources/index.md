@@ -17,7 +17,7 @@ var UserAPI = Marty.createStateSource({
     });
   },
   createUser: function (user) {
-    return this.pose('/users', { body: user });
+    return this.post('/users', { body: user });
   }
 });
 
