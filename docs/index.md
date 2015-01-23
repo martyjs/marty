@@ -25,13 +25,13 @@ id: home
     <div class="col-sm-4">
       <h3>State management</h3>
       <p>
-        Marty provides solutions for <a href="/guides/state-sources/index.html">getting state into your application</a>, <a href="/guides/stores/index.html">storing it in memory</a> and then <a href="/guides/state-mixin/index.html">binding it to your react components</a>
+        Marty provides solutions for <a href="/guides/state-sources/index.html">getting state into your application</a>, <a href="/guides/stores/index.html">storing it in memory</a> and then <a href="/guides/state-mixin/index.html">binding it to your React components</a>.
       </p>
     </div>
     <div class="col-sm-4">
       <h3>Debugging</h3>
       <p>
-        Marty has a <a href="/devtools/">Chrome Developer tool</a> to help you visualize the current state is in your application and how it changes over time.
+        Marty has a <a href="/devtools/">Chrome Developer Tool</a> to help you visualize the current state of your application and how it changes over time.
       </p>
     </div>
   </div>
