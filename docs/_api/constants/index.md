@@ -24,12 +24,12 @@ var Constants = Marty.createConstants([
 <h2 id="createConstantsObj">Marty.createConstants(<i>Object</i>)</h2>
 
 {% highlight js %}
-var Constants = Marty.createConstants([
+var Constants = Marty.createConstants({
   Users: ['RECEIVE_USERS', 'DELETE_USER'],
   Foos: {
     Bars: ['ADD_BAR']
   }
-]);
+});
 
 //returns
 {
