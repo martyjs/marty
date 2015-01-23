@@ -7,7 +7,7 @@ id: home
   <div class="container">
     <h1>marty.js</h1>
     <p class="lead">
-      A Javascript library for state management in React applications
+      A JavaScript library for state management in React applications
     </p>
     <p class="lead">
       <a href="/guides/getting-started" class="btn btn-outline-inverse btn-lg">Get started now</a>
