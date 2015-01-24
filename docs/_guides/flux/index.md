@@ -73,7 +73,7 @@ UserStore.addChangeListener(function (state) {
 });
 {% endhighlight %}
 
-If you have a view thats interested in a domain, it can ask the store to notify it of any changes. When the store updates, your view just rerenders itself with the new state. You might ask, "what if the store changed something your view isn't interested in (e.g. a different entity)?". Thanks to Reacts virtual DOM it doesn't really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views *significantly simpler* since you just render whatever the store tells you to render.
+If you have a view that's interested in a domain, it can ask the store to notify it of any changes. When the store updates, your view just rerenders itself with the new state. You might ask, "what if the store changed something your view isn't interested in (e.g. a different entity)?". Thanks to React's virtual DOM it doesn't really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views *significantly simpler* since you just render whatever the store tells you to render.
 
 {% highlight js %}
 var User = React.createClass({
@@ -139,10 +139,10 @@ var User = React.createClass({
 });
 {% endhighlight %}
 
-Whenever you want to change a value within your application your data must follow this flow of [Action creator](/guides/action-creators/index.html) **->** [Dispatcher](/guides/dispatcher/index.html) **->** [Store](/guides/stores/index.html) **->** [State mixin](/guides/state-mixin/index.html) **->** View. This is known as a **unidirectional data flow**.
+Whenever you want to change a value within your application, your data must follow this flow of [Action creator](/guides/action-creators/index.html) **->** [Dispatcher](/guides/dispatcher/index.html) **->** [Store](/guides/stores/index.html) **->** [State mixin](/guides/state-mixin/index.html) **->** View. This is known as a **unidirectional data flow**.
 
 <center>
   <img src="/img/data-flow.png" alt="Data flow"/>
 </center>
 
-While this seems superfluous at first it turns out to have some great benefits. First and foremost, its really easy to debug. There's only one place your application state can change so you don't have to dig into all the views to work out where a value was changed (it's even easier if you're using [immutable data collections](/guides/stores/immutable-data-collections.html)). Thanks to action types being strings you have a loosely coupled [Law of Demeter](http://en.wikipedia.org/wiki/Law_of_Demeter) architecture which is easy to grow without increasing the complexity of the code base.
+While this seems superfluous at first, it turns out to have some great benefits. First and foremost, it's really easy to debug. There's only one place your application state can change so you don't have to dig into all the views to work out where a value was changed (it's even easier if you're using [immutable data collections](/guides/stores/immutable-data-collections.html)). Thanks to action types being strings you have a loosely coupled [Law of Demeter](http://en.wikipedia.org/wiki/Law_of_Demeter) architecture which is easy to grow without increasing the complexity of the code base.

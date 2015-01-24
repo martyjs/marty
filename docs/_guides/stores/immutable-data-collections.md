@@ -19,7 +19,7 @@ console.log(users2) // ["foo", "bar"]
 
 Using immutable data collections help you sleep soundly with knowledge that nothing outside of stores will be able to change its state.
 
-While immutable data collections are not required, we try to make it as easy to use as possible. For example, you can simple call this.state with the mutated collection and internally it will check if the collection has changed and handle notifying and listeners.
+While immutable data collections are not required, we try to make it as easy to use as possible. For example, you can simply call this.state with the mutated collection and internally it will check if the collection has changed and handle notifying the listeners.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
