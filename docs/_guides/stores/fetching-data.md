@@ -5,7 +5,7 @@ id: stores-fetch
 section: Stores
 ---
 
-From the views perspective, the store holds all the state it needs. In most cases its unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we've found they make your views complicated and difficult to reason about. It also goes againt Flux's unidirectional data flow. Marty introduces the [fetch API](/api/stores/#fetch) which is an alternative solution to the problem.
+From the views perspective, the store holds all the state it needs. In most cases it's unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we've found they make your views complicated and difficult to reason about. It also goes againt Flux's unidirectional data flow. Marty introduces the [fetch API](/api/stores/#fetch) which is an alternative solution to the problem.
 
 Say your view wants to load a user from the ``UserStore``. Internally the store would call ``fetch`` which allows it to define how to get the user locally or, if not present, get it from a state source. ``fetch`` requires 3 things:
 
@@ -29,7 +29,7 @@ var UserStore = Marty.createStore({
 });
 {% endhighlight %}
 
-When you call fetch, Marty will first try calling the ``locally`` function. It the state is present in the store then it's returned and the fetch will finish executing. If the store can't find the state locally it should return ``undefined``. This causes the fetch function to invoke ``remotely``. Once ``remotely`` has finished executing then fetch will then re-execute the ``locally`` function with the expectation that the state is now in the store. If it isn't then the fetch will fail with a "Not found" error. If your ``remotely`` function needs to get the state asynchronously you can return a promise which fetch will wait to be resolved before re-executing ``locally``. 
+When you call fetch, Marty will first try calling the ``locally`` function. It the state is present in the store then it's returned and the fetch will finish executing. If the store can't find the state locally it should return ``undefined``. This causes the fetch function to invoke ``remotely``. Once ``remotely`` has finished executing then fetch will then re-execute the ``locally`` function with the expectation that the state is now in the store. If it isn't then the fetch will fail with a "Not found" error. If the ``remotely`` function needs to get the state asynchronously you can return a promise which fetch will wait to be resolved before re-executing ``locally``.
 
 Using the example of getting a user, you would have a UserHttpAPI (Which is an [HTTP State Source](/guides/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should push the user into the store with a [source action creator](/guides/action-creators/source-action-creators.html). You then return this promise chain to ``remotely``.
 
