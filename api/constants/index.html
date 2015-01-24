@@ -362,12 +362,12 @@
 
 <h2 id="createConstantsObj">Marty.createConstants(<i>Object</i>)</h2>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span>
-  <span class="nx">Users</span><span class="err">:</span> <span class="p">[</span><span class="s1">'RECEIVE_USERS'</span><span class="p">,</span> <span class="s1">'DELETE_USER'</span><span class="p">],</span>
-  <span class="nx">Foos</span><span class="err">:</span> <span class="p">{</span>
-    <span class="nl">Bars</span><span class="p">:</span> <span class="p">[</span><span class="s1">'ADD_BAR'</span><span class="p">]</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Constants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">({</span>
+  <span class="na">Users</span><span class="p">:</span> <span class="p">[</span><span class="s1">'RECEIVE_USERS'</span><span class="p">,</span> <span class="s1">'DELETE_USER'</span><span class="p">],</span>
+  <span class="na">Foos</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">Bars</span><span class="p">:</span> <span class="p">[</span><span class="s1">'ADD_BAR'</span><span class="p">]</span>
   <span class="p">}</span>
-<span class="p">]);</span>
+<span class="p">});</span>
 
 <span class="c1">//returns</span>
 <span class="p">{</span>

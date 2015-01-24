@@ -563,7 +563,7 @@
     <div class="content">
       <p>Within a Flux application you want the stores to be the <strong>only</strong> place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.</p>
 
-<p>The solution this is to use immutable data collections like <a href="http://facebook.github.io/immutable-js/">immutable.js</a> or <a href="http://swannodette.github.io/mori/">mori</a>. Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.</p>
+<p>The solution this is to use immutable data collections like <a href="http://facebook.github.io/immutable-js/">immutable.js</a> or <a href="http://swannodette.github.io/mori/">mori</a>. Operations on immutable data structures do not mutate the instance itself but rather return a new instance which is the result of the mutation.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nx">of</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">users2</span> <span class="o">=</span> <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">);</span>

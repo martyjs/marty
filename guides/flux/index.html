@@ -588,11 +588,11 @@
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/dispatcher'</span><span class="p">);</span>
 
 <span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'action with type'</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="s1">', has been dispatched) ;
-});
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'action with type'</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="s1">'has been dispatched'</span><span class="p">)</span> <span class="p">;</span>
+<span class="p">});</span>
 
-Dispatcher.dispatch({
-  type: '</span><span class="nx">foo</span><span class="err">'</span>
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'foo'</span>
 <span class="p">});</span></code></pre></div>
 
 <p>Normally you don&#39;t manually register callbacks with the dispatcher, instead you create stores which do this for you. Stores hold information about a domain. That domain could be a collection of entities (Like a <a href="http://backbonejs.org/#Collection">Backbone Collection</a>) or it could be some information about something specific (Like a <a href="http://backbonejs.org/#Model">Backbone Model</a>).</p>
@@ -635,7 +635,7 @@ Dispatcher.dispatch({
   <span class="p">},</span>
   <span class="nx">updateEmail</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmailthis</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="nl">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
