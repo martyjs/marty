@@ -7,7 +7,7 @@ section: Stores
 
 Within a Flux application you want the stores to be the **only** place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.
 
-The solution is to use immutable data collections like [immutable.js](http://facebook.github.io/immutable-js/) or [mori](http://swannodette.github.io/mori/). Operations on immutable data structures do mutate the instance itself but rather return a new instance with is the result of the mutation.
+The solution is to use immutable data collections like [immutable.js](http://facebook.github.io/immutable-js/) or [mori](http://swannodette.github.io/mori/). Operations on immutable data structures do not mutate the instance itself but rather return a new instance which is the result of the mutation.
 
 {% highlight js %}
 var users = Immutable.List.of("foo");
