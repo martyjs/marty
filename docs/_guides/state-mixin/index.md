@@ -9,7 +9,7 @@ We found that there was a lot of boilerplate code in React components to start l
 
 Firstly, it automatically [adds change listeners](/api/stores/index.html#addChangeListener) to [stores you want to listen to](/api/state-mixin/index.html#listenTo), as well as disposing of those listeners when the component unmounts.
 
-It also introduces a new function [<code>getState</code>](#getState), which returns state of the component. It will be called just before the initial render of the component and whenever a store updates.
+It also introduces a new function [<code>getState</code>](#getState), which returns the state of the component. It will be called just before the initial render of the component and whenever a store updates.
 
 {% highlight js %}
 var UserState = Marty.createStateMixin({

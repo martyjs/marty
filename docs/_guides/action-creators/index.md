@@ -5,9 +5,9 @@ id: action-creators
 section: Action Creators
 ---
 
-Action Creators are where any changes to your applications state starts. Actions are functions that are responsible for coordinating changes to local and remote state.
+Action Creators are where any changes to your applications state start. Actions are functions that are responsible for coordinating changes to local and remote state.
 
-All actions have a type which is string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/guides/dispatcher/index.html)) and use [action's type to determine whether to do something with it](/api/stores/index.html#handlers). Action types help us build loosely coupled applications that can grow without increasing complexity.
+All actions have a type of string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/guides/dispatcher/index.html)) and use [action's type to determine whether to do something with it](/api/stores/index.html#handlers). Action types help us build loosely coupled applications that can grow without increasing complexity.
 
 [Constants](/guides/constants/index.html) provide a simple way of creating action creators for a type
 

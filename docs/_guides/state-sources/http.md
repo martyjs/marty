@@ -7,7 +7,7 @@ section: State Sources
 
 The HTTP state source makes it easy to talk to remote servers over HTTP. We use the [fetch](https://github.com/github/fetch) polyfill for making requests but you can use easily roll your own if you like.
 
-All requests return a promise (Promises/A) that allow you to easily define what happens when a request has finished.
+All requests return a [promise](https://promisesaplus.com/) that allow you to easily define what happens when a request has finished.
 
 {% highlight js %}
 var UsersAPI = Marty.createStateSource({

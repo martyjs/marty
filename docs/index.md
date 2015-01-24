@@ -31,7 +31,7 @@ id: home
     <div class="col-sm-4">
       <h3>Debugging</h3>
       <p>
-        Marty has a <a href="/devtools/">Chrome Developer Tool</a> to help you visualize the current state of your application and how it changes over time.
+        Marty has a <a href="/devtools/">Chrome Developer Tool</a> to help you visualise the current state of your application and how it changes over time.
       </p>
     </div>
   </div>
