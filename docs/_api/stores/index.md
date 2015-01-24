@@ -11,7 +11,7 @@ To create a new store, you call <code>Marty.createStore</code> passing in a set 
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
-  name: 'Users',
+  displayName: 'Users',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -136,7 +136,7 @@ addChangeListener will return a disposable object. If you want to stop listening
 {% highlight js %}
 var listener = UserStore.addChangeListener(function (state, store) {
   console.log('state', state);
-  console.log('from', store.name);
+  console.log('from', store.displayName);
 }, this);
 
 listener.dispose();
