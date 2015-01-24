@@ -561,7 +561,7 @@
       <h1 class="page-title">Dispatcher</h1>
     
     <div class="content">
-      <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creators</a> creates an action it is passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
+      <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creator</a> creates an action and you call <code>this.dispatch()</code>, the action will be passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
 
 <p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>.</p>
 

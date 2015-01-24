@@ -563,9 +563,9 @@
     <div class="content">
       <p>We found that there was a lot of boilerplate code in React components to start listening to <a href="/guides/stores/index.html">stores</a> and get their states. The State mixin helps to reduce the amount of code you have to write.</p>
 
-<p>Firstly it automatically handles <a href="/api/stores/index.html#addChangeListener">adding change listeners</a> to <a href="/api/state-mixin/index.html#listenTo">stores you want to listen to</a> as well as disposing of those listeners when the component unmounts.</p>
+<p>Firstly, it automatically <a href="/api/stores/index.html#addChangeListener">adds change listeners</a> to <a href="/api/state-mixin/index.html#listenTo">stores you want to listen to</a>, as well as disposing of those listeners when the component unmounts.</p>
 
-<p>It also introduces a new function <a href="#getState"><code>getState</code></a> which returns state of the component. It will be called just before the initial render of the component and whenever a store updates.</p>
+<p>It also introduces a new function <a href="#getState"><code>getState</code></a>, which returns the state of the component. It will be called just before the initial render of the component and whenever a store updates.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
   <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>

@@ -563,7 +563,7 @@
     <div class="content">
       <p>The HTTP state source makes it easy to talk to remote servers over HTTP. We use the <a href="https://github.com/github/fetch">fetch</a> polyfill for making requests but you can use easily roll your own if you like.</p>
 
-<p>All requests return a promise (Promises/A) that allow you to easily define what happens when a request has finished.</p>
+<p>All requests return a <a href="https://promisesaplus.com/">promise</a> that allow you to easily define what happens when a request has finished.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateSource</span><span class="p">({</span>
   <span class="na">type</span><span class="p">:</span> <span class="s2">"http"</span><span class="p">,</span>

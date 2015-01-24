@@ -561,7 +561,7 @@
       <h1 class="page-title">Fetching data</h1>
     
     <div class="content">
-      <p>From the views perspective, the store holds all the state it needs. In most cases its unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we&#39;ve found they make your views complicated and difficult to reason about. It also goes againt Flux&#39;s unidirectional data flow. Marty introduces the <a href="/api/stores/#fetch">fetch API</a> which is an alternative solution to the problem.</p>
+      <p>From the views perspective, the store holds all the state it needs. In most cases it&#39;s unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we&#39;ve found they make your views complicated and difficult to reason about. It also goes againt Flux&#39;s unidirectional data flow. Marty introduces the <a href="/api/stores/#fetch">fetch API</a> which is an alternative solution to the problem.</p>
 
 <p>Say your view wants to load a user from the <code>UserStore</code>. Internally the store would call <code>fetch</code> which allows it to define how to get the user locally or, if not present, get it from a state source. <code>fetch</code> requires 3 things:</p>
 
@@ -585,7 +585,7 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>When you call fetch, Marty will first try calling the <code>locally</code> function. It the state is present in the store then it&#39;s returned and the fetch will finish executing. If the store can&#39;t find the state locally it should return <code>undefined</code>. This causes the fetch function to invoke <code>remotely</code>. Once <code>remotely</code> has finished executing then fetch will then re-execute the <code>locally</code> function with the expectation that the state is now in the store. If it isn&#39;t then the fetch will fail with a &quot;Not found&quot; error. If your <code>remotely</code> function needs to get the state asynchronously you can return a promise which fetch will wait to be resolved before re-executing <code>locally</code>. </p>
+<p>When you call fetch, Marty will first try calling the <code>locally</code> function. It the state is present in the store then it&#39;s returned and the fetch will finish executing. If the store can&#39;t find the state locally it should return <code>undefined</code>. This causes the fetch function to invoke <code>remotely</code>. Once <code>remotely</code> has finished executing then fetch will then re-execute the <code>locally</code> function with the expectation that the state is now in the store. If it isn&#39;t then the fetch will fail with a &quot;Not found&quot; error. If the <code>remotely</code> function needs to get the state asynchronously you can return a promise. The fetch function will wait for the promise to be resolved before re-executing <code>locally</code>.</p>
 
 <p>Using the example of getting a user, you would have a UserHttpAPI (Which is an <a href="/guides/state-sources/http.html">HTTP State Source</a>), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should push the user into the store with a <a href="/guides/action-creators/source-action-creators.html">source action creator</a>. You then return this promise chain to <code>remotely</code>.</p>
 
