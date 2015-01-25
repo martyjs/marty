@@ -16,6 +16,17 @@ var UserActionCreators = Marty.createActionCreators({
 });
 {% endhighlight %}
 
+When using es6 arrow syntax, `this` might not be bound to the `ActionCreator`. Therefore, the `ActionCreator` is always passed as the last argument just in case. 
+
+{% highlight js %}
+var UserActionCreators = Marty.createActionCreators({
+  addUser: UserActions.ADD_USER((name, email, context) => {
+    // Dispatch this action
+    context.dispatch(name, email);
+  })
+});
+{% endhighlight %}
+
 <h2 id="displayName">displayName</h2>
 
 An (optional) display name for the action creator. Used for richer debugging.
