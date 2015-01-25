@@ -1,7 +1,7 @@
 if [ -f tmp/mock-server.pid ];
 then
-  kill $(cat tmp/mock-server.pid)
-  rm tmp/mock-server.pid
+  kill $(cat tmp/mock-server.pid) > /dev/null
+  rm -f tmp/mock-server.pid
 else
   mkdir -p tmp
 fi
@@ -12,6 +12,6 @@ node_modules/.bin/karma start
 
 if [ -f tmp/mock-server.pid ];
 then
-  kill $(cat tmp/mock-server.pid)
-  rm tmp/mock-server.pid
+  kill $(cat tmp/mock-server.pid) > /dev/null
+  rm -f tmp/mock-server.pid
 fi
