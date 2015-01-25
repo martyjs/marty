@@ -5,7 +5,7 @@ var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
 
 var Marty = _.extend({
-  version: '0.8.3',
+  version: '0.8.4',
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -970,8 +970,12 @@ function HttpStateSource(mixinOptions) {
           throw res;
         }
 
-        if (isJson(res) && res._body) {
-          res.body = JSON.parse(res._body);
+        if (isJson(res)) {
+          return res.json().then(function (body) {
+            res.body = body;
+
+            return res;
+          });
         }
 
         return res;
