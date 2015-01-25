@@ -352,7 +352,7 @@
 <p>To create a new store, you call <code>Marty.createStore</code> passing in a set of instance properties. It returns a singleton store which is listening to the dispatcher.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
-  <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
+  <span class="na">displayName</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
   <span class="p">},</span>
@@ -466,7 +466,7 @@
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">listener</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">,</span> <span class="nx">store</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'state'</span><span class="p">,</span> <span class="nx">state</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'from'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'from'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">displayName</span><span class="p">);</span>
 <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
 
 <span class="nx">listener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span></code></pre></div>
@@ -770,7 +770,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.3</li>
+        <li>v0.8.4</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

@@ -568,7 +568,7 @@
 <p>When you create a store it will automatically start listening to the dispatcher. To determine which actions to handle you define the <a href="/api/stores/#handlers">handlers</a> hash. The keys in handlers are the functions you wish to call when an action comes in and the values are <a href="/api/stores/#action-predicates">action predicates</a> (Normally the constant of the action&#39;s type). If your store does handle the action, then the arguments you passed to <a href="/api/action-creators/index.html#dispatch">ActionCreator#dispatch</a> are the arguments for the handler.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
-  <span class="na">name</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
+  <span class="na">displayName</span><span class="p">:</span> <span class="s1">'Users'</span><span class="p">,</span>
   <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
     <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
   <span class="p">},</span>
@@ -594,7 +594,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.3</li>
+        <li>v0.8.4</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
