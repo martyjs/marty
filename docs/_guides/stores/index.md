@@ -13,7 +13,7 @@ When you create a store it will automatically start listening to the dispatcher.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({
-  name: 'Users',
+  displayName: 'Users',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },

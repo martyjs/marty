@@ -25,27 +25,29 @@ function ActionHandlerNotFoundError(actionHandler, store) {
   this.name = 'Action handler not found';
   this.message = 'The action handler "' + actionHandler + '" could not be found';
 
-  if (store && store.name) {
-    this.message += ' in the ' + store.name + ' store';
+  if (store && store.displayName) {
+    this.message += ' in the ' + store.displayName + ' store';
   }
 }
 
 ActionHandlerNotFoundError.prototype = Error.prototype;
 
 module.exports = ActionHandlerNotFoundError;
+
 },{}],5:[function(require,module,exports){
 function ActionPredicateUndefinedError(actionHandler, store) {
   this.name = 'Action predicate undefined';
   this.message = 'The action predicate for "' + actionHandler + '" was undefined';
 
-  if (store && store.name) {
-    this.message += ' in the ' + store.name + ' store';
+  if (store && store.displayName) {
+    this.message += ' in the ' + store.displayName + ' store';
   }
 }
 
 ActionPredicateUndefinedError.prototype = Error.prototype;
 
 module.exports = ActionPredicateUndefinedError;
+
 },{}],6:[function(require,module,exports){
 function CompoundError(errors) {
   this.errors = errors;
@@ -58,7 +60,7 @@ module.exports = CompoundError;
 },{}],7:[function(require,module,exports){
 function NotFoundError(message) {
   this.name = 'Not found';
-  this.message = message || '';
+  this.message = message || 'Not found';
   this.status = 404;
 }
 
@@ -1036,7 +1038,7 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpStateSource;
-},{"es6-promise":33,"isomorphic-fetch":37,"underscore":39}],20:[function(require,module,exports){
+},{"es6-promise":33,"isomorphic-fetch":38,"underscore":39}],20:[function(require,module,exports){
 function JSONStorageStateSource(options) {
   options = options || {};
 
@@ -1413,8 +1415,6 @@ function Store(options) {
       }
     }
   }
-
-
 
   function clear() {
     failedFetches = {};
@@ -3943,13 +3943,10 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 },{}],37:[function(require,module,exports){
-require('fetch');
-
-},{"fetch":38}],38:[function(require,module,exports){
 (function() {
   'use strict';
 
-  if (window.fetch) {
+  if (self.fetch) {
     return
   }
 
@@ -3972,6 +3969,7 @@ require('fetch');
   }
 
   Headers.prototype.append = function(name, value) {
+    name = name.toLowerCase()
     var list = this.map[name]
     if (!list) {
       list = []
@@ -3981,24 +3979,24 @@ require('fetch');
   }
 
   Headers.prototype['delete'] = function(name) {
-    delete this.map[name]
+    delete this.map[name.toLowerCase()]
   }
 
   Headers.prototype.get = function(name) {
-    var values = this.map[name]
+    var values = this.map[name.toLowerCase()]
     return values ? values[0] : null
   }
 
   Headers.prototype.getAll = function(name) {
-    return this.map[name] || []
+    return this.map[name.toLowerCase()] || []
   }
 
   Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(name)
+    return this.map.hasOwnProperty(name.toLowerCase())
   }
 
   Headers.prototype.set = function(name, value) {
-    this.map[name] = [value]
+    this.map[name.toLowerCase()] = [value]
   }
 
   // Instead of iterable for now.
@@ -4011,48 +4009,126 @@ require('fetch');
 
   function consumed(body) {
     if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Body already consumed'))
+      return Promise.reject(new TypeError('Already read'))
     }
     body.bodyUsed = true
   }
 
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob();
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self
+  }
+
   function Body() {
-    this._body = null
     this.bodyUsed = false
 
-    this.arrayBuffer = function() {
-      throw new Error('Not implemented yet')
+    if (support.blob) {
+      this._initBody = function(body) {
+        this._bodyInit = body
+        if (typeof body === 'string') {
+          this._bodyText = body
+        } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+          this._bodyBlob = body
+        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+          this._bodyFormData = body
+        } else if (!body) {
+          this._bodyText = ''
+        } else {
+          throw new Error('unsupported BodyInit type')
+        }
+      }
+
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this._initBody = function(body) {
+        this._bodyInit = body
+        if (typeof body === 'string') {
+          this._bodyText = body
+        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+          this._bodyFormData = body
+        } else if (!body) {
+          this._bodyText = ''
+        } else {
+          throw new Error('unsupported BodyInit type')
+        }
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : Promise.resolve(this._bodyText)
+      }
     }
 
-    this.blob = function() {
-      var rejected = consumed(this)
-      return rejected ? rejected : Promise.resolve(new Blob([this._body]))
-    }
-
-    this.formData = function() {
-      var rejected = consumed(this)
-      return rejected ? rejected : Promise.resolve(decode(this._body))
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
     }
 
     this.json = function() {
-      var rejected = consumed(this)
-      if (rejected) {
-        return rejected
-      }
-
-      var body = this._body
-      return new Promise(function(resolve, reject) {
-        try {
-          resolve(JSON.parse(body))
-        } catch (ex) {
-          reject(ex)
-        }
-      })
-    }
-
-    this.text = function() {
-      var rejected = consumed(this)
-      return rejected ? rejected : Promise.resolve(this._body)
+      return this.text().then(JSON.parse)
     }
 
     return this
@@ -4069,12 +4145,17 @@ require('fetch');
   function Request(url, options) {
     options = options || {}
     this.url = url
-    this._body = options.body
-    this.credentials = options.credentials || null
+
+    this.credentials = options.credentials || 'omit'
     this.headers = new Headers(options.headers)
     this.method = normalizeMethod(options.method || 'GET')
     this.mode = options.mode || null
     this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(options.body)
   }
 
   function decode(body) {
@@ -4107,6 +4188,22 @@ require('fetch');
 
     return new Promise(function(resolve, reject) {
       var xhr = new XMLHttpRequest()
+      if (self.credentials === 'cors') {
+        xhr.withCredentials = true;
+      }
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return;
+      }
 
       xhr.onload = function() {
         var status = (xhr.status === 1223) ? 204 : xhr.status
@@ -4117,16 +4214,21 @@ require('fetch');
         var options = {
           status: status,
           statusText: xhr.statusText,
-          headers: headers(xhr)
+          headers: headers(xhr),
+          url: responseURL()
         }
-        resolve(new Response(xhr.responseText, options))
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        resolve(new Response(body, options))
       }
 
       xhr.onerror = function() {
         reject(new TypeError('Network request failed'))
       }
 
-      xhr.open(self.method, self.url)
+      xhr.open(self.method, self.url, true)
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
 
       self.headers.forEach(function(name, values) {
         values.forEach(function(value) {
@@ -4134,29 +4236,42 @@ require('fetch');
         })
       })
 
-      xhr.send((self._body === undefined) ? null : self._body)
+      xhr.send(typeof self._bodyInit === 'undefined' ? null : self._bodyInit)
     })
   }
 
   Body.call(Request.prototype)
 
-  function Response(body, options) {
-    this._body = body
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this._initBody(bodyInit)
     this.type = 'default'
     this.url = null
     this.status = options.status
     this.statusText = options.statusText
     this.headers = options.headers
+    this.url = options.url || ''
   }
 
   Body.call(Response.prototype)
 
-  window.fetch = function (url, options) {
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
+
+  self.fetch = function (url, options) {
     return new Request(url, options).fetch()
   }
+  self.fetch.polyfill = true
 })();
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
+require('whatwg-fetch');
+
+},{"whatwg-fetch":37}],39:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
