@@ -42,6 +42,20 @@ Dispatcher.register(function (action) {
 UserActionCreators.updateEmail(123, "foo@bar.com");
 {% endhighlight %}
 
+If you're using es6 arrow syntax and/or your function might not be bound to `this`, use the last argument to access the `ActionCreator`.
+
+{% highlight js %}
+
+var UserActionCreators = Marty.createActionCreators({
+  updateEmail: UserConstants.UPDATE_EMAIL((userId, email, context) => {
+    // Dispatch this action
+    context.dispatch(userId, email);
+  })
+});
+
+UserActionCreators.updateEmail(123, "foo@bar.com");
+{% endhighlight %}
+
 You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:
 
 * When an action is about to start
