@@ -14,7 +14,8 @@ describe('Store', function () {
 
   beforeEach(function () {
     dispatcher = {
-      register: sinon.stub().returns(dispatchToken)
+      register: sinon.stub().returns(dispatchToken),
+      unregister: sinon.spy()
     };
 
     store = new Store({
@@ -213,6 +214,7 @@ describe('Store', function () {
     describe('when you dont pass in a dispose function', function () {
       beforeEach(function () {
         store = Marty.createStore({
+          dispatcher: dispatcher,
           clear: clear,
           getInitialState: function () {
             return {};
@@ -232,6 +234,14 @@ describe('Store', function () {
       it('should dispose of all listeners', function () {
         expect(listener).to.have.been.calledOnce;
       });
+
+      it('should call unregister with dispatchToken', function () {
+        expect(dispatcher.unregister).to.have.been.calledWith(dispatchToken);
+      });
+
+      it('should make store.dispatchToken undefined', function () {
+        expect(store.dispatchToken).to.be.undefined;
+      });
     });
 
     describe('when you pass in a dispose function', function () {
@@ -240,6 +250,7 @@ describe('Store', function () {
       beforeEach(function () {
         dispose = sinon.spy();
         store = Marty.createStore({
+          dispatcher: dispatcher,
           clear: clear,
           dispose: dispose,
           getInitialState: function () {
@@ -263,6 +274,14 @@ describe('Store', function () {
 
       it('should dispose of all listeners', function () {
         expect(listener).to.have.been.calledOnce;
+      });
+
+      it('should call unregister with dispatchToken', function () {
+        expect(dispatcher.unregister).to.have.been.calledWith(dispatchToken);
+      });
+
+      it('should make store.dispatchToken undefined', function () {
+        expect(store.dispatchToken).to.be.undefined;
       });
     });
   });

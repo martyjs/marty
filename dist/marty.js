@@ -1258,6 +1258,11 @@ function Store(options) {
     if (_.isFunction(options.dispose)) {
       options.dispose.call(store);
     }
+
+    if (store.dispatchToken) {
+      dispatcher.unregister(store.dispatchToken);
+      store.dispatchToken = undefined;
+    }
   }
 
   function hasAlreadyFetched(fetchId) {
@@ -1548,6 +1553,7 @@ function Store(options) {
 }
 
 module.exports = Store;
+
 },{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":25,"events":27,"underscore":38}],24:[function(require,module,exports){
 function serializeError(error) {
   if (!error) {
