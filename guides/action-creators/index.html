@@ -577,7 +577,9 @@
 
 <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
 
-<p>If your action wants to make a change to the local state, you can use <code>this.dispatch()</code>.</p>
+
+If your action wants to make a change to the local state, you can use ``this.dispatch()``.
+
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/dispatcher'</span><span class="p">);</span>
 
@@ -593,6 +595,11 @@
 <span class="p">});</span>
 
 <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
+
+
+<div class="alert alert-warning" role="alert">
+  <strong>Warning!</strong> Please avoid using es6 arrow syntax for your callbacks since they are bound to the current context.
+</div>
 
 <p>You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:</p>
 
@@ -627,7 +634,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.4</li>
+        <li>v0.8.5</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

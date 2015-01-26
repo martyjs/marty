@@ -586,6 +586,21 @@
   <span class="nx">listener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span>
 <span class="p">});</span></code></pre></div>
 
+<p>Often action creators optimistically dispatch an action before connecting to a state source. So what should you do if that action fails? Action creators will emit actions of  type <code>ACTION_FAILED</code> and <code>{Action Type}_FAILED</code> which your store can handle. Alternatively you can return a function from an action handler which will be called if the action fails or if the <a href="/api/stores/index.html#rollback">action rolled back</a>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">user</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">errors</span><span class="p">[</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">error</span><span class="p">;</span>
+      <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">];</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
     </div>
   </div>
 </div>
@@ -594,7 +609,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.4</li>
+        <li>v0.8.5</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
