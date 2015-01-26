@@ -42,6 +42,10 @@ Dispatcher.register(function (action) {
 UserActionCreators.updateEmail(123, "foo@bar.com");
 {% endhighlight %}
 
+<div class="alert alert-warning" role="alert">
+  <strong>Warning!</strong> Please avoid using es6 arrow syntax for your callbacks since they are bound to the current context.
+</div>
+
 You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:
 
 * When an action is about to start

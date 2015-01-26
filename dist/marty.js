@@ -248,6 +248,7 @@ function ActionCreators(options) {
 }
 
 module.exports = ActionCreators;
+
 },{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":25,"./utils/uuid":26,"underscore":39}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
@@ -1213,16 +1214,22 @@ function Store(options) {
   });
 
   function validateOptions(options) {
-    var errors = [];
+    var missingFunctions = [];
 
     _.each(REQUIRED_FUNCTIONS, function (functionName) {
       if (!_.has(options, functionName)) {
-        errors.push('You must implement ' + functionName);
+        missingFunctions.push(functionName);
       }
     });
 
-    if (errors.length) {
-      throw new Error(errors.join('. '));
+    if (missingFunctions.length) {
+      var error = 'You must implement ' + missingFunctions.join(',');
+
+      if (options.displayName) {
+        error += ' in ' + options.displayName;
+      }
+
+      throw new Error(error);
     }
   }
 
