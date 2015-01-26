@@ -31,7 +31,9 @@ var Dispatcher = require('marty/dispatcher');
 var UserActionCreators = Marty.createActionCreators({
   updateEmail: UserConstants.UPDATE_EMAIL(function (userId, email) {
     this.dispatch(userId, email);
-  })
+    this.somethingElse();
+  }),
+  somethingElse: UserActions.SOMETHING_ELSE()
 });
 
 Dispatcher.register(function (action) {
@@ -42,15 +44,19 @@ Dispatcher.register(function (action) {
 UserActionCreators.updateEmail(123, "foo@bar.com");
 {% endhighlight %}
 
-If you're using es6 arrow syntax and/or your function might not be bound to `this`, use the last argument to access the `ActionCreator`.
+If you're using es6 arrow syntax, use the last argument to access the `dispatch` function.
 
 {% highlight js %}
 
 var UserActionCreators = Marty.createActionCreators({
-  updateEmail: UserConstants.UPDATE_EMAIL((userId, email, context) => {
+  updateEmail: UserConstants.UPDATE_EMAIL((userId, email, dispatch) => {
     // Dispatch this action
-    context.dispatch(userId, email);
-  })
+    dispatch(userId, email);
+
+    // Use global `UserActionCreators` instead of `this` here.
+    UserActionCreators.somethingElse();
+  }),
+  somethingElse: UserActions.SOMETHING_ELSE()
 });
 
 UserActionCreators.updateEmail(123, "foo@bar.com");

@@ -33,7 +33,7 @@ describe('ActionCreators', function () {
   describe(
     'when the action creator is created from a constant and the function is bound to the outer scope',
   function () {
-    var TestConstants, expectedProperties, passedContext;
+    var TestConstants, expectedProperties, passedDispatchFunction;
     beforeEach(function () {
       expectedProperties = {
         foo: 'bar',
@@ -44,9 +44,9 @@ describe('ActionCreators', function () {
 
       actionCreators = new ActionCreators({
         dispatcher: dispatcher,
-        testConstant: TestConstants.TEST_CONSTANT(function (a, b, c, context) {
-          passedContext = context;
-          context.dispatch(a, b, c);
+        testConstant: TestConstants.TEST_CONSTANT(function (a, b, c, dispatch) {
+          passedDispatchFunction = dispatch;
+          dispatch(a, b, c);
         }.bind(this), expectedProperties)
       });
     });
@@ -61,8 +61,8 @@ describe('ActionCreators', function () {
         actualAction = dispatcher.getActionWithType('TEST_CONSTANT');
       });
 
-      it('should pass a context as the last argument', function () {
-        expect(passedContext).to.exist;
+      it('should pass the dispatch as the last argument', function () {
+        expect(passedDispatchFunction).to.exist;
       });
 
       it('should dispatch an action with the constant name', function () {
