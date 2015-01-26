@@ -3,6 +3,7 @@ var sinon = require('sinon');
 var Marty = require('../index');
 var expect = require('chai').expect;
 var uuid = require('../lib/utils/uuid');
+var Diagnostics = require('../lib/diagnostics');
 var ActionPayload = require('../lib/actionPayload');
 var StateMixin = require('../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
@@ -15,6 +16,7 @@ describe('StateMixin', function () {
     initialState = {
       name: 'hello'
     };
+    Diagnostics.devtoolsEnabled = true;
 
     mixin = new StateMixin({
       getInitialState: function () {
@@ -24,6 +26,7 @@ describe('StateMixin', function () {
   });
 
   afterEach(function () {
+    Diagnostics.devtoolsEnabled = false;
     sandbox.restore();
   });
 
@@ -74,10 +77,7 @@ describe('StateMixin', function () {
           name: 'bar',
           id: expectedId,
           error: expectedError,
-          state: {
-            after: null,
-            before: undefined
-          }
+          state: expectedState
         });
       });
     });
@@ -92,10 +92,7 @@ describe('StateMixin', function () {
           name: 'bar',
           error: null,
           id: expectedId,
-          state: {
-            after: null,
-            before: undefined
-          }
+          state: expectedState
         });
       });
     });

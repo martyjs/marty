@@ -1,20 +1,22 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
+var Diagnostics = require('../lib/diagnostics');
 var ActionPayload = require('../lib/actionPayload');
 
 describe('ActionPayload', function () {
-  var action, store, storeState, actionType, args, source, creator, verbose;
+  var action, store, storeState, actionType, args, source, creator, internal;
   var id, timestamp, name, nextState, view, viewHandler, storeHandler, lastState, expectedError;
 
   beforeEach(function () {
     id = '123';
-    verbose = true;
+    internal = true;
     source = 'VIEW';
     args = [1, 2, 3];
     actionType = 'foo';
     creator = 'createFoo';
     timestamp = new Date();
     storeState = { store: 1 };
+    Diagnostics.devtoolsEnabled = true;
 
     store = {
       action: action,
@@ -27,13 +29,17 @@ describe('ActionPayload', function () {
 
     action = new ActionPayload({
       id: id,
-      verbose: verbose,
+      internal: internal,
       timestamp: timestamp,
       type: actionType,
       arguments: args,
       source: source,
       creator: creator
     });
+  });
+
+  afterEach(function () {
+    Diagnostics.devtoolsEnabled = false;
   });
 
   describe('#toJSON()', function () {
@@ -43,7 +49,7 @@ describe('ActionPayload', function () {
         type: actionType,
         source: source,
         creator: creator,
-        verbose: verbose,
+        internal: internal,
         handlers: [],
         status: 'PENDING',
         timestamp: timestamp,
@@ -93,18 +99,14 @@ describe('ActionPayload', function () {
       expect(action.handlers[0].views[0].name).to.equal(name);
     });
 
-    it('should store the before state of the view', function () {
-      expect(action.handlers[0].views[0].state.before).to.equal(lastState);
-    });
-
     describe('#dispose()', function () {
       beforeEach(function () {
         viewHandler.dispose();
       });
 
-      // it('should store the after state of the view', function () {
-      //   expect(action.handlers[0].views[0].state.after).to.equal(nextState);
-      // });
+      it('should store the after state of the view', function () {
+        expect(action.handlers[0].views[0].state).to.equal(nextState);
+      });
     });
 
     describe('#failed()', function () {
@@ -141,9 +143,6 @@ describe('ActionPayload', function () {
       expect(action.handlers[0].name).to.equal(handlerName);
     });
 
-    // it('should store the before state of the view', function () {
-    //   expect(action.handlers[0].state.before).to.eql(lastState);
-    // });
 
     describe('#dispose()', function () {
       beforeEach(function () {
@@ -152,9 +151,9 @@ describe('ActionPayload', function () {
         storeHandler.dispose();
       });
 
-      // it('should store the after state of the view', function () {
-      //   expect(action.handlers[0].state.after).to.eql(nextState);
-      // });
+      it('should store the after state of the view', function () {
+        expect(action.handlers[0].state).to.eql(nextState);
+      });
     });
 
     describe('#failed()', function () {
