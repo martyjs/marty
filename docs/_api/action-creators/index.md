@@ -12,26 +12,13 @@ To create some new action creators, you call <code>Marty.createActionCreators</c
 var UserActionCreators = Marty.createActionCreators({
   addUser: UserActions.ADD_USER(function (name, email) {
     this.dispatch(name, email);
-    this.somethingElse();
-  }),
-  somethingElse: UserActions.SOMETHING_ELSE()
+  })
 });
 {% endhighlight %}
 
-When using es6 arrow syntax, `this` might not be bound to the `ActionCreator`. Therefore, the `dispatch` function is always passed as the last argument just in case.
-
-{% highlight js %}
-var UserActionCreators = Marty.createActionCreators({
-  addUser: UserActions.ADD_USER((name, email, dispatch) => {
-    // Dispatch this action
-    dispatch(name, email);
-
-    // Use global `UserActionCreators` instead of `this` here.
-    UserActionCreators.somethingElse()
-  }),
-  somethingElse: UserActions.SOMETHING_ELSE()
-});
-{% endhighlight %}
+<div class="alert alert-warning" role="alert">
+  <strong>Warning!</strong> Please avoid using es6 arrow syntax for your callbacks since they are bound to the current context.
+</div>
 
 <h2 id="displayName">displayName</h2>
 

@@ -31,9 +31,7 @@ var Dispatcher = require('marty/dispatcher');
 var UserActionCreators = Marty.createActionCreators({
   updateEmail: UserConstants.UPDATE_EMAIL(function (userId, email) {
     this.dispatch(userId, email);
-    this.somethingElse();
-  }),
-  somethingElse: UserActions.SOMETHING_ELSE()
+  })
 });
 
 Dispatcher.register(function (action) {
@@ -44,23 +42,9 @@ Dispatcher.register(function (action) {
 UserActionCreators.updateEmail(123, "foo@bar.com");
 {% endhighlight %}
 
-If you're using es6 arrow syntax, use the last argument to access the `dispatch` function.
-
-{% highlight js %}
-
-var UserActionCreators = Marty.createActionCreators({
-  updateEmail: UserConstants.UPDATE_EMAIL((userId, email, dispatch) => {
-    // Dispatch this action
-    dispatch(userId, email);
-
-    // Use global `UserActionCreators` instead of `this` here.
-    UserActionCreators.somethingElse();
-  }),
-  somethingElse: UserActions.SOMETHING_ELSE()
-});
-
-UserActionCreators.updateEmail(123, "foo@bar.com");
-{% endhighlight %}
+<div class="alert alert-warning" role="alert">
+  <strong>Warning!</strong> Please avoid using es6 arrow syntax for your callbacks since they are bound to the current context.
+</div>
 
 You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:
 

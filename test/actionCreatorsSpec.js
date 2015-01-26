@@ -30,56 +30,6 @@ describe('ActionCreators', function () {
     });
   });
 
-  describe(
-    'when the action creator is created from a constant and the function is bound to the outer scope',
-  function () {
-    var TestConstants, expectedProperties, passedDispatchFunction;
-    beforeEach(function () {
-      expectedProperties = {
-        foo: 'bar',
-        baz: 'bam'
-      };
-
-      TestConstants = constants(['TEST_CONSTANT']);
-
-      actionCreators = new ActionCreators({
-        dispatcher: dispatcher,
-        testConstant: TestConstants.TEST_CONSTANT(function (a, b, c, dispatch) {
-          passedDispatchFunction = dispatch;
-          dispatch(a, b, c);
-        }.bind(this), expectedProperties)
-      });
-    });
-
-
-    describe('when I create an action', function () {
-      var expectedArguments;
-
-      beforeEach(function () {
-        expectedArguments = [1, 2, 3];
-        actionCreators.testConstant.apply(actionCreators, expectedArguments);
-        actualAction = dispatcher.getActionWithType('TEST_CONSTANT');
-      });
-
-      it('should pass the dispatch as the last argument', function () {
-        expect(passedDispatchFunction).to.exist;
-      });
-
-      it('should dispatch an action with the constant name', function () {
-        expect(actualAction).to.exist;
-      });
-
-      it('should pass through all the arguments', function () {
-        expect(actualAction.arguments).to.eql(expectedArguments);
-      });
-
-      it('should pass all properties through', function () {
-        var actualProperties = _.pick(actualAction, Object.keys(expectedProperties));
-        expect(actualProperties).to.eql(expectedProperties);
-      });
-    });
-  });
-
   describe('when the action creator is created from a constant', function () {
     var TestConstants, expectedProperties;
     beforeEach(function () {

@@ -139,7 +139,7 @@ function ActionCreators(options) {
 
         try {
           var context = actionContext();
-          result = func.apply(context, Array.prototype.slice.call(arguments).concat(context.dispatch));
+          result = func.apply(context, arguments);
 
           if (result) {
             if (_.isFunction(result.then)) {
