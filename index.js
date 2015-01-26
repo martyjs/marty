@@ -5,7 +5,7 @@ var Dispatcher = require('./lib/dispatcher');
 var Diagostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
-  version: '0.8.4',
+  version: '0.8.5',
   Diagostics: Diagostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
