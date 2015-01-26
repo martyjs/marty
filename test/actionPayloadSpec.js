@@ -51,6 +51,7 @@ describe('ActionPayload', function () {
         creator: creator,
         internal: internal,
         handlers: [],
+        error: null,
         status: 'PENDING',
         timestamp: timestamp,
         arguments: args

@@ -31,3 +31,20 @@ var listener = UsersStore.addChangeListener(function () {
   listener.dispose();
 });
 {% endhighlight %}
+
+Often action creators optimistically dispatch an action before connecting to a state source. So what should you do if that action fails? Action creators will emit actions of  type ``ACTION_FAILED`` and ``{Action Type}_FAILED`` which your store can handle. Alternatively you can return a function from an action handler which will be called if the action fails or if the [action rolled back](/api/stores/index.html#rollback).
+
+{% highlight js %}
+var UsersStore = Marty.createStore({
+  addUser: function (user) {
+    this.state[user.id] = user;
+    this.hasChanged();
+
+    return function (error) {
+      this.state.errors[user.id] = error;
+      delete this.state[user.id];
+      this.hasChanged();
+    }
+  }
+});
+{% endhighlight %}

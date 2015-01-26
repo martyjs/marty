@@ -3,14 +3,16 @@ var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
+var Diagostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
   version: '0.8.4',
+  Diagostics: Diagostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
-},{"./lib/create":12,"./lib/dispatcher":14,"./lib/state":17,"underscore":39}],1:[function(require,module,exports){
+},{"./lib/create":12,"./lib/diagnostics":13,"./lib/dispatcher":14,"./lib/state":17,"underscore":38}],1:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
@@ -114,6 +116,7 @@ function ActionCreators(options) {
     _.each(functions, function (func, name) {
       var actionType;
       var properties = {};
+      var dispatchedAction;
 
       if (_.isFunction(func)) {
         if (func.properties) {
@@ -143,7 +146,7 @@ function ActionCreators(options) {
 
           if (result) {
             if (_.isFunction(result.then)) {
-              result.then(dispatchDone, dispatchError);
+              result.then(dispatchDone, dispatchFailed);
             } else {
               dispatchDone();
             }
@@ -153,7 +156,7 @@ function ActionCreators(options) {
 
           return result;
         } catch (e) {
-          dispatchError(e);
+          dispatchFailed(e);
 
           throw e;
         }
@@ -161,18 +164,25 @@ function ActionCreators(options) {
         function actionContext() {
           return _.extend({
             dispatch: function () {
-              return dispatch({
+              dispatchedAction = dispatch({
+                id: actionId,
                 type: actionType,
                 handlers: handlers,
                 arguments: arguments
               }, properties);
+
+              return dispatchedAction;
             }
           }, creator);
         }
 
         function dispatchStarting() {
+          if (properties.silent) {
+            return;
+          }
+
           dispatch({
-            verbose: true,
+            internal: true,
             type: actionType + '_STARTING',
             arguments: [{
               id: actionId
@@ -180,7 +190,7 @@ function ActionCreators(options) {
           }, properties);
 
           dispatch({
-            verbose: true,
+            internal: true,
             type: ActionConstants.ACTION_STARTING,
             arguments: [{
               id: actionId,
@@ -192,8 +202,12 @@ function ActionCreators(options) {
         }
 
         function dispatchDone() {
+          if (properties.silent) {
+            return;
+          }
+
           dispatch({
-            verbose: true,
+            internal: true,
             type: actionType + '_DONE',
             arguments: [{
               id: actionId,
@@ -202,7 +216,7 @@ function ActionCreators(options) {
           }, properties);
 
           dispatch({
-            verbose: true,
+            internal: true,
             type: ActionConstants.ACTION_DONE,
             arguments: [{
               id: actionId,
@@ -211,11 +225,11 @@ function ActionCreators(options) {
           }, properties);
         }
 
-        function dispatchError(err) {
+        function dispatchFailed(err) {
           err = serializeError(err);
 
           dispatch({
-            verbose: true,
+            internal: true,
             type: actionType + '_FAILED',
             arguments: [{
               error: err,
@@ -225,7 +239,7 @@ function ActionCreators(options) {
           }, properties);
 
           dispatch({
-            verbose: true,
+            internal: true,
             type: ActionConstants.ACTION_FAILED,
             arguments: [{
               error: err,
@@ -233,6 +247,11 @@ function ActionCreators(options) {
               handlers: handlers
             }]
           }, properties);
+
+          if (dispatchedAction) {
+            dispatchedAction.rollback();
+            dispatchedAction.error = err;
+          }
         }
       };
     });
@@ -249,10 +268,10 @@ function ActionCreators(options) {
 
 module.exports = ActionCreators;
 
-},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":25,"./utils/uuid":26,"underscore":39}],10:[function(require,module,exports){
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./utils/serializeError":24,"./utils/uuid":25,"underscore":38}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
-var cloneState = require('./utils/cloneState');
+var Diagnostics = require('./diagnostics');
 var StatusConstants = require('../constants/status');
 
 function ActionPayload(options) {
@@ -268,10 +287,11 @@ function ActionPayload(options) {
   this.type = actionType(options.type);
   this.arguments = _.toArray(options.arguments);
 
+  this.error = null;
   this.toJSON = toJSON;
   this.toString = toString;
   this.rollback = rollback;
-  this.verbose = !!options.verbose;
+  this.internal = !!options.internal;
   this.addViewHandler = addViewHandler;
   this.addStoreHandler = addStoreHandler;
   this.addRollbackHandler = addRollbackHandler;
@@ -323,9 +343,10 @@ function ActionPayload(options) {
     var json = _.pick(this,
       'id',
       'type',
+      'error',
       'source',
       'creator',
-      'verbose',
+      'internal',
       'handlers',
       'arguments',
       'timestamp'
@@ -338,28 +359,26 @@ function ActionPayload(options) {
 
   function rollback() {
     _.each(rollbackHandlers, function (rollback) {
-      rollback();
-    });
+      rollback(this.error);
+    }, this);
   }
 
-  function addViewHandler(name, view, lastState) {
+  function addViewHandler(name, view) {
     var storeHandler = handlers[handlers.length - 1];
 
     var viewHandler = {
       name: name,
       error: null,
       id: uuid.small(),
-      state: {
-        after: null,
-        before: lastState
-      }
     };
 
     storeHandler.views.push(viewHandler);
 
     return {
       dispose: function () {
-        viewHandler.state.after = cloneState(view.state);
+        if (Diagnostics.devtoolsEnabled) {
+          viewHandler.state = view.state;
+        }
       },
       failed: function (err) {
         viewHandler.error = err;
@@ -373,19 +392,17 @@ function ActionPayload(options) {
       error: null,
       type: 'Store',
       id: uuid.small(),
-      store: store.displayName,
       name: handlerName,
-      state: {
-        before: cloneState(store.getState()),
-        after: undefined
-      },
+      store: store.displayName,
     };
 
     handlers.push(handler);
 
     return {
       dispose: function () {
-        handler.state.after = cloneState(store.getState());
+        if (Diagnostics.devtoolsEnabled) {
+          handler.state = (store.serialize || store.getState)();
+        }
       },
       failed: function (err) {
         handler.error = err;
@@ -405,7 +422,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-},{"../constants/status":3,"./utils/cloneState":24,"./utils/uuid":26,"underscore":39}],11:[function(require,module,exports){
+},{"../constants/status":3,"./diagnostics":13,"./utils/uuid":25,"underscore":38}],11:[function(require,module,exports){
 var _ = require('underscore');
 
 function constants(obj) {
@@ -472,7 +489,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"underscore":39}],12:[function(require,module,exports){
+},{"underscore":38}],12:[function(require,module,exports){
 var _ = require('underscore');
 var Store = require('./store');
 var constants = require('./constants');
@@ -557,25 +574,16 @@ function defaults(marty, options) {
 
   return options;
 }
-},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./mixins/stateMixin":16,"./stateSource":18,"./store":23,"events":28,"underscore":39}],13:[function(require,module,exports){
-var ACTION_STARTED = 'action-started';
-var EventEmitter = require('events').EventEmitter;
-var diagnosticEvents = new EventEmitter();
-
+},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./mixins/stateMixin":16,"./stateSource":18,"./store":23,"events":27,"underscore":38}],13:[function(require,module,exports){
 var diagnostics = {
   log: log,
   trace: log,
   warn: warn,
   enabled: false,
-  onAction: onAction,
-  dispatchingAction: dispatchingAction
+  devtoolsEnabled: false,
 };
 
 module.exports = diagnostics;
-
-function dispatchingAction(action) {
-  diagnosticEvents.emit(ACTION_STARTED, action);
-}
 
 function log() {
   if (diagnostics.enabled) {
@@ -588,17 +596,7 @@ function warn() {
     console.warn.apply(console, arguments);
   }
 }
-
-function onAction(callback) {
-  diagnosticEvents.on(ACTION_STARTED, callback);
-
-  return {
-    dispose: function () {
-      diagnosticEvents.removeListener(ACTION_STARTED, callback);
-    }
-  };
-}
-},{"events":28}],14:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
@@ -610,7 +608,7 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-},{"./utils/uuid":26,"flux":34}],15:[function(require,module,exports){
+},{"./utils/uuid":25,"flux":33}],15:[function(require,module,exports){
 var when = require('./when');
 var NotFoundError = require('../errors/notFound');
 
@@ -654,11 +652,10 @@ function fetchResult(result) {
 
   return result;
 }
-},{"../errors/notFound":7,"./when":27}],16:[function(require,module,exports){
+},{"../errors/notFound":7,"./when":26}],16:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
-var cloneState = require('../utils/cloneState');
 var reservedKeys = ['listenTo', 'getState', 'getInitialState'];
 
 function StateMixin(options) {
@@ -693,7 +690,7 @@ function StateMixin(options) {
       var handler;
 
       if (store && store.action) {
-        handler = store.action.addViewHandler(this.displayName, this, this._marty.lastState);
+        handler = store.action.addViewHandler(this.displayName, this);
       }
 
       try {
@@ -707,7 +704,6 @@ function StateMixin(options) {
       } finally {
         if (handler) {
           handler.dispose();
-          this._marty.lastState = cloneState(this.state);
         }
       }
     },
@@ -761,8 +757,7 @@ function StateMixin(options) {
 
       this._marty = {
         listeners: [],
-        id: uuid.small(),
-        lastState: undefined
+        id: uuid.small()
       };
 
       if (options.getInitialState) {
@@ -770,10 +765,6 @@ function StateMixin(options) {
       }
 
       this.state = _.extend(this.state, this.getState());
-
-      if (Diagnostics.enabled) {
-        this._marty.lastState = cloneState(this.state);
-      }
 
       return this.state;
     }
@@ -850,7 +841,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-},{"../diagnostics":13,"../utils/cloneState":24,"../utils/uuid":26,"underscore":39}],17:[function(require,module,exports){
+},{"../diagnostics":13,"../utils/uuid":25,"underscore":38}],17:[function(require,module,exports){
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -905,7 +896,7 @@ function serializeState() {
 
   return state;
 }
-},{"../errors/unknownStore":8,"underscore":39}],18:[function(require,module,exports){
+},{"../errors/unknownStore":8,"underscore":38}],18:[function(require,module,exports){
 var _ = require('underscore');
 var HttpStateSource = require('./stateSources/http');
 var JSONStorageStateSource = require('./stateSources/jsonStorage');
@@ -939,7 +930,7 @@ function StateSource(options) {
 }
 
 module.exports = StateSource;
-},{"./stateSources/http":19,"./stateSources/jsonStorage":20,"./stateSources/localStorage":21,"./stateSources/sessionStorage":22,"underscore":39}],19:[function(require,module,exports){
+},{"./stateSources/http":19,"./stateSources/jsonStorage":20,"./stateSources/localStorage":21,"./stateSources/sessionStorage":22,"underscore":38}],19:[function(require,module,exports){
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
@@ -1043,7 +1034,7 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpStateSource;
-},{"es6-promise":33,"isomorphic-fetch":38,"underscore":39}],20:[function(require,module,exports){
+},{"es6-promise":32,"isomorphic-fetch":37,"underscore":38}],20:[function(require,module,exports){
 function JSONStorageStateSource(options) {
   options = options || {};
 
@@ -1557,13 +1548,7 @@ function Store(options) {
 }
 
 module.exports = Store;
-},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":26,"events":28,"underscore":39}],24:[function(require,module,exports){
-function cloneState() {
-  return null;
-}
-
-module.exports = cloneState;
-},{}],25:[function(require,module,exports){
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./utils/uuid":25,"events":27,"underscore":38}],24:[function(require,module,exports){
 function serializeError(error) {
   if (!error) {
     return null;
@@ -1580,7 +1565,7 @@ function serializeError(error) {
 }
 
 module.exports = serializeError;
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var format = require('util').format;
 
 function uuid() {
@@ -1597,7 +1582,7 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
-},{"util":32}],27:[function(require,module,exports){
+},{"util":31}],26:[function(require,module,exports){
 var _ = require('underscore');
 var StatusConstants = require('../constants/status');
 
@@ -1681,7 +1666,7 @@ function aggregateStatus(fetchResults) {
 }
 
 module.exports = when;
-},{"../constants/status":3,"underscore":39}],28:[function(require,module,exports){
+},{"../constants/status":3,"underscore":38}],27:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1984,7 +1969,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2009,7 +1994,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -2074,14 +2059,14 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2671,7 +2656,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":31,"_process":30,"inherits":29}],33:[function(require,module,exports){
+},{"./support/isBuffer":30,"_process":29,"inherits":28}],32:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -3634,7 +3619,7 @@ function hasOwnProperty(obj, prop) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":30}],34:[function(require,module,exports){
+},{"_process":29}],33:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3646,7 +3631,7 @@ function hasOwnProperty(obj, prop) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":35}],35:[function(require,module,exports){
+},{"./lib/Dispatcher":34}],34:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3898,7 +3883,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":36}],36:[function(require,module,exports){
+},{"./invariant":35}],35:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3953,7 +3938,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -4279,10 +4264,10 @@ module.exports = invariant;
   self.fetch.polyfill = true
 })();
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 require('whatwg-fetch');
 
-},{"whatwg-fetch":37}],39:[function(require,module,exports){
+},{"whatwg-fetch":36}],38:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

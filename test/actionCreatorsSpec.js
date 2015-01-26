@@ -1,6 +1,9 @@
+var sinon = require('sinon');
 var _ = require('underscore');
 var expect = require('chai').expect;
+var Store = require('../lib/store');
 var constants = require('../lib/constants');
+var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
 var MockDispatcher = require('./lib/mockDispatcher');
 var ActionCreators = require('../lib/actionCreators');
@@ -262,6 +265,45 @@ describe('ActionCreators', function () {
       it('should include the actions token', function () {
         expect(actualAction.arguments[0]).to.be.defined;
       });
+    });
+  });
+
+  describe('when the action fails', function () {
+    var rollback;
+
+    beforeEach(function () {
+      rollback = sinon.stub();
+
+      var dispatcher = new Dispatcher();
+      var TestConstants = constants(['TEST']);
+      var store = new Store({ // jshint ignore:line
+        dispatcher: dispatcher,
+        handlers: {
+          test: TestConstants.TEST
+        },
+        getInitialState: function () {
+          return {};
+        },
+        test: function () {
+          return rollback;
+        }
+      });
+
+      var actions = new ActionCreators({
+        dispatcher: dispatcher,
+        test: TestConstants.TEST(function () {
+          this.dispatch();
+
+          throw new Error();
+        })
+      });
+      try {
+        actions.test();
+      } catch (e) { }
+    });
+
+    it('should rollback the action', function () {
+      expect(rollback).to.have.been.calledOnce;
     });
   });
 
