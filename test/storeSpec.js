@@ -19,6 +19,7 @@ describe('Store', function () {
     };
 
     store = new Store({
+      displayName: 'Test',
       dispatcher: dispatcher,
       handlers: {
         one: 'one-action',
