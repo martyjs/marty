@@ -6,7 +6,7 @@ var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
-  version: '0.8.7',
+  version: '0.8.8',
   Diagnostics: Diagnostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
@@ -1149,8 +1149,9 @@ var StatusConstants = require('../constants/status');
 var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
 
+var RESERVED_FUNCTIONS = ['getState'];
 var REQUIRED_FUNCTIONS = ['getInitialState'];
-var RESERVED_FUNCTIONS = ['dispose', 'clear', 'getState'];
+var PROTECTED_FUNCTIONS = ['clear', 'dispose'];
 
 Store.defaultMaxListeners = 10000000;
 
@@ -1185,7 +1186,7 @@ function Store(options) {
   emitter.setMaxListeners(options.maxListeners || Store.defaultMaxListeners);
 
   validateOptions(options);
-  extendStore(this, _.omit(options, RESERVED_FUNCTIONS));
+  extendStore(this, _.omit(options, _.union(PROTECTED_FUNCTIONS, RESERVED_FUNCTIONS)));
   validateHandlers(this);
 
   this.dispatchToken = dispatcher.register(_.bind(this.handleAction, this));
@@ -1206,6 +1207,16 @@ function Store(options) {
 
   function validateOptions(options) {
     var missingFunctions = [];
+
+    _.each(RESERVED_FUNCTIONS, function (functionName) {
+      if (options[functionName]) {
+        if (options.displayName) {
+          functionName += ' in ' + options.displayName;
+        }
+
+        console.warn(functionName + ' is reserved for use by Marty. Please use a different name');
+      }
+    });
 
     _.each(REQUIRED_FUNCTIONS, function (functionName) {
       if (!_.has(options, functionName)) {
