@@ -3,11 +3,11 @@ var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');
-var Diagostics = require('./lib/diagnostics');
+var Diagnostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
-  version: '0.8.6',
-  Diagostics: Diagostics,
+  version: '0.8.7',
+  Diagnostics: Diagnostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
@@ -1150,7 +1150,7 @@ var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
 
 var REQUIRED_FUNCTIONS = ['getInitialState'];
-var RESERVED_FUNCTIONS = ['dispose', 'clear'];
+var RESERVED_FUNCTIONS = ['dispose', 'clear', 'getState'];
 
 Store.defaultMaxListeners = 10000000;
 
