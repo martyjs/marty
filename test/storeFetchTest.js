@@ -26,6 +26,7 @@ describe('Store#fetch()', function () {
   describe('#hasAlreadyFetched()', function () {
     beforeEach(function () {
       store = Marty.createStore({
+        displayName: 'Test',
         getInitialState: _.noop,
         fetchFoo: function () {
           return this.fetch(fetchId, function () {
