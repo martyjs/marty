@@ -6,7 +6,7 @@ var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
-  version: '0.8.8',
+  version: '0.8.9',
   Diagnostics: Diagnostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
@@ -126,6 +126,8 @@ function ActionCreators(options) {
 
           actionType = func.properties.type;
           properties = _.omit(func.properties, 'type');
+        } else if (options.types && options.types[name]) {
+          actionType = options.types[name];
         } else {
           actionType = creator.getActionType(name);
         }
@@ -2680,7 +2682,7 @@ function hasOwnProperty(obj, prop) {
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   2.0.1
+ * @version   2.0.0
  */
 
 (function() {
@@ -3311,11 +3313,13 @@ function hasOwnProperty(obj, prop) {
 
       @class Promise
       @param {function} resolver
+      @param {String} label optional string for labeling the promise.
       Useful for tooling.
       @constructor
     */
-    function $$es6$promise$promise$$Promise(resolver) {
+    function $$es6$promise$promise$$Promise(resolver, label) {
       this._id = $$es6$promise$promise$$counter++;
+      this._label = label;
       this._state = undefined;
       this._result = undefined;
       this._subscribers = [];
@@ -3531,10 +3535,11 @@ function hasOwnProperty(obj, prop) {
       @method then
       @param {Function} onFulfilled
       @param {Function} onRejected
+      @param {String} label optional string for labeling the promise.
       Useful for tooling.
       @return {Promise}
     */
-      then: function(onFulfillment, onRejection) {
+      then: function(onFulfillment, onRejection, label) {
         var parent = this;
         var state = parent._state;
 
@@ -3542,7 +3547,9 @@ function hasOwnProperty(obj, prop) {
           return this;
         }
 
-        var child = new this.constructor($$$internal$$noop);
+        parent._onerror = null;
+
+        var child = new this.constructor($$$internal$$noop, label);
         var result = parent._result;
 
         if (state) {
@@ -3581,11 +3588,12 @@ function hasOwnProperty(obj, prop) {
 
       @method catch
       @param {Function} onRejection
+      @param {String} label optional string for labeling the promise.
       Useful for tooling.
       @return {Promise}
     */
-      'catch': function(onRejection) {
-        return this.then(null, onRejection);
+      'catch': function(onRejection, label) {
+        return this.then(null, onRejection, label);
       }
     };
 
@@ -3622,8 +3630,8 @@ function hasOwnProperty(obj, prop) {
     };
 
     var es6$promise$umd$$ES6Promise = {
-      'Promise': $$es6$promise$promise$$default,
-      'polyfill': $$es6$promise$polyfill$$default
+      Promise: $$es6$promise$promise$$default,
+      polyfill: $$es6$promise$polyfill$$default
     };
 
     /* global define:true module:true window: true */
@@ -4298,7 +4306,7 @@ module.exports = invariant;
 })();
 
 },{}],37:[function(require,module,exports){
-require('whatwg-fetch');
+module.exports = require('whatwg-fetch');
 
 },{"whatwg-fetch":36}],38:[function(require,module,exports){
 //     Underscore.js 1.7.0
