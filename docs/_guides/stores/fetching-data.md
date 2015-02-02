@@ -5,7 +5,7 @@ id: stores-fetch
 section: Stores
 ---
 
-From the views perspective, the store holds all the state it needs. In most cases it's unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we've found they make your views complicated and difficult to reason about. It also goes againt Flux's unidirectional data flow. Marty introduces the [fetch API](/api/stores/#fetch) which is an alternative solution to the problem.
+From the views perspective, the store holds all the state it needs. In most cases it's unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we've found they make your views complicated and difficult to reason about. It also goes against Flux's unidirectional data flow. Marty introduces the [fetch API](/api/stores/#fetch) which is an alternative solution to the problem.
 
 Say your view wants to load a user from the ``UserStore``. Internally the store would call ``fetch`` which allows it to define how to get the user locally or, if not present, get it from a state source. ``fetch`` requires 3 things:
 
