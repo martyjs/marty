@@ -387,7 +387,7 @@ describe('Store', function () {
     describe('when I pass in dispatch tokens', function () {
       beforeEach(function () {
         executionOrder = waitFor(function (store) {
-          store.waitFor(store3.dispatchToken);
+          store.waitFor(store3.dispatchToken, store2.dispatchToken);
         });
       });
 
