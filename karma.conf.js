@@ -115,6 +115,9 @@ module.exports = function (config) {
         'test/**/*.js': ['browserify']
       },
       port: 9876,
+      proxies: {
+        '/stub': 'http://localhost:8956/stub'
+      },
       logLevel: config.LOG_INFO,
     };
   }

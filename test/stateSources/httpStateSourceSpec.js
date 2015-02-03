@@ -1,7 +1,5 @@
-var MOCK_SERVER_PORT = 8956;
 var sinon = require('sinon');
 var _ = require('lodash-node');
-var format = require('util').format;
 var expect = require('chai').expect;
 var HttpStateSource = require('../../lib/stateSources/http');
 
@@ -14,7 +12,7 @@ describe('HttpStateSource', function () {
   var API, baseUrl, response;
 
   beforeEach(function () {
-    baseUrl = format('http://localhost:%s/stub/', MOCK_SERVER_PORT);
+    baseUrl = '/stub/';
   });
 
   describe('when you dont specify a baseUrl', function () {

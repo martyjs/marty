@@ -69,7 +69,7 @@
   "dependencies": {
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
-    "isomorphic-fetch": "^1.6.0",
+    "isomorphic-fetch": "1.6.0",
     "underscore": "^1.7.0"
   }
 }
