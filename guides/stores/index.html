@@ -561,9 +561,9 @@
       <h1 class="page-title">Stores</h1>
     
     <div class="content">
-      <p>The store is where your state should live. It is also the only place that your state should <strong>change</strong>. Actions come in from the dispatcher and the store  decides whether to handle them of not. If the store does choose to handle an action and subsequently changes its state then it will notify any listeners that it has changed. Your views can then listen to those changes (via the <a href="/guides/state-mixin">State Mixin</a>) and then re-render themselves.</p>
+      <p>The store is where your state should live. It is also the only place that your state should <strong>change</strong>. Actions come in from the dispatcher and the store  decides whether to handle them or not. If the store does choose to handle an action and subsequently changes its state then it will notify any listeners that it has changed. Your views can then listen to those changes (via the <a href="/guides/state-mixin">State Mixin</a>) and then re-render themselves.</p>
 
-<p>All of a stores state should live within <code>Store#state</code>. If you want to update the state you should use <code>Store#setState</code> which will update <code>this.state</code> and then notify any listeners that the store has changed. Or if you prefer you can update <code>this.state</code> and then manually call <code>this.hasChanged()</code></p>
+<p>All of a store&#39;s state should live within <code>Store#state</code>. If you want to update the state you should use <code>Store#setState</code> which will update <code>this.state</code> and then notify any listeners that the store has changed. Or if you prefer you can update <code>this.state</code> and then manually call <code>this.hasChanged()</code></p>
 
 <p>When you create a store it will automatically start listening to the dispatcher. To determine which actions to handle you define the <a href="/api/stores/#handlers">handlers</a> hash. The keys in handlers are the functions you wish to call when an action comes in and the values are <a href="/api/stores/#action-predicates">action predicates</a> (Normally the constant of the action&#39;s type). If your store does handle the action, then the arguments you passed to <a href="/api/action-creators/index.html#dispatch">ActionCreator#dispatch</a> are the arguments for the handler.</p>
 
@@ -609,7 +609,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.5</li>
+        <li>v0.8.10</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
