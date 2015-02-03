@@ -6,7 +6,7 @@ var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
-  version: '0.8.9',
+  version: '0.8.10',
   Diagnostics: Diagnostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
@@ -978,7 +978,13 @@ function HttpStateSource(mixinOptions) {
       function isJson(res) {
         var contentTypes = getHeader(res, CONTENT_TYPE);
 
-        _.isArray(contentTypes) || (contentTypes = [contentTypes]);
+        if (!_.isArray(contentTypes)) {
+          if (contentTypes === undefined || contentTypes === null) {
+            contentTypes = [];
+          } else {
+            contentTypes = [contentTypes];
+          }
+        }
 
         return _.any(contentTypes, function (contentType) {
           return contentType.indexOf(JSON_CONTENT_TYPE) !== -1;
@@ -1036,6 +1042,7 @@ function requestOptions(method, baseUrl, options) {
 }
 
 module.exports = HttpStateSource;
+
 },{"es6-promise":32,"isomorphic-fetch":37,"underscore":38}],20:[function(require,module,exports){
 function JSONStorageStateSource(options) {
   options = options || {};
@@ -1295,6 +1302,11 @@ function Store(options) {
       };
     }
 
+    _.defaults(options, {
+      locally: _.noop,
+      remotely: _.noop
+    });
+
     if (!options || !options.id) {
       throw new Error('must specify an id');
     }
@@ -1377,10 +1389,24 @@ function Store(options) {
           }
         }
 
+        console.warn(promiseNotReturnedWarning());
+
         return notFound();
       } catch (error) {
         return failed(error);
       }
+    }
+
+    function promiseNotReturnedWarning() {
+      var inStore = '';
+      if (store.displayName) {
+        inStore = ' in ' + store.displayName;
+      }
+
+      return 'The remote fetch for \'' + options.id + '\'' +
+        inStore + ' did not return a promise and the state was ' +
+        'not present after remotely finished executing. ' +
+        'This might be because you forgot to return a promise.';
     }
 
     function finished() {
@@ -2682,7 +2708,7 @@ function hasOwnProperty(obj, prop) {
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   2.0.0
+ * @version   2.0.1
  */
 
 (function() {
@@ -3313,13 +3339,11 @@ function hasOwnProperty(obj, prop) {
 
       @class Promise
       @param {function} resolver
-      @param {String} label optional string for labeling the promise.
       Useful for tooling.
       @constructor
     */
-    function $$es6$promise$promise$$Promise(resolver, label) {
+    function $$es6$promise$promise$$Promise(resolver) {
       this._id = $$es6$promise$promise$$counter++;
-      this._label = label;
       this._state = undefined;
       this._result = undefined;
       this._subscribers = [];
@@ -3535,11 +3559,10 @@ function hasOwnProperty(obj, prop) {
       @method then
       @param {Function} onFulfilled
       @param {Function} onRejected
-      @param {String} label optional string for labeling the promise.
       Useful for tooling.
       @return {Promise}
     */
-      then: function(onFulfillment, onRejection, label) {
+      then: function(onFulfillment, onRejection) {
         var parent = this;
         var state = parent._state;
 
@@ -3547,9 +3570,7 @@ function hasOwnProperty(obj, prop) {
           return this;
         }
 
-        parent._onerror = null;
-
-        var child = new this.constructor($$$internal$$noop, label);
+        var child = new this.constructor($$$internal$$noop);
         var result = parent._result;
 
         if (state) {
@@ -3588,12 +3609,11 @@ function hasOwnProperty(obj, prop) {
 
       @method catch
       @param {Function} onRejection
-      @param {String} label optional string for labeling the promise.
       Useful for tooling.
       @return {Promise}
     */
-      'catch': function(onRejection, label) {
-        return this.then(null, onRejection, label);
+      'catch': function(onRejection) {
+        return this.then(null, onRejection);
       }
     };
 
@@ -3630,8 +3650,8 @@ function hasOwnProperty(obj, prop) {
     };
 
     var es6$promise$umd$$ES6Promise = {
-      Promise: $$es6$promise$promise$$default,
-      polyfill: $$es6$promise$polyfill$$default
+      'Promise': $$es6$promise$promise$$default,
+      'polyfill': $$es6$promise$polyfill$$default
     };
 
     /* global define:true module:true window: true */
@@ -4067,8 +4087,7 @@ module.exports = invariant;
         return false
       }
     })(),
-    formData: 'FormData' in self,
-    XDomainRequest: 'XDomainRequest' in self
+    formData: 'FormData' in self
   }
 
   function Body() {
@@ -4209,18 +4228,8 @@ module.exports = invariant;
     var self = this
 
     return new Promise(function(resolve, reject) {
-      var legacyCors = false;
-      if (support.XDomainRequest) {
-        var origin = location.protocol + '//' + location.host;
-        legacyCors = (/^\/\//.test(self.url) ? location.protocol + self.url : self.url).substring(0, origin.length) !== origin;
-      }
-      var xhr = legacyCors ? new XDomainRequest() : new XMLHttpRequest()
-
-      if (legacyCors) {
-        xhr.getAllResponseHeaders = function() {
-          return 'Content-Type: '+xhr.contentType;
-        };
-      } else if (self.credentials === 'cors') {
+      var xhr = new XMLHttpRequest()
+      if (self.credentials === 'cors') {
         xhr.withCredentials = true;
       }
 
@@ -4239,11 +4248,6 @@ module.exports = invariant;
 
       xhr.onload = function() {
         var status = (xhr.status === 1223) ? 204 : xhr.status
-
-        // If XDomainRequest there is no status code so just hope for the best...
-        if (legacyCors) {
-          status = 200;
-        }
         if (status < 100 || status > 599) {
           reject(new TypeError('Network request failed'))
           return
@@ -4306,7 +4310,7 @@ module.exports = invariant;
 })();
 
 },{}],37:[function(require,module,exports){
-module.exports = require('whatwg-fetch');
+require('whatwg-fetch');
 
 },{"whatwg-fetch":36}],38:[function(require,module,exports){
 //     Underscore.js 1.7.0
