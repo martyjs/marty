@@ -12,14 +12,14 @@ The way to get around this is to have a seperate action creator that is responsi
 {% highlight js %}
 // actions/userActionCreators.js
 var UserActionCreators = Marty.createActionCreators({
-  saveUser: UserActions.SAVE_USER(function (user) {
+  saveUser: UserConstants.SAVE_USER(function (user) {
     return UserAPI.saveUser(user);
   })
 });
 
 // actions/userSourceActionCreators.js
 var UserSourceActionCreators = Marty.createActionCreators({
-  addUser: UserActions.ADD_USER(function (user) {
+  addUser: UserConstants.ADD_USER(function (user) {
     this.dispatch(user);
   })
 });
