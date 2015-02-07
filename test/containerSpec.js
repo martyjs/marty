@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 var Container = require('../lib/container');
 
 describe('Container', function () {
-  var container, action, id;
+  var container, action, id, resolver, context;
 
   beforeEach(function () {
     id = 'foo';
@@ -25,7 +25,7 @@ describe('Container', function () {
 
     describe('when I register an action creator with an Id', function () {
       beforeEach(function () {
-        container.registerActionCreators(expectedActionCreator);
+        resolver = container.registerActionCreators(expectedActionCreator);
       });
 
       it('should be able to create an instance of it', function () {
@@ -33,6 +33,14 @@ describe('Container', function () {
         expect(actualActionCreator).to.be.defined;
         actualActionCreator.foo();
         expect(action).to.be.called;
+      });
+
+      it('should return a resolver', function () {
+        context = container.createContext();
+        resolver.foo();
+        resolver(context).foo();
+
+        expect(action).to.be.calledTwice;
       });
     });
 
@@ -65,8 +73,6 @@ describe('Container', function () {
   });
 
   describe('createActionCreatorResolver', function () {
-    var resolver;
-
     beforeEach(function () {
       container.registerActionCreators({
         id: id,
@@ -86,7 +92,7 @@ describe('Container', function () {
     });
 
     describe('when I resolve the instance for a context', function () {
-      var context, actualActionCreators;
+      var actualActionCreators;
 
       beforeEach(function () {
         context = container.createContext();

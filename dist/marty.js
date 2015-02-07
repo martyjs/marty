@@ -515,10 +515,7 @@ Container.prototype = {
     var id = classId(clazz, type);
 
     if (!id) {
-      throw new Error(
-        'Cannot register ' + (clazz.displayName || '') +
-        ' ' + type + ' because it does not have an Id.'
-      );
+      throw CannotRegisterClassError(clazz, type);
     }
 
     this.types[type][id] = clazz;
@@ -529,10 +526,7 @@ Container.prototype = {
     var clazz = (this.types[type] || {})[id];
 
     if (!clazz) {
-      throw new Error(
-        'Could not find ' +
-        type + ' with Id ' + id
-      );
+      throw CannotFindTypeWithId(type, id);
     }
 
     var factory = this.factories[type] || this.factories.default;
@@ -582,6 +576,20 @@ function typeResolver(type, id) {
 
     throw new Error('Could not resolve context');
   }
+}
+
+function CannotFindTypeWithId(type, id) {
+  return new Error('Could not find ' + type + ' with Id ' + id);
+}
+
+function CannotRegisterClassError(clazz, type) {
+  var message = 'Cannot register ';
+
+  if (clazz && clazz.displayName) {
+    message += clazz.displayName + ' ';
+  }
+
+  return new Error(message + type + ' because it does not have an Id.');
 }
 },{"./actionCreators":9,"./context":13,"./utils/classId":26,"underscore":38}],13:[function(require,module,exports){
 var _ = require('underscore');
