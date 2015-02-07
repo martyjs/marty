@@ -301,7 +301,7 @@ describe('Store', function () {
         getInitialState: _.noop
       });
 
-      Dispatcher.getCurrent().dispatch(new ActionPayload({
+      Dispatcher.getDefault().dispatch(new ActionPayload({
         type: actionType,
         arguments: [data]
       }));

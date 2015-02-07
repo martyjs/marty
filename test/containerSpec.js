@@ -1,15 +1,29 @@
 var sinon = require('sinon');
 var _ = require('underscore');
 var expect = require('chai').expect;
+var Dispatcher = require('../dispatcher');
 var Container = require('../lib/container');
+var NUMBER_OF_ACTIONS_DISPATCHED = 4;
 
 describe('Container', function () {
   var container, action, id, resolver, context;
+  var defaultDispatcher, defaultActionHandler, sandbox;
 
   beforeEach(function () {
     id = 'foo';
     action = sinon.spy();
+    sandbox = sinon.sandbox.create();
+    defaultActionHandler = sinon.spy();
+    defaultDispatcher = new Dispatcher();
+    defaultDispatcher.isDefault = true;
+    defaultDispatcher.register(defaultActionHandler);
+    sandbox.stub(Dispatcher, 'getDefault').returns(defaultDispatcher);
+
     container = new Container();
+  });
+
+  afterEach(function () {
+    sandbox.restore();
   });
 
   describe('registerActionCreator', function () {
@@ -91,12 +105,19 @@ describe('Container', function () {
       expect(action).to.be.called;
     });
 
+    it('should use the default dispatcher', function () {
+      resolver.foo();
+      expect(defaultActionHandler).to.have.callCount(NUMBER_OF_ACTIONS_DISPATCHED);
+    });
+
     describe('when I resolve the instance for a context', function () {
-      var actualActionCreators;
+      var actualActionCreators, contextActionHandler;
 
       beforeEach(function () {
+        contextActionHandler = sinon.spy();
         context = container.createContext();
         actualActionCreators = resolver(context);
+        context.dispatcher.register(contextActionHandler);
       });
 
       it('should still be an action creator', function () {
@@ -106,6 +127,20 @@ describe('Container', function () {
 
       it('should not be the same instance as the factory', function () {
         expect(actualActionCreators).to.not.equal(resolver);
+      });
+
+      it('should have its context', function () {
+        expect(actualActionCreators.context).to.equal(context);
+      });
+
+      it('should use the contexts dispatcher', function () {
+        actualActionCreators.foo();
+        expect(contextActionHandler).to.callCount(NUMBER_OF_ACTIONS_DISPATCHED);
+      });
+
+      it('should not call the default dispatcher', function () {
+        actualActionCreators.foo();
+        expect(defaultActionHandler).to.not.be.called;
       });
     });
   });
