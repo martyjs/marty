@@ -156,6 +156,109 @@ describe('Container', function () {
     });
   });
 
+  describe('state sources', function () {
+    var expectedStateSource, stateCall, actualStateSource, stateSourceResolver;
+
+    beforeEach(function () {
+      stateCall = sinon.spy();
+
+      expectedStateSource = {
+        id: id,
+        getFoo: stateCall,
+        displayName: 'StateSource'
+      };
+    });
+
+    describe('registerStateSource', function () {
+
+      describe('when I register a state source with an Id', function () {
+        beforeEach(function () {
+          stateSourceResolver = container.registerStateSource(expectedStateSource);
+        });
+
+        it('should be able to create an instance of it', function () {
+          actualStateSource = container.resolveStateSource(expectedStateSource.id);
+          expect(actualStateSource).to.be.defined;
+          actualStateSource.getFoo();
+          expect(stateCall).to.be.calledOnce;
+        });
+
+        it('should return a resolver', function () {
+          context = container.createContext();
+
+          stateSourceResolver(context).getFoo();
+          expect(stateCall).to.be.calledOnce;
+        });
+      });
+
+      describe('when the state source doesnt have an Id or displayName', function () {
+        beforeEach(function () {
+          delete expectedStateSource.id;
+          delete expectedStateSource.displayName;
+          container.registerStateSource(expectedStateSource);
+        });
+
+        it('should generate an Id for it', function () {
+          actualStateSource = container.resolveStateSource(expectedId);
+          expect(actualStateSource).to.be.defined;
+          expect(actualStateSource.getFoo).to.be.defined;
+        });
+      });
+
+      describe('when the state source only has a display name', function () {
+        beforeEach(function () {
+          delete expectedStateSource.id;
+          container.registerStateSource(expectedStateSource);
+        });
+
+        it('should use the displayName as an Id', function () {
+          actualStateSource = container.resolveStateSource(expectedStateSource.displayName);
+          expect(actualStateSource).to.be.defined;
+          expect(actualStateSource.getFoo).to.be.defined;
+        });
+      });
+    });
+
+    describe('createStateSourceResolver', function () {
+      beforeEach(function () {
+        container.registerStateSource(expectedStateSource);
+
+        stateSourceResolver = container.createStateSourceResolver(id);
+      });
+
+      it('should be a function', function () {
+        expect(_.isFunction(stateSourceResolver)).to.be.true;
+      });
+
+      it('should still be a state source', function () {
+        stateSourceResolver.getFoo();
+        expect(stateCall).to.be.calledOnce;
+      });
+
+      describe('when I resolve the instance for a context', function () {
+        var actualStateSource;
+
+        beforeEach(function () {
+          context = container.createContext();
+          actualStateSource = stateSourceResolver(context);
+        });
+
+        it('should still be a state source', function () {
+          stateSourceResolver(context).getFoo();
+          expect(stateCall).to.be.calledOnce;
+        });
+
+        it('should not be the same instance as the resolver', function () {
+          expect(actualStateSource).to.not.equal(stateSourceResolver);
+        });
+
+        it('should have its context', function () {
+          expect(actualStateSource.context).to.equal(context);
+        });
+      });
+    });
+  });
+
   describe('action creators', function () {
     describe('registerActionCreators', function () {
       var expectedActionCreator, actualActionCreator;
