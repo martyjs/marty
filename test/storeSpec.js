@@ -19,6 +19,7 @@ describe('Store', function () {
     };
 
     store = new Store({
+      id: 'test',
       displayName: 'Test',
       dispatcher: dispatcher,
       handlers: {
@@ -404,12 +405,14 @@ describe('Store', function () {
     function waitFor(waitForCb) {
       var order = [];
       testActionCreators = Marty.createActionCreators({
+        id: 'test',
         sum: function () {
           this.dispatch(2);
         }
       });
 
       store2 = Marty.createStore({
+        id: 'store2',
         handlers: { sum: 'SUM'},
         getInitialState: function () {
           return 0;
@@ -422,6 +425,7 @@ describe('Store', function () {
       });
 
       store1 = Marty.createStore({
+        id: 'store1',
         handlers: { sum: 'SUM'},
         getInitialState: function () {
           return 0;
@@ -434,6 +438,7 @@ describe('Store', function () {
       });
 
       store3 = Marty.createStore({
+        id: 'store3',
         handlers: { sum: 'SUM'},
         getInitialState: function () {
           return 0;
@@ -524,6 +529,7 @@ describe('Store', function () {
 
       beforeEach(function () {
         Store = Marty.createStore({
+          id: 'store',
           handlers: {
             add: 'ADD'
           },
@@ -540,6 +546,7 @@ describe('Store', function () {
         });
 
         ActionCreators = Marty.createActionCreators({
+          id: 'rollbacks',
           add: function (user) {
             var action = this.dispatch(user);
 
@@ -595,6 +602,7 @@ describe('Store', function () {
     describe('when you do not pass in a clear function', function () {
       beforeEach(function () {
         store = Marty.createStore({
+          id: 'clear',
           getInitialState: function () {
             return {};
           }
@@ -616,6 +624,7 @@ describe('Store', function () {
         clear = sinon.spy();
         store = Marty.createStore({
           clear: clear,
+          id: 'clear',
           getInitialState: function () {
             return {};
           }

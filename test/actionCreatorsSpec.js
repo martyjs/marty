@@ -1,5 +1,6 @@
 var sinon = require('sinon');
 var _ = require('underscore');
+var Marty = require('../index');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
 var constants = require('../lib/constants');
@@ -30,6 +31,32 @@ describe('ActionCreators', function () {
           dispatch: TestConstants.DISPATCH()
         });
       }
+    });
+  });
+
+  describe('resolve', function () {
+    var context, creators, actualInstance, expectedInstance, action;
+
+    beforeEach(function () {
+      action = sinon.spy();
+      creators = Marty.createActionCreators({
+        id: 'foo',
+        displayName: 'Bar',
+        someAction: action
+      });
+
+      context = Marty.createContext();
+      actualInstance = creators(context);
+      expectedInstance = context.types.ActionCreators.foo;
+    });
+
+    it('should resolve to the actual instance', function () {
+      expect(actualInstance).to.equal(expectedInstance);
+    });
+
+    it('should still expose all actions', function () {
+      creators.someAction(1);
+      expect(action).to.be.calledWith(1);
     });
   });
 

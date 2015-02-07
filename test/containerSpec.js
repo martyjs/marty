@@ -1,11 +1,13 @@
 var sinon = require('sinon');
+var _ = require('underscore');
 var expect = require('chai').expect;
 var Container = require('../lib/container');
 
 describe('Container', function () {
-  var container, action;
+  var container, action, id;
 
   beforeEach(function () {
+    id = 'foo';
     action = sinon.spy();
     container = new Container();
   });
@@ -15,7 +17,7 @@ describe('Container', function () {
 
     beforeEach(function () {
       expectedActionCreator = {
-        id: 'foo',
+        id: id,
         displayName: 'Foo',
         foo: action
       };
@@ -23,25 +25,11 @@ describe('Container', function () {
 
     describe('when I register an action creator with an Id', function () {
       beforeEach(function () {
-        container.registerActionCreator(expectedActionCreator);
+        container.registerActionCreators(expectedActionCreator);
       });
 
       it('should be able to create an instance of it', function () {
-        actualActionCreator = container.resolveActionCreator(expectedActionCreator.id);
-        expect(actualActionCreator).to.be.defined;
-        actualActionCreator.foo();
-        expect(action).to.be.called;
-      });
-    });
-
-    describe('when the action creator only has a display name', function () {
-      beforeEach(function () {
-        delete expectedActionCreator.id;
-        container.registerActionCreator(expectedActionCreator);
-      });
-
-      it('should use the displayName as an Id', function () {
-        actualActionCreator = container.resolveActionCreator(expectedActionCreator.displayName);
+        actualActionCreator = container.resolveActionCreators(expectedActionCreator.id);
         expect(actualActionCreator).to.be.defined;
         actualActionCreator.foo();
         expect(action).to.be.called;
@@ -56,8 +44,62 @@ describe('Container', function () {
 
       it('should throw an error', function () {
         expect(function () {
-          container.registerActionCreator(expectedActionCreator);
+          container.registerActionCreators(expectedActionCreator);
         }).to.throw(Error);
+      });
+    });
+
+    describe('when the action creator only has a display name', function () {
+      beforeEach(function () {
+        delete expectedActionCreator.id;
+        container.registerActionCreators(expectedActionCreator);
+      });
+
+      it('should use the displayName as an Id', function () {
+        actualActionCreator = container.resolveActionCreators(expectedActionCreator.displayName);
+        expect(actualActionCreator).to.be.defined;
+        actualActionCreator.foo();
+        expect(action).to.be.called;
+      });
+    });
+  });
+
+  describe('createActionCreatorResolver', function () {
+    var resolver;
+
+    beforeEach(function () {
+      container.registerActionCreators({
+        id: id,
+        foo: action
+      });
+
+      resolver = container.createActionCreatorsResolver(id);
+    });
+
+    it('should be a function', function () {
+      expect(_.isFunction(resolver)).to.be.true;
+    });
+
+    it('should still be an action creator', function () {
+      resolver.foo();
+      expect(action).to.be.called;
+    });
+
+    describe('when I resolve the instance for a context', function () {
+      var context, actualActionCreators;
+
+      beforeEach(function () {
+        context = container.createContext();
+        actualActionCreators = resolver(context);
+      });
+
+      it('should still be an action creator', function () {
+        actualActionCreators.foo();
+        expect(action).to.be.called;
+      });
+
+      it('should not be the same instance as the factory', function () {
+        expect(actualActionCreators).to.not.equal(resolver);
       });
     });
   });
