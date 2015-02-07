@@ -10,11 +10,13 @@ describe('Marty#addStoreChangeListener()', function () {
     listener = sinon.spy();
 
     Store1 = Marty.createStore({
+      id: 'store1',
       displayName: 'store1',
       getInitialState: _.noop
     });
 
     Store2 = Marty.createStore({
+      id: 'store1',
       displayName: 'store2',
       getInitialState: _.noop
     });

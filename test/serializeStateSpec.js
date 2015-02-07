@@ -10,6 +10,7 @@ describe('Marty#serializeState()', function () {
     store1ExpectedState = { initial: 'store1' };
 
     Store1 = Marty.createStore({
+      id: 'store1',
       displayName: 'store1',
       getInitialState: _.noop,
       serialize: function () {
@@ -18,6 +19,7 @@ describe('Marty#serializeState()', function () {
     });
 
     Store2 = Marty.createStore({
+      id: 'store2',
       displayName: 'store2',
       getInitialState: _.noop,
       serialize: function () {
@@ -26,6 +28,7 @@ describe('Marty#serializeState()', function () {
     });
 
     Store3 = Marty.createStore({
+      id: 'store3',
       getInitialState: _.noop
     });
     serializedState = Marty.serializeState();

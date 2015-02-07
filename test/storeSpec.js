@@ -58,6 +58,7 @@ describe('Store', function () {
 
       function storeWithoutGetInitialState() {
         return new Store({
+          id: 'storeWithoutGetInitialState',
           foo: function () {
             return 'bar';
           }
@@ -80,6 +81,7 @@ describe('Store', function () {
         };
 
         store = new Store({
+          id: 'multiple-mixins',
           dispatcher: dispatcher,
           getInitialState: _.noop,
           mixins: [mixin1, mixin2]
@@ -104,6 +106,7 @@ describe('Store', function () {
         };
 
         store = new Store({
+          id: 'mixin-with-handlers',
           dispatcher: dispatcher,
           handlers: {
             foo: 'FOO',
@@ -216,6 +219,7 @@ describe('Store', function () {
     describe('when you dont pass in a dispose function', function () {
       beforeEach(function () {
         store = Marty.createStore({
+          id: 'no dispose',
           dispatcher: dispatcher,
           clear: clear,
           getInitialState: function () {
@@ -252,6 +256,7 @@ describe('Store', function () {
       beforeEach(function () {
         dispose = sinon.spy();
         store = Marty.createStore({
+          id: 'dispose',
           dispatcher: dispatcher,
           clear: clear,
           dispose: dispose,
@@ -294,6 +299,7 @@ describe('Store', function () {
 
     beforeEach(function () {
       store = Marty.createStore({
+        id: 'createStore',
         handlers: {
           one: actionType,
         },
@@ -319,6 +325,7 @@ describe('Store', function () {
 
         function createStoreWithMissingActionHandler() {
           return new Store({
+            id: 'createStoreWithMissingActionHandler',
             dispatcher: dispatcher,
             handlers: {
               foo: 'FOO'
@@ -334,6 +341,7 @@ describe('Store', function () {
 
         function createStoreWithANullActionPredicate() {
           return new Store({
+            id: 'createStoreWithANullActionPredicate',
             dispatcher: dispatcher,
             handlers: {
               foo: null

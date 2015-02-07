@@ -389,6 +389,7 @@ describe('StateMixin', function () {
 
   function createStore(state) {
     return Marty.createStore({
+      id: 'stateMixin',
       getInitialState: function () {
         return state || {};
       }

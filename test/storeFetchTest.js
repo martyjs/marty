@@ -12,6 +12,7 @@ describe('Store#fetch()', function () {
     fetchId = 'foo';
     listener = sinon.spy();
     store = Marty.createStore({
+      id: 'storeFetch',
       getInitialState: _.noop
     });
     changeListener = store.addChangeListener(listener);

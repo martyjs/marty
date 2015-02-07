@@ -304,6 +304,7 @@ describe('ActionCreators', function () {
       var dispatcher = new Dispatcher();
       var TestConstants = constants(['TEST']);
       var store = new Store({ // jshint ignore:line
+        id: 'action-fails',
         dispatcher: dispatcher,
         handlers: {
           test: TestConstants.TEST
