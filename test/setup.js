@@ -6,3 +6,9 @@ var chaiAsPromised = require('chai-as-promised');
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
+
+afterEach(function () {
+  var Marty = require('../index');
+
+  Marty.dispose();
+});
