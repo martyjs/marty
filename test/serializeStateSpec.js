@@ -2,13 +2,13 @@ var _ = require('underscore');
 var expect = require('chai').expect;
 
 describe('Marty#serializeState()', function () {
-  var Marty = require('../index');
-  var Store1, Store2, Store3, store1ExpectedState, storeSerializedState, serializedState;
+  var Store1, Store2, Store3, Marty;
+  var store1ExpectedState, storeSerializedState, serializedState;
 
   beforeEach(function () {
     storeSerializedState = { bar: 'bar' };
     store1ExpectedState = { initial: 'store1' };
-
+    Marty = require('../index').createInstance();
     Store1 = Marty.createStore({
       id: 'store1',
       displayName: 'store1',

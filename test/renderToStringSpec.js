@@ -5,7 +5,7 @@ var expect = require('chai').expect;
 var Message = require('./fixtures/components/message');
 var MessageStore = require('./fixtures/stores/messageStore');
 
-describe.only('Marty#renderToString', function () {
+describe('Marty#renderToString', function () {
   var $, context;
 
   beforeEach(function () {
@@ -30,18 +30,32 @@ describe.only('Marty#renderToString', function () {
     it('should reject');
   });
 
-  describe('when all the state is present', function () {
+  describe('when all the state is present locally', function () {
 
     beforeEach(function () {
-      return Marty.renderToString(function () {
-        return React.createElement(Message, { source: 'locally' });
-      }, context).then(loadDOM);
+      return renderToString({ source: 'locally' });
     });
 
     it('should render the html', function () {
       expect($('.text').text()).to.equal('local-context');
     });
   });
+
+  // describe('when it needs to wait for state to come from a remote source', function () {
+  //   beforeEach(function () {
+  //     return renderToString({ source: 'remotely' });
+  //   });
+
+  //   it('should wait for the state to be present before resolving', function () {
+  //     expect($('.text').text()).to.equal('remote-context');
+  //   });
+  // });
+
+  function renderToString(props) {
+    return Marty.renderToString(function () {
+      return React.createElement(Message, props);
+    }, context).then(loadDOM);
+  }
 
   function loadDOM(html) {
     $ = cheerio.load(html);

@@ -1,5 +1,6 @@
 var React = require('react');
 var sinon = require('sinon');
+var _ = require('underscore');
 var Marty = require('../index');
 var expect = require('chai').expect;
 var uuid = require('../lib/utils/uuid');
@@ -44,12 +45,12 @@ describe('StateMixin', function () {
       expectedState = {};
       log = console.log;
       console.log = function () {};
-      store = {
+      store = mockStore({
         displayName: 'foo',
         action: action,
         addChangeListener: sinon.spy(),
         getState: sinon.stub().returns(expectedState),
-      };
+      });
 
       mixin = new StateMixin({
         displayName: 'bar',
@@ -131,14 +132,14 @@ describe('StateMixin', function () {
         dispose: sinon.spy()
       };
 
-      store = {
+      store = mockStore({
         getState: function () {
           return {};
         },
         addChangeListener: function () {
           return disposable;
         }
-      };
+      });
 
       mixin = new StateMixin(store);
       element = renderClassWithMixin(mixin);
@@ -386,6 +387,14 @@ describe('StateMixin', function () {
       store.dispose();
     });
   });
+
+  function mockStore(options) {
+    var store = function () {
+      return store;
+    };
+
+    return _.extend(store, options);
+  }
 
   function createStore(state) {
     return Marty.createStore({
