@@ -10,25 +10,30 @@ module.exports = function (Marty) {
     setContextName: function (name) {
       this.state.contextName = name;
     },
-    getMessage: function (source) {
+    addMessage: function (id, message) {
+      this.state[id] = message;
+    },
+    getMessage: function (source, id) {
       var contextName = this.state.contextName;
+
+      if (source === 'locally') {
+        this.addMessage(id, {
+          text: 'local-' + contextName
+        });
+      }
 
       return this.fetch({
         id: source,
         locally: function () {
-          if (source === 'locally') {
-            return {
-              text: 'local-' + contextName
-            };
-          }
+          return this.state[id];
         },
         remotely: function () {
+          this.addMessage(id, {
+            text: 'remote-' + contextName
+          });
+
           return new Promise(function (resolve) {
-            setTimeout(function () {
-              resolve({
-                text: 'remote-' + contextName
-              });
-            }, 10);
+            setTimeout(resolve, 10);
           });
         }
       });
@@ -38,7 +43,7 @@ module.exports = function (Marty) {
   var MessageState = Marty.createStateMixin({
     getState: function () {
       return {
-        message: MessageStore(this).getMessage(this.props.source)
+        message: MessageStore(this).getMessage(this.props.source, this.props.id)
       };
     }
   });
@@ -50,8 +55,8 @@ module.exports = function (Marty) {
         pending: function () {
           return 'pending';
         },
-        failed: function () {
-          return 'error';
+        failed: function (error) {
+          return 'error-' + error;
         },
         done: function (message) {
           return message.text;

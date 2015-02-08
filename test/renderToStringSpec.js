@@ -1,6 +1,7 @@
 var React = require('react');
 var cheerio = require('cheerio');
 var expect = require('chai').expect;
+var uuid = require('../lib/utils/uuid');
 var messagesFixture = require('./fixtures/messages');
 
 describe('Marty#renderToString', function () {
@@ -33,7 +34,7 @@ describe('Marty#renderToString', function () {
   describe('when all the state is present locally', function () {
 
     beforeEach(function () {
-      return renderToString({ source: 'locally' });
+      return renderToString('locally');
     });
 
     it('should render the html', function () {
@@ -41,17 +42,22 @@ describe('Marty#renderToString', function () {
     });
   });
 
-  // describe('when it needs to wait for state to come from a remote source', function () {
-  //   beforeEach(function () {
-  //     return renderToString({ source: 'remotely' });
-  //   });
+  describe('when it needs to wait for state to come from a remote source', function () {
+    beforeEach(function () {
+      return renderToString('remotely');
+    });
 
-  //   it('should wait for the state to be present before resolving', function () {
-  //     expect($('.text').text()).to.equal('remote-context');
-  //   });
-  // });
+    it('should wait for the state to be present before resolving', function () {
+      expect($('.text').text()).to.equal('remote-context');
+    });
+  });
 
-  function renderToString(props) {
+  function renderToString(source) {
+    var props = {
+      source: source,
+      id: uuid.small()
+    };
+
     return Marty.renderToString(function () {
       return React.createElement(fixture.Message, props);
     }, context).then(loadDOM);
