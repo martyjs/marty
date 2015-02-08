@@ -1,12 +1,12 @@
 var sinon = require('sinon');
 var _ = require('underscore');
-var Marty = require('../index');
 var expect = require('chai').expect;
 
 describe('Marty#addStoreChangeListener()', function () {
-  var Store1, Store2, listener, disposable;
+  var Marty, Store1, Store2, listener, disposable;
 
   beforeEach(function () {
+    Marty = require('../index').createInstance();
     listener = sinon.spy();
 
     Store1 = Marty.createStore({

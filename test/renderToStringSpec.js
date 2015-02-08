@@ -1,17 +1,17 @@
 var React = require('react');
-var Marty = require('../index');
 var cheerio = require('cheerio');
 var expect = require('chai').expect;
-var Message = require('./fixtures/components/message');
-var MessageStore = require('./fixtures/stores/messageStore');
+var messagesFixture = require('./fixtures/messages');
 
 describe('Marty#renderToString', function () {
-  var $, context;
+  var $, context, Marty, fixture;
 
   beforeEach(function () {
+    Marty = require('../index').createInstance();
+    fixture = messagesFixture(Marty);
     context = Marty.createContext();
-    MessageStore.setContextName('global');
-    MessageStore(context).setContextName('context');
+    fixture.MessageStore.setContextName('global');
+    fixture.MessageStore(context).setContextName('context');
   });
 
   describe('when you dont pass in a createElement function', function () {
@@ -53,7 +53,7 @@ describe('Marty#renderToString', function () {
 
   function renderToString(props) {
     return Marty.renderToString(function () {
-      return React.createElement(Message, props);
+      return React.createElement(fixture.Message, props);
     }, context).then(loadDOM);
   }
 
