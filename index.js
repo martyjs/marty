@@ -1,3 +1,5 @@
+require('es6-promise').polyfill();
+
 var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
@@ -6,9 +8,6 @@ var Container = require('./lib/container');
 var Diagnostics = require('./lib/diagnostics');
 var EventEmitter = require('events').EventEmitter;
 var renderToString = require('./lib/renderToString');
-var Marty = createInstance();
-
-module.exports = Marty;
 
 function createInstance() {
   return _.extend(new EventEmitter(), {
@@ -20,3 +19,5 @@ function createInstance() {
     createInstance: createInstance
   }, state, create);
 }
+
+module.exports = createInstance();
