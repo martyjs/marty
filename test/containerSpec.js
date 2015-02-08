@@ -150,7 +150,7 @@ describe('Container', function () {
         });
 
         it('should have its context', function () {
-          expect(actualStore.context).to.equal(context);
+          expect(actualStore.__context).to.equal(context);
         });
       });
     });
@@ -253,7 +253,7 @@ describe('Container', function () {
         });
 
         it('should have its context', function () {
-          expect(actualStateSource.context).to.equal(context);
+          expect(actualStateSource.__context).to.equal(context);
         });
       });
     });
@@ -366,7 +366,7 @@ describe('Container', function () {
         });
 
         it('should have its context', function () {
-          expect(actualActionCreators.context).to.equal(context);
+          expect(actualActionCreators.__context).to.equal(context);
         });
 
         it('should use the contexts dispatcher', function () {
