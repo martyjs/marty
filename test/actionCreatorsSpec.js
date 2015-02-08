@@ -47,7 +47,7 @@ describe('ActionCreators', function () {
 
       context = Marty.createContext();
       actualInstance = creators(context);
-      expectedInstance = context.types.ActionCreators.foo;
+      expectedInstance = context.instances.ActionCreators.foo;
     });
 
     it('should resolve to the actual instance', function () {
