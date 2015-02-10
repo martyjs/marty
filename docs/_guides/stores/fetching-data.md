@@ -36,7 +36,7 @@ Using the example of getting a user, you would have a UserHttpAPI (Which is an [
 {% highlight js %}
 var UserHttpAPI = Marty.createStateSource({
   getUser: function (userId) {
-    return this.get('/users/' + userId).then(function (res) {
+    return this.get('http://jsonplaceholder.typicode.com/users/' + userId).then(function (res) {
       UserSourceActionCreators.receiveUser(res.body);
     });
   }
