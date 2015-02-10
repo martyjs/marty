@@ -35,12 +35,18 @@ Using the example of getting a user, you would have a UserHttpAPI (Which is an [
 
 {% highlight js %}
 var UserHttpAPI = Marty.createStateSource({
+  type: 'http',
   getUser: function (userId) {
     return this.get('/users/' + userId).then(function (res) {
       UserSourceActionCreators.receiveUser(res.body);
     });
   }
 });
+
+var UserConstants = Marty.createConstants([
+  'RECEIVE_USER',
+  'USER_NOT_FOUND'
+]);
 
 var UserSourceActionCreators = Marty.createActionCreators({
   receiveUser: UserConstants.RECEIVE_USER(function (user) {
@@ -52,6 +58,9 @@ var UserStore = Marty.createStore({
   handlers: {
     addUser: UserConstants.RECEIVE_USER,
     removeUser: UserConstants.USER_NOT_FOUND
+  },
+  getInitialState: function() {
+    return {};
   },
   addUser: function (user) {
     this.state[user.id] = user;
@@ -67,6 +76,9 @@ var UserStore = Marty.createStore({
         return UserHttpAPI.getUser(userId)
       }
     });
+  },
+  removeUser: function (userId) {
+    // ...
   }
 });
 {% endhighlight %}
