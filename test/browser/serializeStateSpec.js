@@ -8,7 +8,7 @@ describe('Marty#serializeState()', function () {
   beforeEach(function () {
     storeSerializedState = { bar: 'bar' };
     store1ExpectedState = { initial: 'store1' };
-    Marty = require('../index').createInstance();
+    Marty = require('../../index').createInstance();
     Store1 = Marty.createStore({
       id: 'store1',
       displayName: 'store1',

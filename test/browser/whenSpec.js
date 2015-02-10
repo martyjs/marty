@@ -1,6 +1,6 @@
 var sinon = require('sinon');
-var when = require('../when');
-var fetch = require('../fetch');
+var when = require('../../when');
+var fetch = require('../../fetch');
 var expect = require('chai').expect;
 
 describe('when', function () {

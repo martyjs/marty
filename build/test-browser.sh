@@ -6,7 +6,7 @@ else
   mkdir -p tmp
 fi
 
-node test/lib/mockServer &
+node test/browser/lib/mockServer &
 echo $! > tmp/mock-server.pid
 node_modules/.bin/karma start --single-run
 

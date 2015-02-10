@@ -1,12 +1,12 @@
 var React = require('react');
 var sinon = require('sinon');
 var _ = require('underscore');
-var Marty = require('../index');
+var Marty = require('../../index');
 var expect = require('chai').expect;
-var uuid = require('../lib/utils/uuid');
-var Diagnostics = require('../lib/diagnostics');
-var ActionPayload = require('../lib/actionPayload');
-var StateMixin = require('../lib/mixins/stateMixin');
+var uuid = require('../../lib/utils/uuid');
+var Diagnostics = require('../../lib/diagnostics');
+var ActionPayload = require('../../lib/actionPayload');
+var StateMixin = require('../../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {

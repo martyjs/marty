@@ -1,9 +1,9 @@
 var sinon = require('sinon');
 var _ = require('underscore');
 var expect = require('chai').expect;
-var uuid = require('../lib/utils/uuid');
-var Dispatcher = require('../dispatcher');
-var Container = require('../lib/container');
+var uuid = require('../../lib/utils/uuid');
+var Dispatcher = require('../../dispatcher');
+var Container = require('../../lib/container');
 var NUMBER_OF_ACTIONS_DISPATCHED = 4;
 
 describe('Container', function () {

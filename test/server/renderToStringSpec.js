@@ -1,14 +1,14 @@
 var React = require('react');
 var cheerio = require('cheerio');
 var expect = require('chai').expect;
-var uuid = require('../lib/utils/uuid');
+var uuid = require('../../lib/utils/uuid');
 var messagesFixture = require('./fixtures/messages');
 
 describe('Marty#renderToString', function () {
   var $, context, Marty, fixture;
 
   beforeEach(function () {
-    Marty = require('../index').createInstance();
+    Marty = require('../../index').createInstance();
     fixture = messagesFixture(Marty);
     context = Marty.createContext();
     fixture.MessageStore.setContextName('global');

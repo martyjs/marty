@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 
 describe('Marty#clearState()', function () {
-  var Marty = require('../index');
+  var Marty = require('../../index');
   var Store1, Store2, store1ExpectedState, store2ExpectedState;
 
   beforeEach(function () {

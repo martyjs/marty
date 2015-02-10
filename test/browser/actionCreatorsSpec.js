@@ -1,14 +1,14 @@
 var sinon = require('sinon');
 var _ = require('underscore');
-var Marty = require('../index');
+var Marty = require('../../index');
 var expect = require('chai').expect;
-var Store = require('../lib/store');
-var constants = require('../lib/constants');
+var Store = require('../../lib/store');
+var constants = require('../../lib/constants');
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
 var MockDispatcher = require('./lib/mockDispatcher');
-var ActionCreators = require('../lib/actionCreators');
-var serializeError = require('../lib/utils/serializeError');
+var ActionCreators = require('../../lib/actionCreators');
+var serializeError = require('../../lib/utils/serializeError');
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, actualResult, actualError;

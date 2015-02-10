@@ -1,6 +1,6 @@
-var Marty = require('../index');
+var Marty = require('../../index');
 var expect = require('chai').expect;
-var StateSource = require('../lib/stateSource');
+var StateSource = require('../../lib/stateSource');
 
 describe('StateSource', function () {
   var stateSource;

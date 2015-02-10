@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var SessionStorageStateSource = require('../../lib/stateSources/sessionStorage');
+var SessionStorageStateSource = require('../../../lib/stateSources/sessionStorage');
 
 describe('SessionStorageStateSource', function () {
 

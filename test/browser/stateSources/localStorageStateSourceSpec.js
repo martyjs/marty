@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var LocalStorageStateSource = require('../../lib/stateSources/localStorage');
+var LocalStorageStateSource = require('../../../lib/stateSources/localStorage');
 
 describe('LocalStorageStateSource', function () {
 

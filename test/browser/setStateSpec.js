@@ -1,9 +1,9 @@
 var _ = require('underscore');
 var expect = require('chai').expect;
-var UnknownStoreError = require('../errors/unknownStore');
+var UnknownStoreError = require('../../errors/unknownStore');
 
 describe('Marty#setState()', function () {
-  var Marty = require('../index');
+  var Marty = require('../../index');
   var Store1, Store2;
 
   beforeEach(function () {

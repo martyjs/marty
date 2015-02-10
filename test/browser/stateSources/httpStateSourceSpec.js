@@ -1,7 +1,7 @@
 var sinon = require('sinon');
 var _ = require('lodash-node');
 var expect = require('chai').expect;
-var HttpStateSource = require('../../lib/stateSources/http');
+var HttpStateSource = require('../../../lib/stateSources/http');
 
 require('es6-promise').polyfill();
 
