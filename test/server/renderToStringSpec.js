@@ -7,14 +7,15 @@ var uuid = require('../../lib/utils/uuid');
 var messagesFixture = require('./fixtures/messages');
 
 describe('Marty#renderToString', function () {
-  var $, context, Marty, fixture;
+  var $, context, Marty, fixture, expectedId;
 
   beforeEach(function () {
+    expectedId = uuid.small();
     Marty = require('../../index').createInstance();
     fixture = messagesFixture(Marty);
     context = Marty.createContext();
-    fixture.MessageStore.setContextName('global');
-    fixture.MessageStore(context).setContextName('context');
+    fixture.MessageStore.setContextName('global-context');
+    fixture.MessageStore(context).setContextName('local-context');
   });
 
   describe('when you dont pass in a createElement function', function () {
@@ -44,33 +45,51 @@ describe('Marty#renderToString', function () {
   describe('when all the state is present locally', function () {
 
     beforeEach(function () {
-      return renderToString('locally');
+      fixture.MessageStore(context).addMessage(expectedId, { text: 'local' });
+      return renderToString();
     });
 
-    it('should render the html', function () {
-      expect($('.text').text()).to.equal('local-context');
+    it('should get the state', function () {
+      expect($('.text').text()).to.equal('local');
+    });
+
+    it('should come from the correct context', function () {
+      expect($('.context').text()).to.equal('local-context');
     });
   });
 
   describe('when it needs to wait for state to come from a remote source', function () {
     beforeEach(function () {
-      return renderToString('remotely');
+      return renderToString();
     });
 
-    it('should wait for the state to be present before resolving', function () {
-      expect($('.text').text()).to.equal('remote-context');
+    it('should get the state', function () {
+      expect($('.text').text()).to.equal('remote');
+    });
+
+    it('should come from the correct context', function () {
+      expect($('.context').text()).to.equal('local-context');
     });
   });
 
-  function renderToString(source) {
-    var props = {
-      source: source,
-      id: uuid.small()
-    };
+  describe('timeout', function () {
+    beforeEach(function () {
+      fixture.MessageAPI(context).delay = 1500;
 
+      return renderToString({
+        timeout: 100
+      });
+    });
+
+    it('should render after the timeout regardless of whether fetches are complete', function () {
+      expect($('.text').text()).to.equal('pending');
+    });
+  });
+
+  function renderToString(options) {
     return Marty.renderToString(function () {
-      return React.createElement(fixture.Message, props);
-    }, context).then(loadDOM);
+      return React.createElement(fixture.Message, { id: expectedId });
+    }, context, options).then(loadDOM);
   }
 
   function loadDOM(html) {
