@@ -1,6 +1,8 @@
 var React = require('react');
+var _ = require('underscore');
 var cheerio = require('cheerio');
 var expect = require('chai').expect;
+var Context = require('../../lib/context');
 var uuid = require('../../lib/utils/uuid');
 var messagesFixture = require('./fixtures/messages');
 
@@ -16,19 +18,27 @@ describe('Marty#renderToString', function () {
   });
 
   describe('when you dont pass in a createElement function', function () {
-    it('should reject');
+    it('should reject', function () {
+      return expect(Marty.renderToString(null)).to.be.rejected;
+    });
   });
 
   describe('when you don\'t pass in a context', function () {
-    it('should reject');
+    it('should reject', function () {
+      return expect(Marty.renderToString(_.noop)).to.be.rejected;
+    });
   });
 
   describe('when you pass in an object that isn\'t a context', function () {
-    it('should reject');
+    it('should reject', function () {
+      return expect(Marty.renderToString(_.noop, {})).to.be.rejected;
+    });
   });
 
   describe('when createElement returns null', function () {
-    it('should reject');
+    it('should reject', function () {
+      return expect(Marty.renderToString(_.noop, new Context())).to.be.rejected;
+    });
   });
 
   describe('when all the state is present locally', function () {
