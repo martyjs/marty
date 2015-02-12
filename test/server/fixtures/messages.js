@@ -63,7 +63,7 @@ module.exports = function (Marty) {
         failed: function (error) {
           return {
             text: 'error: ' + error
-          }
+          };
         },
         done: function (message) {
           return message;
