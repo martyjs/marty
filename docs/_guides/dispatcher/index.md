@@ -10,7 +10,7 @@ The dispatcher is the central hub in which all application data flows throw. Whe
 Marty uses [facebook's dispatcher](https://github.com/facebook/flux/).
 
 {% highlight js %}
-var Dispatcher = require('marty/dispatcher');
+var Dispatcher = require('marty/dispatcher').getCurrent();
 
 var dispatchToken = Dispatcher.register(function (action) {
   console.log(action);
