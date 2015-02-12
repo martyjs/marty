@@ -6,7 +6,7 @@ var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
-  version: '0.8.10',
+  version: '0.8.11',
   Diagnostics: Diagnostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
@@ -379,7 +379,10 @@ function ActionPayload(options) {
     return {
       dispose: function () {
         if (Diagnostics.devtoolsEnabled) {
-          viewHandler.state = view.state;
+          var state = view.state;
+          if (state) {
+            viewHandler.state = JSON.parse(JSON.stringify(state));
+          }
         }
       },
       failed: function (err) {
@@ -403,7 +406,11 @@ function ActionPayload(options) {
     return {
       dispose: function () {
         if (Diagnostics.devtoolsEnabled) {
-          handler.state = (store.serialize || store.getState)();
+          var state = (store.serialize || store.getState)();
+
+          if (state) {
+            handler.state = JSON.parse(JSON.stringify(state));
+          }
         }
       },
       failed: function (err) {
@@ -589,15 +596,16 @@ module.exports = diagnostics;
 
 function log() {
   if (diagnostics.enabled) {
-    console.log.apply(console, arguments);
+    console && console.log.apply(console, arguments);
   }
 }
 
 function warn() {
   if (diagnostics.enabled) {
-    console.warn.apply(console, arguments);
+    console && console.warn.apply(console, arguments);
   }
 }
+
 },{}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
@@ -945,7 +953,7 @@ function HttpStateSource(mixinOptions) {
   mixinOptions = mixinOptions || {};
 
   var defaultBaseUrl = '';
-  var methods = ['get', 'put', 'post', 'delete'];
+  var methods = ['get', 'put', 'post', 'delete', 'patch'];
 
   var mixin = {
     _isHttpStateSource: true,
@@ -1054,6 +1062,11 @@ function JSONStorageStateSource(options) {
     _isJSONStorageStateSource: true,
     get: function (key) {
       var raw = getStorage().getItem(getNamespacedKey(key));
+
+      if (!raw) {
+        return raw;
+      }
+
       try {
         var payload = JSON.parse(raw);
         return payload.value;
@@ -1223,7 +1236,7 @@ function Store(options) {
           functionName += ' in ' + options.displayName;
         }
 
-        console.warn(functionName + ' is reserved for use by Marty. Please use a different name');
+        Diagnostics.warn(functionName + ' is reserved for use by Marty. Please use a different name');
       }
     });
 
@@ -1389,7 +1402,7 @@ function Store(options) {
           }
         }
 
-        console.warn(promiseNotReturnedWarning());
+        Diagnostics.warn(promiseNotReturnedWarning());
 
         return notFound();
       } catch (error) {
