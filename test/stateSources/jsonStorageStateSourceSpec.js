@@ -43,6 +43,18 @@ describe('JSONStorageStateSource', function () {
     it('should retrieve serialized data under key in localStorage', function () {
       expect(mixin.get('foo')).to.deep.equal(payload.value);
     });
+
+    describe('when the value is undefined', function () {
+      var result;
+
+      beforeEach(function () {
+        result = mixin.get('bar');
+      });
+
+      it('should return null', function () {
+        expect(result).to.equal(null);
+      });
+    });
   });
 
   describe('#storage', function () {
