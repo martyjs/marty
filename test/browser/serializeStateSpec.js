@@ -37,7 +37,8 @@ describe('Marty#serializeState()', function () {
   it('should serialze all the stores', function () {
     expect(serializedState.toJSON()).to.eql({
       store1: store1ExpectedState,
-      store2: storeSerializedState
+      store2: storeSerializedState,
+      store3: {}
     });
   });
 
@@ -45,7 +46,8 @@ describe('Marty#serializeState()', function () {
     it('should create a string that can be injected into the page', function () {
       expect(serializedState.toString()).to.equal('(window.__marty||(window.__marty={})).state=' + JSON.stringify({
         store1: store1ExpectedState,
-        store2: storeSerializedState
+        store2: storeSerializedState,
+        store3: {}
       }));
     });
   });

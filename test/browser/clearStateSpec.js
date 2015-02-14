@@ -22,7 +22,7 @@ describe('Marty#clearState()', function () {
       }
     });
 
-    Marty.setState({
+    Marty.setInitialState({
       store1: { foo: 'bar' },
       store2: { bar: 'baz' }
     });
