@@ -10,11 +10,12 @@ var EventEmitter = require('events').EventEmitter;
 var renderToString = require('./lib/renderToString');
 
 function createInstance() {
-  return _.extend(new EventEmitter(), {
+  return _.extend({
     dispose: dispose,
     version: '0.8.12',
     Diagnostics: Diagnostics,
     container: new Container(),
+    __events: new EventEmitter(),
     renderToString: renderToString,
     createInstance: createInstance
   }, state, create);

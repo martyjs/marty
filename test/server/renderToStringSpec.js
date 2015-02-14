@@ -43,7 +43,6 @@ describe('Marty#renderToString', function () {
   });
 
   describe('when all the state is present locally', function () {
-
     beforeEach(function () {
       fixture.MessageStore(context).addMessage(expectedId, { text: 'local' });
       return renderToString();

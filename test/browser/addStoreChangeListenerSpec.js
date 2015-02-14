@@ -16,7 +16,7 @@ describe('Marty#addStoreChangeListener()', function () {
     });
 
     Store2 = Marty.createStore({
-      id: 'store1',
+      id: 'store2',
       displayName: 'store2',
       getInitialState: _.noop
     });

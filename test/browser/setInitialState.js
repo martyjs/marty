@@ -1,4 +1,3 @@
-var _ = require('underscore');
 var expect = require('chai').expect;
 var UnknownStoreError = require('../../errors/unknownStore');
 
