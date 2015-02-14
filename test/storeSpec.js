@@ -4,6 +4,7 @@ var Marty = require('../index');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
 var Dispatcher = require('../dispatcher');
+var stubbedLogger = require('./lib/stubbedLogger');
 var ActionPayload = require('../lib/actionPayload');
 var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
@@ -11,17 +12,22 @@ var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined'
 describe('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
   var actualAction, actualChangeListenerFunctionContext, expectedChangeListenerFunctionContext;
+  var expectedError, logger;
 
   beforeEach(function () {
+    logger = stubbedLogger();
     dispatcher = {
       register: sinon.stub().returns(dispatchToken),
       unregister: sinon.spy()
     };
 
+    expectedError = new Error('foo');
+
     store = new Store({
       displayName: 'Test',
       dispatcher: dispatcher,
       handlers: {
+        error: 'ERROR',
         one: 'one-action',
         multiple: ['multi-1-action', 'multi-2-action'],
         where: { source: 'VIEW' },
@@ -34,6 +40,7 @@ describe('Store', function () {
       multiple: sinon.spy(),
       initialize: sinon.spy(),
       whereAndAction: sinon.spy(),
+      error: sinon.stub().throws(expectedError),
       getInitialState: sinon.stub().returns(initialState)
     });
     expectedChangeListenerFunctionContext = {};
@@ -41,6 +48,10 @@ describe('Store', function () {
       actualChangeListenerFunctionContext = this;
     });
     changeListener = store.addChangeListener(listener, expectedChangeListenerFunctionContext);
+  });
+
+  afterEach(function () {
+    logger.restore();
   });
 
   it('should have a dispatch token', function () {
@@ -453,6 +464,22 @@ describe('Store', function () {
 
   describe('#handleAction()', function () {
     var data = {}, expectedAction;
+
+    describe('when an error occurs', function () {
+      beforeEach(function () {
+        expectedAction = new ActionPayload({ type: 'ERROR' });
+        try {
+          store.handleAction(expectedAction);
+        } catch (e) { }
+      });
+
+      it('should log the error and any additional metadata', function () {
+        var expectedMessage = 'An error occured while trying to handle an ' +
+        '\'ERROR\' action in the action handler `error` within the store Test';
+
+        expect(logger.error).to.be.calledWith(expectedMessage, expectedError, expectedAction);
+      });
+    });
 
     describe('when the store does not handle action type', function () {
       beforeEach(function () {
