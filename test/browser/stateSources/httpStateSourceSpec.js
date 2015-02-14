@@ -35,7 +35,7 @@ describe('HttpStateSource', function () {
   });
 
   describe('middleware', function () {
-    var server;
+    var server, expectedStateSource, actualContext;
 
     beforeEach(function () {
       server = sinon.fakeServer.create();
@@ -53,6 +53,7 @@ describe('HttpStateSource', function () {
           middleware1 = {
             priority: 2,
             before: sinon.spy(function () {
+              actualContext = this;
               executionOrder.push(1);
             })
           };
@@ -89,6 +90,10 @@ describe('HttpStateSource', function () {
           });
         });
 
+        it('should set the context to the mixin', function () {
+          expect(actualContext).to.equal(expectedStateSource);
+        });
+
         it('should execute them in priority order', function () {
           expect(executionOrder).to.eql([3, 1, 2]);
         });
@@ -100,6 +105,7 @@ describe('HttpStateSource', function () {
           middleware1 = {
             priority: 2,
             after: sinon.spy(function () {
+              actualContext = this;
               executionOrder.push(1);
             })
           };
@@ -136,6 +142,10 @@ describe('HttpStateSource', function () {
           });
         });
 
+        it('should set the context to the mixin', function () {
+          expect(actualContext).to.equal(expectedStateSource);
+        });
+
         it('should execute them in priority order', function () {
           expect(executionOrder).to.eql([3, 1, 2]);
         });
@@ -143,7 +153,9 @@ describe('HttpStateSource', function () {
     });
 
     function get() {
-      var res = new HttpStateSource().get('/foo');
+      expectedStateSource = new HttpStateSource();
+
+      var res = expectedStateSource.get('/foo');
 
       server.respond();
 
