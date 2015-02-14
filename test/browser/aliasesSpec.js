@@ -67,4 +67,10 @@ describe('aliases', function () {
       expect(Object.keys(require('../../constants/status'))).to.eql(['PENDING', 'FAILED', 'DONE']);
     });
   });
+
+  describe('marty/http/stateSource', function () {
+    it('should resolve to http state source', function () {
+      expect(require('../../http/stateSource')).to.eql(require('../../lib/stateSources/http'));
+    });
+  });
 });

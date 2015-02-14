@@ -10,6 +10,7 @@ describe('HttpStateSource', function () {
   this.timeout(10000);
 
   var API, baseUrl, response;
+  var middleware1, middleware2, middleware3, executionOrder;
 
   beforeEach(function () {
     baseUrl = '/stub/';
@@ -33,26 +34,142 @@ describe('HttpStateSource', function () {
     });
   });
 
-  describe('when a request fails', function () {
-    var fetch, expectedResponse, actualError;
-    beforeEach(function () {
-      expectedResponse = {
-        status: 400
-      };
+  describe('middleware', function () {
+    var server;
 
-      var fetchResult =  new Promise(function (resolve) {
-        resolve(expectedResponse);
+    beforeEach(function () {
+      server = sinon.fakeServer.create();
+      server.respondWith('GET', '/foo', [400, {}, '']);
+    });
+
+    afterEach(function () {
+      server.restore();
+    });
+
+    describe('use', function () {
+      describe('before', function () {
+        beforeEach(function () {
+          executionOrder = [];
+          middleware1 = {
+            priority: 2,
+            before: sinon.spy(function () {
+              executionOrder.push(1);
+            })
+          };
+
+          middleware2 = {
+            before: sinon.spy(function () {
+              executionOrder.push(2);
+            })
+          };
+
+          middleware3 = {
+            priority: 1,
+            before: sinon.spy(function () {
+              executionOrder.push(3);
+            })
+          };
+
+          HttpStateSource.use(middleware1);
+          HttpStateSource.use(middleware2);
+          HttpStateSource.use(middleware3);
+
+          return get();
+        });
+
+        afterEach(function () {
+          HttpStateSource.remove(middleware1);
+          HttpStateSource.remove(middleware2);
+          HttpStateSource.remove(middleware3);
+        });
+
+        it('should call the before middleware once', function () {
+          _.each([middleware1, middleware2, middleware3], function (middleware) {
+            expect(middleware.before).to.be.calledOnce;
+          });
+        });
+
+        it('should execute them in priority order', function () {
+          expect(executionOrder).to.eql([3, 1, 2]);
+        });
       });
 
-      fetch = sinon.stub(window, 'fetch').returns(fetchResult);
+      describe('after', function () {
+        beforeEach(function () {
+          executionOrder = [];
+          middleware1 = {
+            priority: 2,
+            after: sinon.spy(function () {
+              executionOrder.push(1);
+            })
+          };
 
-      return new HttpStateSource().get('/foo').catch(function (error) {
+          middleware2 = {
+            after: sinon.spy(function () {
+              executionOrder.push(2);
+            })
+          };
+
+          middleware3 = {
+            priority: 1,
+            after: sinon.spy(function () {
+              executionOrder.push(3);
+            })
+          };
+
+          HttpStateSource.use(middleware1);
+          HttpStateSource.use(middleware2);
+          HttpStateSource.use(middleware3);
+
+          return get();
+        });
+
+        afterEach(function () {
+          HttpStateSource.remove(middleware1);
+          HttpStateSource.remove(middleware2);
+          HttpStateSource.remove(middleware3);
+        });
+
+        it('should call the after middleware once', function () {
+          _.each([middleware1, middleware2, middleware3], function (middleware) {
+            expect(middleware.after).to.be.calledOnce;
+          });
+        });
+
+        it('should execute them in priority order', function () {
+          expect(executionOrder).to.eql([3, 1, 2]);
+        });
+      });
+    });
+
+    function get() {
+      var res = new HttpStateSource().get('/foo');
+
+      server.respond();
+
+      return res;
+    }
+  });
+
+  describe('when a request fails', function () {
+    var server, expectedResponse, actualError;
+
+    beforeEach(function () {
+      server = sinon.fakeServer.create();
+
+      server.respondWith('GET', '/foo', [400, {}, '']);
+
+      var res = new HttpStateSource().get('/foo');
+
+      server.respond();
+
+      return res.catch(function (error) {
         actualError = error;
       });
     });
 
     afterEach(function () {
-      fetch.restore();
+      server.restore();
     });
 
     it('should reject with the response object', function () {
