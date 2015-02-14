@@ -6,6 +6,7 @@ var Store = require('../../lib/store');
 var constants = require('../../lib/constants');
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
+var stubbedLogger = require('./lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var ActionCreators = require('../../lib/actionCreators');
 var serializeError = require('../../lib/utils/serializeError');
@@ -13,10 +14,15 @@ var serializeError = require('../../lib/utils/serializeError');
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, actualResult, actualError;
   var expectedActionType, expectedOtherArg, expectedArg;
-  var actualAction, payload, expectedError, promise;
+  var actualAction, payload, expectedError, promise, logger;
 
   beforeEach(function () {
+    logger = stubbedLogger();
     dispatcher = new MockDispatcher();
+  });
+
+  afterEach(function () {
+    logger.restore();
   });
 
   describe('when you create an action creator called \'dispatch\'', function () {
@@ -189,6 +195,7 @@ describe('ActionCreators', function () {
     beforeEach(function () {
       expectedError = new Error('foo');
       actionCreators = new ActionCreators({
+        displayName: 'Test',
         dispatcher: dispatcher,
         someAction: function () {
           throw expectedError;
@@ -202,6 +209,12 @@ describe('ActionCreators', function () {
 
       actualAction = dispatcher.getActionWithType('ACTION_FAILED');
       payload = (actualAction || {}).arguments[0];
+    });
+
+    it('should log the error', function () {
+      var expectedErrorMessage = 'An error occured when creating a \'SOME_ACTION\' action in Test#someAction';
+
+      expect(logger.error).to.be.calledWith(expectedErrorMessage, expectedError);
     });
 
     it('should dispatch {action type}_FAILED', function () {

@@ -5,6 +5,7 @@ var create = require('./lib/create');
 var dispose = require('./lib/dispose');
 var Container = require('./lib/container');
 var Diagnostics = require('./lib/diagnostics');
+<<<<<<< HEAD
 var EventEmitter = require('events').EventEmitter;
 var renderToString = require('./lib/renderToString');
 var Marty = createInstance();
@@ -22,6 +23,17 @@ function createInstance() {
   }, state, create);
 }
 },{"./lib/container":12,"./lib/create":14,"./lib/diagnostics":15,"./lib/dispose":17,"./lib/renderToString":20,"./lib/state":21,"events":32,"underscore":186}],1:[function(require,module,exports){
+=======
+
+var Marty = _.extend({
+  version: '0.8.12',
+  Diagnostics: Diagnostics,
+  Dispatcher: Dispatcher.getCurrent()
+}, state, create);
+
+module.exports = Marty;
+},{"./lib/create":12,"./lib/diagnostics":13,"./lib/dispatcher":14,"./lib/state":18,"underscore":39}],1:[function(require,module,exports){
+>>>>>>> master
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
@@ -89,6 +101,7 @@ UnkownStoreError.prototype = Error.prototype;
 module.exports = UnkownStoreError;
 },{}],9:[function(require,module,exports){
 var _ = require('underscore');
+var log = require('./logger');
 var uuid = require('./utils/uuid');
 var RESERVED_KEYWORDS = ['dispatch'];
 var Dispatcher = require('./dispatcher');
@@ -112,7 +125,11 @@ function ActionCreators(options) {
     }
   });
 
+<<<<<<< HEAD
   creator.getActionType = getActionType;
+=======
+  this.getActionType = getActionType;
+>>>>>>> master
 
   _.extend.apply(_, [
     creator,
@@ -171,6 +188,10 @@ function ActionCreators(options) {
 
           return result;
         } catch (e) {
+          var error = 'An error occured when creating a \'' + actionType + '\' action in ';
+          error += (creator.displayName || creator.id || ' ') + '#' + name;
+          log.error(error, e);
+
           dispatchFailed(e);
 
           throw e;
@@ -283,7 +304,11 @@ function ActionCreators(options) {
 
 module.exports = ActionCreators;
 
+<<<<<<< HEAD
 },{"../constants/actions":1,"./actionPayload":10,"./dispatcher":16,"./utils/serializeError":29,"./utils/uuid":30,"underscore":186}],10:[function(require,module,exports){
+=======
+},{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./logger":16,"./utils/serializeError":25,"./utils/uuid":26,"underscore":39}],10:[function(require,module,exports){
+>>>>>>> master
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
 var Diagnostics = require('./diagnostics');
@@ -392,7 +417,10 @@ function ActionPayload(options) {
     return {
       dispose: function () {
         if (Diagnostics.devtoolsEnabled) {
-          viewHandler.state = view.state;
+          var state = view.state;
+          if (state) {
+            viewHandler.state = JSON.parse(JSON.stringify(state));
+          }
         }
       },
       failed: function (err) {
@@ -416,7 +444,11 @@ function ActionPayload(options) {
     return {
       dispose: function () {
         if (Diagnostics.devtoolsEnabled) {
-          handler.state = (store.serialize || store.getState)();
+          var state = (store.serialize || store.getState)();
+
+          if (state) {
+            handler.state = JSON.parse(JSON.stringify(state));
+          }
         }
       },
       failed: function (err) {
@@ -437,7 +469,11 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
+<<<<<<< HEAD
 },{"../constants/status":3,"./diagnostics":15,"./utils/uuid":30,"underscore":186}],11:[function(require,module,exports){
+=======
+},{"../constants/status":3,"./diagnostics":13,"./utils/uuid":26,"underscore":39}],11:[function(require,module,exports){
+>>>>>>> master
 var _ = require('underscore');
 
 function constants(obj) {
@@ -504,7 +540,11 @@ function constants(obj) {
 }
 
 module.exports = constants;
+<<<<<<< HEAD
 },{"underscore":186}],12:[function(require,module,exports){
+=======
+},{"underscore":39}],12:[function(require,module,exports){
+>>>>>>> master
 var _ = require('underscore');
 var Store = require('./store');
 var Context = require('./context');
@@ -804,7 +844,11 @@ function createActionCreators(options) {
 function createStateSource(options) {
   return this.container.registerStateSource(options);
 }
+<<<<<<< HEAD
 },{"./constants":11,"./mixins/stateMixin":19,"underscore":186}],15:[function(require,module,exports){
+=======
+},{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./mixins/stateMixin":17,"./stateSource":19,"./store":24,"events":28,"underscore":39}],13:[function(require,module,exports){
+>>>>>>> master
 var diagnostics = {
   log: log,
   trace: log,
@@ -827,7 +871,11 @@ function warn() {
   }
 }
 
+<<<<<<< HEAD
 },{}],16:[function(require,module,exports){
+=======
+},{}],14:[function(require,module,exports){
+>>>>>>> master
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
 var defaultDispatcher = createDefaultDispatcher();
@@ -840,6 +888,7 @@ createDispatcher.dispose = function () {
   defaultDispatcher = createDefaultDispatcher();
 };
 
+<<<<<<< HEAD
 module.exports = createDispatcher;
 
 function createDefaultDispatcher() {
@@ -864,6 +913,10 @@ function dispose() {
 
 module.exports = dispose;
 },{"./dispatcher":16}],18:[function(require,module,exports){
+=======
+module.exports = Dispatcher;
+},{"./utils/uuid":26,"flux":34}],15:[function(require,module,exports){
+>>>>>>> master
 var when = require('./when');
 var NotFoundError = require('../errors/notFound');
 
@@ -874,42 +927,67 @@ module.exports = {
   notFound: notFound
 };
 
-function pending() {
+function pending(id, store) {
   return fetchResult({
+    id: id,
     pending: true,
     status: 'PENDING'
-  });
+  }, store);
 }
 
-function failed(error) {
+function failed(error, id, store) {
   return fetchResult({
+    id: id,
     error: error,
     failed: true,
     status: 'FAILED'
-  });
+  }, store);
 }
 
-function done(result) {
+function done(result, id, store) {
   return fetchResult({
+    id: id,
     done: true,
     status: 'DONE',
     result: result
-  });
+  }, store);
 }
 
-function notFound() {
-  return failed(new NotFoundError());
+function notFound(id, store) {
+  return failed(new NotFoundError(), id, store);
 }
 
-function fetchResult(result) {
+function fetchResult(result, store) {
   result.when = when;
   result._isFetchResult = true;
 
+  if (store) {
+    result.store = store.displayName || store.id;
+  }
+
   return result;
 }
+<<<<<<< HEAD
 },{"../errors/notFound":7,"./when":31}],19:[function(require,module,exports){
 var _ = require('underscore');
 var Context = require('../context');
+=======
+},{"../errors/notFound":7,"./when":27}],16:[function(require,module,exports){
+var _ = require('underscore');
+
+if (console) {
+  module.exports = console;
+} else {
+  module.exports = {
+    log: _.noop,
+    warn: _.noop,
+    error: _.noop
+  };
+}
+},{"underscore":39}],17:[function(require,module,exports){
+var _ = require('underscore');
+var log = require('../logger');
+>>>>>>> master
 var uuid = require('../utils/uuid');
 var Diagnostics = require('../diagnostics');
 var reservedKeys = ['listenTo', 'getState', 'getInitialState'];
@@ -935,10 +1013,15 @@ function StateMixin(options) {
       );
 
       if (this._lifeCycleState === 'UNMOUNTED') {
+<<<<<<< HEAD
         Diagnostics.warn(
           'Warning: Trying to set the state of ',
           this.displayName,
           'component (' + this._marty.id + ') which is unmounted'
+=======
+        log.warn(
+          'Trying to set the state of ', this.displayName, 'component (' + this._marty.id + ') which is unmounted'
+>>>>>>> master
         );
       } else {
         this.setState(this.tryGetState(store));
@@ -954,6 +1037,10 @@ function StateMixin(options) {
       try {
         return this.getState();
       } catch (e) {
+        var errorMessage = 'An error occured while trying to get the latest state in the view ' + this.displayName;
+
+        log.error(errorMessage, e, this);
+
         if (handler) {
           handler.failed(e);
         }
@@ -1111,6 +1198,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
+<<<<<<< HEAD
 },{"../context":13,"../diagnostics":15,"../utils/uuid":30,"underscore":186}],20:[function(require,module,exports){
 var React = require('react');
 var _ = require('underscore');
@@ -1150,6 +1238,9 @@ function renderToString(createElement, context) {
 
 module.exports = renderToString;
 },{"./context":13,"react":185,"underscore":186}],21:[function(require,module,exports){
+=======
+},{"../diagnostics":13,"../logger":16,"../utils/uuid":26,"underscore":39}],18:[function(require,module,exports){
+>>>>>>> master
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
 
@@ -1204,7 +1295,11 @@ function serializeState() {
 
   return state;
 }
+<<<<<<< HEAD
 },{"../errors/unknownStore":8,"underscore":186}],22:[function(require,module,exports){
+=======
+},{"../errors/unknownStore":8,"underscore":39}],19:[function(require,module,exports){
+>>>>>>> master
 var _ = require('underscore');
 var HttpStateSource = require('./stateSources/http');
 var JSONStorageStateSource = require('./stateSources/jsonStorage');
@@ -1243,7 +1338,11 @@ function StateSource(options) {
 }
 
 module.exports = StateSource;
+<<<<<<< HEAD
 },{"./stateSources/http":23,"./stateSources/jsonStorage":24,"./stateSources/localStorage":25,"./stateSources/sessionStorage":26,"underscore":186}],23:[function(require,module,exports){
+=======
+},{"./stateSources/http":20,"./stateSources/jsonStorage":21,"./stateSources/localStorage":22,"./stateSources/sessionStorage":23,"underscore":39}],20:[function(require,module,exports){
+>>>>>>> master
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
@@ -1256,7 +1355,7 @@ function HttpStateSource(mixinOptions) {
   mixinOptions = mixinOptions || {};
 
   var defaultBaseUrl = '';
-  var methods = ['get', 'put', 'post', 'delete'];
+  var methods = ['get', 'put', 'post', 'delete', 'patch'];
 
   var mixin = {
     _isHttpStateSource: true,
@@ -1354,7 +1453,11 @@ function requestOptions(method, baseUrl, options) {
 
 module.exports = HttpStateSource;
 
+<<<<<<< HEAD
 },{"es6-promise":34,"isomorphic-fetch":39,"underscore":186}],24:[function(require,module,exports){
+=======
+},{"es6-promise":33,"isomorphic-fetch":38,"underscore":39}],21:[function(require,module,exports){
+>>>>>>> master
 function JSONStorageStateSource(options) {
   options = options || {};
 
@@ -1365,6 +1468,11 @@ function JSONStorageStateSource(options) {
     _isJSONStorageStateSource: true,
     get: function (key) {
       var raw = getStorage().getItem(getNamespacedKey(key));
+
+      if (!raw) {
+        return raw;
+      }
+
       try {
         var payload = JSON.parse(raw);
         return payload.value;
@@ -1399,7 +1507,11 @@ function JSONStorageStateSource(options) {
 }
 
 module.exports = JSONStorageStateSource;
+<<<<<<< HEAD
 },{}],25:[function(require,module,exports){
+=======
+},{}],22:[function(require,module,exports){
+>>>>>>> master
 function LocalStorageStateSource(options) {
   options = options || {};
 
@@ -1427,7 +1539,11 @@ function LocalStorageStateSource(options) {
 }
 
 module.exports = LocalStorageStateSource;
+<<<<<<< HEAD
 },{}],26:[function(require,module,exports){
+=======
+},{}],23:[function(require,module,exports){
+>>>>>>> master
 function SessionStorageStateSource(options) {
 
   options = options || {};
@@ -1455,9 +1571,14 @@ function SessionStorageStateSource(options) {
 }
 
 module.exports = SessionStorageStateSource;
+<<<<<<< HEAD
 },{}],27:[function(require,module,exports){
+=======
+},{}],24:[function(require,module,exports){
+>>>>>>> master
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
+var log = require('./logger');
 var uuid = require('./utils/uuid');
 var fetchResult = require('./fetch');
 var Dispatcher = require('./dispatcher');
@@ -1539,7 +1660,11 @@ function Store(options) {
           functionName += ' in ' + options.displayName;
         }
 
+<<<<<<< HEAD
         Diagnostics.warn('Warning:', functionName, 'is reserved for use by Marty. Please use a different name');
+=======
+        Diagnostics.warn(functionName + ' is reserved for use by Marty. Please use a different name');
+>>>>>>> master
       }
     });
 
@@ -1639,12 +1764,16 @@ function Store(options) {
       error = failedFetches[options.id];
 
       if (error) {
+<<<<<<< HEAD
         return failed(error);
+=======
+        return fetchResult.failed(error, options.id, store);
+>>>>>>> master
       }
     }
 
     if (fetchInProgress[options.id]) {
-      return fetchResult.pending();
+      return fetchResult.pending(options.id, store);
     }
 
     if (context) {
@@ -1666,11 +1795,11 @@ function Store(options) {
         }
 
         finished();
-        return fetchResult.done(result);
+        return fetchResult.done(result, options.id, store);
       } catch (error) {
         failed(error);
 
-        return fetchResult.failed(error);
+        return fetchResult.failed(error, options.id, store);
       }
     }
 
@@ -1698,7 +1827,7 @@ function Store(options) {
               hasChanged();
             });
 
-            return fetchResult.pending();
+            return fetchResult.pending(options.id, store);
           } else {
             fetchHistory[options.id] = true;
             result = tryAndGetLocally();
@@ -1745,11 +1874,11 @@ function Store(options) {
 
       finished();
 
-      return fetchResult.failed(error);
+      return fetchResult.failed(error, options.id, store);
     }
 
     function notFound() {
-      return failed(new NotFoundError());
+      return failed(new NotFoundError(), options.id, store);
     }
   }
 
@@ -1772,11 +1901,11 @@ function Store(options) {
         }
 
         if (dependencyErrors.length) {
-          return fetchResult.failed(new CompoundError(dependencyErrors));
+          return fetchResult.failed(new CompoundError(dependencyErrors), options.id, store);
         }
 
         if (pending) {
-          return fetchResult.pending();
+          return fetchResult.pending(options.id, store);
         }
       } else {
         if (!options.dependsOn.done) {
@@ -1846,6 +1975,17 @@ function Store(options) {
               throw new ActionHandlerNotFoundError(handlerName, this);
             }
           } catch (e) {
+            var errorMessage = 'An error occured while trying to handle an \'' +
+            action.type.toString() + '\' action in the action handler `' + handlerName + '`';
+
+            var displayName = store.displayName || store.id;
+
+            if (displayName) {
+              errorMessage += ' within the store ' + displayName;
+            }
+
+            log.error(errorMessage, e, action);
+
             handler.failed(e);
             throw e;
           } finally {
@@ -1917,6 +2057,7 @@ function Store(options) {
 
 module.exports = Store;
 
+<<<<<<< HEAD
 },{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":15,"./dispatcher":16,"./fetch":18,"./utils/uuid":30,"events":32,"underscore":186}],28:[function(require,module,exports){
 var uuid = require('./uuid');
 var Diagnostics = require('../diagnostics');
@@ -1936,6 +2077,9 @@ function classId(clazz, type) {
 
 module.exports = classId;
 },{"../diagnostics":15,"./uuid":30}],29:[function(require,module,exports){
+=======
+},{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./logger":16,"./utils/uuid":26,"events":28,"underscore":39}],25:[function(require,module,exports){
+>>>>>>> master
 function serializeError(error) {
   if (!error) {
     return null;
@@ -1952,10 +2096,15 @@ function serializeError(error) {
 }
 
 module.exports = serializeError;
+<<<<<<< HEAD
 },{}],30:[function(require,module,exports){
 function generate() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
+=======
+},{}],26:[function(require,module,exports){
+var format = require('util').format;
+>>>>>>> master
 
 function small() {
   return s4() + s4() + s4() + s4();
@@ -1969,8 +2118,13 @@ module.exports = {
   small: small,
   generate: generate
 };
+<<<<<<< HEAD
 },{}],31:[function(require,module,exports){
+=======
+},{"util":32}],27:[function(require,module,exports){
+>>>>>>> master
 var _ = require('underscore');
+var log = require('./logger');
 var StatusConstants = require('../constants/status');
 
 when.all = all;
@@ -1985,15 +2139,33 @@ function when(handlers) {
     throw new Error('Could not find a ' + this.status + ' handler');
   }
 
-  switch (this.status) {
-    case StatusConstants.PENDING.toString():
-      return handler.call(handlers);
-    case StatusConstants.FAILED.toString():
-      return handler.call(handlers, this.error);
-    case StatusConstants.DONE.toString():
-      return handler.call(handlers, this.result);
-    default:
-      throw new Error('Unknown fetch result status');
+  try {
+    switch (this.status) {
+      case StatusConstants.PENDING.toString():
+        return handler.call(handlers);
+      case StatusConstants.FAILED.toString():
+        return handler.call(handlers, this.error);
+      case StatusConstants.DONE.toString():
+        return handler.call(handlers, this.result);
+      default:
+        throw new Error('Unknown fetch result status');
+    }
+  } catch (e) {
+    var errorMessage = 'An error occured when handling the DONE state of ';
+
+    if (this.id) {
+      errorMessage += 'the fetch \'' + this.id + '\'';
+    } else {
+      errorMessage += 'a fetch';
+    }
+
+    if (this.store) {
+      errorMessage += ' from the store ' + this.store;
+    }
+
+    log.error(errorMessage, e);
+
+    throw e;
   }
 }
 
@@ -2053,7 +2225,11 @@ function aggregateStatus(fetchResults) {
 }
 
 module.exports = when;
+<<<<<<< HEAD
 },{"../constants/status":3,"underscore":186}],32:[function(require,module,exports){
+=======
+},{"../constants/status":3,"./logger":16,"underscore":39}],28:[function(require,module,exports){
+>>>>>>> master
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2356,7 +2532,36 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
+<<<<<<< HEAD
 },{}],33:[function(require,module,exports){
+=======
+},{}],29:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+},{}],30:[function(require,module,exports){
+>>>>>>> master
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -2421,7 +2626,18 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
+<<<<<<< HEAD
 },{}],34:[function(require,module,exports){
+=======
+},{}],31:[function(require,module,exports){
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+},{}],32:[function(require,module,exports){
+>>>>>>> master
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -2446,6 +2662,550 @@ process.chdir = function (dir) {
       return typeof x === 'object' && x !== null;
     }
 
+<<<<<<< HEAD
+=======
+  if (process.noDeprecation === true) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function(set) {
+  if (isUndefined(debugEnviron))
+    debugEnviron = process.env.NODE_DEBUG || '';
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
+
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  };
+  // legacy...
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  }
+  // set default options
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+exports.inspect = inspect;
+
+
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+  'bold' : [1, 22],
+  'italic' : [3, 23],
+  'underline' : [4, 24],
+  'inverse' : [7, 27],
+  'white' : [37, 39],
+  'grey' : [90, 39],
+  'black' : [30, 39],
+  'blue' : [34, 39],
+  'cyan' : [36, 39],
+  'green' : [32, 39],
+  'magenta' : [35, 39],
+  'red' : [31, 39],
+  'yellow' : [33, 39]
+};
+
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+
+function arrayToHash(array) {
+  var hash = {};
+
+  array.forEach(function(val, idx) {
+    hash[val] = true;
+  });
+
+  return hash;
+}
+
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect &&
+      value &&
+      isFunction(value.inspect) &&
+      // Filter out the util module, it's inspect function is special
+      value.inspect !== exports.inspect &&
+      // Also filter out any prototype objects using the circular check.
+      !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes, ctx);
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+    return ret;
+  }
+
+  // Primitive types cannot have properties
+  var primitive = formatPrimitive(ctx, value);
+  if (primitive) {
+    return primitive;
+  }
+
+  // Look up the keys of the object.
+  var keys = Object.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = Object.getOwnPropertyNames(value);
+  }
+
+  // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+  if (isError(value)
+      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
+  }
+
+  // Some type of object without properties can be shortcutted.
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '', array = false, braces = ['{', '}'];
+
+  // Make Array say that they are Array
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  }
+
+  // Make functions say that they are functions
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  }
+
+  // Make RegExps say that they are RegExps
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  }
+
+  // Make dates with properties first say the date
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  }
+
+  // Make error with message first say the error
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+
+  var output;
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function(key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+
+  return reduceToSingleString(output, base, braces);
+}
+
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value))
+    return ctx.stylize('undefined', 'undefined');
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+                                             .replace(/'/g, "\\'")
+                                             .replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+  if (isNumber(value))
+    return ctx.stylize('' + value, 'number');
+  if (isBoolean(value))
+    return ctx.stylize('' + value, 'boolean');
+  // For some reason typeof null is "object", so special case here.
+  if (isNull(value))
+    return ctx.stylize('null', 'null');
+}
+
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+  keys.forEach(function(key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          key, true));
+    }
+  });
+  return output;
+}
+
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+  if (!str) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function(line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function(line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+    name = JSON.stringify('' + key);
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'")
+                 .replace(/\\"/g, '"')
+                 .replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = output.reduce(function(prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] +
+           (base === '' ? '' : base + '\n ') +
+           ' ' +
+           output.join(',\n  ') +
+           ' ' +
+           braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+  return Array.isArray(ar);
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) &&
+      (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+exports.isBuffer = require('./support/isBuffer');
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+              'Oct', 'Nov', 'Dec'];
+
+// 26 Feb 16:19:34
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()),
+              pad(d.getMinutes()),
+              pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+}
+
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function() {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+
+
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = require('inherits');
+
+exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+
+  var keys = Object.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":31,"_process":30,"inherits":29}],33:[function(require,module,exports){
+(function (process,global){
+/*!
+ * @overview es6-promise - a tiny implementation of Promises/A+.
+ * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
+ * @license   Licensed under MIT license
+ *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
+ * @version   2.0.1
+ */
+
+(function() {
+    "use strict";
+
+    function $$utils$$objectOrFunction(x) {
+      return typeof x === 'function' || (typeof x === 'object' && x !== null);
+    }
+
+    function $$utils$$isFunction(x) {
+      return typeof x === 'function';
+    }
+
+    function $$utils$$isMaybeThenable(x) {
+      return typeof x === 'object' && x !== null;
+    }
+
+>>>>>>> master
     var $$utils$$_isArray;
 
     if (!Array.isArray) {
@@ -3384,7 +4144,11 @@ process.chdir = function (dir) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+<<<<<<< HEAD
 },{"_process":33}],35:[function(require,module,exports){
+=======
+},{"_process":30}],34:[function(require,module,exports){
+>>>>>>> master
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3396,7 +4160,11 @@ process.chdir = function (dir) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
+<<<<<<< HEAD
 },{"./lib/Dispatcher":36}],36:[function(require,module,exports){
+=======
+},{"./lib/Dispatcher":35}],35:[function(require,module,exports){
+>>>>>>> master
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3648,7 +4416,11 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
+<<<<<<< HEAD
 },{"./invariant":37}],37:[function(require,module,exports){
+=======
+},{"./invariant":36}],36:[function(require,module,exports){
+>>>>>>> master
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -3703,7 +4475,11 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
+<<<<<<< HEAD
 },{}],38:[function(require,module,exports){
+=======
+},{}],37:[function(require,module,exports){
+>>>>>>> master
 (function() {
   'use strict';
 
@@ -4029,6 +4805,7 @@ module.exports = invariant;
   self.fetch.polyfill = true
 })();
 
+<<<<<<< HEAD
 },{}],39:[function(require,module,exports){
 require('whatwg-fetch');
 
@@ -22261,6 +23038,12 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":67}],186:[function(require,module,exports){
+=======
+},{}],38:[function(require,module,exports){
+require('whatwg-fetch');
+
+},{"whatwg-fetch":37}],39:[function(require,module,exports){
+>>>>>>> master
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

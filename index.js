@@ -12,7 +12,7 @@ var renderToString = require('./lib/renderToString');
 function createInstance() {
   return _.extend(new EventEmitter(), {
     dispose: dispose,
-    version: '0.8.10',
+    version: '0.8.12',
     Diagnostics: Diagnostics,
     container: new Container(),
     renderToString: renderToString,

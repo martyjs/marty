@@ -31,6 +31,12 @@ describe('aliases', function () {
     });
   });
 
+  describe('marty/logger', function () {
+    it('should resolve to logger', function () {
+      expect(require('../../logger')).to.equal(require('../../lib/logger'));
+    });
+  });
+
   describe('marty/actionPayload', function () {
     it('should resolve to actionPayload', function () {
       expect(require('../../actionPayload')).to.equal(require('../../lib/actionPayload'));

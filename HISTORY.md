@@ -1,6 +1,13 @@
-Unreleased
-==================
-- Add HISTORY.md
+0.8.12 / 2015-02-14
+===================
+- Added improved error logging [#129](https://github.com/jhollingworth/marty/issues/129)
+
+0.8.11 / 2015-02-12
+===================
+- Improve documentation
+- Fixes [#106](https://github.com/jhollingworth/marty/issues/106)
+- Fixes [#74](https://github.com/jhollingworth/marty/issues/74)
+- Fixes [#123](https://github.com/jhollingworth/marty/issues/123)
 
 0.8.10 / 2015-02-03
 ==================

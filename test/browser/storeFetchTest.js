@@ -13,6 +13,7 @@ describe('Store#fetch()', function () {
     listener = sinon.spy();
     store = Marty.createStore({
       id: 'storeFetch',
+      displayName: 'Test',
       getInitialState: _.noop
     });
     changeListener = store.addChangeListener(listener);
@@ -357,7 +358,7 @@ describe('Store#fetch()', function () {
     });
 
     it('should return a fetch not found result', function () {
-      expect(actualResult).to.eql(store.fetch.notFound());
+      expect(actualResult).to.eql(store.fetch.notFound('bar', store));
     });
 
     it('should not call remotely', function () {

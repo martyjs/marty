@@ -5,14 +5,16 @@ var Marty = require('../../index');
 var expect = require('chai').expect;
 var uuid = require('../../lib/utils/uuid');
 var Diagnostics = require('../../lib/diagnostics');
+var stubbedLogger = require('./lib/stubbedLogger');
 var ActionPayload = require('../../lib/actionPayload');
 var StateMixin = require('../../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {
-  var element, sandbox, mixin, initialState;
+  var element, sandbox, mixin, initialState, logger;
 
   beforeEach(function () {
+    logger = stubbedLogger();
     sandbox = sinon.sandbox.create();
     initialState = {
       name: 'hello'
@@ -28,11 +30,36 @@ describe('StateMixin', function () {
 
   afterEach(function () {
     Diagnostics.devtoolsEnabled = false;
+    logger.restore();
     sandbox.restore();
   });
 
   it('should throw an error if you dont pass in an object literal', function () {
     expect(function () { StateMixin(); }).to.throw(Error);
+  });
+
+  describe('when an error is thrown when getting state', function () {
+    var expectedError;
+
+    beforeEach(function () {
+      expectedError = new Error('Bar');
+      mixin = new StateMixin({
+        displayName: 'Test',
+        getState: function () {
+          throw expectedError;
+        }
+      });
+
+      try {
+        mixin.tryGetState();
+      } catch (e) { }
+    });
+
+    it('should log the error and any additional metadata', function () {
+      var expectedMessage = 'An error occured while trying to get the latest state in the view Test';
+
+      expect(logger.error).to.be.calledWith(expectedMessage, expectedError, mixin);
+    });
   });
 
   describe('when a store changes', function () {

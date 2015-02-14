@@ -1,12 +1,15 @@
+var util = require('util');
 var sinon = require('sinon');
 var when = require('../../when');
 var fetch = require('../../fetch');
 var expect = require('chai').expect;
+var stubbedLogger = require('./lib/stubbedLogger');
 
 describe('when', function () {
-  var handlers, expectedResult1, expectedResult2, expectedError;
+  var handlers, logger, expectedResult1, expectedResult2, expectedError;
 
   beforeEach(function () {
+    logger = stubbedLogger();
     expectedError = new Error();
     expectedResult1 = { foo: 'bar' };
     expectedResult2 = { baz: 'bam' };
@@ -15,6 +18,42 @@ describe('when', function () {
       failed: sinon.stub(),
       done: sinon.stub()
     };
+  });
+
+  afterEach(function () {
+    logger.restore();
+  });
+
+  describe('when an error occurs in a when handler', function () {
+    var expectedError, expectedFetchId, expectedStore;
+
+    beforeEach(function () {
+      expectedStore = 'Foo';
+      expectedFetchId = '123';
+      expectedError = new Error('bar');
+
+      var doneFetch = fetch.done({}, expectedFetchId, {
+        displayName: expectedStore
+      });
+
+      try {
+        doneFetch.when({
+          done: function () {
+            throw expectedError;
+          }
+        });
+      } catch (e) { }
+    });
+
+    it('should log the error and any additional metadata', function () {
+      var expectedMessage = util.format(
+        'An error occured when handling the DONE state of the fetch \'%s\' from the store %s',
+        expectedFetchId,
+        expectedStore
+      );
+
+      expect(logger.error).to.be.calledWith(expectedMessage, expectedError);
+    });
   });
 
   describe('#all()', function () {
