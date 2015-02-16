@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var stubbedLogger = require('../lib/stubbedLogger');
 
 describe('calling resolver warnings', function () {
-  var Marty, logger, expectedMessage;
+  var Marty, logger;
 
   beforeEach(function () {
     logger = stubbedLogger();
@@ -24,9 +24,9 @@ describe('calling resolver warnings', function () {
       creators.bar();
     });
 
-    it.only('should warn you that you should be resolving an instance', function () {
+    it('should warn you that you should be resolving an instance', function () {
       expectWarning(
-        'Warning: You are calling `bar` on the static instance of the action creators \'Foo\'. ' +
+        'Warning: You are calling `bar` on the static instance of the ActionCreators \'Foo\'. ' +
         'You should resolve the instance for the current context'
       );
     });
@@ -47,7 +47,7 @@ describe('calling resolver warnings', function () {
 
     it('should warn you that you should be resolving an instance', function () {
       expectWarning(
-        'Warning: You are calling `bar` on the static instance of the store \'Foo\'. ' +
+        'Warning: You are calling `bar` on the static instance of the Store \'Foo\'. ' +
         'You should resolve the instance for the current context'
       );
     });
@@ -65,7 +65,7 @@ describe('calling resolver warnings', function () {
 
     it('should warn you that you should be resolving an instance', function () {
       expectWarning(
-        'Warning: You are calling `bar` on the static instance of the state source \'Foo\'. ' +
+        'Warning: You are calling `bar` on the static instance of the StateSource \'Foo\'. ' +
         'You should resolve the instance for the current context'
       );
     });

@@ -16,7 +16,6 @@ describe('Marty#renderToString', function () {
     Marty = require('../../index').createInstance();
     fixture = messagesFixture(Marty);
     context = Marty.createContext();
-    fixture.MessageStore.setContextName('global-context');
     fixture.MessageStore(context).setContextName('local-context');
   });
 
