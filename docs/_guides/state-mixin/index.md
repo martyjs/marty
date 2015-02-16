@@ -25,7 +25,7 @@ var Users = React.createClass({
   mixins: [UserState],
   render: function () {
     return (<ul>
-      {this.state.map(function (user) {
+      {this.state.users.map(function (user) {
         return <li>{user.name}</li>;
       })}
     </ul>);
