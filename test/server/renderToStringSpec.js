@@ -6,6 +6,8 @@ var Context = require('../../lib/context');
 var uuid = require('../../lib/utils/uuid');
 var messagesFixture = require('./fixtures/messages');
 
+var MARTY_STATE_ID = '__marty-state';
+
 describe('Marty#renderToString', function () {
   var $, context, Marty, fixture, expectedId;
 
@@ -55,6 +57,10 @@ describe('Marty#renderToString', function () {
     it('should come from the correct context', function () {
       expect($('.context').text()).to.equal('local-context');
     });
+
+    it('should include the serialized state', function () {
+      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState().toString());
+    });
   });
 
   describe('when it needs to wait for state to come from a remote source', function () {
@@ -68,6 +74,10 @@ describe('Marty#renderToString', function () {
 
     it('should come from the correct context', function () {
       expect($('.context').text()).to.equal('local-context');
+    });
+
+    it('should include the serialized state', function () {
+      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState().toString());
     });
   });
 
