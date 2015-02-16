@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var when = require('../../when');
 var fetch = require('../../fetch');
 var expect = require('chai').expect;
-var stubbedLogger = require('./lib/stubbedLogger');
+var stubbedLogger = require('../lib/stubbedLogger');
 
 describe('when', function () {
   var handlers, logger, expectedResult1, expectedResult2, expectedError;

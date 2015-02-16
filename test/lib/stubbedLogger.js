@@ -1,6 +1,6 @@
 var sinon = require('sinon');
 var _ = require('underscore');
-var logger = require('../../../logger');
+var logger = require('../../logger');
 
 function stubbedLogger() {
   var sandbox = sinon.sandbox.create();
