@@ -58,7 +58,7 @@ describe('Marty#renderToString', function () {
     });
 
     it('should include the serialized state', function () {
-      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState().toString());
+      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState(context).toString());
     });
   });
 
@@ -76,7 +76,7 @@ describe('Marty#renderToString', function () {
     });
 
     it('should include the serialized state', function () {
-      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState().toString());
+      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState(context).toString());
     });
   });
 

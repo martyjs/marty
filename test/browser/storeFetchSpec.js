@@ -2,6 +2,7 @@ var sinon = require('sinon');
 var _ = require('underscore');
 var Marty = require('../../index');
 var expect = require('chai').expect;
+var warnings = require('../../warnings');
 var Promise = require('es6-promise').Promise;
 
 describe('Store#fetch()', function () {
@@ -16,6 +17,7 @@ describe('Store#fetch()', function () {
       displayName: 'Test',
       getInitialState: _.noop
     });
+    warnings.promiseNotReturnedFromRemotely = false;
     changeListener = store.addChangeListener(listener);
   });
 
@@ -23,11 +25,13 @@ describe('Store#fetch()', function () {
     store.dispose();
     endFetch && endFetch();
     changeListener.dispose();
+    warnings.promiseNotReturnedFromRemotely = true;
   });
 
   describe('#hasAlreadyFetched()', function () {
     beforeEach(function () {
       store = Marty.createStore({
+        id: 'hasAlreadyFetched',
         displayName: 'Test',
         getInitialState: _.noop,
         fetchFoo: function () {

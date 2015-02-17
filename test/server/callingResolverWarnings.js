@@ -25,7 +25,7 @@ describe('calling resolver warnings', function () {
     });
 
     it('should warn you that you should be resolving an instance', function () {
-      expectWarning(
+      expect(logger.warn).to.be.calledWith(
         'Warning: You are calling `bar` on the static instance of the ActionCreators \'Foo\'. ' +
         'You should resolve the instance for the current context'
       );
@@ -46,7 +46,7 @@ describe('calling resolver warnings', function () {
     });
 
     it('should warn you that you should be resolving an instance', function () {
-      expectWarning(
+      expect(logger.warn).to.be.calledWith(
         'Warning: You are calling `bar` on the static instance of the Store \'Foo\'. ' +
         'You should resolve the instance for the current context'
       );
@@ -64,14 +64,10 @@ describe('calling resolver warnings', function () {
     });
 
     it('should warn you that you should be resolving an instance', function () {
-      expectWarning(
+      expect(logger.warn).to.be.calledWith(
         'Warning: You are calling `bar` on the static instance of the StateSource \'Foo\'. ' +
         'You should resolve the instance for the current context'
       );
     });
   });
-
-  function expectWarning(message) {
-    expect(logger.warn).to.be.calledWith(message);
-  }
 });

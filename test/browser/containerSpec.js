@@ -1,6 +1,7 @@
 var sinon = require('sinon');
 var _ = require('underscore');
 var expect = require('chai').expect;
+var warnings = require('../../warnings');
 var uuid = require('../../lib/utils/uuid');
 var Dispatcher = require('../../dispatcher');
 var Container = require('../../lib/container');
@@ -87,6 +88,7 @@ describe('Container', function () {
         beforeEach(function () {
           delete expectedStore.id;
           delete expectedStore.displayName;
+          warnings.classDoesNotHaveAnId = false;
           container.registerStore(expectedStore);
         });
 
@@ -95,11 +97,16 @@ describe('Container', function () {
           expect(actualStore).to.be.defined;
           expect(actualStore.getFoo).to.be.defined;
         });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
+        });
       });
 
       describe('when the store only has a display name', function () {
         beforeEach(function () {
           delete expectedStore.id;
+          warnings.classDoesNotHaveAnId = false;
           container.registerStore(expectedStore);
         });
 
@@ -107,6 +114,10 @@ describe('Container', function () {
           actualStore = container.resolveStore(expectedStore.displayName);
           expect(actualStore).to.be.defined;
           expect(actualStore.getFoo).to.be.defined;
+        });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
         });
       });
     });
@@ -195,6 +206,7 @@ describe('Container', function () {
         beforeEach(function () {
           delete expectedStateSource.id;
           delete expectedStateSource.displayName;
+          warnings.classDoesNotHaveAnId = false;
           container.registerStateSource(expectedStateSource);
         });
 
@@ -203,11 +215,16 @@ describe('Container', function () {
           expect(actualStateSource).to.be.defined;
           expect(actualStateSource.getFoo).to.be.defined;
         });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
+        });
       });
 
       describe('when the state source only has a display name', function () {
         beforeEach(function () {
           delete expectedStateSource.id;
+          warnings.classDoesNotHaveAnId = false;
           container.registerStateSource(expectedStateSource);
         });
 
@@ -215,6 +232,10 @@ describe('Container', function () {
           actualStateSource = container.resolveStateSource(expectedStateSource.displayName);
           expect(actualStateSource).to.be.defined;
           expect(actualStateSource.getFoo).to.be.defined;
+        });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
         });
       });
     });
@@ -296,6 +317,7 @@ describe('Container', function () {
         beforeEach(function () {
           delete expectedActionCreator.id;
           delete expectedActionCreator.displayName;
+          warnings.classDoesNotHaveAnId = false;
           container.registerActionCreators(expectedActionCreator);
         });
 
@@ -305,11 +327,16 @@ describe('Container', function () {
           actualActionCreator.foo();
           expect(action).to.be.called;
         });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
+        });
       });
 
       describe('when the action creator only has a display name', function () {
         beforeEach(function () {
           delete expectedActionCreator.id;
+          warnings.classDoesNotHaveAnId = false;
           container.registerActionCreators(expectedActionCreator);
         });
 
@@ -318,6 +345,10 @@ describe('Container', function () {
           expect(actualActionCreator).to.be.defined;
           actualActionCreator.foo();
           expect(action).to.be.called;
+        });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
         });
       });
     });

@@ -12,6 +12,7 @@ describe('StateSource', function () {
       beforeEach(function () {
         expectedResult = 'foo';
         stateSource = Marty.createStateSource({
+          id: 'createStateSource',
           foo: function () {
             return this.bar();
           },
@@ -30,6 +31,7 @@ describe('StateSource', function () {
       describe('jsonStorage', function () {
         beforeEach(function () {
           stateSource = Marty.createStateSource({
+            id: 'jsonStorage',
             type: 'jsonStorage'
           });
         });
@@ -42,6 +44,7 @@ describe('StateSource', function () {
       describe('localStorage', function () {
         beforeEach(function () {
           stateSource = Marty.createStateSource({
+            id: 'localStorage',
             type: 'localStorage'
           });
         });
@@ -54,6 +57,7 @@ describe('StateSource', function () {
       describe('sessionStorage', function () {
         beforeEach(function () {
           stateSource = Marty.createStateSource({
+            id: 'sessionStorage',
             type: 'sessionStorage'
           });
         });
@@ -66,6 +70,7 @@ describe('StateSource', function () {
       describe('http', function () {
         beforeEach(function () {
           stateSource = Marty.createStateSource({
+            id: 'http',
             type: 'http'
           });
         });

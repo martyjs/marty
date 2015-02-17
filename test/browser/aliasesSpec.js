@@ -31,6 +31,18 @@ describe('aliases', function () {
     });
   });
 
+  describe('marty/environment', function () {
+    it('should resolve to environment', function () {
+      expect(require('../../environment')).to.equal(require('../../lib/environment'));
+    });
+  });
+
+  describe('marty/warnings', function () {
+    it('should resolve to warnings', function () {
+      expect(require('../../warnings')).to.equal(require('../../lib/warnings'));
+    });
+  });
+
   describe('marty/logger', function () {
     it('should resolve to logger', function () {
       expect(require('../../logger')).to.equal(require('../../lib/logger'));

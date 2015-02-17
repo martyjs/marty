@@ -7,6 +7,7 @@ describe('Marty#setInitialState()', function () {
 
   beforeEach(function () {
     Store1 = Marty.createStore({
+      id: 'store1',
       displayName: 'store1',
       getInitialState: function (state) {
         return state || {};
@@ -14,6 +15,7 @@ describe('Marty#setInitialState()', function () {
     });
 
     Store2 = Marty.createStore({
+      id: 'store2',
       displayName: 'store2',
       getInitialState: function (state) {
         return state || {};

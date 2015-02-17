@@ -9,22 +9,22 @@ describe('Marty#clearState()', function () {
     store2ExpectedState = { initial: 'store2' };
 
     Store1 = Marty.createStore({
-      displayName: 'store1',
+      id: 'clearState1',
       getInitialState: function () {
         return store1ExpectedState;
       }
     });
 
     Store2 = Marty.createStore({
-      displayName: 'store2',
+      id: 'clearState2',
       getInitialState: function () {
         return store2ExpectedState;
       }
     });
 
     Marty.setInitialState({
-      store1: { foo: 'bar' },
-      store2: { bar: 'baz' }
+      clearState1: { foo: 'bar' },
+      clearState2: { bar: 'baz' }
     });
 
     Marty.clearState();
