@@ -104,15 +104,15 @@ module.exports = function (config) {
       files: [
         'index.js',
         'lib/*.js',
-        'test/**/*.js'
+        'test/browser/**/*.js'
       ],
       exclude: [
-        'test/lib/mockServer/*'
+        'test/browser/lib/mockServer.js'
       ],
       preprocessors: {
         'lib/*': ['browserify'],
         'index.js': ['browserify'],
-        'test/**/*.js': ['browserify']
+        'test/browser/**/*.js': ['browserify']
       },
       port: 9876,
       proxies: {

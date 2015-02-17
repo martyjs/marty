@@ -1,11 +1,16 @@
 BIN = ./node_modules/.bin
 
-.PHONY: bootstrap bootstrap-js bootstrap-ruby start test docs release-docs;
+.PHONY: bootstrap bootstrap-js bootstrap-ruby start test test-server test-browser docs release-docs;
 
 SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
-test: lint
-	@./build/test.sh
+test: lint test-server test-browser
+
+test-server:
+	@./build/test-server.sh
+
+test-browser:
+	@./build/test-browser.sh
 
 test-watch: lint
 	@./build/test-watch.sh
