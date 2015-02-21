@@ -114,3 +114,39 @@ Same as <code>request({ method: 'DELETE', url: url })</code>
 <h2 id="deleteOptions">delete(options)</h2>
 
 Same as <code>request(_.extend(options, { method: 'DELETE'})</code>
+
+<h2 id="middleware">middleware</h2>
+
+HTTP Middleware allows you to make changes to requests before they are sent and as well as when responses are received. This can be useful when you want to do things like automatically converting all JSON responses to immutable objects.
+
+Middlware are object literals which have 3 optional keys: ``before``, ``after`` and ``priority``. If ``before`` is present then it will be called with the request as its argument. If ``after`` is present then it will be called after the response is recieved with the response as its argument. Setting a priority allows you to alter in what order the middleware is executed (The smaller the number, the earlier it will be executed).
+
+<h3 id="use">use</h3>
+
+Registers the middleware in the pipeline
+
+{% highlight js %}
+var HttpStateSource = require('marty/http/stateSource');
+
+HttpStateSource.use({
+  priority: 1,
+  before: function (req) {
+    req.headers['Foo'] = 'bar';
+  },
+  after: function (res) {
+    return res.json();
+  }
+});
+{% endhighlight %}
+
+<h3 id="remove">remove</h3>
+
+Removes the middleware from the pipline.
+
+{% highlight js %}
+var HttpStateSource = require('marty/http/stateSource');
+var ParseJSON = require('marty/http/middleware/parseJSON');
+
+HttpStateSource.remove(ParseJSON);
+{% endhighlight %}
+

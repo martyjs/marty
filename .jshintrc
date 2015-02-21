@@ -20,7 +20,10 @@
   "node": true,
   "devel": true,
   "indent": 2,
-  "maxlen": 120,
+  "maxlen": 180,
+  "validthis": true,
+  "esnext": true,
+  "proto": true,
   "globals": {
     "define": true,
     "require": true,

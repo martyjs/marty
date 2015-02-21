@@ -1,0 +1,1 @@
+node_modules/.bin/mocha -t 3000 test/server

@@ -1,1 +1,1 @@
-module.exports = require('./lib/when');
+module.exports = require('./lib/store/when');
