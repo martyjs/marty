@@ -6,7 +6,7 @@ module.exports = {
   before: function (req) {
     var contentType = req.headers[CONTENT_TYPE] || JSON_CONTENT_TYPE
 
-    if (req.body instanceof FormData) {
+    if (typeof FormData !== 'undefined' && req.body instanceof FormData) {
       return;
     }
 

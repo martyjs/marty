@@ -302,48 +302,50 @@ describeStaticAndClass('HttpStateSource', function () {
       });
     });
 
-    describe('when request body is a FormData object', function () {
-      var options;
+    if (typeof FormData !== 'undefined') {
+      describe('when request body is a FormData object', function () {
+        var options;
 
-      beforeEach(function () {
-        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-        API = httpStateSource(baseUrl);
+        beforeEach(function () {
+          baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+          API = httpStateSource(baseUrl);
 
-        options = {
-          url: 'foos',
-          headers: {},
-          body: new FormData()
-        };
+          options = {
+            url: 'foos',
+            headers: {},
+            body: new FormData()
+          };
 
-        return API.post(options);
+          return API.post(options);
+        });
+
+        it('should not set the Content-Type request header', function () {
+          expect(options.headers['Content-Type']).to.eql(undefined);
+        });
       });
 
-      it('should not set the Content-Type request header', function () {
-        expect(options.headers['Content-Type']).to.eql(undefined);
+      describe('when request body is not a FormData object', function () {
+        var options;
+
+        beforeEach(function () {
+          baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+
+          API = httpStateSource(baseUrl);
+
+          options = {
+            url: 'foos',
+            headers: {},
+            body: {}
+          };
+
+          return API.post(options);
+        });
+
+        it('should default the Content-Type request header to application/json', function () {
+          expect(options.headers['Content-Type']).to.eql('application/json');
+        });
       });
-    });
-
-    describe('when request body is not a FormData object', function () {
-      var options;
-
-      beforeEach(function () {
-        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-
-        API = httpStateSource(baseUrl);
-
-        options = {
-          url: 'foos',
-          headers: {},
-          body: {}
-        };
-
-        return API.post(options);
-      });
-
-      it('should default the Content-Type request header to application/json', function () {
-        expect(options.headers['Content-Type']).to.eql('application/json');
-      });
-    });
+    }
   });
 
   describe('#delete()', function () {
