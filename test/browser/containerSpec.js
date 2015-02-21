@@ -74,7 +74,7 @@ describe('Container', function () {
           expect(actualStore.getFoo(expectedFoo.id)).to.equal(expectedFoo);
         });
 
-        it('should return a resolver', function () {
+        it('should return a resolvable instance', function () {
           context = container.createContext();
 
           actionCreators.for(context).addFoo(expectedFoo);
@@ -149,7 +149,7 @@ describe('Container', function () {
           expect(stateCall).to.be.calledOnce;
         });
 
-        it('should return a resolver', function () {
+        it('should return a resolvable instance', function () {
           context = container.createContext();
 
           defaultStateSource.for(context).getFoo();

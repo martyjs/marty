@@ -1,12 +1,13 @@
 var sinon = require('sinon');
 var _ = require('underscore');
 var expect = require('chai').expect;
-var constants = require('../../lib/constants');
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
+var constants = require('../../lib/constants');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var serializeError = require('../../lib/utils/serializeError');
+var describeStaticAndClass = require('./lib/describeStaticAndClass');
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, actualResult, actualError, Marty;
@@ -106,7 +107,9 @@ describe('ActionCreators', function () {
     });
   });
 
-  describe('when the action returns a promise', function () {
+  describeStaticAndClass('when the action returns a promise', function () {
+    var factory = this.factory;
+
     describe('when the promise fails', function () {
       beforeEach(function (done) {
         expectedError = new Error('foo');
@@ -116,10 +119,29 @@ describe('ActionCreators', function () {
           });
         });
 
-        actionCreators = Marty.createActionCreators({
-          dispatcher: dispatcher,
-          someAction: function () {
-            return promise;
+        actionCreators = factory({
+          static: function () {
+            return Marty.createActionCreators({
+              dispatcher: dispatcher,
+              someAction: function () {
+                return promise;
+              }
+            });
+          },
+          class: function () {
+            class TestActionCreators extends Marty.ActionCreators {
+              constructor(options) {
+                super(options);
+              }
+
+              someAction() {
+                return promise;
+              }
+            };
+
+            return new TestActionCreators({
+              dispatcher: dispatcher
+            });
           }
         });
 
@@ -165,16 +187,36 @@ describe('ActionCreators', function () {
           }, 2);
         });
 
-        actionCreators = Marty.createActionCreators({
-          dispatcher: dispatcher,
-          someAction: function () {
-            dispatched = promise.then((function () {
-              this.dispatch(expectedArg);
-            }).bind(this));
+        actionCreators = factory({
+          static: function () {
+            return Marty.createActionCreators({
+              dispatcher: dispatcher,
+              someAction: function () {
+                dispatched = promise.then((function () {
+                  this.dispatch(expectedArg);
+                }).bind(this));
 
-            return dispatched;
+                return dispatched;
+              }
+            });
+          },
+          class: function () {
+            class TestActionCreators extends Marty.ActionCreators {
+              someAction() {
+                dispatched = promise.then((function () {
+                  this.dispatch(expectedArg);
+                }).bind(this));
+
+                return dispatched;
+              }
+            };
+
+            return new TestActionCreators({
+              dispatcher: dispatcher
+            });
           }
         });
+
         actionCreators.someAction(expectedArg);
         dispatched.then(done);
       });
@@ -189,16 +231,39 @@ describe('ActionCreators', function () {
     });
   });
 
-  describe('when the action throws an error', function () {
+  describeStaticAndClass('when the action throws an error', function () {
+    var factory = this.factory;
+
     beforeEach(function () {
       expectedError = new Error('foo');
-      actionCreators = Marty.createActionCreators({
-        displayName: 'Test',
-        dispatcher: dispatcher,
-        someAction: function () {
-          throw expectedError;
+      actionCreators = factory({
+        static: function () {
+          return Marty.createActionCreators({
+            displayName: 'Test',
+            dispatcher: dispatcher,
+            someAction: function () {
+              throw expectedError;
+            }
+          });
+        },
+        class: function () {
+          class TestActionCreators extends Marty.ActionCreators {
+            constructor(options) {
+              super(options);
+              this.displayName = 'Test';
+            }
+
+            someAction() {
+              throw expectedError;
+            }
+          }
+
+          return new TestActionCreators({
+            dispatcher: dispatcher
+          });
         }
       });
+
       try {
         actionCreators.someAction();
       } catch (e) {
@@ -206,7 +271,7 @@ describe('ActionCreators', function () {
       }
 
       actualAction = dispatcher.getActionWithType('ACTION_FAILED');
-      payload = (actualAction || {}).arguments[0];
+      payload = (actualAction || { arguments: [] }).arguments[0];
     });
 
     it('should log the error', function () {
@@ -236,17 +301,35 @@ describe('ActionCreators', function () {
     });
   });
 
-  describe('when the action does not return anything', function () {
+  describeStaticAndClass('when the action does not return anything', function () {
+    var factory = this.factory;
+
     beforeEach(function () {
       expectedArg = { foo: 'bar' };
       expectedOtherArg = { baz: 'bim' };
       expectedActionType = 'SOME_ACTION';
-      actionCreators = Marty.createActionCreators({
-        dispatcher: dispatcher,
-        someAction: function (arg) {
-          this.dispatch(expectedOtherArg, arg);
+      actionCreators = factory({
+        static: function () {
+          return Marty.createActionCreators({
+            dispatcher: dispatcher,
+            someAction: function (arg) {
+              this.dispatch(expectedOtherArg, arg);
+            }
+          });
+        },
+        class: function () {
+          class TestActionCreators extends Marty.ActionCreators {
+            someAction(arg) {
+              this.dispatch(expectedOtherArg, arg);
+            }
+          }
+
+          return new TestActionCreators({
+            dispatcher: dispatcher
+          });
         }
       });
+
       actualResult = actionCreators.someAction(expectedArg);
     });
 
