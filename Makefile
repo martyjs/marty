@@ -33,7 +33,7 @@ release: test
 
 build: lint
 	@mkdir -p dist
-	@$(BIN)/browserify --transform babelify --require ./index.js  --standalone Marty > dist/marty.js
+	@$(BIN)/browserify --transform babelify --require ./index.js --exclude react  --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 	@gzip dist/marty.min.js -c > dist/marty.min.js.gz
 
