@@ -1,24 +1,22 @@
 var sinon = require('sinon');
 var _ = require('underscore');
-var Marty = require('../../index');
 var expect = require('chai').expect;
-var Store = require('../../lib/store');
 var constants = require('../../lib/constants');
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
-var ActionCreators = require('../../lib/actionCreators');
 var serializeError = require('../../lib/utils/serializeError');
 
 describe('ActionCreators', function () {
-  var actionCreators, dispatcher, actualResult, actualError;
+  var actionCreators, dispatcher, actualResult, actualError, Marty;
   var expectedActionType, expectedOtherArg, expectedArg;
   var actualAction, payload, expectedError, promise, logger;
 
   beforeEach(function () {
     logger = stubbedLogger();
     dispatcher = new MockDispatcher();
+    Marty = require('../../index').createInstance();
   });
 
   afterEach(function () {
@@ -32,7 +30,7 @@ describe('ActionCreators', function () {
       function createADispatchActionCreator() {
         var TestConstants = constants(['DISPATCH']);
 
-        return new ActionCreators({
+        return Marty.createActionCreators({
           dispatcher: dispatcher,
           dispatch: TestConstants.DISPATCH()
         });
@@ -52,7 +50,7 @@ describe('ActionCreators', function () {
       });
 
       context = Marty.createContext();
-      actualInstance = creators(context);
+      actualInstance = creators.for(context);
       expectedInstance = context.instances.ActionCreators.foo;
     });
 
@@ -76,7 +74,7 @@ describe('ActionCreators', function () {
 
       TestConstants = constants(['TEST_CONSTANT']);
 
-      actionCreators = new ActionCreators({
+      actionCreators = Marty.createActionCreators({
         dispatcher: dispatcher,
         testConstant: TestConstants.TEST_CONSTANT(function (a, b, c) {
           this.dispatch(a, b, c);
@@ -118,7 +116,7 @@ describe('ActionCreators', function () {
           });
         });
 
-        actionCreators = new ActionCreators({
+        actionCreators = Marty.createActionCreators({
           dispatcher: dispatcher,
           someAction: function () {
             return promise;
@@ -167,7 +165,7 @@ describe('ActionCreators', function () {
           }, 2);
         });
 
-        actionCreators = new ActionCreators({
+        actionCreators = Marty.createActionCreators({
           dispatcher: dispatcher,
           someAction: function () {
             dispatched = promise.then((function () {
@@ -194,7 +192,7 @@ describe('ActionCreators', function () {
   describe('when the action throws an error', function () {
     beforeEach(function () {
       expectedError = new Error('foo');
-      actionCreators = new ActionCreators({
+      actionCreators = Marty.createActionCreators({
         displayName: 'Test',
         dispatcher: dispatcher,
         someAction: function () {
@@ -212,7 +210,7 @@ describe('ActionCreators', function () {
     });
 
     it('should log the error', function () {
-      var expectedErrorMessage = 'An error occured when creating a \'SOME_ACTION\' action in Test#someAction';
+      var expectedErrorMessage = 'An error occured when dispatching a \'SOME_ACTION\' action in Test#someAction';
 
       expect(logger.error).to.be.calledWith(expectedErrorMessage, expectedError);
     });
@@ -243,7 +241,7 @@ describe('ActionCreators', function () {
       expectedArg = { foo: 'bar' };
       expectedOtherArg = { baz: 'bim' };
       expectedActionType = 'SOME_ACTION';
-      actionCreators = new ActionCreators({
+      actionCreators = Marty.createActionCreators({
         dispatcher: dispatcher,
         someAction: function (arg) {
           this.dispatch(expectedOtherArg, arg);
@@ -316,7 +314,7 @@ describe('ActionCreators', function () {
 
       var dispatcher = new Dispatcher();
       var TestConstants = constants(['TEST']);
-      var store = new Store({ // jshint ignore:line
+      var store = Marty.createStore({ // jshint ignore:line
         id: 'action-fails',
         dispatcher: dispatcher,
         handlers: {
@@ -330,7 +328,7 @@ describe('ActionCreators', function () {
         }
       });
 
-      var actions = new ActionCreators({
+      var actions = Marty.createActionCreators({
         dispatcher: dispatcher,
         test: TestConstants.TEST(function () {
           this.dispatch();
@@ -360,7 +358,7 @@ describe('ActionCreators', function () {
         bar: function () { return 'baz'; }
       };
 
-      actionCreators = new ActionCreators({
+      actionCreators = Marty.createActionCreators({
         dispatcher: dispatcher,
         mixins: [mixin1, mixin2]
       });

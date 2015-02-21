@@ -2,7 +2,6 @@ var sinon = require('sinon');
 var _ = require('lodash-node');
 var Marty = require('../../index');
 var expect = require('chai').expect;
-var Store = require('../../lib/store');
 var Dispatcher = require('../../dispatcher');
 var stubbedLogger = require('../lib/stubbedLogger');
 var ActionPayload = require('../../lib/actionPayload');
@@ -23,7 +22,7 @@ describe('Store', function () {
 
     expectedError = new Error('foo');
 
-    store = new Store({
+    store = Marty.createStore({
       id: 'test',
       displayName: 'Test',
       dispatcher: dispatcher,
@@ -68,7 +67,7 @@ describe('Store', function () {
       expect(storeWithoutGetInitialState).to.throw(Error);
 
       function storeWithoutGetInitialState() {
-        return new Store({
+        return Marty.createStore({
           id: 'storeWithoutGetInitialState',
           foo: function () {
             return 'bar';
@@ -91,7 +90,7 @@ describe('Store', function () {
           bar: function () { return 'baz'; }
         };
 
-        store = new Store({
+        store = Marty.createStore({
           id: 'multiple-mixins',
           dispatcher: dispatcher,
           getInitialState: _.noop,
@@ -116,7 +115,7 @@ describe('Store', function () {
           baz: noop
         };
 
-        store = new Store({
+        store = Marty.createStore({
           id: 'mixin-with-handlers',
           dispatcher: dispatcher,
           handlers: {
@@ -162,12 +161,12 @@ describe('Store', function () {
     });
   });
 
-  describe('#setState()', function () {
+  describe('#replaceState()', function () {
     describe('when the state has changed', function () {
       var newState;
       beforeEach(function () {
         newState = {};
-        store.setState(newState);
+        store.replaceState(newState);
       });
 
       it('should update the state', function () {
@@ -181,7 +180,7 @@ describe('Store', function () {
 
     describe('when the state has not changed', function () {
       beforeEach(function () {
-        store.setState(store.state);
+        store.replaceState(store.state);
       });
 
       it('should not call the change linstener', function () {
@@ -315,7 +314,9 @@ describe('Store', function () {
           one: actionType,
         },
         one: sinon.spy(),
-        getInitialState: _.noop
+        getInitialState: function () {
+          return {};
+        }
       });
 
       Dispatcher.getDefault().dispatch(new ActionPayload({
@@ -335,7 +336,7 @@ describe('Store', function () {
         expect(createStoreWithMissingActionHandler).to.throw(ActionHandlerNotFoundError);
 
         function createStoreWithMissingActionHandler() {
-          return new Store({
+          return Marty.createStore({
             id: 'createStoreWithMissingActionHandler',
             dispatcher: dispatcher,
             handlers: {
@@ -351,7 +352,7 @@ describe('Store', function () {
         expect(createStoreWithANullActionPredicate).to.throw(ActionPredicateUndefinedError);
 
         function createStoreWithANullActionPredicate() {
-          return new Store({
+          return Marty.createStore({
             id: 'createStoreWithANullActionPredicate',
             dispatcher: dispatcher,
             handlers: {

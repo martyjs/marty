@@ -2,10 +2,10 @@ var expect = require('chai').expect;
 var UnknownStoreError = require('../../errors/unknownStore');
 
 describe('Marty#setInitialState()', function () {
-  var Marty = require('../../index');
-  var Store1, Store2;
+  var Store1, Store2, Marty;
 
   beforeEach(function () {
+    Marty = require('../../index').createInstance();
     Store1 = Marty.createStore({
       id: 'store1',
       displayName: 'store1',
@@ -26,7 +26,7 @@ describe('Marty#setInitialState()', function () {
   describe('when you pass in state for an unknown store', function () {
     it('should throw an UnknownStoreError', function () {
       expect(function () {
-        Marty.setInitialState({foo:{}});
+        Marty.setInitialState({foo: {}});
       }).to.throw(UnknownStoreError);
     });
   });

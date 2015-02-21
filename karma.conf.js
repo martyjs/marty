@@ -98,7 +98,7 @@ module.exports = function (config) {
       basePath: '',
       frameworks: ['mocha', 'browserify'],
       browserify: {
-        transform: ['reactify'],
+        transform: ['babelify'],
         debug: true
       },
       files: [

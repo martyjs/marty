@@ -1,9 +1,11 @@
+require('babel/register');
 require('es6-promise').polyfill();
 
 var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
 var dispose = require('./lib/dispose');
+var classes = require('./lib/classes');
 var Container = require('./lib/container');
 var Diagnostics = require('./lib/diagnostics');
 var EventEmitter = require('events').EventEmitter;
@@ -18,7 +20,7 @@ function createInstance() {
     __events: new EventEmitter(),
     renderToString: renderToString,
     createInstance: createInstance
-  }, state, create);
+  }, state, create, classes);
 }
 
 module.exports = createInstance();

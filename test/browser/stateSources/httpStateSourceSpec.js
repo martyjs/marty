@@ -1,7 +1,9 @@
 var sinon = require('sinon');
 var _ = require('lodash-node');
 var expect = require('chai').expect;
-var HttpStateSource = require('../../../lib/stateSources/http');
+var Marty = require('../../../index');
+var warnings = require('../../../warnings');
+var HttpStateSource = require('../../../lib/stateSource/http');
 
 require('es6-promise').polyfill();
 
@@ -14,6 +16,11 @@ describe('HttpStateSource', function () {
 
   beforeEach(function () {
     baseUrl = '/stub/';
+    warnings.classDoesNotHaveAnId = false;
+  });
+
+  afterEach(function () {
+    warnings.classDoesNotHaveAnId = true;
   });
 
   describe('when you dont specify a baseUrl', function () {
@@ -22,7 +29,7 @@ describe('HttpStateSource', function () {
     beforeEach(function () {
       url = baseUrl + 'foos';
 
-      return HttpStateSource().get(url).then(storeResponse);
+      return httpStateSource().get(url).then(storeResponse);
     });
 
     it('should start a get request with the given url', function () {
@@ -34,7 +41,7 @@ describe('HttpStateSource', function () {
     });
   });
 
-  describe('middleware', function () {
+  describe('hooks', function () {
     var server, expectedStateSource, actualContext;
 
     beforeEach(function () {
@@ -71,17 +78,17 @@ describe('HttpStateSource', function () {
             })
           };
 
-          HttpStateSource.use(middleware1);
-          HttpStateSource.use(middleware2);
-          HttpStateSource.use(middleware3);
+          HttpStateSource.addHook(middleware1);
+          HttpStateSource.addHook(middleware2);
+          HttpStateSource.addHook(middleware3);
 
           return get();
         });
 
         afterEach(function () {
-          HttpStateSource.remove(middleware1);
-          HttpStateSource.remove(middleware2);
-          HttpStateSource.remove(middleware3);
+          HttpStateSource.removeHook(middleware1);
+          HttpStateSource.removeHook(middleware2);
+          HttpStateSource.removeHook(middleware3);
         });
 
         it('should call the before middleware once', function () {
@@ -123,17 +130,17 @@ describe('HttpStateSource', function () {
             })
           };
 
-          HttpStateSource.use(middleware1);
-          HttpStateSource.use(middleware2);
-          HttpStateSource.use(middleware3);
+          HttpStateSource.addHook(middleware1);
+          HttpStateSource.addHook(middleware2);
+          HttpStateSource.addHook(middleware3);
 
           return get();
         });
 
         afterEach(function () {
-          HttpStateSource.remove(middleware1);
-          HttpStateSource.remove(middleware2);
-          HttpStateSource.remove(middleware3);
+          HttpStateSource.removeHook(middleware1);
+          HttpStateSource.removeHook(middleware2);
+          HttpStateSource.removeHook(middleware3);
         });
 
         it('should call the after middleware once', function () {
@@ -153,7 +160,7 @@ describe('HttpStateSource', function () {
     });
 
     function get() {
-      expectedStateSource = new HttpStateSource();
+      expectedStateSource = httpStateSource();
 
       var res = expectedStateSource.get('/foo');
 
@@ -171,7 +178,8 @@ describe('HttpStateSource', function () {
 
       server.respondWith('GET', '/foo', [400, {}, '']);
 
-      var res = new HttpStateSource().get('/foo');
+
+      var res = httpStateSource().get('/foo');
 
       server.respond();
 
@@ -293,6 +301,52 @@ describe('HttpStateSource', function () {
         });
       });
     });
+
+    describe('when request body is a FormData object', function () {
+      var options;
+
+      beforeEach(function () {
+        API = Marty.createStateSource({
+          type: 'http',
+          baseUrl: baseUrl.substring(0, baseUrl.length - 1)
+        });
+
+        options = {
+          url: 'foos',
+          headers: {},
+          body: new FormData()
+        };
+
+        return API.post(options);
+      });
+
+      it('should not set the Content-Type request header', function () {
+        expect(options.headers['Content-Type']).to.eql(undefined);
+      });
+    });
+
+    describe('when request body is not a FormData object', function () {
+      var options;
+
+      beforeEach(function () {
+        API = Marty.createStateSource({
+          type: 'http',
+          baseUrl: baseUrl.substring(0, baseUrl.length - 1)
+        });
+
+        options = {
+          url: 'foos',
+          headers: {},
+          body: {}
+        };
+
+        return API.post(options);
+      });
+
+      it('should default the Content-Type request header to application/json', function () {
+        expect(options.headers['Content-Type']).to.eql('application/json');
+      });
+    });
   });
 
   describe('#delete()', function () {
@@ -330,7 +384,8 @@ describe('HttpStateSource', function () {
   describe('#baseUrl', function () {
     describe('when you have a baseUrl', function () {
       beforeEach(function () {
-        API = HttpStateSource({
+        API = Marty.createStateSource({
+          type: 'http',
           baseUrl: baseUrl
         });
 
@@ -348,7 +403,8 @@ describe('HttpStateSource', function () {
 
     describe('when you dont specify a / in the baseUrl or url', function () {
       beforeEach(function () {
-        API = HttpStateSource({
+        API = Marty.createStateSource({
+          type: 'http',
           baseUrl: baseUrl.substring(0, baseUrl.length - 1)
         });
 
@@ -365,6 +421,12 @@ describe('HttpStateSource', function () {
     });
   });
 
+  function httpStateSource() {
+    return Marty.createStateSource({
+      type: 'http'
+    });
+  }
+
   function storeResponse(res) {
     response = res.body;
   }
@@ -372,7 +434,8 @@ describe('HttpStateSource', function () {
   function makeRequest(method) {
     var args = _.rest(arguments);
 
-    API = HttpStateSource({
+    API = Marty.createStateSource({
+      type: 'http',
       baseUrl: baseUrl
     });
 

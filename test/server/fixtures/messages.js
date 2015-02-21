@@ -24,7 +24,7 @@ module.exports = function (Marty) {
           return this.state[id];
         },
         remotely: function () {
-          return MessageAPI(this).getMessage(id);
+          return MessageAPI.for(this).getMessage(id);
         }
       });
     }
@@ -36,7 +36,7 @@ module.exports = function (Marty) {
     getMessage: function (id) {
       return new Promise(function (resolve) {
         setTimeout(function () {
-          MessageStore(this).addMessage(id, { text: 'remote' });
+          MessageStore.for(this).addMessage(id, { text: 'remote' });
           resolve();
         }.bind(this), this.delay);
       }.bind(this));
@@ -46,7 +46,7 @@ module.exports = function (Marty) {
   var MessageState = Marty.createStateMixin({
     getState: function () {
       return {
-        message: MessageStore(this).getMessage(this.props.id)
+        message: MessageStore.for(this).getMessage(this.props.id)
       };
     }
   });

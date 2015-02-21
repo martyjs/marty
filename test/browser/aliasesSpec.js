@@ -15,13 +15,13 @@ describe('aliases', function () {
 
   describe('marty/fetch', function () {
     it('should resolve to fetch', function () {
-      expect(require('../../fetch')).to.equal(require('../../lib/fetch'));
+      expect(require('../../fetch')).to.equal(require('../../lib/store/fetchResult'));
     });
   });
 
   describe('marty/when', function () {
     it('should resolve to when', function () {
-      expect(require('../../when')).to.equal(require('../../lib/when'));
+      expect(require('../../when')).to.equal(require('../../lib/store/when'));
     });
   });
 
@@ -80,9 +80,27 @@ describe('aliases', function () {
     });
   });
 
-  describe('marty/http/stateSource', function () {
+  describe('marty/stateSources/http', function () {
     it('should resolve to http state source', function () {
-      expect(require('../../http/stateSource')).to.eql(require('../../lib/stateSources/http'));
+      expect(require('../../stateSources/http')).to.eql(require('../../lib/stateSource/http'));
+    });
+  });
+
+  describe('marty/stateSources/jsonStorage', function () {
+    it('should resolve to json storage state source', function () {
+      expect(require('../../stateSources/jsonStorage')).to.eql(require('../../lib/stateSource/jsonStorage'));
+    });
+  });
+
+  describe('marty/stateSources/sessionStoraage', function () {
+    it('should resolve to session storage state source', function () {
+      expect(require('../../stateSources/sessionStorage')).to.eql(require('../../lib/stateSource/sessionStorage'));
+    });
+  });
+
+  describe('marty/stateSources/localStoraage', function () {
+    it('should resolve to local storage state source', function () {
+      expect(require('../../stateSources/localStorage')).to.eql(require('../../lib/stateSource/localStorage'));
     });
   });
 });

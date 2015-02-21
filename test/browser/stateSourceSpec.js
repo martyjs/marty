@@ -1,6 +1,5 @@
 var Marty = require('../../index');
 var expect = require('chai').expect;
-var StateSource = require('../../lib/stateSource');
 
 describe('StateSource', function () {
   var stateSource;
@@ -85,7 +84,8 @@ describe('StateSource', function () {
   describe('#mixins', function () {
     describe('when you have multiple mixins', function () {
       beforeEach(function () {
-        stateSource = new StateSource({
+        stateSource = Marty.createStateSource({
+          id: 'stateSourceWithMixins',
           mixins: [{
             foo: function () { return 'foo'; }
           }, {
