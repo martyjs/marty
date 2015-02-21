@@ -1,5 +1,3 @@
-var _ = require('underscore');
-
 function describeStaticAndClass(description, cb, options = {}) {
   if (options.only) {
     describe.only(description, staticAndClass);
@@ -36,12 +34,12 @@ describeStaticAndClass.only = function (description, cb) {
   describeStaticAndClass(description, cb, {
     only: true
   });
-}
+};
 
 describeStaticAndClass.skip = function (description, cb) {
   describeStaticAndClass(description, cb, {
     skip: true
   });
-}
+};
 
 module.exports = describeStaticAndClass;

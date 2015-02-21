@@ -1,16 +1,27 @@
 var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
+var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
-describe('SessionStorageStateSource', function () {
-
+describeStaticAndClass('SessionStorageStateSource', function () {
   var source;
+  var factory = this.factory;
 
   beforeEach(function () {
     warnings.classDoesNotHaveAnId = false;
     sessionStorage.clear();
-    source = Marty.createStateSource({
-      type: 'sessionStorage'
+    source = factory({
+      static: function () {
+        return Marty.createStateSource({
+          type: 'sessionStorage'
+        });
+      },
+      class: function () {
+        class SessionStorage extends Marty.SessionStorageStateSource {
+        }
+
+        return new SessionStorage();
+      }
     });
   });
 
@@ -47,9 +58,22 @@ describe('SessionStorageStateSource', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      source = Marty.createStateSource({
-        namespace: 'baz',
-        type: 'sessionStorage'
+      source = factory({
+        static: function () {
+          return Marty.createStateSource({
+            namespace: 'baz',
+            type: 'sessionStorage'
+          });
+        },
+        class: function () {
+          class SessionStorage extends Marty.SessionStorageStateSource {
+            get namespace() {
+              return 'baz';
+            }
+          }
+
+          return new SessionStorage();
+        }
       });
     });
 

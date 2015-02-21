@@ -1,9 +1,10 @@
 var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
+var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
-describe('JSONStorageStateSource', function () {
-
+describeStaticAndClass('JSONStorageStateSource', function () {
+  var factory = this.factory;
   var source, payload, serializedPayload;
 
   payload = {
@@ -18,9 +19,19 @@ describe('JSONStorageStateSource', function () {
 
     localStorage.clear();
     sessionStorage.clear();
-    source = Marty.createStateSource({
-      id: 'jsonStorage',
-      type: 'jsonStorage'
+    source = factory({
+      static: function () {
+        return Marty.createStateSource({
+          id: 'jsonStorage',
+          type: 'jsonStorage'
+        });
+      },
+      class: function () {
+        class StateSource extends Marty.JSONStorageStateSource {
+        }
+
+        return new StateSource();
+      }
     });
   });
 
@@ -71,10 +82,23 @@ describe('JSONStorageStateSource', function () {
   describe('#storage', function () {
     describe('when you pass in a custom web storage object', function () {
       beforeEach(function () {
-        source = Marty.createStateSource({
-          type: 'jsonStorage',
-          storage: sessionStorage,
-          id: 'jsonStorageWithSessionStorage'
+        source = factory({
+          static: function () {
+            return Marty.createStateSource({
+              type: 'jsonStorage',
+              storage: sessionStorage,
+              id: 'jsonStorageWithSessionStorage'
+            });
+          },
+          class: function () {
+            class StateSource extends Marty.JSONStorageStateSource {
+              get storage() {
+                return sessionStorage;
+              }
+            }
+
+            return new StateSource();
+          }
         });
 
         source.set('foo', payload.value);

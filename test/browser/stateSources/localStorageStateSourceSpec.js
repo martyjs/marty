@@ -1,17 +1,28 @@
 var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
+var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
-describe('LocalStorageStateSource', function () {
-
+describeStaticAndClass('LocalStorageStateSource', function () {
   var source;
+  var factory = this.factory;
 
   beforeEach(function () {
     warnings.classDoesNotHaveAnId = false;
 
     localStorage.clear();
-    source = Marty.createStateSource({
-      type: 'localStorage'
+    source = factory({
+      static: function () {
+        return Marty.createStateSource({
+          type: 'localStorage'
+        });
+      },
+      class: function () {
+        class LocalStorage extends Marty.LocalStorageStateSource {
+        }
+
+        return new LocalStorage();
+      }
     });
   });
 
@@ -48,9 +59,22 @@ describe('LocalStorageStateSource', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      source = Marty.createStateSource({
-        namespace: 'baz',
-        type: 'localStorage'
+      source = factory({
+        static: function () {
+          return Marty.createStateSource({
+            namespace: 'baz',
+            type: 'localStorage'
+          });
+        },
+        class: function () {
+          class LocalStorage extends Marty.LocalStorageStateSource {
+            get namespace() {
+              return 'baz';
+            }
+          }
+
+          return new LocalStorage();
+        }
       });
     });
 

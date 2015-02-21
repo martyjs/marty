@@ -137,7 +137,7 @@ describe('ActionCreators', function () {
               someAction() {
                 return promise;
               }
-            };
+            }
 
             return new TestActionCreators({
               dispatcher: dispatcher
@@ -209,7 +209,7 @@ describe('ActionCreators', function () {
 
                 return dispatched;
               }
-            };
+            }
 
             return new TestActionCreators({
               dispatcher: dispatcher

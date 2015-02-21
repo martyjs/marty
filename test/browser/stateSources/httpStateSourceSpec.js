@@ -8,7 +8,7 @@ var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
 require('es6-promise').polyfill();
 
-describeStaticAndClass('HttpStateSource', function ()  {
+describeStaticAndClass('HttpStateSource', function () {
   this.timeout(10000);
 
   var API, baseUrl, response;
@@ -427,7 +427,7 @@ describeStaticAndClass('HttpStateSource', function ()  {
           constructor() {
             this.baseUrl = baseUrl;
           }
-        };
+        }
 
         return new ExampleHttpStateSource();
       }
