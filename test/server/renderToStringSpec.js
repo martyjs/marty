@@ -16,7 +16,7 @@ describe('Marty#renderToString', function () {
     Marty = require('../../index').createInstance();
     fixture = messagesFixture(Marty);
     context = Marty.createContext();
-    fixture.MessageStore(context).setContextName('local-context');
+    fixture.MessageStore.for(context).setContextName('local-context');
   });
 
   describe('when you dont pass in a createElement function', function () {
@@ -45,7 +45,7 @@ describe('Marty#renderToString', function () {
 
   describe('when all the state is present locally', function () {
     beforeEach(function () {
-      fixture.MessageStore(context).addMessage(expectedId, { text: 'local' });
+      fixture.MessageStore.for(context).addMessage(expectedId, { text: 'local' });
       return renderToString();
     });
 
@@ -82,7 +82,7 @@ describe('Marty#renderToString', function () {
 
   describe('timeout', function () {
     beforeEach(function () {
-      fixture.MessageAPI(context).delay = 1500;
+      fixture.MessageAPI.for(context).delay = 1500;
 
       return renderToString({
         timeout: 100

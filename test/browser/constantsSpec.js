@@ -48,8 +48,8 @@ describe('Constants', function () {
           expect(actionCreator).to.be.instanceof(Function);
         });
 
-        it('should have creators type as a property', function () {
-          expect(actionCreator.properties.type).to.eql('foo');
+        it('should have creators type as a annotation', function () {
+          expect(actionCreator.annotations.type).to.eql('foo');
         });
 
         describe('when I call the action creator', function () {
@@ -79,7 +79,7 @@ describe('Constants', function () {
         });
 
         it('should have creators type as a property', function () {
-          expect(actionCreator.properties.type).to.eql('foo');
+          expect(actionCreator.annotations.type).to.eql('foo');
         });
 
         describe('when I call the action creator', function () {
@@ -114,12 +114,12 @@ describe('Constants', function () {
         });
 
         it('should have creators type as a property', function () {
-          expect(actionCreator.properties.type).to.eql('foo');
+          expect(actionCreator.annotations.type).to.eql('foo');
         });
 
-        it('should include the custom properties', function () {
+        it('should include the custom annotations', function () {
           _.each(customProperties, function (value, key) {
-            expect(actionCreator.properties[key]).to.eql(value);
+            expect(actionCreator.annotations[key]).to.eql(value);
           });
         });
 

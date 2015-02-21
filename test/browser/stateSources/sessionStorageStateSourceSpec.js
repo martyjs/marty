@@ -1,24 +1,44 @@
 var expect = require('chai').expect;
-var SessionStorageStateSource = require('../../../lib/stateSources/sessionStorage');
+var Marty = require('../../../index');
+var warnings = require('../../../warnings');
+var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
-describe('SessionStorageStateSource', function () {
-
-  var mixin;
+describeStaticAndClass('SessionStorageStateSource', function () {
+  var source;
+  var factory = this.factory;
 
   beforeEach(function () {
+    warnings.classDoesNotHaveAnId = false;
     sessionStorage.clear();
-    mixin = new SessionStorageStateSource();
+    source = factory({
+      static: function () {
+        return Marty.createStateSource({
+          type: 'sessionStorage'
+        });
+      },
+      class: function () {
+        class SessionStorage extends Marty.SessionStorageStateSource {
+        }
+
+        return new SessionStorage();
+      }
+    });
+  });
+
+  afterEach(function () {
+    warnings.classDoesNotHaveAnId = true;
   });
 
   describe('#createRepository()', function () {
     it('should expose get and set methods', function () {
-      expect(mixin).to.include.keys('get', 'set');
+      expect(source).to.have.property('get');
+      expect(source).to.have.property('set');
     });
   });
 
   describe('#set()', function () {
     beforeEach(function () {
-      mixin.set('foo', 'bar');
+      source.set('foo', 'bar');
     });
 
     it('should store data under key in sessionStorage', function () {
@@ -32,14 +52,28 @@ describe('SessionStorageStateSource', function () {
     });
 
     it('should retrieve data under key in sessionStorage', function () {
-      expect(mixin.get('foo')).to.equal('bar');
+      expect(source.get('foo')).to.equal('bar');
     });
   });
 
   describe('#namespace', function () {
     beforeEach(function () {
-      mixin = new SessionStorageStateSource({
-        namespace: 'baz'
+      source = factory({
+        static: function () {
+          return Marty.createStateSource({
+            namespace: 'baz',
+            type: 'sessionStorage'
+          });
+        },
+        class: function () {
+          class SessionStorage extends Marty.SessionStorageStateSource {
+            get namespace() {
+              return 'baz';
+            }
+          }
+
+          return new SessionStorage();
+        }
       });
     });
 
@@ -50,13 +84,13 @@ describe('SessionStorageStateSource', function () {
         });
 
         it('should prepend namespace to key', function () {
-          expect(mixin.get('foo')).to.equal('bar');
+          expect(source.get('foo')).to.equal('bar');
         });
       });
 
       describe('when storing data', function () {
         beforeEach(function () {
-          mixin.set('foo', 'bar');
+          source.set('foo', 'bar');
         });
 
         it('should prepend namespace to key', function () {

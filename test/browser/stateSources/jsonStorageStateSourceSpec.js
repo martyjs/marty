@@ -1,9 +1,11 @@
 var expect = require('chai').expect;
-var JSONStorageStateSource = require('../../../lib/stateSources/jsonStorage');
+var Marty = require('../../../index');
+var warnings = require('../../../warnings');
+var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
-describe('JSONStorageStateSource', function () {
-
-  var mixin, payload, serializedPayload;
+describeStaticAndClass('JSONStorageStateSource', function () {
+  var factory = this.factory;
+  var source, payload, serializedPayload;
 
   payload = {
     value: {
@@ -13,20 +15,40 @@ describe('JSONStorageStateSource', function () {
   serializedPayload = JSON.stringify(payload);
 
   beforeEach(function () {
+    warnings.classDoesNotHaveAnId = false;
+
     localStorage.clear();
     sessionStorage.clear();
-    mixin = new JSONStorageStateSource();
+    source = factory({
+      static: function () {
+        return Marty.createStateSource({
+          id: 'jsonStorage',
+          type: 'jsonStorage'
+        });
+      },
+      class: function () {
+        class StateSource extends Marty.JSONStorageStateSource {
+        }
+
+        return new StateSource();
+      }
+    });
+  });
+
+  afterEach(function () {
+    warnings.classDoesNotHaveAnId = true;
   });
 
   describe('#createRepository()', function () {
     it('should expose get and set methods', function () {
-      expect(mixin).to.include.keys('get', 'set');
+      expect(source).to.have.property('get');
+      expect(source).to.have.property('set');
     });
   });
 
   describe('#set()', function () {
     beforeEach(function () {
-      mixin.set('foo', payload.value);
+      source.set('foo', payload.value);
     });
 
     it('should store serialized data under key in localStorage', function () {
@@ -41,14 +63,14 @@ describe('JSONStorageStateSource', function () {
     });
 
     it('should retrieve serialized data under key in localStorage', function () {
-      expect(mixin.get('foo')).to.deep.equal(payload.value);
+      expect(source.get('foo')).to.deep.equal(payload.value);
     });
 
     describe('when the value is undefined', function () {
       var result;
 
       beforeEach(function () {
-        result = mixin.get('bar');
+        result = source.get('bar');
       });
 
       it('should return null', function () {
@@ -60,10 +82,26 @@ describe('JSONStorageStateSource', function () {
   describe('#storage', function () {
     describe('when you pass in a custom web storage object', function () {
       beforeEach(function () {
-        mixin = new JSONStorageStateSource({
-          storage: sessionStorage
+        source = factory({
+          static: function () {
+            return Marty.createStateSource({
+              type: 'jsonStorage',
+              storage: sessionStorage,
+              id: 'jsonStorageWithSessionStorage'
+            });
+          },
+          class: function () {
+            class StateSource extends Marty.JSONStorageStateSource {
+              get storage() {
+                return sessionStorage;
+              }
+            }
+
+            return new StateSource();
+          }
         });
-        mixin.set('foo', payload.value);
+
+        source.set('foo', payload.value);
       });
       it('should use the custom web storage object', function () {
         expect(sessionStorage.getItem('foo')).to.equal(serializedPayload);
@@ -73,8 +111,10 @@ describe('JSONStorageStateSource', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      mixin = new JSONStorageStateSource({
-        namespace: 'baz'
+      source = Marty.createStateSource({
+        namespace: 'baz',
+        type: 'jsonStorage',
+        id: 'jsonStorageWithNamespace'
       });
     });
 
@@ -85,13 +125,13 @@ describe('JSONStorageStateSource', function () {
         });
 
         it('should prepend namespace to key', function () {
-          expect(mixin.get('foo')).to.deep.equal(payload.value);
+          expect(source.get('foo')).to.deep.equal(payload.value);
         });
       });
 
       describe('when storing data', function () {
         beforeEach(function () {
-          mixin.set('foo', payload.value);
+          source.set('foo', payload.value);
         });
 
         it('should prepend namespace to key', function () {

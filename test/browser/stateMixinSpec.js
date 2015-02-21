@@ -1,7 +1,5 @@
 var React = require('react');
 var sinon = require('sinon');
-var _ = require('underscore');
-var Marty = require('../../index');
 var expect = require('chai').expect;
 var uuid = require('../../lib/utils/uuid');
 var Diagnostics = require('../../lib/diagnostics');
@@ -11,7 +9,7 @@ var StateMixin = require('../../lib/mixins/stateMixin');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {
-  var element, sandbox, mixin, initialState, logger;
+  var element, sandbox, mixin, initialState, logger, Marty;
 
   beforeEach(function () {
     logger = stubbedLogger();
@@ -20,6 +18,7 @@ describe('StateMixin', function () {
       name: 'hello'
     };
     Diagnostics.devtoolsEnabled = true;
+    Marty = require('../../index').createInstance();
 
     mixin = new StateMixin({
       getInitialState: function () {
@@ -72,10 +71,12 @@ describe('StateMixin', function () {
       expectedState = {};
       log = console.log;
       console.log = function () {};
-      store = mockStore({
-        displayName: 'foo',
+      store = Marty.createStore({
         action: action,
+        id: 'storeChanges',
+        displayName: 'Store Changes',
         addChangeListener: sinon.spy(),
+        getInitialState: function () { return {}; },
         getState: sinon.stub().returns(expectedState),
       });
 
@@ -159,8 +160,11 @@ describe('StateMixin', function () {
         dispose: sinon.spy()
       };
 
-      store = mockStore({
+      store = Marty.createStore({
         getState: function () {
+          return {};
+        },
+        getInitialState: function () {
           return {};
         },
         addChangeListener: function () {
@@ -414,14 +418,6 @@ describe('StateMixin', function () {
       store.dispose();
     });
   });
-
-  function mockStore(options) {
-    var store = function () {
-      return store;
-    };
-
-    return _.extend(store, options);
-  }
 
   function createStore(state) {
     return Marty.createStore({

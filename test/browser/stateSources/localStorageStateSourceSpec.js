@@ -1,24 +1,45 @@
 var expect = require('chai').expect;
-var LocalStorageStateSource = require('../../../lib/stateSources/localStorage');
+var Marty = require('../../../index');
+var warnings = require('../../../warnings');
+var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
-describe('LocalStorageStateSource', function () {
-
-  var mixin;
+describeStaticAndClass('LocalStorageStateSource', function () {
+  var source;
+  var factory = this.factory;
 
   beforeEach(function () {
+    warnings.classDoesNotHaveAnId = false;
+
     localStorage.clear();
-    mixin = new LocalStorageStateSource();
+    source = factory({
+      static: function () {
+        return Marty.createStateSource({
+          type: 'localStorage'
+        });
+      },
+      class: function () {
+        class LocalStorage extends Marty.LocalStorageStateSource {
+        }
+
+        return new LocalStorage();
+      }
+    });
+  });
+
+  afterEach(function () {
+    warnings.classDoesNotHaveAnId = true;
   });
 
   describe('#createRepository()', function () {
     it('should expose get and set methods', function () {
-      expect(mixin).to.include.keys('get', 'set');
+      expect(source).to.have.property('get');
+      expect(source).to.have.property('set');
     });
   });
 
   describe('#set()', function () {
     beforeEach(function () {
-      mixin.set('foo', 'bar');
+      source.set('foo', 'bar');
     });
 
     it('should store data under key in localStorage', function () {
@@ -32,14 +53,28 @@ describe('LocalStorageStateSource', function () {
     });
 
     it('should retrieve data under key in localStorage', function () {
-      expect(mixin.get('foo')).to.equal('bar');
+      expect(source.get('foo')).to.equal('bar');
     });
   });
 
   describe('#namespace', function () {
     beforeEach(function () {
-      mixin = new LocalStorageStateSource({
-        namespace: 'baz'
+      source = factory({
+        static: function () {
+          return Marty.createStateSource({
+            namespace: 'baz',
+            type: 'localStorage'
+          });
+        },
+        class: function () {
+          class LocalStorage extends Marty.LocalStorageStateSource {
+            get namespace() {
+              return 'baz';
+            }
+          }
+
+          return new LocalStorage();
+        }
       });
     });
 
@@ -50,13 +85,13 @@ describe('LocalStorageStateSource', function () {
         });
 
         it('should prepend namespace to key', function () {
-          expect(mixin.get('foo')).to.equal('bar');
+          expect(source.get('foo')).to.equal('bar');
         });
       });
 
       describe('when storing data', function () {
         beforeEach(function () {
-          mixin.set('foo', 'bar');
+          source.set('foo', 'bar');
         });
 
         it('should prepend namespace to key', function () {

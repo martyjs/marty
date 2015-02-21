@@ -10,6 +10,9 @@ describe('Store#fetch()', function () {
   var expectedResult, actualResult, actualContext, expectedError, actualError;
 
   beforeEach(function () {
+    warnings.stateIsNullOrUndefined = false;
+    warnings.promiseNotReturnedFromRemotely = false;
+
     fetchId = 'foo';
     listener = sinon.spy();
     store = Marty.createStore({
@@ -17,7 +20,6 @@ describe('Store#fetch()', function () {
       displayName: 'Test',
       getInitialState: _.noop
     });
-    warnings.promiseNotReturnedFromRemotely = false;
     changeListener = store.addChangeListener(listener);
   });
 
@@ -25,6 +27,7 @@ describe('Store#fetch()', function () {
     store.dispose();
     endFetch && endFetch();
     changeListener.dispose();
+    warnings.stateIsNullOrUndefined = true;
     warnings.promiseNotReturnedFromRemotely = true;
   });
 
@@ -373,7 +376,7 @@ describe('Store#fetch()', function () {
   describe('when the local fetch returns undefined', function () {
     describe('when the remote fetch returns undefined', function () {
       beforeEach(function () {
-        actualResult = store.fetch('foo', noop, noop);
+        actualResult = store.fetch('whatever', noop, noop);
       });
 
       it('should have a status of failed', function () {

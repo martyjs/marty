@@ -1,23 +1,41 @@
 var Marty = require('../../index');
 var expect = require('chai').expect;
-var StateSource = require('../../lib/stateSource');
+var describeStaticAndClass = require('./lib/describeStaticAndClass');
 
 describe('StateSource', function () {
   var stateSource;
 
   describe('#createStateSource()', function () {
-    describe('when you pass in a function', function () {
+    describeStaticAndClass('when you pass in a function', function () {
       var expectedResult;
+      var factory = this.factory;
 
       beforeEach(function () {
         expectedResult = 'foo';
-        stateSource = Marty.createStateSource({
-          id: 'createStateSource',
-          foo: function () {
-            return this.bar();
+        stateSource = factory({
+          static: function () {
+            return Marty.createStateSource({
+              id: 'createStateSource',
+              foo: function () {
+                return this.bar();
+              },
+              bar: function () {
+                return expectedResult;
+              }
+            });
           },
-          bar: function () {
-            return expectedResult;
+          class: function () {
+            class CreateStateSource extends Marty.StateSource {
+              foo() {
+                return this.bar();
+              }
+
+              bar() {
+                return expectedResult;
+              }
+            }
+
+            return new CreateStateSource();
           }
         });
       });
@@ -85,7 +103,8 @@ describe('StateSource', function () {
   describe('#mixins', function () {
     describe('when you have multiple mixins', function () {
       beforeEach(function () {
-        stateSource = new StateSource({
+        stateSource = Marty.createStateSource({
+          id: 'stateSourceWithMixins',
           mixins: [{
             foo: function () { return 'foo'; }
           }, {

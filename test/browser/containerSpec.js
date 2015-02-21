@@ -1,15 +1,12 @@
 var sinon = require('sinon');
-var _ = require('underscore');
 var expect = require('chai').expect;
 var warnings = require('../../warnings');
 var uuid = require('../../lib/utils/uuid');
 var Dispatcher = require('../../dispatcher');
-var Container = require('../../lib/container');
-var NUMBER_OF_ACTIONS_DISPATCHED = 4;
 
 describe('Container', function () {
-  var container, action, id, resolver, context, expectedId;
-  var defaultDispatcher, defaultActionHandler, sandbox;
+  var container, action, id, context, expectedId;
+  var defaultDispatcher, defaultActionHandler, sandbox, Marty;
 
   beforeEach(function () {
     id = 'foo';
@@ -19,11 +16,12 @@ describe('Container', function () {
     defaultActionHandler = sinon.spy();
     defaultDispatcher = new Dispatcher();
     defaultDispatcher.isDefault = true;
+    Marty = require('../../index').createInstance();
     defaultDispatcher.register(defaultActionHandler);
     sandbox.stub(uuid, 'generate').returns(expectedId);
     sandbox.stub(Dispatcher, 'getDefault').returns(defaultDispatcher);
 
-    container = new Container();
+    container = Marty.container;
   });
 
   afterEach(function () {
@@ -31,12 +29,13 @@ describe('Container', function () {
   });
 
   describe('stores', function () {
-    var expectedStore, expectedFoo, actualStore, actionCreators, storeResolver;
+    var expectedStore, expectedFoo, actualStore, actionCreators, defaultStore;
+
 
     beforeEach(function () {
-      expectedFoo = { id: 123, foo: 'bar '};
+      expectedFoo = { id: 123, foo: 'bar'};
 
-      actionCreators = container.registerActionCreators({
+      actionCreators = Marty.createActionCreators({
         id: 'registerStoreActionCreators',
         addFoo: function (foo) {
           this.dispatch(foo);
@@ -65,7 +64,7 @@ describe('Container', function () {
 
       describe('when I register a store with an Id', function () {
         beforeEach(function () {
-          storeResolver = container.registerStore(expectedStore);
+          defaultStore = Marty.createStore(expectedStore);
         });
 
         it('should be able to create an instance of it', function () {
@@ -75,12 +74,12 @@ describe('Container', function () {
           expect(actualStore.getFoo(expectedFoo.id)).to.equal(expectedFoo);
         });
 
-        it('should return a resolver', function () {
+        it('should return a resolvable instance', function () {
           context = container.createContext();
 
-          actionCreators(context).addFoo(expectedFoo);
-          expect(storeResolver(context).getFoo(expectedFoo.id)).to.equal(expectedFoo);
-          expect(storeResolver.getFoo(expectedFoo.id)).to.be.undefined;
+          actionCreators.for(context).addFoo(expectedFoo);
+          expect(defaultStore.for(context).getFoo(expectedFoo.id)).to.equal(expectedFoo);
+          expect(defaultStore.getFoo(expectedFoo.id)).to.be.undefined;
         });
       });
 
@@ -89,7 +88,7 @@ describe('Container', function () {
           delete expectedStore.id;
           delete expectedStore.displayName;
           warnings.classDoesNotHaveAnId = false;
-          container.registerStore(expectedStore);
+          Marty.createStore(expectedStore);
         });
 
         it('should generate an Id for it', function () {
@@ -107,7 +106,7 @@ describe('Container', function () {
         beforeEach(function () {
           delete expectedStore.id;
           warnings.classDoesNotHaveAnId = false;
-          container.registerStore(expectedStore);
+          Marty.createStore(expectedStore);
         });
 
         it('should use the displayName as an Id', function () {
@@ -121,54 +120,10 @@ describe('Container', function () {
         });
       });
     });
-
-    describe('createStoreResolver', function () {
-      beforeEach(function () {
-        container.registerStore(expectedStore);
-
-        storeResolver = container.createStoreResolver(id);
-      });
-
-      it('should be a function', function () {
-        expect(_.isFunction(storeResolver)).to.be.true;
-      });
-
-      it('should still be a store', function () {
-        actionCreators.addFoo(expectedFoo);
-        expect(storeResolver.getFoo(expectedFoo.id)).to.equal(expectedFoo);
-      });
-
-      describe('when I resolve the instance for a context', function () {
-        var actualStore;
-
-        beforeEach(function () {
-          context = container.createContext();
-          actualStore = storeResolver(context);
-        });
-
-        it('should still be a store', function () {
-          actionCreators(context).addFoo(expectedFoo);
-          expect(actualStore.getFoo(expectedFoo.id)).to.equal(expectedFoo);
-        });
-
-        it('should not use the default dispatcher', function () {
-          actionCreators(context).addFoo(expectedFoo);
-          expect(storeResolver.getFoo(expectedFoo.id)).to.be.undefined;
-        });
-
-        it('should not be the same instance as the resolver', function () {
-          expect(actualStore).to.not.equal(storeResolver);
-        });
-
-        it('should have its context', function () {
-          expect(actualStore.__context).to.equal(context);
-        });
-      });
-    });
   });
 
   describe('state sources', function () {
-    var expectedStateSource, stateCall, actualStateSource, stateSourceResolver;
+    var expectedStateSource, stateCall, actualStateSource, defaultStateSource;
 
     beforeEach(function () {
       stateCall = sinon.spy();
@@ -184,7 +139,7 @@ describe('Container', function () {
 
       describe('when I register a state source with an Id', function () {
         beforeEach(function () {
-          stateSourceResolver = container.registerStateSource(expectedStateSource);
+          defaultStateSource = Marty.createStateSource(expectedStateSource);
         });
 
         it('should be able to create an instance of it', function () {
@@ -194,10 +149,10 @@ describe('Container', function () {
           expect(stateCall).to.be.calledOnce;
         });
 
-        it('should return a resolver', function () {
+        it('should return a resolvable instance', function () {
           context = container.createContext();
 
-          stateSourceResolver(context).getFoo();
+          defaultStateSource.for(context).getFoo();
           expect(stateCall).to.be.calledOnce;
         });
       });
@@ -207,7 +162,7 @@ describe('Container', function () {
           delete expectedStateSource.id;
           delete expectedStateSource.displayName;
           warnings.classDoesNotHaveAnId = false;
-          container.registerStateSource(expectedStateSource);
+          Marty.createStateSource(expectedStateSource);
         });
 
         it('should generate an Id for it', function () {
@@ -225,7 +180,7 @@ describe('Container', function () {
         beforeEach(function () {
           delete expectedStateSource.id;
           warnings.classDoesNotHaveAnId = false;
-          container.registerStateSource(expectedStateSource);
+          Marty.createStateSource(expectedStateSource);
         });
 
         it('should use the displayName as an Id', function () {
@@ -239,50 +194,11 @@ describe('Container', function () {
         });
       });
     });
-
-    describe('createStateSourceResolver', function () {
-      beforeEach(function () {
-        container.registerStateSource(expectedStateSource);
-
-        stateSourceResolver = container.createStateSourceResolver(id);
-      });
-
-      it('should be a function', function () {
-        expect(_.isFunction(stateSourceResolver)).to.be.true;
-      });
-
-      it('should still be a state source', function () {
-        stateSourceResolver.getFoo();
-        expect(stateCall).to.be.calledOnce;
-      });
-
-      describe('when I resolve the instance for a context', function () {
-        var actualStateSource;
-
-        beforeEach(function () {
-          context = container.createContext();
-          actualStateSource = stateSourceResolver(context);
-        });
-
-        it('should still be a state source', function () {
-          stateSourceResolver(context).getFoo();
-          expect(stateCall).to.be.calledOnce;
-        });
-
-        it('should not be the same instance as the resolver', function () {
-          expect(actualStateSource).to.not.equal(stateSourceResolver);
-        });
-
-        it('should have its context', function () {
-          expect(actualStateSource.__context).to.equal(context);
-        });
-      });
-    });
   });
 
   describe('action creators', function () {
     describe('registerActionCreators', function () {
-      var expectedActionCreator, actualActionCreator;
+      var expectedActionCreator, actualActionCreator, defaultActionCreator;
 
       beforeEach(function () {
         expectedActionCreator = {
@@ -294,7 +210,7 @@ describe('Container', function () {
 
       describe('when I register an action creator with an Id', function () {
         beforeEach(function () {
-          resolver = container.registerActionCreators(expectedActionCreator);
+          defaultActionCreator = Marty.createActionCreators(expectedActionCreator);
         });
 
         it('should be able to create an instance of it', function () {
@@ -304,10 +220,10 @@ describe('Container', function () {
           expect(action).to.be.called;
         });
 
-        it('should return a resolver', function () {
+        it('should return a defaultActionCreator', function () {
           context = container.createContext();
-          resolver.foo();
-          resolver(context).foo();
+          defaultActionCreator.foo();
+          defaultActionCreator.for(context).foo();
 
           expect(action).to.be.calledTwice;
         });
@@ -318,7 +234,7 @@ describe('Container', function () {
           delete expectedActionCreator.id;
           delete expectedActionCreator.displayName;
           warnings.classDoesNotHaveAnId = false;
-          container.registerActionCreators(expectedActionCreator);
+          Marty.createActionCreators(expectedActionCreator);
         });
 
         it('should generate an Id for it', function () {
@@ -337,7 +253,7 @@ describe('Container', function () {
         beforeEach(function () {
           delete expectedActionCreator.id;
           warnings.classDoesNotHaveAnId = false;
-          container.registerActionCreators(expectedActionCreator);
+          Marty.createActionCreators(expectedActionCreator);
         });
 
         it('should use the displayName as an Id', function () {
@@ -349,65 +265,6 @@ describe('Container', function () {
 
         afterEach(function () {
           warnings.classDoesNotHaveAnId = true;
-        });
-      });
-    });
-
-    describe('createActionCreatorResolver', function () {
-      beforeEach(function () {
-        container.registerActionCreators({
-          id: id,
-          foo: action
-        });
-
-        resolver = container.createActionCreatorsResolver(id);
-      });
-
-      it('should be a function', function () {
-        expect(_.isFunction(resolver)).to.be.true;
-      });
-
-      it('should still be an action creator', function () {
-        resolver.foo();
-        expect(action).to.be.called;
-      });
-
-      it('should use the default dispatcher', function () {
-        resolver.foo();
-        expect(defaultActionHandler).to.have.callCount(NUMBER_OF_ACTIONS_DISPATCHED);
-      });
-
-      describe('when I resolve the instance for a context', function () {
-        var actualActionCreators, contextActionHandler;
-
-        beforeEach(function () {
-          contextActionHandler = sinon.spy();
-          context = container.createContext();
-          actualActionCreators = resolver(context);
-          context.dispatcher.register(contextActionHandler);
-        });
-
-        it('should still be an action creator', function () {
-          actualActionCreators.foo();
-          expect(action).to.be.called;
-        });
-
-        it('should not be the same instance as the resolver', function () {
-          expect(actualActionCreators).to.not.equal(resolver);
-        });
-
-        it('should have its context', function () {
-          expect(actualActionCreators.__context).to.equal(context);
-        });
-
-        it('should use the contexts dispatcher', function () {
-          actualActionCreators.foo();
-          expect(contextActionHandler).to.callCount(NUMBER_OF_ACTIONS_DISPATCHED);
-        });
-
-        it('should not call the default dispatcher', function () {
-          actualActionCreators.foo();
-          expect(defaultActionHandler).to.not.be.called;
         });
       });
     });

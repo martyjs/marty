@@ -31,8 +31,8 @@ describe('Marty#addStoreChangeListener()', function () {
       store1State = { foo: 'bar' };
       store2State = { bar: 'baz '};
 
-      Store1.setState(store1State);
-      Store2.setState(store2State);
+      Store1.replaceState(store1State);
+      Store2.replaceState(store2State);
     });
 
     it('should invoke any listeners', function () {
@@ -43,9 +43,9 @@ describe('Marty#addStoreChangeListener()', function () {
 
   describe('#dispose()', function () {
     beforeEach(function () {
-      Store1.setState({});
+      Store1.replaceState({});
       disposable.dispose();
-      Store1.setState({});
+      Store1.replaceState({});
     });
 
     it('should stop listening', function () {
