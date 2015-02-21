@@ -4,15 +4,16 @@ var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
 var HttpStateSource = require('../../../lib/stateSource/http');
+var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
 require('es6-promise').polyfill();
 
-describe('HttpStateSource', function () {
-
+describeStaticAndClass('HttpStateSource', function ()  {
   this.timeout(10000);
 
   var API, baseUrl, response;
-  var middleware1, middleware2, middleware3, executionOrder;
+  var factory = this.factory;
+  var hook1, hook2, hook3, executionOrder;
 
   beforeEach(function () {
     baseUrl = '/stub/';
@@ -57,7 +58,7 @@ describe('HttpStateSource', function () {
       describe('before', function () {
         beforeEach(function () {
           executionOrder = [];
-          middleware1 = {
+          hook1 = {
             priority: 2,
             before: sinon.spy(function () {
               actualContext = this;
@@ -65,35 +66,35 @@ describe('HttpStateSource', function () {
             })
           };
 
-          middleware2 = {
+          hook2 = {
             before: sinon.spy(function () {
               executionOrder.push(2);
             })
           };
 
-          middleware3 = {
+          hook3 = {
             priority: 1,
             before: sinon.spy(function () {
               executionOrder.push(3);
             })
           };
 
-          HttpStateSource.addHook(middleware1);
-          HttpStateSource.addHook(middleware2);
-          HttpStateSource.addHook(middleware3);
+          HttpStateSource.addHook(hook1);
+          HttpStateSource.addHook(hook2);
+          HttpStateSource.addHook(hook3);
 
           return get();
         });
 
         afterEach(function () {
-          HttpStateSource.removeHook(middleware1);
-          HttpStateSource.removeHook(middleware2);
-          HttpStateSource.removeHook(middleware3);
+          HttpStateSource.removeHook(hook1);
+          HttpStateSource.removeHook(hook2);
+          HttpStateSource.removeHook(hook3);
         });
 
-        it('should call the before middleware once', function () {
-          _.each([middleware1, middleware2, middleware3], function (middleware) {
-            expect(middleware.before).to.be.calledOnce;
+        it('should call the before hook once', function () {
+          _.each([hook1, hook2, hook3], function (hook) {
+            expect(hook.before).to.be.calledOnce;
           });
         });
 
@@ -109,7 +110,7 @@ describe('HttpStateSource', function () {
       describe('after', function () {
         beforeEach(function () {
           executionOrder = [];
-          middleware1 = {
+          hook1 = {
             priority: 2,
             after: sinon.spy(function () {
               actualContext = this;
@@ -117,35 +118,35 @@ describe('HttpStateSource', function () {
             })
           };
 
-          middleware2 = {
+          hook2 = {
             after: sinon.spy(function () {
               executionOrder.push(2);
             })
           };
 
-          middleware3 = {
+          hook3 = {
             priority: 1,
             after: sinon.spy(function () {
               executionOrder.push(3);
             })
           };
 
-          HttpStateSource.addHook(middleware1);
-          HttpStateSource.addHook(middleware2);
-          HttpStateSource.addHook(middleware3);
+          HttpStateSource.addHook(hook1);
+          HttpStateSource.addHook(hook2);
+          HttpStateSource.addHook(hook3);
 
           return get();
         });
 
         afterEach(function () {
-          HttpStateSource.removeHook(middleware1);
-          HttpStateSource.removeHook(middleware2);
-          HttpStateSource.removeHook(middleware3);
+          HttpStateSource.removeHook(hook1);
+          HttpStateSource.removeHook(hook2);
+          HttpStateSource.removeHook(hook3);
         });
 
-        it('should call the after middleware once', function () {
-          _.each([middleware1, middleware2, middleware3], function (middleware) {
-            expect(middleware.after).to.be.calledOnce;
+        it('should call the after hook once', function () {
+          _.each([hook1, hook2, hook3], function (hook) {
+            expect(hook.after).to.be.calledOnce;
           });
         });
 
@@ -177,7 +178,6 @@ describe('HttpStateSource', function () {
       server = sinon.fakeServer.create();
 
       server.respondWith('GET', '/foo', [400, {}, '']);
-
 
       var res = httpStateSource().get('/foo');
 
@@ -306,10 +306,8 @@ describe('HttpStateSource', function () {
       var options;
 
       beforeEach(function () {
-        API = Marty.createStateSource({
-          type: 'http',
-          baseUrl: baseUrl.substring(0, baseUrl.length - 1)
-        });
+        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+        API = httpStateSource(baseUrl);
 
         options = {
           url: 'foos',
@@ -329,10 +327,9 @@ describe('HttpStateSource', function () {
       var options;
 
       beforeEach(function () {
-        API = Marty.createStateSource({
-          type: 'http',
-          baseUrl: baseUrl.substring(0, baseUrl.length - 1)
-        });
+        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+
+        API = httpStateSource(baseUrl);
 
         options = {
           url: 'foos',
@@ -384,10 +381,7 @@ describe('HttpStateSource', function () {
   describe('#baseUrl', function () {
     describe('when you have a baseUrl', function () {
       beforeEach(function () {
-        API = Marty.createStateSource({
-          type: 'http',
-          baseUrl: baseUrl
-        });
+        API = httpStateSource(baseUrl);
 
         return API.get('/foos').then(storeResponse);
       });
@@ -403,10 +397,9 @@ describe('HttpStateSource', function () {
 
     describe('when you dont specify a / in the baseUrl or url', function () {
       beforeEach(function () {
-        API = Marty.createStateSource({
-          type: 'http',
-          baseUrl: baseUrl.substring(0, baseUrl.length - 1)
-        });
+        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+
+        API = httpStateSource(baseUrl);
 
         return API.get('foos').then(storeResponse);
       });
@@ -421,9 +414,23 @@ describe('HttpStateSource', function () {
     });
   });
 
-  function httpStateSource() {
-    return Marty.createStateSource({
-      type: 'http'
+  function httpStateSource(baseUrl) {
+    return factory({
+      static: function () {
+        return Marty.createStateSource({
+          type: 'http',
+          baseUrl: baseUrl
+        });
+      },
+      class: function () {
+        class ExampleHttpStateSource extends HttpStateSource {
+          constructor() {
+            this.baseUrl = baseUrl;
+          }
+        };
+
+        return new ExampleHttpStateSource();
+      }
     });
   }
 
@@ -434,10 +441,7 @@ describe('HttpStateSource', function () {
   function makeRequest(method) {
     var args = _.rest(arguments);
 
-    API = Marty.createStateSource({
-      type: 'http',
-      baseUrl: baseUrl
-    });
+    API = httpStateSource(baseUrl);
 
     return API[method].apply(API, args).then(storeResponse);
   }
