@@ -1,31 +1,163 @@
-var Marty = require('../../index');
 var expect = require('chai').expect;
 
-describe.skip('Marty#register', function () {
-  describe('Store class', function () {
-    var ActualStore, expectedInitialState;
+describe('Marty#register', function () {
+  var Marty, expectedId;
 
-    class ExpectedStore {
-      getInitialState() {
-        return expectedInitialState;
-      }
-      getFoo(id) {
-        return this.state[id];
-      }
+  beforeEach(function () {
+    expectedId = 'Foo';
+    Marty = require('../../index').createInstance();
+  });
+
+  describe('Store', function () {
+    var ExpectedStore, ActualStore, expectedInitialState;
+
+    describe('when you dont pass in an id', function () {
+      beforeEach(function () {
+        expectedInitialState = {
+          123: { foo: 'bar' }
+        };
+
+        ExpectedStore = createStore(Marty, expectedInitialState);
+        ActualStore = Marty.register(ExpectedStore);
+      });
+
+      it('should return an instance of the store', function () {
+        expect(ActualStore).to.exist;
+        expect(ActualStore.getState()).to.eql(expectedInitialState);
+        expect(ActualStore.getFoo(123)).to.eql(expectedInitialState[123]);
+      });
+
+      it('should default to the class name', function () {
+        expect(Marty.container.getDefault('Store', 'ExpectedStore')).to.equal(ActualStore);
+      });
+    });
+
+    describe('when you pass in an id', function () {
+      beforeEach(function () {
+        expectedInitialState = {
+          123: { foo: 'bar' }
+        };
+
+        ExpectedStore = createStore(Marty, expectedInitialState);
+        ActualStore = Marty.register(expectedId, ExpectedStore);
+      });
+
+      it('should return an instance of the store', function () {
+        expect(ActualStore).to.exist;
+        expect(ActualStore.getState()).to.eql(expectedInitialState);
+        expect(ActualStore.getFoo(123)).to.eql(expectedInitialState[123]);
+      });
+
+      it('should default to the class name', function () {
+        expect(Marty.container.getDefault('Store', expectedId)).to.equal(ActualStore);
+      });
+    });
+
+    function createStore(Marty, expectedInitialState) {
+      return class ExpectedStore extends Marty.Store {
+        getInitialState() {
+          return expectedInitialState;
+        }
+        getFoo(id) {
+          return this.state[id];
+        }
+      };
     }
+  });
+
+  describe('ActionCreators', function () {
+    var ExpectedActionCreators, ActualActionCreators, expectedResult;
 
     beforeEach(function () {
-      expectedInitialState = {
-        123: { foo: 'bar' }
+      expectedResult = 'bar';
+    });
+
+    describe('when you dont pass in an id', function () {
+      beforeEach(function () {
+        ExpectedActionCreators = createActionCreators(Marty);
+        ActualActionCreators = Marty.register(ExpectedActionCreators);
+      });
+
+      it('should return an instance of the store', function () {
+        expect(ActualActionCreators).to.exist;
+        expect(ActualActionCreators.test()).to.eql(expectedResult);
+      });
+
+      it('should default to the class name', function () {
+        expect(Marty.container.getDefault('ActionCreators', 'ExpectedActionCreators')).to.equal(ActualActionCreators);
+      });
+    });
+
+    describe('when you pass in an id', function () {
+      beforeEach(function () {
+        ExpectedActionCreators = createActionCreators(Marty);
+        ActualActionCreators = Marty.register(expectedId, ExpectedActionCreators);
+      });
+
+      it('should return an instance of the store', function () {
+        expect(ActualActionCreators).to.exist;
+        expect(ActualActionCreators.test()).to.eql(expectedResult);
+      });
+
+      it('should default to the class name', function () {
+        expect(Marty.container.getDefault('ActionCreators', expectedId)).to.equal(ActualActionCreators);
+      });
+    });
+
+    function createActionCreators(Marty) {
+      return class ExpectedActionCreators extends Marty.ActionCreators {
+        test() {
+          return expectedResult;
+        }
       };
+    }
+  });
 
-      ActualStore = Marty.register(ExpectedStore);
+  describe('StateSource', function () {
+    var ExpectedStateSource, ActualStateSource, expectedResult;
+
+    beforeEach(function () {
+      expectedResult = 'bar';
     });
 
-    it('should return an instance of the store', function () {
-      expect(ActualStore).to.exist;
-      expect(ActualStore.getState()).to.eql(expectedInitialState);
-      expect(ActualStore.getFoo(123)).to.eql(expectedInitialState[123]);
+    describe('when you dont pass in an id', function () {
+      beforeEach(function () {
+        ExpectedStateSource = createStateSource(Marty);
+        ActualStateSource = Marty.register(ExpectedStateSource);
+      });
+
+      it('should return an instance of the store', function () {
+        expect(ActualStateSource).to.exist;
+        expect(ActualStateSource.test()).to.eql(expectedResult);
+      });
+
+      it('should default to the class name', function () {
+        expect(Marty.container.getDefault('StateSource', 'ExpectedStateSource')).to.equal(ActualStateSource);
+      });
     });
+
+    describe('when you pass in an id', function () {
+      beforeEach(function () {
+        ExpectedStateSource = createStateSource(Marty);
+        ActualStateSource = Marty.register(expectedId, ExpectedStateSource);
+      });
+
+      it('should return an instance of the store', function () {
+        expect(ActualStateSource).to.exist;
+        expect(ActualStateSource.test()).to.eql(expectedResult);
+      });
+
+      it('should default to the class name', function () {
+        expect(Marty.container.getDefault('StateSource', expectedId)).to.equal(ActualStateSource);
+      });
+    });
+
+    function createStateSource(Marty) {
+      return class ExpectedStateSource extends Marty.StateSource {
+        test() {
+          return expectedResult;
+        }
+      };
+    }
   });
 });
