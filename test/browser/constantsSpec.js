@@ -1,10 +1,19 @@
 var sinon = require('sinon');
 var _ = require('underscore');
 var expect = require('chai').expect;
+var warnings = require('../../warnings');
 var constants = require('../../lib/constants');
 
 describe('Constants', function () {
   var input, actualResult;
+
+  beforeEach(function () {
+    warnings.invokeConstant = false;
+  });
+
+  afterEach(function () {
+    warnings.invokeConstant = true;
+  });
 
   describe('when you pass in null', function () {
     it('should return an empty object literal', function () {
