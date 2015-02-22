@@ -11,27 +11,55 @@ All actions have a type of string which gives a terse description of what the ac
 
 [Constants](/guides/constants/index.html) provide a simple way of creating action creators for a type
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
-  updateEmail: UserConstants.UPDATE_EMAIL(function (userId, email) {
+  types: {
+    updateEmail: UserConstants.UPDATE_EMAIL
+  },
+  updateEmail: function (userId, email) {
     ...
-  })
+  }
 });
 
 UserActionCreators.updateEmail(123, "foo@bar.com");
-{% endhighlight %}
+
+es6
+===
+var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
+
+class UserActionCreators extends Marty.ActionCreators {
+  constructor() {
+    super();
+    this.types = {
+      updateEmail: UserConstants.UPDATE_EMAIL
+    };
+  }
+  updateEmail(userId, email) {
+    ...
+  }
+}
+
+UserActionCreators.updateEmail(123, "foo@bar.com");
+{% endsample %}
 
 If your action wants to make a change to the local state, you can use ``this.dispatch()``.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var Dispatcher = require('marty/dispatcher');
 
 var UserActionCreators = Marty.createActionCreators({
-  updateEmail: UserConstants.UPDATE_EMAIL(function (userId, email) {
+  types: {
+    updateEmail: UserConstants.UPDATE_EMAIL  
+  },
+  updateEmail: function (userId, email) {
     this.dispatch(userId, email);
-  })
+  }
 });
 
 Dispatcher.register(function (action) {
@@ -40,11 +68,29 @@ Dispatcher.register(function (action) {
 });
 
 UserActionCreators.updateEmail(123, "foo@bar.com");
-{% endhighlight %}
+es6
+===
+var Dispatcher = require('marty/dispatcher');
 
-<div class="alert alert-warning" role="alert">
-  <strong>Warning!</strong> Please avoid using es6 arrow syntax for your callbacks since they are bound to the current context.
-</div>
+class UserActionCreators extends Marty.ActionCreators {
+  constructor() {
+    super();
+    this.types = {
+      updateEmail: UserConstants.UPDATE_EMAIL  
+    };
+  }
+  updateEmail(userId, email) {
+    this.dispatch(userId, email);
+  }
+}
+
+Dispatcher.register((action) => {
+  console.log(action.type) // => "UPDATE_EMAIL"
+  console.log(action.arguments) // => [123, "foo@bar.com"];
+});
+
+UserActionCreators.updateEmail(123, "foo@bar.com");
+{% endsample %}
 
 You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:
 

@@ -9,19 +9,27 @@ Often your action creator will call a [state source](/guides/state-source/index.
 
 The way to get around this is to have a seperate action creator that is responsible for handling responses from sources. In Marty we call them **Source Action Creator**.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 // actions/userActionCreators.js
 var UserActionCreators = Marty.createActionCreators({
-  saveUser: UserConstants.SAVE_USER(function (user) {
+  types: {
+    saveUser: UserConstants.SAVE_USER
+  },
+  saveUser: function (user) {
     return UserAPI.saveUser(user);
-  })
+  }
 });
 
 // actions/userSourceActionCreators.js
 var UserSourceActionCreators = Marty.createActionCreators({
-  addUser: UserConstants.ADD_USER(function (user) {
+  types: {
+    addUser: UserConstants.ADD_USER
+  },
+  addUser: function (user) {
     this.dispatch(user);
-  })
+  }
 });
 
 // sources/userAPI.js
@@ -33,4 +41,41 @@ var UserAPI = Marty.createStateSource({
     });
   }
 });
-{% endhighlight %}
+
+es6
+===
+// actions/userActionCreators.js
+class UserActionCreators extends Marty.ActionCreators {
+  constructor() {
+    super();
+    this.types = {
+      saveUser: UserConstants.SAVE_USER
+    };
+  }
+  saveUser(user) {
+    return UserAPI.saveUser(user);
+  }
+}
+
+// actions/userSourceActionCreators.js
+class UserSourceActionCreators extends Marty.ActionCreators {
+  constructor() {
+    super();
+    this.types = {
+      addUser: UserConstants.ADD_USER
+    };
+  }
+  addUser(user) {
+    this.dispatch(user);
+  }
+}
+
+// sources/userAPI.js
+class UserAPI extends Marty.HttpStateSource {
+  saveUser(user) {
+    this.post({ url: '/users', data: user }).then(function (user) {
+      UserSourceActionCreators.addUser(user);
+    });
+  }
+}
+{% endsample %}

@@ -21,7 +21,9 @@ Using immutable data collections help you sleep soundly with the knowledge that 
 
 Whilst immutable data collections are not required, we try to make it as easy to use as possible. For example, you can simply set ``this.state`` with the mutated collection. If the state has changed it will call ``this.hasChanged()`` for you.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
   handlers: {
     addUser: Constants.RECEIVE_USER
@@ -33,4 +35,19 @@ var UsersStore = Marty.createStore({
     this.state = this.state.push(user);
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor() {
+    super();
+    this.state = Immutable.List();
+    this.handlers = {
+      addUser: Constants.RECEIVE_USER
+    };
+  }
+  addUser(user) {
+    this.state = this.state.push(user);
+  }
+}
+{% endsample %}

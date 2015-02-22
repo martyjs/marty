@@ -16,10 +16,6 @@ var UserActionCreators = Marty.createActionCreators({
 });
 {% endhighlight %}
 
-<div class="alert alert-warning" role="alert">
-  <strong>Warning!</strong> Please avoid using es6 arrow syntax for your callbacks since they are bound to the current context.
-</div>
-
 <h2 id="displayName">displayName</h2>
 
 An (optional) display name for the action creator. Used for richer debugging.

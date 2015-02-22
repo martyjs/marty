@@ -7,7 +7,9 @@ section: State Sources
 
 The Session Storage State Source allows you to persist data to [sessionStorage](https://developer.mozilla.org/en/docs/Web/Guide/API/DOM/Storage#sessionStorage).
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var FooStorage = Marty.createStateSource({
   type: 'sessionStorage',
   saveFoo: function (foo) {
@@ -19,4 +21,17 @@ var FooStorage = Marty.createStateSource({
 });
 
 FooStorage.saveFoo('Foo');
-{% endhighlight %}
+
+es6
+===
+class FooStorage extends Marty.LocalStorageStateSource {
+  saveFoo(foo) {
+    this.set('foo', foo);
+  }
+  getFoo() {
+    return this.get('foo');
+  }
+}
+
+FooStorage.saveFoo('Foo');
+{% endsample %}

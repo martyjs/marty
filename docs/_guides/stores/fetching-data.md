@@ -13,7 +13,9 @@ Say your view wants to load a user from the ``UserStore``. Internally the store 
 2. **locally** A function which tries to find the required state in the stores state (if its present)
 3. **remotely** A function which tries to get the required state from a state source (if not present)
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserStore = Marty.createStore({
   getUser: function (userId) {
     return this.fetch({
@@ -27,13 +29,37 @@ var UserStore = Marty.createStore({
     });
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UserStore extends Marty.Store {
+  getUser(userId) {
+    return this.fetch({
+      id: userId,
+      locally: function () {
+        return this.state[userId];
+      },
+      remotely: function () {
+        return UserHttpAPI.getUser(userId)
+      }
+    });
+  }
+}
+
+{% endsample %}
 
 When you call fetch, Marty will first try calling the ``locally`` function. It the state is present in the store then it's returned and the fetch will finish executing. If the store can't find the state locally it should return ``undefined``. This causes the fetch function to invoke ``remotely``. Once ``remotely`` has finished executing then fetch will then re-execute the ``locally`` function with the expectation that the state is now in the store. If it isn't then the fetch will fail with a "Not found" error. If the ``remotely`` function needs to get the state asynchronously you can return a promise. The fetch function will wait for the promise to be resolved before re-executing ``locally``.
 
 Using the example of getting a user, you would have a UserHttpAPI (Which is an [HTTP State Source](/guides/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should push the user into the store with a [source action creator](/guides/action-creators/source-action-creators.html). You then return this promise chain to ``remotely``.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
+var UserConstants = Marty.createConstants([
+  'RECEIVE_USER',
+  'USER_NOT_FOUND'
+]);
+
 var UserHttpAPI = Marty.createStateSource({
   type: 'http',
   getUser: function (userId) {
@@ -43,15 +69,13 @@ var UserHttpAPI = Marty.createStateSource({
   }
 });
 
-var UserConstants = Marty.createConstants([
-  'RECEIVE_USER',
-  'USER_NOT_FOUND'
-]);
-
 var UserSourceActionCreators = Marty.createActionCreators({
-  receiveUser: UserConstants.RECEIVE_USER(function (user) {
+  types: {
+    receiveUser: UserConstants.RECEIVE_USER
+  },
+  receiveUser: function (user) {
     this.dispatch(user);
-  })
+  }
 });
 
 var UserStore = Marty.createStore({
@@ -81,7 +105,63 @@ var UserStore = Marty.createStore({
     // ...
   }
 });
-{% endhighlight %}
+
+es6
+===
+var UserConstants = Marty.createConstants([
+  'RECEIVE_USER',
+  'USER_NOT_FOUND'
+]);
+
+class UserHttpAPI extends Marty.HttpStateSource {
+  getUser(userId) {
+    return this.get('http://jsonplaceholder.typicode.com/users/' + userId).then((res) => {
+      UserSourceActionCreators.receiveUser(res.body);
+    });
+  }
+}
+
+class UserSourceActionCreators extends Marty.ActionCreators {
+  constructor() {
+    super();
+    this.types = {
+      receiveUser: UserConstants.RECEIVE_USER
+    }
+  }
+  receiveUser(user) {
+    this.dispatch(user);
+  }
+}
+
+class UserStore extends Marty.Store {
+  constructor() {
+    super();
+    this.state = {};
+    this.handlers = {
+      addUser: UserConstants.RECEIVE_USER,
+      removeUser: UserConstants.USER_NOT_FOUND
+    };
+  }
+  addUser(user) {
+    this.state[user.id] = user;
+    this.hasChanged();
+  }
+  getUser(userId) {
+    return this.fetch({
+      id: userId,
+      locally: function () {
+        return this.state[userId];
+      },
+      remotely: function () {
+        return UserHttpAPI.getUser(userId)
+      }
+    });
+  }
+  removeUser(userId) {
+    // ...
+  }
+}
+{% endsample %}
 
 The result of the fetch function is a [fetch result](/api/stores/#fetch-result) which represents the current state of the fetch. A fetch can either be **PENDING**, **FAILED** or **DONE** (``fetch.status``). If a fetch has failed then the result will have the error (``fetch.error``) and if done it will have the result (``fetch.result``). Your views normally have to deal with each state of a fetch so the fetch result has a ``when()`` function which allows you to render different views for each state
 

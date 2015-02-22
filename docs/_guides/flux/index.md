@@ -15,24 +15,47 @@ Action Creators are where any changes to your applications state starts. Actions
 
 We want to be explicit about the action types in your application so we define them as ([Constants](/guides/constants/index.html)). Constants allow you to loosely couple your application as well as documenting what actions are available (Useful for understanding what your application can do). Constants are also responsible for creating action creators.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
-  updateUserEmail: UserConstants.UPDATE_USER_EMAIL(function (userId, email) {
+  types: {
+    updateUserEmail: UserConstants.UPDATE_USER_EMAIL
+  },
+  updateUserEmail: function (userId, email) {
     this.dispatch(userId, email);
-  })
+  }
 });
 
 UserActionCreators.updateUserEmail(122, "foo@bar.com");
-{% endhighlight %}
+
+es6
+===
+var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
+
+class UserActionCreators extends Marty.ActionCreators {
+  constructor() {
+    super();
+    this.types = {
+      updateUserEmail: UserConstants.UPDATE_USER_EMAIL
+    };
+  }
+  updateUserEmail(userId, email) {
+    this.dispatch(userId, email);
+  }
+}
+
+UserActionCreators.updateUserEmail(122, "foo@bar.com");
+{% endsample %}
 
 In the above scenario, ``UserConstants.UPDATE_USER_EMAIL`` creates an action creator which, when invoked, will create an action with type `UPDATE_USER_EMAIL`.
 
 If an action is making a change to your local state then it can pass its type data along to something called a dispatcher. The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
 
 {% highlight js %}
-var Dispatcher = require('marty/dispatcher');
+var Dispatcher = require('marty/dispatcher').getDefault();
 
 Dispatcher.register(function (action) {
   console.log('action with type', action.type, 'has been dispatched') ;
@@ -45,7 +68,9 @@ Dispatcher.dispatch({
 
 Normally you don't manually register callbacks with the dispatcher, instead you create stores which do this for you. Stores hold information about a domain. That domain could be a collection of entities (Like a [Backbone Collection](http://backbonejs.org/#Collection)) or it could be some information about something specific (Like a [Backbone Model](http://backbonejs.org/#Model)).
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserStore = Marty.createStore({
   handlers: {
     updateEmail: UserConstants.UPDATE_USER_EMAIL
@@ -61,7 +86,26 @@ var UserStore = Marty.createStore({
     this.hasChanged();
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UserStore extends Marty.Store {
+  constructor() {
+    super();
+    this.state = {};
+    this.handlers = {
+      updateEmail: UserConstants.UPDATE_USER_EMAIL
+    };
+  }
+  getUser(userId) {
+    return this.state[userId];
+  }
+  updateEmail(userId, email) {
+    this.state[userId].email = email;
+    this.hasChanged();
+  }
+}
+{% endsample %}
 
 When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its [``handlers`` hash](/api/stores/index.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in ``this.state``).
 
