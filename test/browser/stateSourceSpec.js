@@ -13,7 +13,7 @@ describe('StateSource', function () {
       beforeEach(function () {
         expectedResult = 'foo';
         stateSource = factory({
-          static: function () {
+          classic: function () {
             return Marty.createStateSource({
               id: 'createStateSource',
               foo: function () {
@@ -24,7 +24,7 @@ describe('StateSource', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class CreateStateSource extends Marty.StateSource {
               foo() {
                 return this.bar();

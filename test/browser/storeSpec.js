@@ -44,7 +44,7 @@ describeStaticAndClass('Store', function () {
     };
 
     store = factory({
-      static: function () {
+      classic: function () {
         return Marty.createStore(_.extend({
           id: 'test',
           handlers: handlers,
@@ -52,7 +52,7 @@ describeStaticAndClass('Store', function () {
           displayName: 'TestStore'
         }, proto));
       },
-      class: function () {
+      es6: function () {
         class TestStore extends Marty.Store {
           constructor(options) {
             super(options);
@@ -94,7 +94,7 @@ describeStaticAndClass('Store', function () {
 
       function storeWithoutGetInitialState() {
         return factory({
-          static: function () {
+          classic: function () {
             return Marty.createStore({
               id: 'storeWithoutGetInitialState',
               foo: function () {
@@ -102,7 +102,7 @@ describeStaticAndClass('Store', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class TestStore extends Marty.Store { }
 
             return new TestStore();
@@ -287,7 +287,7 @@ describeStaticAndClass('Store', function () {
     describe('when you dont pass in a dispose function', function () {
       beforeEach(function () {
         store = factory({
-          static: function () {
+          classic: function () {
             return Marty.createStore({
               id: 'no dispose',
               dispatcher: dispatcher,
@@ -297,7 +297,7 @@ describeStaticAndClass('Store', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class TestStore extends Marty.Store {
               getInitialState() {
                 return {};
@@ -341,7 +341,7 @@ describeStaticAndClass('Store', function () {
       beforeEach(function () {
         dispose = sinon.spy();
         store = factory({
-          static: function () {
+          classic: function () {
             return Marty.createStore({
               id: 'dispose',
               dispatcher: dispatcher,
@@ -352,7 +352,7 @@ describeStaticAndClass('Store', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class TestStore extends Marty.Store {
               clear() {
                 super.clear();
@@ -408,7 +408,7 @@ describeStaticAndClass('Store', function () {
     beforeEach(function () {
       one = sinon.spy();
       store = factory({
-        static: function () {
+        classic: function () {
           return Marty.createStore({
             id: 'createStore',
             handlers: {
@@ -420,7 +420,7 @@ describeStaticAndClass('Store', function () {
             }
           });
         },
-        class: function () {
+        es6: function () {
           class TestStore extends Marty.Store {
             constructor(options) {
               super(options);
@@ -460,7 +460,7 @@ describeStaticAndClass('Store', function () {
 
         function createStoreWithMissingActionHandler() {
           var Store = factory({
-            static: function () {
+            classic: function () {
               return Marty.createStore({
                 id: 'createStoreWithMissingActionHandler',
                 dispatcher: dispatcher,
@@ -469,7 +469,7 @@ describeStaticAndClass('Store', function () {
                 }
               });
             },
-            class: function () {
+            es6: function () {
               class TestStore extends Marty.Store {
                 constructor(options) {
                   super(options);
@@ -500,7 +500,7 @@ describeStaticAndClass('Store', function () {
 
         function createStoreWithANullActionPredicate() {
           var Store = factory({
-            static: function () {
+            classic: function () {
               return Marty.createStore({
                 id: 'createStoreWithANullActionPredicate',
                 dispatcher: dispatcher,
@@ -510,7 +510,7 @@ describeStaticAndClass('Store', function () {
                 foo: _.noop
               });
             },
-            class: function () {
+            es6: function () {
               class TestStore extends Marty.Store {
                 constructor(options) {
                   super(options);
@@ -597,7 +597,7 @@ describeStaticAndClass('Store', function () {
       var order = [];
 
       factory({
-        static: function () {
+        classic: function () {
           testActionCreators = Marty.createActionCreators({
             id: 'test',
             sum: function () {
@@ -643,7 +643,7 @@ describeStaticAndClass('Store', function () {
             }
           });
         },
-        class: function () {
+        es6: function () {
           class TestActionCreators extends Marty.ActionCreators {
             sum() {
               this.dispatch(2);
@@ -807,7 +807,7 @@ describeStaticAndClass('Store', function () {
 
       beforeEach(function () {
         Store = factory({
-          static: function () {
+          classic: function () {
             ActionCreators = Marty.createActionCreators({
               id: 'rollbacks',
               add: function (user) {
@@ -836,7 +836,7 @@ describeStaticAndClass('Store', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class TestActionCreators extends Marty.ActionCreators {
               add(user) {
                 var action = this.dispatch(user);
@@ -917,7 +917,7 @@ describeStaticAndClass('Store', function () {
     describe('when you do not pass in a clear function', function () {
       beforeEach(function () {
         store = factory({
-          static: function () {
+          classic: function () {
             return Marty.createStore({
               id: 'clear',
               getInitialState: function () {
@@ -925,7 +925,7 @@ describeStaticAndClass('Store', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class ClearStore extends Marty.Store {
               getInitialState() {
                 return {};
@@ -954,7 +954,7 @@ describeStaticAndClass('Store', function () {
       beforeEach(function () {
         clear = sinon.spy();
         store = factory({
-          static: function () {
+          classic: function () {
             return Marty.createStore({
               id: 'clear',
               clear: clear,
@@ -963,7 +963,7 @@ describeStaticAndClass('Store', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class ClearStore extends Marty.Store {
               getInitialState() {
                 return {};

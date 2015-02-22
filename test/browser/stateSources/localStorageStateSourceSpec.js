@@ -12,12 +12,12 @@ describeStaticAndClass('LocalStorageStateSource', function () {
 
     localStorage.clear();
     source = factory({
-      static: function () {
+      classic: function () {
         return Marty.createStateSource({
           type: 'localStorage'
         });
       },
-      class: function () {
+      es6: function () {
         class LocalStorage extends Marty.LocalStorageStateSource {
         }
 
@@ -60,13 +60,13 @@ describeStaticAndClass('LocalStorageStateSource', function () {
   describe('#namespace', function () {
     beforeEach(function () {
       source = factory({
-        static: function () {
+        classic: function () {
           return Marty.createStateSource({
             namespace: 'baz',
             type: 'localStorage'
           });
         },
-        class: function () {
+        es6: function () {
           class LocalStorage extends Marty.LocalStorageStateSource {
             get namespace() {
               return 'baz';

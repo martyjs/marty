@@ -120,7 +120,7 @@ describe('ActionCreators', function () {
         });
 
         actionCreators = factory({
-          static: function () {
+          classic: function () {
             return Marty.createActionCreators({
               dispatcher: dispatcher,
               someAction: function () {
@@ -128,7 +128,7 @@ describe('ActionCreators', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class TestActionCreators extends Marty.ActionCreators {
               constructor(options) {
                 super(options);
@@ -188,7 +188,7 @@ describe('ActionCreators', function () {
         });
 
         actionCreators = factory({
-          static: function () {
+          classic: function () {
             return Marty.createActionCreators({
               dispatcher: dispatcher,
               someAction: function () {
@@ -200,7 +200,7 @@ describe('ActionCreators', function () {
               }
             });
           },
-          class: function () {
+          es6: function () {
             class TestActionCreators extends Marty.ActionCreators {
               someAction() {
                 dispatched = promise.then((function () {
@@ -237,7 +237,7 @@ describe('ActionCreators', function () {
     beforeEach(function () {
       expectedError = new Error('foo');
       actionCreators = factory({
-        static: function () {
+        classic: function () {
           return Marty.createActionCreators({
             displayName: 'Test',
             dispatcher: dispatcher,
@@ -246,7 +246,7 @@ describe('ActionCreators', function () {
             }
           });
         },
-        class: function () {
+        es6: function () {
           class TestActionCreators extends Marty.ActionCreators {
             constructor(options) {
               super(options);
@@ -309,7 +309,7 @@ describe('ActionCreators', function () {
       expectedOtherArg = { baz: 'bim' };
       expectedActionType = 'SOME_ACTION';
       actionCreators = factory({
-        static: function () {
+        classic: function () {
           return Marty.createActionCreators({
             dispatcher: dispatcher,
             someAction: function (arg) {
@@ -317,7 +317,7 @@ describe('ActionCreators', function () {
             }
           });
         },
-        class: function () {
+        es6: function () {
           class TestActionCreators extends Marty.ActionCreators {
             someAction(arg) {
               this.dispatch(expectedOtherArg, arg);
@@ -426,6 +426,64 @@ describe('ActionCreators', function () {
 
     it('should rollback the action', function () {
       expect(rollback).to.have.been.calledOnce;
+    });
+  });
+
+  describeStaticAndClass('#types', function () {
+    var factory = this.factory;
+    var Creators, Constants, fooAction, barAction, expectedArg;
+
+    beforeEach(function () {
+      expectedArg = 'foo';
+      Constants = constants(['FOO', 'BAR']);
+      Creators = factory({
+        classic: function () {
+          return Marty.createActionCreators({
+            id: 'TypeActionCreators',
+            dispatcher: dispatcher,
+            types: {
+              woop: Constants.FOO,
+              loop: Constants.BAR
+            },
+            woop: function (arg) {
+              this.dispatch(arg, 2);
+            }
+          });
+        },
+        es6: function () {
+          class TypeActionCreators extends Marty.ActionCreators {
+            constructor(options) {
+              super(options);
+              this.types = {
+                woop: Constants.FOO,
+                loop: Constants.BAR
+              };
+            }
+            woop(arg) {
+              this.dispatch(arg, 2);
+            }
+          }
+
+          return new TypeActionCreators({
+            dispatcher: dispatcher
+          });
+        }
+      });
+
+      Creators.woop(expectedArg);
+      Creators.loop(expectedArg);
+      fooAction = dispatcher.getActionWithType('FOO');
+      barAction = dispatcher.getActionWithType('BAR');
+    });
+
+    it('should annotate the function with the specified type', function () {
+      expect(fooAction).to.exist;
+      expect(fooAction.arguments).to.eql([expectedArg, 2]);
+    });
+
+    it('should create a function that automatically dispatches if there is no function', function () {
+      expect(barAction).to.exist;
+      expect(barAction.arguments).to.eql([expectedArg]);
     });
   });
 
