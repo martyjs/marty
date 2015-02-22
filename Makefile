@@ -6,13 +6,13 @@ SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint test-server test-browser
 
-test-server:
+test-server: lint
 	@./build/test-server.sh
 
-test-browser:
+test-browser: lint
 	@./build/test-browser.sh
 
-test-watch:
+test-watch: lint
 	@./build/test-watch.sh
 
 bootstrap: bootstrap-js bootstrap-ruby

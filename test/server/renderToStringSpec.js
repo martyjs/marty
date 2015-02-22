@@ -1,4 +1,5 @@
 var React = require('react');
+var sinon = require('sinon');
 var _ = require('underscore');
 var cheerio = require('cheerio');
 var expect = require('chai').expect;
@@ -9,14 +10,19 @@ var messagesFixture = require('./fixtures/messages');
 var MARTY_STATE_ID = '__marty-state';
 
 describe('Marty#renderToString', function () {
-  var $, context, Marty, fixture, expectedId;
+  var $, context, Marty, fixture, expectedId, dispose;
 
   beforeEach(function () {
     expectedId = uuid.small();
     Marty = require('../../index').createInstance();
     fixture = messagesFixture(Marty);
     context = Marty.createContext();
+    dispose = sinon.stub(context, 'dispose');
     fixture.MessageStore.for(context).setContextName('local-context');
+  });
+
+  afterEach(function () {
+    dispose.restore();
   });
 
   describe('when you dont pass in a createElement function', function () {
@@ -60,6 +66,10 @@ describe('Marty#renderToString', function () {
     it('should include the serialized state', function () {
       expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState(context).toString());
     });
+
+    it('should call dispose', function () {
+      expect(dispose).to.be.calledOnce;
+    });
   });
 
   describe('when it needs to wait for state to come from a remote source', function () {
@@ -78,6 +88,10 @@ describe('Marty#renderToString', function () {
     it('should include the serialized state', function () {
       expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState(context).toString());
     });
+
+    it('should call dispose', function () {
+      expect(dispose).to.be.calledOnce;
+    });
   });
 
   describe('timeout', function () {
@@ -91,6 +105,10 @@ describe('Marty#renderToString', function () {
 
     it('should render after the timeout regardless of whether fetches are complete', function () {
       expect($('.text').text()).to.equal('pending');
+    });
+
+    it('should call dispose', function () {
+      expect(dispose).to.be.calledOnce;
     });
   });
 
