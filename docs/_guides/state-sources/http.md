@@ -13,7 +13,8 @@ All requests return a [promise](https://promisesaplus.com/) that allow you to ea
 classic
 =======
 var UsersAPI = Marty.createStateSource({
-  type: "http",
+  type: 'http',
+  id: 'UsersAPI',
   baseUrl: 'http://foo.com'
   getAll: function (users) {
     return this.get('/users').then(function (res) {

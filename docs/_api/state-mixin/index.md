@@ -4,8 +4,6 @@ id: api-state-mixin
 title: State Mixin API
 section: State Mixin
 ---
-<h2 id="createStateMixinObject">Marty.createStateMixin(<i>Object</i>)</h2>
-
 <h3 id="listenTo">listenTo</h3>
 
 Expects either a [store](/api/stores/index.html) or an array of [stores](/api/stores/index.html). Just before the [initial render](http://facebook.github.io/react/docs/component-specs.html#mounting-componentwillmount), it will register a change listener with the specified store(s).

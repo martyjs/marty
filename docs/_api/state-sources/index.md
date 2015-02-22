@@ -5,23 +5,33 @@ id: api-state-sources
 section: State Sources
 ---
 
-<h3 id="createStateSource">createStateSource(props)</h3>
-
-To create a new repository, you call <code>Marty.createStateSource</code> passing in a set of properties. It returns your repository as a singleton.
-
-{% highlight js %}
-var UserRepository = Marty.createStateSource({
+{% sample %}
+classic
+=======
+var UsersAPI = Marty.createStateSource({
+  id: 'UsersAPI'
   createUser: function (user) {
     return $.get("/users");
   }
 });
-{% endhighlight %}
 
+es6
+===
+class UsersAPI extends Marty.StateSource {
+  createUser(user) {
+    return $.get("/users");
+  }
+}
+{% endsample %}
 
-<h3 id="type">type</h3>
+<h2 id="id">id</h2>
+
+A unique identifier (*required*). Used for registration within the container.
+
+<h2 id="type">type</h2>
 
 The type of the state source (e.g. 'http').
 
-<h3 id="mixins">mixins</h3>
+<h2 id="mixins">mixins</h2>
 
 An (optional) array of mixins that can be passed in through the createStateSource method.

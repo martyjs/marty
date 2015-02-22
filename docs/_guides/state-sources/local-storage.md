@@ -11,6 +11,7 @@ The Local Storage State Source allows you to persist data to [localStorage](http
 classic
 =======
 var FooStorage = Marty.createStateSource({
+  id: 'FooStorage',
   type: 'localStorage',
   saveFoo: function (foo) {
     this.set('foo', foo);

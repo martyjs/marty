@@ -11,6 +11,7 @@ The Session Storage State Source allows you to persist data to [sessionStorage](
 classic
 =======
 var FooStorage = Marty.createStateSource({
+  id: 'FooStorage',
   type: 'sessionStorage',
   saveFoo: function (foo) {
     this.set('foo', foo);

@@ -5,8 +5,11 @@ id: state-source-json
 section: State Sources
 ---
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserStorage = Marty.createStateSource({
+  id: 'UserStorage',
   namespace: 'users',
   type: 'jsonStorage',
   createUser: function (user) {
@@ -16,7 +19,22 @@ var UserStorage = Marty.createStateSource({
     return this.get(id);
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UserStorage extends Marty.JSONStorageStateSource {
+  constructor() {
+    super();
+    this.namespace = 'users';
+  }
+  createUser(user) {
+    this.set(user.id, user);
+  }
+  getUser(id) {
+    return this.get(id);
+  }
+}
+{% endsample %}
 
 <h2 id="storage">storage</h2>
 

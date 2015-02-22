@@ -25,6 +25,7 @@ Whilst immutable data collections are not required, we try to make it as easy to
 classic
 =======
 var UsersStore = Marty.createStore({
+  id: 'UsersStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
