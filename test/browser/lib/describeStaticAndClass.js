@@ -1,20 +1,20 @@
 function describeStaticAndClass(description, cb, options = {}) {
   if (options.only) {
-    describe.only(description, staticAndClass);
+    describe.only(description, classicAndClass);
   } else if (options.skip) {
-    describe.skip(description, staticAndClass);
+    describe.skip(description, classicAndClass);
   } else {
-    staticAndClass();
+    classicAndClass();
   }
 
-  function staticAndClass() {
-    describe(description + ' (Static)', function () {
-      this.factory = factory('static');
+  function classicAndClass() {
+    describe(description + ' (Classic)', function () {
+      this.factory = factory('classic');
       cb.call(this);
     });
 
-    describe(description + ' (Class)', function () {
-      this.factory = factory('class');
+    describe(description + ' (ES6)', function () {
+      this.factory = factory('es6');
       cb.call(this);
     });
   }

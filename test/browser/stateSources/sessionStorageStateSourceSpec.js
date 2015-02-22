@@ -11,12 +11,12 @@ describeStaticAndClass('SessionStorageStateSource', function () {
     warnings.classDoesNotHaveAnId = false;
     sessionStorage.clear();
     source = factory({
-      static: function () {
+      classic: function () {
         return Marty.createStateSource({
           type: 'sessionStorage'
         });
       },
-      class: function () {
+      es6: function () {
         class SessionStorage extends Marty.SessionStorageStateSource {
         }
 
@@ -59,13 +59,13 @@ describeStaticAndClass('SessionStorageStateSource', function () {
   describe('#namespace', function () {
     beforeEach(function () {
       source = factory({
-        static: function () {
+        classic: function () {
           return Marty.createStateSource({
             namespace: 'baz',
             type: 'sessionStorage'
           });
         },
-        class: function () {
+        es6: function () {
           class SessionStorage extends Marty.SessionStorageStateSource {
             get namespace() {
               return 'baz';

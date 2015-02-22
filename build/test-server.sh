@@ -1,1 +1,1 @@
-node_modules/.bin/mocha -r test/server/setup test/server
+node_modules/.bin/mocha -r test/server/setup -t 3000 test/server

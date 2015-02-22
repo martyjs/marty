@@ -15,8 +15,8 @@ var Constants = Marty.createConstants([
 
 //returns
 {
-  RECEIVE_USERS: function RECEIVE_USERS_CREATOR() { ... },
-  DELETE_USER: function DELETE_USER_CREATOR() { ... }
+  RECEIVE_USERS: 'RECEIVE_USERS',
+  DELETE_USER: 'DELETE_USER'
 }
 {% endhighlight %}
 
@@ -34,12 +34,12 @@ var Constants = Marty.createConstants({
 //returns
 {
   Users: {
-    RECEIVE_USERS: function RECEIVE_USERS_CREATOR() { ... },
-    DELETE_USER: function DELETE_USER_CREATOR() { ... }
+    RECEIVE_USERS: 'RECEIVE_USERS'
+    DELETE_USER: 'DELETE_USER'
   },
   Foos: {
     Bars: {
-      ADD_BAR: function ADD_BAR_CREATOR() { ... }
+      ADD_BAR: 'ADD_BAR'
     }
   }
 }

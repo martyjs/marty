@@ -5,8 +5,11 @@ id: state-source-session
 section: State Sources
 ---
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var FooStorage = Marty.createStateSource({
+  id: 'FooStorage',
   namespace: 'foos',
   type: 'sessionStorage',
   saveFoo: function (foo) {
@@ -16,7 +19,22 @@ var FooStorage = Marty.createStateSource({
     return this.get(id);
   }
 });
-{% endhighlight %}
+
+es6
+===
+class FooStorage extends Marty.SessionStorageStateSource {
+  constructor() {
+    super();
+    this.namespace = 'foos';
+  }
+  saveFoo(foo) {
+    this.set('bar', foo);
+  }
+  getFoo(id) {
+    return this.get(id);
+  }
+}
+{% endsample %}
 
 <h2 id="namespace">namespace</h2>
 

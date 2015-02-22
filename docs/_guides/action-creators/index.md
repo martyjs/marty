@@ -9,7 +9,7 @@ Action Creators are where any changes to your applications state start. Actions 
 
 All actions have a type of string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/guides/dispatcher/index.html)) and use [action's type to determine whether to do something with it](/api/stores/index.html#handlers). Action types help us build loosely coupled applications that can grow without increasing complexity.
 
-[Constants](/guides/constants/index.html) provide a simple way of creating action creators for a type
+To define the action type for an action creator you use the [types object hash](/api/actionCreators/index.html#types)
 
 {% sample %}
 classic
@@ -17,6 +17,7 @@ classic
 var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
+  id: 'UserActionCreators',
   types: {
     updateEmail: UserConstants.UPDATE_EMAIL
   },
@@ -90,6 +91,45 @@ Dispatcher.register((action) => {
 });
 
 UserActionCreators.updateEmail(123, "foo@bar.com");
+{% endsample %}
+
+We found that a lot of the time action creators just dispatched any arguments it was invoked with. If you add an action creator name to the types object but dont add an associated function, Marty will create one for you which dispatches whatever arguments passed to it.
+
+{% sample %}
+classic
+=======
+var UserActionCreators = Marty.createActionCreators({
+  id: 'UserActionCreators',
+  types: {
+    foo: Constants.FOO,
+    bar: Constants.BAR
+  },
+  // This is unnecessary, Marty will do this for you automatically
+  bar: function (baz) {
+    this.dispatch(baz);
+  }
+});
+
+UserActionCreators.foo(1, 2); // Dispatch FOO(1, 2)
+UserActionCreators.bar('baz'); // Dispatch BAR('baz')
+es6
+===
+class UserActionCreators extends Marty.ActionCreators {
+  constructor() {
+    super();
+    this.types = {
+      foo: Constants.FOO,
+      bar: Constants.BAR
+    };
+  }
+  // This is unnecessary, Marty will do this for you automatically
+  bar(baz) {
+    this.dispatch(baz);
+  }
+}
+
+UserActionCreators.foo(1, 2); // Dispatch FOO(1, 2)
+UserActionCreators.bar('baz'); // Dispatch BAR('baz')
 {% endsample %}
 
 You often want to know if an action is starting, finished or has failed. To help here Marty actually emits a number of other actions:

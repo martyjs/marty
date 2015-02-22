@@ -12,6 +12,7 @@ classic
 =======
 var UserAPI = Marty.createStateSource({
   type: 'http',
+  id: 'UserAPI',
   baseUrl: 'http://foo.com',
   getUsers: function () {
     return this.get('/users').then(function (res) {

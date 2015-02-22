@@ -21,6 +21,7 @@ classic
 var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
+  id: 'UserActionCreators',
   types: {
     updateUserEmail: UserConstants.UPDATE_USER_EMAIL
   },
@@ -72,6 +73,7 @@ Normally you don't manually register callbacks with the dispatcher, instead you 
 classic
 =======
 var UserStore = Marty.createStore({
+  id: 'UserStore',
   handlers: {
     updateEmail: UserConstants.UPDATE_USER_EMAIL
   },

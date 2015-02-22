@@ -15,7 +15,7 @@ When you create a store it will automatically start listening to the dispatcher.
 classic
 =======
 var UsersStore = Marty.createStore({
-  displayName: 'UserStore',
+  id: 'UserStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -62,6 +62,7 @@ Often action creators optimistically dispatch an action before connecting to a s
 classic
 =======
 var UsersStore = Marty.createStore({
+  id: 'UsersStore',
   addUser: function (user) {
     this.state[user.id] = user;
     this.hasChanged();

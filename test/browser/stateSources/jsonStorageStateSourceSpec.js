@@ -20,13 +20,13 @@ describeStaticAndClass('JSONStorageStateSource', function () {
     localStorage.clear();
     sessionStorage.clear();
     source = factory({
-      static: function () {
+      classic: function () {
         return Marty.createStateSource({
           id: 'jsonStorage',
           type: 'jsonStorage'
         });
       },
-      class: function () {
+      es6: function () {
         class StateSource extends Marty.JSONStorageStateSource {
         }
 
@@ -83,14 +83,14 @@ describeStaticAndClass('JSONStorageStateSource', function () {
     describe('when you pass in a custom web storage object', function () {
       beforeEach(function () {
         source = factory({
-          static: function () {
+          classic: function () {
             return Marty.createStateSource({
               type: 'jsonStorage',
               storage: sessionStorage,
               id: 'jsonStorageWithSessionStorage'
             });
           },
-          class: function () {
+          es6: function () {
             class StateSource extends Marty.JSONStorageStateSource {
               get storage() {
                 return sessionStorage;

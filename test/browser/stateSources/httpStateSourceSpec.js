@@ -418,13 +418,13 @@ describeStaticAndClass('HttpStateSource', function () {
 
   function httpStateSource(baseUrl) {
     return factory({
-      static: function () {
+      classic: function () {
         return Marty.createStateSource({
           type: 'http',
           baseUrl: baseUrl
         });
       },
-      class: function () {
+      es6: function () {
         class ExampleHttpStateSource extends HttpStateSource {
           constructor() {
             this.baseUrl = baseUrl;

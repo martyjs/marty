@@ -14,6 +14,7 @@ classic
 =======
 // actions/userActionCreators.js
 var UserActionCreators = Marty.createActionCreators({
+  id: 'UserActionCreators',
   types: {
     saveUser: UserConstants.SAVE_USER
   },
@@ -24,6 +25,7 @@ var UserActionCreators = Marty.createActionCreators({
 
 // actions/userSourceActionCreators.js
 var UserSourceActionCreators = Marty.createActionCreators({
+  id: 'UserActionCreators',
   types: {
     addUser: UserConstants.ADD_USER
   },
@@ -35,6 +37,7 @@ var UserSourceActionCreators = Marty.createActionCreators({
 // sources/userAPI.js
 var UserAPI = Marty.createStateSource({
   type: 'http',
+  id: 'UserAPI',
   saveUser: function (user) {
     this.post({ url: '/users', data: user }).then(function (user) {
       UserSourceActionCreators.addUser(user);
