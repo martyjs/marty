@@ -79,28 +79,4 @@ describe('aliases', function () {
       expect(Object.keys(require('../../constants/status'))).to.eql(['PENDING', 'FAILED', 'DONE']);
     });
   });
-
-  describe('marty/stateSources/http', function () {
-    it('should resolve to http state source', function () {
-      expect(require('../../stateSources/http')).to.eql(require('../../lib/stateSource/http'));
-    });
-  });
-
-  describe('marty/stateSources/jsonStorage', function () {
-    it('should resolve to json storage state source', function () {
-      expect(require('../../stateSources/jsonStorage')).to.eql(require('../../lib/stateSource/jsonStorage'));
-    });
-  });
-
-  describe('marty/stateSources/sessionStoraage', function () {
-    it('should resolve to session storage state source', function () {
-      expect(require('../../stateSources/sessionStorage')).to.eql(require('../../lib/stateSource/sessionStorage'));
-    });
-  });
-
-  describe('marty/stateSources/localStoraage', function () {
-    it('should resolve to local storage state source', function () {
-      expect(require('../../stateSources/localStorage')).to.eql(require('../../lib/stateSource/localStorage'));
-    });
-  });
 });

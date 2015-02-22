@@ -3,7 +3,7 @@ var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
-var HttpStateSource = require('../../../lib/stateSource/http');
+var HttpStateSource = require('../../../stateSources/http');
 var describeStaticAndClass = require('../lib/describeStaticAndClass');
 
 require('es6-promise').polyfill();
