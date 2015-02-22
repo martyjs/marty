@@ -14,6 +14,10 @@ class SessionStorageStateSource extends StateSource {
   set(key, value) {
     return this.storage.setItem(getNamespacedKey(this, key), value);
   }
+
+  static get defaultNamespace() {
+    return '';
+  }
 }
 
 function getNamespacedKey(source, key) {
@@ -23,7 +27,5 @@ function getNamespacedKey(source, key) {
 function getNamespace(source) {
   return source.namespace || SessionStorageStateSource.defaultNamespace;
 }
-
-SessionStorageStateSource.defaultNamespace = '';
 
 module.exports = SessionStorageStateSource;

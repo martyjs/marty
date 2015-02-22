@@ -39,11 +39,22 @@ class HttpStateSource extends StateSource {
   patch(options) {
     return this.request(requestOptions('PATCH', this, options));
   }
+
+  static addHook(hook) {
+    if (hook) {
+      hooks.push(hook);
+    }
+  }
+
+  static removeHook(hook) {
+    hooks = _.without(hooks, hook);
+  }
+
+  static get defaultBaseUrl() {
+    return '';
+  }
 }
 
-HttpStateSource.addHook = addHook;
-HttpStateSource.defaultBaseUrl = '';
-HttpStateSource.removeHook = removeHook;
 HttpStateSource.addHook(require('../http/hooks/parseJSON'));
 HttpStateSource.addHook(require('../http/hooks/stringifyJSON'));
 
@@ -78,7 +89,6 @@ function requestOptions(method, source, options) {
 
   return options;
 }
-
 
 function beforeRequest(source, req) {
   _.each(getHooks('before'), (hook) => {
@@ -136,14 +146,4 @@ function getHooks(func) {
       return hook && _.isFunction(hook[func]);
     };
   }
-}
-
-function addHook(hook) {
-  if (hook) {
-    hooks.push(hook);
-  }
-}
-
-function removeHook(hook) {
-  hooks = _.without(hooks, hook);
 }

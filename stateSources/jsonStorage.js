@@ -34,6 +34,14 @@ class JSONStorageStateSource extends StateSource {
     var raw = JSON.stringify(payload);
     getStorage(this).setItem(getNamespacedKey(this, key), raw);
   }
+
+  static get defaultNamespace() {
+    return '';
+  }
+
+  static get defaultStorage() {
+    return typeof window === 'undefined' ? noopStorage : window.localStorage;
+  }
 }
 
 function getNamespacedKey(source, key) {
@@ -47,8 +55,5 @@ function getNamespace(source) {
 function getStorage(source) {
   return source.storage || JSONStorageStateSource.defaultStorage || noopStorage;
 }
-
-JSONStorageStateSource.defaultNamespace = '';
-JSONStorageStateSource.defaultStorage = typeof window === 'undefined' ? noopStorage : window.localStorage;
 
 module.exports = JSONStorageStateSource;

@@ -14,6 +14,10 @@ class LocalStorageStateSource extends StateSource {
   set(key, value) {
     return this.storage.setItem(getNamespacedKey(this, key), value);
   }
+
+  static get defaultNamespace() {
+    return '';
+  }
 }
 
 function getNamespacedKey(source, key) {
@@ -23,7 +27,5 @@ function getNamespacedKey(source, key) {
 function getNamespace(source) {
   return source.namespace || LocalStorageStateSource.defaultNamespace;
 }
-
-LocalStorageStateSource.defaultNamespace = '';
 
 module.exports = LocalStorageStateSource;
