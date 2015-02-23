@@ -28,6 +28,22 @@ describe('Container', function () {
     sandbox.restore();
   });
 
+  describe('when there are two classes with the same Id', function () {
+    beforeEach(function () {
+      expectedId = 'Foo';
+
+      Marty.createStore({ id: expectedId });
+    });
+
+    it('should throw an error when you try to register the second class', function () {
+      expect(registerSecondClass).to.throw(Error);
+
+      function registerSecondClass() {
+        Marty.createStore({ id: expectedId });
+      }
+    });
+  });
+
   describe('stores', function () {
     var expectedStore, expectedFoo, actualStore, actionCreators, defaultStore;
 

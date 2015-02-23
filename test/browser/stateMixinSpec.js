@@ -421,7 +421,7 @@ describe('StateMixin', function () {
 
   function createStore(state) {
     return Marty.createStore({
-      id: 'stateMixin',
+      id: uuid.type('StateMixin'),
       getInitialState: function () {
         return state || {};
       }
