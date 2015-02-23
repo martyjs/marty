@@ -1,53 +1,77 @@
 var _ = require('underscore');
 var expect = require('chai').expect;
+var describeStyles = require('./lib/describeStyles');
 
-describe('Marty#serializeState()', function () {
-  var Store1, Store2, Store3, Marty;
+describeStyles('Marty#serializeState()', function () {
+  var Marty, factory = this.factory;
   var store1ExpectedState, storeSerializedState, serializedState;
 
   beforeEach(function () {
     storeSerializedState = { bar: 'bar' };
     store1ExpectedState = { initial: 'store1' };
     Marty = require('../../index').createInstance();
-    Store1 = Marty.createStore({
-      id: 'store1',
-      displayName: 'store1',
-      getInitialState: _.noop,
-      serialize: function () {
-        return store1ExpectedState;
+    factory({
+      classic: function () {
+        Marty.createStore({
+          id: 'Store1',
+          getInitialState: _.noop,
+          serialize: function () {
+            return store1ExpectedState;
+          }
+        });
+
+        Marty.createStore({
+          displayName: 'Store2',
+          getInitialState: _.noop,
+          serialize: function () {
+            return storeSerializedState;
+          }
+        });
+
+        Marty.createStore({
+          id: 'Store3',
+          getInitialState: _.noop
+        });
+      },
+      es6: function () {
+        class Store1 extends Marty.Store {
+          serialize() {
+            return store1ExpectedState;
+          }
+        }
+
+        class Store2 extends Marty.Store {
+          serialize() {
+            return storeSerializedState;
+          }
+        }
+
+        class Store3 extends Marty.Store {
+        }
+
+        Marty.register(Store1);
+        Marty.register(Store2);
+        Marty.register(Store3);
       }
     });
 
-    Store2 = Marty.createStore({
-      id: 'store2',
-      displayName: 'store2',
-      getInitialState: _.noop,
-      serialize: function () {
-        return storeSerializedState;
-      }
-    });
-
-    Store3 = Marty.createStore({
-      id: 'store3',
-      getInitialState: _.noop
-    });
     serializedState = Marty.serializeState();
   });
 
   it('should serialze all the stores', function () {
     expect(serializedState.toJSON()).to.eql({
-      store1: store1ExpectedState,
-      store2: storeSerializedState,
-      store3: {}
+      Store1: store1ExpectedState,
+      Store2: storeSerializedState,
+      Store3: {}
     });
   });
 
   describe('#toString()', function () {
     it('should create a string that can be injected into the page', function () {
       expect(serializedState.toString()).to.equal('(window.__marty||(window.__marty={})).state=' + JSON.stringify({
-        store1: store1ExpectedState,
-        store2: storeSerializedState,
-        store3: {}
+        Store1: store1ExpectedState,
+        Store2: storeSerializedState,
+        Store3: {}
       }));
     });
   });
