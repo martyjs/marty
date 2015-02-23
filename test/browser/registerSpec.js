@@ -55,8 +55,9 @@ describe('Marty#register', function () {
 
     function createStore(Marty, expectedInitialState) {
       return class ExpectedStore extends Marty.Store {
-        getInitialState() {
-          return expectedInitialState;
+        constructor(options) {
+          super(options);
+          this.state = expectedInitialState;
         }
         getFoo(id) {
           return this.state[id];

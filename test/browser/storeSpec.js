@@ -12,7 +12,7 @@ var ActionPredicateUndefinedError = require('../../errors/actionPredicateUndefin
 describeStaticAndClass('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
   var actualAction, actualChangeListenerFunctionContext, expectedChangeListenerFunctionContext;
-  var expectedError, logger, factory = this.factory;
+  var expectedError, logger, factory = this.factory, style = this.style;
 
   beforeEach(function () {
     logger = stubbedLogger();
@@ -57,11 +57,12 @@ describeStaticAndClass('Store', function () {
           constructor(options) {
             super(options);
             this.handlers = handlers;
+            this.state = initialState;
             this.displayName = 'TestStore';
           }
         }
 
-        _.extend(TestStore.prototype, proto);
+        _.extend(TestStore.prototype, _.omit(proto, 'getInitialState'));
 
         return new TestStore({
           dispatcher: dispatcher
@@ -88,97 +89,76 @@ describeStaticAndClass('Store', function () {
     expect(dispatcher.register).to.have.been.called;
   });
 
-  describe('when you don\'t pass in getInitialState', function () {
-    it('should throw an error', function () {
-      expect(storeWithoutGetInitialState).to.throw(Error);
+  if (style === 'classic') {
 
-      function storeWithoutGetInitialState() {
-        return factory({
-          classic: function () {
-            return Marty.createStore({
-              id: 'storeWithoutGetInitialState',
-              foo: function () {
-                return 'bar';
-              }
-            });
-          },
-          es6: function () {
-            class TestStore extends Marty.Store { }
+    describe('#mixins', function () {
+      describe('when you have multiple mixins', function () {
+        var mixin1, mixin2;
 
-            return new TestStore();
-          }
+        beforeEach(function () {
+          mixin1 = {
+            foo: function () { return 'bar'; }
+          };
+
+          mixin2 = {
+            bar: function () { return 'baz'; }
+          };
+
+          store = Marty.createStore({
+            id: 'multiple-mixins',
+            dispatcher: dispatcher,
+            getInitialState: _.noop,
+            mixins: [mixin1, mixin2]
+          });
         });
-      }
-    });
-  });
 
-  describe('#mixins', function () {
-    describe('when you have multiple mixins', function () {
-      var mixin1, mixin2;
-
-      beforeEach(function () {
-        mixin1 = {
-          foo: function () { return 'bar'; }
-        };
-
-        mixin2 = {
-          bar: function () { return 'baz'; }
-        };
-
-        store = Marty.createStore({
-          id: 'multiple-mixins',
-          dispatcher: dispatcher,
-          getInitialState: _.noop,
-          mixins: [mixin1, mixin2]
+        it('should allow you to mixin object literals', function () {
+          expect(store.foo()).to.equal('bar');
+          expect(store.bar()).to.equal('baz');
         });
       });
 
-      it('should allow you to mixin object literals', function () {
-        expect(store.foo()).to.equal('bar');
-        expect(store.bar()).to.equal('baz');
-      });
-    });
+      describe('when the mixin has handlers', function () {
+        var handlerMixin;
 
-    describe('when the mixin has handlers', function () {
-      var handlerMixin;
+        beforeEach(function () {
+          handlerMixin = {
+            handlers: {
+              baz: 'BAZ'
+            },
+            baz: _.noop
+          };
 
-      beforeEach(function () {
-        handlerMixin = {
-          handlers: {
-            baz: 'BAZ'
-          },
-          baz: _.noop
-        };
+          store = Marty.createStore({
+            id: 'mixin-with-handlers',
+            dispatcher: dispatcher,
+            handlers: {
+              foo: 'FOO',
+              bar: 'BAR'
+            },
+            getInitialState: _.noop,
+            mixins: [handlerMixin],
+            foo: _.noop,
+            bar: _.noop
+          });
+        });
 
-        store = Marty.createStore({
-          id: 'mixin-with-handlers',
-          dispatcher: dispatcher,
-          handlers: {
-            foo: 'FOO',
-            bar: 'BAR'
-          },
-          getInitialState: _.noop,
-          mixins: [handlerMixin],
-          foo: _.noop,
-          bar: _.noop
+        it('should do a deep merge', function () {
+          expect(store.handlers).to.include.keys('foo', 'bar', 'baz');
         });
       });
+    });
 
-      it('should do a deep merge', function () {
-        expect(store.handlers).to.include.keys('foo', 'bar', 'baz');
+    describe('#getInitialState()', function () {
+      it('should be called once', function () {
+        expect(store.getInitialState).to.have.been.calledOnce;
+      });
+
+      it('should set the stores state to the initial state', function () {
+        expect(store.state).to.equal(initialState);
       });
     });
-  });
-
-  describe('#getInitialState()', function () {
-    it('should be called once', function () {
-      expect(store.getInitialState).to.have.been.calledOnce;
-    });
-
-    it('should set the stores state to the initial state', function () {
-      expect(store.state).to.equal(initialState);
-    });
-  });
+  }
 
   describe('#state', function () {
     var newState;
@@ -299,9 +279,6 @@ describeStaticAndClass('Store', function () {
           },
           es6: function () {
             class TestStore extends Marty.Store {
-              getInitialState() {
-                return {};
-              }
             }
 
             TestStore.prototype.clear = clear;
@@ -354,6 +331,10 @@ describeStaticAndClass('Store', function () {
           },
           es6: function () {
             class TestStore extends Marty.Store {
+              constructor(options) {
+                super(options);
+                this.state = {};
+              }
               clear() {
                 super.clear();
                 clear();
@@ -361,9 +342,6 @@ describeStaticAndClass('Store', function () {
               dispose() {
                 super.dispose();
                 dispose();
-              }
-              getInitialState() {
-                return {};
               }
             }
 
@@ -424,13 +402,10 @@ describeStaticAndClass('Store', function () {
           class TestStore extends Marty.Store {
             constructor(options) {
               super(options);
-
+              this.state = {};
               this.handlers = {
                 one: actionType
               };
-            }
-            getInitialState() {
-              return {};
             }
           }
 
@@ -473,13 +448,10 @@ describeStaticAndClass('Store', function () {
               class TestStore extends Marty.Store {
                 constructor(options) {
                   super(options);
-
+                  this.state = {};
                   this.handlers = {
                     foo: 'FOO'
                   };
-                }
-                getInitialState() {
-                  return {};
                 }
               }
 
@@ -514,13 +486,10 @@ describeStaticAndClass('Store', function () {
               class TestStore extends Marty.Store {
                 constructor(options) {
                   super(options);
-
+                  this.state = {};
                   this.handlers = {
                     foo: null
                   };
-                }
-                getInitialState() {
-                  return {};
                 }
               }
 
@@ -654,13 +623,9 @@ describeStaticAndClass('Store', function () {
 
             constructor() {
               super();
+              this.state = 0;
               this.handlers = { sum: 'SUM'};
             }
-
-            getInitialState() {
-              return 0;
-            }
-
             sum(value) {
               waitForCb(this);
               this.state = store2.getState() + value;
@@ -671,10 +636,8 @@ describeStaticAndClass('Store', function () {
           class Store2 extends Marty.Store {
             constructor() {
               super();
+              this.state = 0;
               this.handlers = { sum: 'SUM'};
-            }
-            getInitialState() {
-              return 0;
             }
             sum(value) {
               this.waitFor(store3);
@@ -686,13 +649,9 @@ describeStaticAndClass('Store', function () {
           class Store3 extends Marty.Store {
             constructor() {
               super();
+              this.state = 0;
               this.handlers = { sum: 'SUM'};
             }
-
-            getInitialState() {
-              return 0;
-            }
-
             sum(value) {
               this.state += value;
               order.push('store3');
@@ -850,13 +809,12 @@ describeStaticAndClass('Store', function () {
             ActionCreators = new TestActionCreators();
 
             class TestStore extends Marty.Store {
-              get handlers() {
-                return {
+              constructor(options) {
+                super(options);
+                this.state = [];
+                this.handlers = {
                   add: 'ADD'
                 };
-              }
-              getInitialState() {
-                return [];
               }
               add(user) {
                 this.state.push(user);
@@ -927,8 +885,9 @@ describeStaticAndClass('Store', function () {
           },
           es6: function () {
             class ClearStore extends Marty.Store {
-              getInitialState() {
-                return {};
+              constructor() {
+                super();
+                this.state = {};
               }
             }
 
@@ -965,8 +924,9 @@ describeStaticAndClass('Store', function () {
           },
           es6: function () {
             class ClearStore extends Marty.Store {
-              getInitialState() {
-                return {};
+              constructor(options) {
+                super(options);
+                this.state = {};
               }
               clear() {
                 clear();

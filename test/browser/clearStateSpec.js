@@ -2,23 +2,20 @@ var expect = require('chai').expect;
 
 describe('Marty#clearState()', function () {
   var Marty = require('../../index');
-  var Store1, Store2, store1ExpectedState, store2ExpectedState;
+  var Store1, Store2;
 
   beforeEach(function () {
-    store1ExpectedState = { initial: 'store1' };
-    store2ExpectedState = { initial: 'store2' };
-
     Store1 = Marty.createStore({
       id: 'clearState1',
       getInitialState: function () {
-        return store1ExpectedState;
+        return {};
       }
     });
 
     Store2 = Marty.createStore({
       id: 'clearState2',
       getInitialState: function () {
-        return store2ExpectedState;
+        return {};
       }
     });
 
@@ -31,8 +28,8 @@ describe('Marty#clearState()', function () {
   });
 
   it('should reset the store state to its initial state', function () {
-    expect(Store1.getState()).to.equal(store1ExpectedState);
-    expect(Store2.getState()).to.equal(store2ExpectedState);
+    expect(Store1.getState()).to.eql({});
+    expect(Store2.getState()).to.eql({});
   });
 });
 

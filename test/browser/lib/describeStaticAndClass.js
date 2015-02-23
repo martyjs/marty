@@ -9,12 +9,14 @@ function describeStaticAndClass(description, cb, options = {}) {
 
   function classicAndClass() {
     describe(description + ' (Classic)', function () {
-      this.factory = factory('classic');
+      this.style = 'classic';
+      this.factory = factory(this.style);
       cb.call(this);
     });
 
     describe(description + ' (ES6)', function () {
-      this.factory = factory('es6');
+      this.style = 'es6';
+      this.factory = factory(this.style);
       cb.call(this);
     });
   }
