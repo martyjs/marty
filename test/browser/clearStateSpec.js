@@ -19,7 +19,7 @@ describe('Marty#clearState()', function () {
       }
     });
 
-    Marty.setInitialState({
+    Marty.replaceState({
       clearState1: { foo: 'bar' },
       clearState2: { bar: 'baz' }
     });
