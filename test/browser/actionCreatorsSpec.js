@@ -7,7 +7,7 @@ var constants = require('../../lib/constants');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var serializeError = require('../../lib/utils/serializeError');
-var describeStaticAndClass = require('./lib/describeStaticAndClass');
+var describeStyles = require('./lib/describeStyles');
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, actualResult, actualError, Marty;
@@ -107,7 +107,7 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStaticAndClass('when the action returns a promise', function () {
+  describeStyles('when the action returns a promise', function () {
     var factory = this.factory;
 
     describe('when the promise fails', function () {
@@ -231,7 +231,7 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStaticAndClass('when the action throws an error', function () {
+  describeStyles('when the action throws an error', function () {
     var factory = this.factory;
 
     beforeEach(function () {
@@ -301,7 +301,7 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStaticAndClass('when the action does not return anything', function () {
+  describeStyles('when the action does not return anything', function () {
     var factory = this.factory;
 
     beforeEach(function () {
@@ -429,7 +429,7 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStaticAndClass('#types', function () {
+  describeStyles('#types', function () {
     var factory = this.factory;
     var Creators, Constants, fooAction, barAction, expectedArg;
 

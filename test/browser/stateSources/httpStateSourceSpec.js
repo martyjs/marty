@@ -4,11 +4,11 @@ var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
 var HttpStateSource = require('../../../stateSources/http');
-var describeStaticAndClass = require('../lib/describeStaticAndClass');
+var describeStyles = require('../lib/describeStyles');
 
 require('es6-promise').polyfill();
 
-describeStaticAndClass('HttpStateSource', function () {
+describeStyles('HttpStateSource', function () {
   this.timeout(10000);
 
   var API, baseUrl, response;

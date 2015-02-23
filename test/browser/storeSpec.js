@@ -5,11 +5,11 @@ var expect = require('chai').expect;
 var Dispatcher = require('../../dispatcher');
 var stubbedLogger = require('../lib/stubbedLogger');
 var ActionPayload = require('../../lib/actionPayload');
-var describeStaticAndClass = require('./lib/describeStaticAndClass');
+var describeStyles = require('./lib/describeStyles');
 var ActionHandlerNotFoundError = require('../../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../../errors/actionPredicateUndefined');
 
-describeStaticAndClass('Store', function () {
+describeStyles('Store', function () {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
   var actualAction, actualChangeListenerFunctionContext, expectedChangeListenerFunctionContext;
   var expectedError, logger, factory = this.factory, style = this.style;

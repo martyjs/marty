@@ -1,12 +1,12 @@
 var Marty = require('../../index');
 var expect = require('chai').expect;
-var describeStaticAndClass = require('./lib/describeStaticAndClass');
+var describeStyles = require('./lib/describeStyles');
 
 describe('StateSource', function () {
   var stateSource;
 
   describe('#createStateSource()', function () {
-    describeStaticAndClass('when you pass in a function', function () {
+    describeStyles('when you pass in a function', function () {
       var expectedResult;
       var factory = this.factory;
 

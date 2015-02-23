@@ -1,9 +1,9 @@
 var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
-var describeStaticAndClass = require('../lib/describeStaticAndClass');
+var describeStyles = require('../lib/describeStyles');
 
-describeStaticAndClass('SessionStorageStateSource', function () {
+describeStyles('SessionStorageStateSource', function () {
   var source;
   var factory = this.factory;
 

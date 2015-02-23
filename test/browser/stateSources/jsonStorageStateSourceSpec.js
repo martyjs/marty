@@ -1,9 +1,9 @@
 var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
-var describeStaticAndClass = require('../lib/describeStaticAndClass');
+var describeStyles = require('../lib/describeStyles');
 
-describeStaticAndClass('JSONStorageStateSource', function () {
+describeStyles('JSONStorageStateSource', function () {
   var factory = this.factory;
   var source, payload, serializedPayload;
 

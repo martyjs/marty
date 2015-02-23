@@ -1,4 +1,4 @@
-function describeStaticAndClass(description, cb, options = {}) {
+function describeStyles(description, cb, options = {}) {
   if (options.only) {
     describe.only(description, classicAndClass);
   } else if (options.skip) {
@@ -32,16 +32,16 @@ function describeStaticAndClass(description, cb, options = {}) {
   }
 }
 
-describeStaticAndClass.only = function (description, cb) {
-  describeStaticAndClass(description, cb, {
+describeStyles.only = function (description, cb) {
+  describeStyles(description, cb, {
     only: true
   });
 };
 
-describeStaticAndClass.skip = function (description, cb) {
-  describeStaticAndClass(description, cb, {
+describeStyles.skip = function (description, cb) {
+  describeStyles(description, cb, {
     skip: true
   });
 };
 
-module.exports = describeStaticAndClass;
+module.exports = describeStyles;
