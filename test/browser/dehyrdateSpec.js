@@ -2,7 +2,7 @@ var _ = require('underscore');
 var expect = require('chai').expect;
 var describeStyles = require('./lib/describeStyles');
 
-describeStyles('Marty#serializeState()', function () {
+describeStyles('Marty#dehydrate()', function () {
   var Marty, factory = this.factory;
   var store1ExpectedState, storeSerializedState, serializedState;
 
@@ -15,15 +15,15 @@ describeStyles('Marty#serializeState()', function () {
         Marty.createStore({
           id: 'Store1',
           getInitialState: _.noop,
-          serialize: function () {
+          hydrate: function () {
             return store1ExpectedState;
           }
         });
 
         Marty.createStore({
-          displayName: 'Store2',
+          id: 'Store2',
           getInitialState: _.noop,
-          serialize: function () {
+          hydrate: function () {
             return storeSerializedState;
           }
         });
@@ -35,13 +35,13 @@ describeStyles('Marty#serializeState()', function () {
       },
       es6: function () {
         class Store1 extends Marty.Store {
-          serialize() {
+          hydrate() {
             return store1ExpectedState;
           }
         }
 
         class Store2 extends Marty.Store {
-          serialize() {
+          hydrate() {
             return storeSerializedState;
           }
         }
@@ -55,7 +55,7 @@ describeStyles('Marty#serializeState()', function () {
       }
     });
 
-    serializedState = Marty.serializeState();
+    serializedState = Marty.dehydrate();
   });
 
   it('should serialze all the stores', function () {

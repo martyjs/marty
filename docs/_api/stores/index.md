@@ -382,7 +382,6 @@ when.all([foo, bar], {
 });
 {% endhighlight %}
 
-
 <h3>Options</h3>
 
 <table class="table table-bordered table-striped">
@@ -652,6 +651,14 @@ class UsersStore extends Marty.Store {
   }
 }
 {% endsample %}
+
+<h2 id="dehydrate">dehydrate()</h2>
+
+Should return the state of your store in a form that can be serialised to JSON. Used in conjunction with <a href="#rehydrate">rehydrate</a> for synchronising the state of a store on the server with its browser counterpart. If not implemented then Marty will attempt to serialise <code>this.state</code>.
+
+<h2 id="rehydrate">rehydrate(dehydratedState)</h2>
+
+Expects the store to deserialize the dehydrated state and initialise the store. Used in conjunction with <a href="#dehydrate">dehydrate</a> for synchronising the state of a store on the server with its browser counterpart. If not implemented then Marty will call <code>this.replaceState(dehydratedState)</code>.
 
 <h2 id="waitFor">waitFor(*stores)</h2>
 
