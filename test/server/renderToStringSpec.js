@@ -64,7 +64,7 @@ describe('Marty#renderToString', function () {
     });
 
     it('should include the serialized state', function () {
-      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState(context).toString());
+      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.dehydrate(context).toString());
     });
 
     it('should call dispose', function () {
@@ -86,7 +86,7 @@ describe('Marty#renderToString', function () {
     });
 
     it('should include the serialized state', function () {
-      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.serializeState(context).toString());
+      expect($('#' + MARTY_STATE_ID).html()).to.equal(Marty.dehydrate(context).toString());
     });
 
     it('should call dispose', function () {
