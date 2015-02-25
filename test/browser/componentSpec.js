@@ -5,14 +5,16 @@ var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('Component', function () {
-  var Store, Component, getState, expectedId;
+  var Store, Component, getState, expectedId, dispose;
+
+  beforeEach(function () {
+    expectedId = 123;
+    getState = sinon.spy();
+    Store = Marty.register(FooStore);
+  });
 
   describe('when you listen to stores', function () {
     beforeEach(function () {
-      expectedId = 123;
-      getState = sinon.spy();
-
-      Store = Marty.register(FooStore);
       Component = render(FooComponent);
     });
 
@@ -40,19 +42,88 @@ describe('Component', function () {
   });
 
   describe('when you dont implement `getState`', function () {
-    it('should default to returning {}');
+    beforeEach(function () {
+      delete FooComponent.prototype.getState;
+      Component = render(FooComponent);
+      Store.replaceState({
+        [expectedId]: { foo: 'bar' }
+      });
+    });
+
+    it('should default to returning {}', function () {
+      expect(Component.state).to.eql({});
+    });
   });
 
   describe('when you listen to an array of stores', function () {
-    it('should listen to all of the stores');
+    var OtherStore;
+
+    beforeEach(function () {
+      OtherStore = Marty.register(BarStore);
+      Component = render(BarComponent);
+
+      Store.replaceState({
+        [expectedId]: { foo: 'bar' }
+      });
+
+      OtherStore.replaceState({
+        [expectedId]: { bar: 'baz' }
+      });
+    });
+
+    it('should listen to all of the stores', function () {
+      expect(Component.state).to.eql({
+        foo: { foo: 'bar' },
+        bar: { bar: 'baz' }
+      });
+
+      expect(getState).to.be.calledThrice;
+    });
+
+    class BarStore extends Marty.Store {
+      getBar(id) {
+        return this.state[id] || null;
+      }
+    }
+
+    class BarComponent extends Marty.Component {
+      constructor(props) {
+        super(props);
+        this.listenTo = [Store, OtherStore];
+      }
+
+      render() {
+        return <div>foo</div>;
+      }
+
+      getState() {
+        getState();
+        return {
+          foo: Store.getFoo(expectedId),
+          bar: OtherStore.getBar(expectedId)
+        };
+      }
+    }
   });
 
   describe('when the component unmounts', function () {
-    it('should stop listening to any stores');
-  });
+    var disposable;
+    beforeEach(function () {
+      disposable = {
+        dispose: sinon.spy()
+      };
 
-  describe('when you implement `getInitialState`', function () {
-    it('should merge `getInitialState` with `getState`');
+      Store.addChangeListener = function () {
+        return disposable;
+      };
+
+      Component = render(FooComponent);
+      React.unmountComponentAtNode(React.findDOMNode(Component).parentNode);
+    });
+
+    it('should stop listening to any stores', function () {
+      expect(disposable.dispose).to.be.calledOnce;
+    });
   });
 
   function render(component) {
@@ -76,6 +147,7 @@ describe('Component', function () {
     }
 
     getState() {
+      getState();
       return {
         foo: Store.getFoo(expectedId)
       };
