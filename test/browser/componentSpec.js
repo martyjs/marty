@@ -87,8 +87,8 @@ describe('Component', function () {
     }
 
     class BarComponent extends Marty.Component {
-      constructor(props) {
-        super(props);
+      constructor(props, context) {
+        super(props, context);
         this.listenTo = [Store, OtherStore];
       }
 
@@ -126,6 +126,107 @@ describe('Component', function () {
     });
   });
 
+  describe('when I render within a context', function () {
+    var context, expectedState;
+
+    beforeEach(function () {
+      context = Marty.createContext();
+      expectedState = {
+        'foo': { foo: 'bar' }
+      };
+
+      Store.for(context).replaceState({
+        [expectedId]: expectedState.foo
+      });
+
+      Component = TestUtils.renderIntoDocument(
+        React.createElement(ContextComponent, {
+          context: context,
+          type: RootComponent
+        })
+      ).refs.subject;
+    });
+
+    it('should add the context to the root element', function () {
+      expect(Component.state).to.eql(expectedState);
+    });
+
+    it('should pass the context to child elements', function () {
+      expect(Component.refs.foo.state).to.eql(expectedState);
+      expect(Component.refs.bar.state).to.eql(expectedState);
+    });
+
+    describe('when the store changes', function () {
+      beforeEach(function () {
+        expectedState = {
+          'foo': { bar: 'baz' }
+        };
+
+        Store.for(context).replaceState({
+          [expectedId]: expectedState.foo
+        });
+      });
+
+      it('should update the component state', function () {
+        expect(Component.state).to.eql(expectedState);
+      });
+
+      it('should pass the context to child elements', function () {
+        expect(Component.refs.foo.state).to.eql(expectedState);
+        expect(Component.refs.bar.state).to.eql(expectedState);
+      });
+    });
+
+    class RootComponent extends Marty.Component {
+      constructor(props, context) {
+        super(props, context);
+        this.listenTo = Store;
+      }
+      render() {
+        return React.createElement('div', null, [
+          React.createElement(ChildComponent, { ref: 'foo', key: 'foo' }),
+          React.createElement(ChildComponent, { ref: 'bar', key: 'bar' })
+        ]);
+      }
+      getState() {
+        return {
+          foo: Store.for(this).getFoo(expectedId)
+        };
+      }
+    }
+
+    class ChildComponent extends Marty.Component {
+      constructor(props, context) {
+        super(props, context);
+        this.listenTo = Store;
+      }
+      render() {
+        return React.createElement('div');
+      }
+      getState() {
+        return {
+          foo: Store.for(this).getFoo(expectedId)
+        };
+      }
+    }
+
+    class ContextComponent extends React.Component {
+      static get childContextTypes() {
+        return {
+           martyContext: React.PropTypes.object.isRequired
+        };
+      }
+      getChildContext() {
+        return {
+          martyContext: this.props.context
+        };
+      }
+      render() {
+        return React.createElement(this.props.type, { ref: 'subject' });
+      }
+    }
+  });
+
   function render(component) {
     return TestUtils.renderIntoDocument(React.createElement(component));
   }
@@ -137,8 +238,8 @@ describe('Component', function () {
   }
 
   class FooComponent extends Marty.Component {
-    constructor(props) {
-      super(props);
+    constructor(props, context) {
+      super(props, context);
       this.listenTo = Store;
     }
 
