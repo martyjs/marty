@@ -28,7 +28,7 @@ function createInstance() {
 
 module.exports = createInstance();
 
-},{"./lib/classes":16,"./lib/container":18,"./lib/create":20,"./lib/diagnostics":22,"./lib/dispose":24,"./lib/renderToString":29,"./lib/state":30,"babel/register":58,"es6-promise":61,"events":59,"underscore":67}],1:[function(require,module,exports){
+},{"./lib/classes":16,"./lib/container":19,"./lib/create":21,"./lib/diagnostics":23,"./lib/dispose":25,"./lib/renderToString":29,"./lib/state":30,"babel/register":56,"es6-promise":59,"events":57,"underscore":65}],1:[function(require,module,exports){
 "use strict";
 
 var constants = require("./index");
@@ -42,7 +42,7 @@ module.exports = constants(["ACTION_STARTING", "ACTION_DONE", "ACTION_FAILED"]);
 module.exports = require("../lib/constants");
 
 
-},{"../lib/constants":17}],3:[function(require,module,exports){
+},{"../lib/constants":18}],3:[function(require,module,exports){
 "use strict";
 
 var constants = require("./index");
@@ -56,7 +56,7 @@ module.exports = constants(["PENDING", "FAILED", "DONE"]);
 module.exports = require("./lib/dispatcher");
 
 
-},{"./lib/dispatcher":23}],5:[function(require,module,exports){
+},{"./lib/dispatcher":24}],5:[function(require,module,exports){
 "use strict";
 
 function ActionHandlerNotFoundError(actionHandler, store) {
@@ -168,7 +168,7 @@ function isJson(res) {
 }
 
 
-},{"underscore":67}],11:[function(require,module,exports){
+},{"underscore":65}],11:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
@@ -191,7 +191,7 @@ module.exports = {
 };
 
 
-},{"underscore":67}],12:[function(require,module,exports){
+},{"underscore":65}],12:[function(require,module,exports){
 "use strict";
 
 var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
@@ -214,12 +214,10 @@ var serializeError = require("../utils/serializeError");
 var ActionConstants = require("../../constants/actions");
 var FUNCTIONS_TO_NOT_WRAP = ["constructor"];
 
-function getInstance(creators) {
-  return Instances.get(creators);
-}
-
 var ActionCreators = (function () {
   function ActionCreators(options) {
+    var _this = this;
+
     _classCallCheck(this, ActionCreators);
 
     this.__type = "ActionCreators";
@@ -229,17 +227,40 @@ var ActionCreators = (function () {
 
     var props = _.difference(Object.getOwnPropertyNames(this.constructor.prototype), FUNCTIONS_TO_NOT_WRAP);
 
+    if (options && options.types) {
+      this.types = options.types;
+    }
+
     // Wrap all functions so that we can emit actions before and after
     _.each(props, function (name) {
-      var func = this[name];
+      var func = _this[name];
 
       if (_.isFunction(func)) {
-        this[name] = wrapFunction(this, this[name], name);
+        _this[name] = wrapFunction(_this, _this[name], name);
       }
-    }, this);
+    });
   }
 
   _prototypeProperties(ActionCreators, null, {
+    types: {
+      get: function get() {
+        return Instances.get(this).types;
+      },
+      set: function set(value) {
+        var _this = this;
+
+        Instances.get(this).types = value;
+
+        _.each(this.types, function (type, name) {
+          if (_.isUndefined(_this[name])) {
+            _this[name] = wrapFunction(_this, function () {
+              this.dispatch.apply(this, arguments);
+            }, name, type.toString());
+          }
+        });
+      },
+      configurable: true
+    },
     getActionType: {
       value: function getActionType(name) {
         return name.replace(/([a-z\d])([A-Z]+)/g, "$1_$2").replace(/[-\s]+/g, "_").toUpperCase();
@@ -267,18 +288,19 @@ var ActionCreators = (function () {
 
 module.exports = ActionCreators;
 
-function wrapFunction(creators, func, name) {
-  var _metadata = metadata(func, name);
-
-  var actionType = _metadata.actionType;
-  var annotations = _metadata.annotations;
-
+function wrapFunction(creators, func, name, actionType) {
   return function () {
     var result;
     var handlers = [];
     var dispatchedAction;
     var actionId = uuid.small();
     var context = actionContext();
+    var functionMetadata = metadata(func, name);
+    var annotations = functionMetadata.annotations || {};
+
+    if (!actionType) {
+      actionType = functionMetadata.actionType;
+    }
 
     dispatchStarting();
 
@@ -403,51 +425,55 @@ function wrapFunction(creators, func, name) {
         dispatchedAction.error = err;
       }
     }
-  };
 
-  function metadata(func, name) {
-    var actionType;
-    var annotations = {};
+    function metadata(func, name) {
+      var actionType;
+      var annotations = {};
 
-    if (func.annotations) {
-      if (!func.annotations.type) {
-        throw new Error("Unknown action type");
+      if (func.annotations) {
+        if (!func.annotations.type) {
+          throw new Error("Unknown action type");
+        }
+
+        actionType = func.annotations.type;
+        annotations = _.omit(func.annotations, "type");
+      } else if (creators.types && creators.types[name]) {
+        actionType = creators.types[name];
+      } else {
+        actionType = creators.getActionType(name);
       }
 
-      actionType = func.annotations.type;
-      annotations = _.omit(func.annotations, "type");
-    } else if (creators.types && creators.types[name]) {
-      actionType = creators.types[name];
-    } else {
-      actionType = creators.getActionType(name);
+      return {
+        annotations: annotations,
+        actionType: actionType.toString()
+      };
     }
 
-    return {
-      actionType: actionType,
-      annotations: annotations
-    };
-  }
+    function dispatch(payload, annotations) {
+      var dispatcher = getInstance(creators).dispatcher;
+      var action = new ActionPayload(_.extend({}, annotations, payload));
 
-  function dispatch(payload, annotations) {
-    var dispatcher = getInstance(creators).dispatcher;
-    var action = new ActionPayload(_.extend({}, annotations, payload));
+      dispatcher.dispatch(action);
 
-    dispatcher.dispatch(action);
+      return action;
+    }
 
-    return action;
-  }
+    function logError(err) {
+      var error = "An error occured when dispatching a '" + actionType + "' action in ";
+      error += (creators.displayName || creators.id || " ") + "#" + name;
+      log.error(error, err);
+    }
+  };
+}
 
-  function logError(err) {
-    var error = "An error occured when dispatching a '" + actionType + "' action in ";
-    error += (creators.displayName || creators.id || " ") + "#" + name;
-    log.error(error, err);
-  }
+function getInstance(creators) {
+  return Instances.get(creators);
 }
 
 module.exports = ActionCreators;
 
 
-},{"../../constants/actions":1,"../actionPayload":15,"../instances":26,"../logger":27,"../utils/resolve":49,"../utils/serializeError":50,"../utils/uuid":52,"underscore":67}],13:[function(require,module,exports){
+},{"../../constants/actions":1,"../actionPayload":15,"../instances":27,"../logger":28,"../utils/resolve":46,"../utils/serializeError":47,"../utils/uuid":49,"underscore":65}],13:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
@@ -463,13 +489,15 @@ function createActionCreatorsClass(properties) {
     }
   });
 
-  return createClass(_.omit(properties, "mixins"), ActionCreators);
+  var classProperties = _.omit(properties, "mixins", "types");
+
+  return createClass(classProperties, properties, ActionCreators);
 }
 
 module.exports = createActionCreatorsClass;
 
 
-},{"../createClass":21,"./actionCreators":12,"underscore":67}],14:[function(require,module,exports){
+},{"../createClass":22,"./actionCreators":12,"underscore":65}],14:[function(require,module,exports){
 "use strict";
 
 module.exports = require("./actionCreators");
@@ -628,23 +656,155 @@ function ActionPayload(options) {
 module.exports = ActionPayload;
 
 
-},{"../constants/status":3,"./diagnostics":22,"./utils/uuid":52,"underscore":67}],16:[function(require,module,exports){
+},{"../constants/status":3,"./diagnostics":23,"./utils/uuid":49,"underscore":65}],16:[function(require,module,exports){
 "use strict";
 
 module.exports = {
   Store: require("./store"),
+  Component: require("./component"),
   StateSource: require("./stateSource"),
   ActionCreators: require("./actionCreators"),
-  HttpStateSource: require("./stateSource/http"),
-  JSONStorageStateSource: require("./stateSource/jsonStorage"),
-  LocalStorageStateSource: require("./stateSource/localStorage"),
-  SessionStorageStateSource: require("./stateSource/sessionStorage") };
+  HttpStateSource: require("../stateSources/http"),
+  JSONStorageStateSource: require("../stateSources/jsonStorage"),
+  LocalStorageStateSource: require("../stateSources/localStorage"),
+  SessionStorageStateSource: require("../stateSources/sessionStorage") };
 
 
-},{"./actionCreators":14,"./stateSource":33,"./stateSource/http":32,"./stateSource/jsonStorage":34,"./stateSource/localStorage":35,"./stateSource/sessionStorage":37,"./store":43}],17:[function(require,module,exports){
+},{"../stateSources/http":67,"../stateSources/jsonStorage":68,"../stateSources/localStorage":69,"../stateSources/sessionStorage":71,"./actionCreators":14,"./component":17,"./stateSource":33,"./store":39}],17:[function(require,module,exports){
+"use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;
+
+  _function: while (_again) {
+    _again = false;
+    var object = _x,
+        property = _x2,
+        receiver = _x3;
+    desc = parent = getter = undefined;
+    var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;
+        _x2 = property;
+        _x3 = receiver;
+        _again = true;
+        continue _function;
+      }
+    } else if ("value" in desc && desc.writable) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
+
+var _inherits = function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var React = require("react");
+var _ = require("underscore");
+var log = require("./logger");
+var uuid = require("./utils/uuid");
+var Instances = require("./instances");
+var StoreObserver = require("./storeObserver");
+
+var Component = (function (_React$Component) {
+  function Component(props) {
+    _classCallCheck(this, Component);
+
+    _get(Object.getPrototypeOf(Component.prototype), "constructor", this).call(this, props);
+    this.__id = uuid.type("Component");
+    Instances.add(this);
+    this.state = this.getState();
+  }
+
+  _inherits(Component, _React$Component);
+
+  _prototypeProperties(Component, null, {
+    componentDidMount: {
+      value: function componentDidMount() {
+        var observer = new StoreObserver(this, getStoresToListenTo(this));
+
+        Instances.get(this).observer = observer;
+      },
+      writable: true,
+      configurable: true
+    },
+    componentWillUnmount: {
+      value: function componentWillUnmount() {
+        var instance = Instances.get(this);
+
+        if (instance) {
+          if (instance.observer) {
+            instance.observer.dispose();
+          }
+
+          Instances.dispose(this);
+        }
+      },
+      writable: true,
+      configurable: true
+    },
+    getState: {
+      value: function getState() {
+        return {};
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return Component;
+})(React.Component);
+
+function getStoresToListenTo(component) {
+  var stores = component.listenTo;
+
+  if (!stores) {
+    return [];
+  }
+
+  if (!_.isArray(stores)) {
+    stores = [stores];
+  }
+
+  return _.filter(stores, function (store) {
+    var isStore = store.constructor.type === "Store";
+
+    if (!isStore) {
+      log.warn("Warning: Trying to listen to something that isn't a store", store, component);
+    }
+
+    return isStore;
+  });
+}
+
+module.exports = Component;
+
+
+},{"./instances":27,"./logger":28,"./storeObserver":43,"./utils/uuid":49,"react":undefined,"underscore":65}],18:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
+var log = require("./logger");
+var warnings = require("./warnings");
 
 function constants(obj) {
   return toConstant(obj);
@@ -681,6 +841,10 @@ function constants(obj) {
 
   function createActionCreator(actionType) {
     var constantActionCreator = function constantActionCreator(actionCreator, annotations) {
+      if (warnings.invokeConstant) {
+        log.warn("Warning: Invoking constants has been depreciated. " + "Please migrate to using the types hash: " + "http://martyjs.org/api/action-creators/index.html#types");
+      }
+
       if (!actionCreator) {
         actionCreator = dispatchActionCreator;
       } else if (!_.isFunction(actionCreator)) {
@@ -712,8 +876,18 @@ function constants(obj) {
 module.exports = constants;
 
 
-},{"underscore":67}],18:[function(require,module,exports){
+},{"./logger":28,"./warnings":50,"underscore":65}],19:[function(require,module,exports){
 "use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
 
 var _ = require("underscore");
 var log = require("./logger");
@@ -727,71 +901,119 @@ var ActionCreators = require("./actionCreators");
 
 var FUNCTIONS_TO_NOT_WRAP = ["fetch"];
 
-function Container() {
-  this.types = {};
-  this.defaults = {};
-}
+var Container = (function () {
+  function Container() {
+    _classCallCheck(this, Container);
 
-Container.prototype = {
-  dispose: function dispose() {
     this.types = {};
-  },
-  createContext: function createContext(req) {
-    return new Context(this, req);
-  },
-  get: function get(type, clazz) {
-    return (this.types[type] || {})[clazz];
-  },
-  getAll: function getAll(type) {
-    return _.values(this.types[type] || {});
-  },
-  getDefault: function getDefault(type, id) {
-    return this.defaults[type][id];
-  },
-  getAllDefaults: function getAllDefaults(type) {
-    return _.values(this.defaults[type]);
-  },
-  register: function register(clazz) {
-    var defaultInstance = new clazz();
-    var type = classType(defaultInstance);
-
-    if (!this.types[type]) {
-      this.types[type] = {};
-    }
-
-    if (!this.defaults[type]) {
-      this.defaults[type] = {};
-    }
-
-    var id = classId(clazz, type);
-
-    if (!id) {
-      throw CannotRegisterClassError(clazz, type);
-    }
-
-    clazz.id = id;
-    clazz.type = type;
-
-    this.types[type][id] = clazz;
-
-    if (Environment.isServer) {
-      _.each(_.functions(defaultInstance), wrapResolverFunctions, defaultInstance);
-    }
-
-    this.defaults[type][id] = defaultInstance;
-
-    return defaultInstance;
-  },
-  resolve: function resolve(type, id, options) {
-    var clazz = (this.types[type] || {})[id];
-
-    if (!clazz) {
-      throw CannotFindTypeWithId(type, id);
-    }
-
-    return new clazz(options);
+    this.defaults = {};
   }
-};
+
+  _prototypeProperties(Container, null, {
+    dispose: {
+      value: function dispose() {
+        this.types = {};
+      },
+      writable: true,
+      configurable: true
+    },
+    createContext: {
+      value: function createContext(req) {
+        return new Context(this, req);
+      },
+      writable: true,
+      configurable: true
+    },
+    get: {
+      value: function get(type, clazz) {
+        return (this.types[type] || {})[clazz];
+      },
+      writable: true,
+      configurable: true
+    },
+    getAll: {
+      value: function getAll(type) {
+        return _.values(this.types[type] || {});
+      },
+      writable: true,
+      configurable: true
+    },
+    getDefault: {
+      value: function getDefault(type, id) {
+        return this.defaults[type][id];
+      },
+      writable: true,
+      configurable: true
+    },
+    getAllDefaults: {
+      value: function getAllDefaults(type) {
+        return _.values(this.defaults[type]);
+      },
+      writable: true,
+      configurable: true
+    },
+    register: {
+      value: function register(clazz) {
+        var defaultInstance = new clazz();
+        var type = classType(defaultInstance);
+
+        if (!this.types[type]) {
+          this.types[type] = {};
+        }
+
+        if (!this.defaults[type]) {
+          this.defaults[type] = {};
+        }
+
+        var id = classId(clazz, type);
+
+        if (!id) {
+          throw CannotRegisterClassError(clazz, type);
+        }
+
+        if (this.types[type][id]) {
+          throw ClassAlreadyRegisteredWithId(clazz, type);
+        }
+
+        clazz.id = id;
+        clazz.type = type;
+
+        this.types[type][id] = clazz;
+
+        if (Environment.isServer) {
+          _.each(_.functions(defaultInstance), wrapResolverFunctions, defaultInstance);
+        }
+
+        this.defaults[type][id] = defaultInstance;
+
+        return defaultInstance;
+      },
+      writable: true,
+      configurable: true
+    },
+    resolve: {
+      value: function resolve(type, id, options) {
+        var clazz = (this.types[type] || {})[id];
+
+        if (!clazz) {
+          throw CannotFindTypeWithId(type, id);
+        }
+
+        return new clazz(options);
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return Container;
+})();
+
+addTypeHelpers("Store");
+addTypeHelpers("StateSource");
+addTypeHelpers("ActionCreators");
+
+module.exports = Container;
 
 function classType(obj) {
   if (obj instanceof Store) {
@@ -821,7 +1043,7 @@ function wrapResolverFunctions(functionName) {
     if (warnings.callingResolverOnServer && Environment.isServer) {
       var type = instance.__type;
       var displayName = instance.displayName || instance.id;
-      var warningMessage = "Warning: You are calling `" + functionName + "` on the static instance of the " + type + " '" + displayName + "'. You should resolve the instance for the current context";
+      var warningMessage = "Warning: You are calling " + functionName + " on the static instance of the " + type + " " + ("'" + displayName + "'. You should resolve the instance for the current context");
 
       log.warn(warningMessage);
     }
@@ -829,12 +1051,6 @@ function wrapResolverFunctions(functionName) {
     return originalFunc.apply(instance, arguments);
   };
 }
-
-addTypeHelpers("Store");
-addTypeHelpers("StateSource");
-addTypeHelpers("ActionCreators");
-
-module.exports = Container;
 
 function addTypeHelpers(type) {
   var proto = Container.prototype;
@@ -862,128 +1078,186 @@ function CannotRegisterClassError(clazz, type) {
     message += clazz.displayName + " ";
   }
 
-  return new Error(message + type + " because it does not have an Id.");
+  return new Error("" + message + " " + type + " because it does not have an Id.");
+}
+
+function ClassAlreadyRegisteredWithId(clazz, type) {
+  var message = "Cannot register ";
+
+  if (clazz && clazz.displayName) {
+    message += clazz.displayName + " ";
+  }
+
+  return new Error("" + message + " " + type + " because there is already a class with that Id.");
 }
 
 
-},{"./actionCreators":14,"./context":19,"./environment":25,"./logger":27,"./stateSource":33,"./store":43,"./utils/classId":47,"./warnings":53,"underscore":67}],19:[function(require,module,exports){
+},{"./actionCreators":14,"./context":20,"./environment":26,"./logger":28,"./stateSource":33,"./store":39,"./utils/classId":44,"./warnings":50,"underscore":65}],20:[function(require,module,exports){
 "use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
 
 var currentContext = null;
 var _ = require("underscore");
 var uuid = require("./utils/uuid");
+var Instances = require("./instances");
 var Dispatcher = require("./dispatcher");
 
-function Context(container, req) {
-  var fetchCount, deferredFetchFinished;
+var Context = (function () {
+  function Context(container, req) {
+    var _this = this;
 
-  this.req = req;
-  this.instances = {};
-  this.id = uuid.generate();
-  this.fetchStarted = fetchStarted;
-  this.fetchFinished = fetchFinished;
-  this.dispatcher = new Dispatcher();
-  this.renderInContext = renderInContext;
+    _classCallCheck(this, Context);
 
-  if (container) {
-    _.each(container.types, createInstancesOfType, this);
-  }
+    this.req = req;
+    this.instances = {};
+    this.id = uuid.type("Context");
+    this.dispatcher = new Dispatcher();
 
-  function renderInContext(cb, context) {
-    var fetchFinished, result;
+    Instances.add(this);
 
-    if (currentContext) {
-      throw new Error("Another context is in use");
-    }
+    _.each((container || {}).types, function (classes, type) {
+      var options = {
+        context: _this,
+        dispatcher: _this.dispatcher
+      };
 
-    fetchCount = 0;
-    deferredFetchFinished = deferred();
-    fetchFinished = deferredFetchFinished.promise;
+      _this.instances[type] = {};
 
-    try {
-      currentContext = this;
-      result = cb.call(context);
-      fetchFinished = fetchFinished.then(function () {
-        return result;
+      _.each(classes, function (clazz) {
+        _this.instances[type][clazz.id] = container.resolve(type, clazz.id, options);
       });
-    } finally {
-      currentContext = null;
+    });
+  }
+
+  _prototypeProperties(Context, {
+    getCurrent: {
+      value: function getCurrent() {
+        return currentContext;
+      },
+      writable: true,
+      configurable: true
     }
+  }, {
+    renderInContext: {
+      value: function renderInContext(cb, context) {
+        var fetchFinished, result;
+        var instance = getInstance(this);
 
-    return fetchFinished;
-  }
+        if (currentContext) {
+          throw new Error("Another context is in use");
+        }
 
-  function fetchStarted() {
-    fetchCount++;
-  }
+        instance.fetchCount = 0;
+        instance.deferredFetchFinished = deferred();
+        fetchFinished = instance.deferredFetchFinished.promise;
 
-  function fetchFinished() {
-    fetchCount--;
-    if (fetchCount === 0) {
-      deferredFetchFinished.resolve();
+        try {
+          currentContext = this;
+          result = cb.call(context);
+          fetchFinished = fetchFinished.then(function () {
+            return result;
+          });
+        } finally {
+          currentContext = null;
+        }
+
+        if (instance.fetchCount === 0) {
+          instance.deferredFetchFinished.resolve();
+        }
+
+        return fetchFinished;
+      },
+      writable: true,
+      configurable: true
+    },
+    fetchStarted: {
+      value: function fetchStarted() {
+        getInstance(this).fetchCount++;
+      },
+      writable: true,
+      configurable: true
+    },
+    fetchFinished: {
+      value: function fetchFinished() {
+        var instance = getInstance(this);
+        instance.fetchCount--;
+        if (instance.fetchCount === 0) {
+          instance.deferredFetchFinished.resolve();
+        }
+      },
+      writable: true,
+      configurable: true
+    },
+    dispose: {
+      value: function dispose() {
+        Instances.dispose(this);
+
+        _.each(this.instances, function (instances) {
+          _.each(instances, function (instance) {
+            if (_.isFunction(instance.dispose)) {
+              instance.dispose();
+            }
+          });
+        });
+
+        this.instances = null;
+        this.dispatcher = null;
+      },
+      writable: true,
+      configurable: true
+    },
+    resolve: {
+      value: function resolve(obj) {
+        if (!obj.constructor) {
+          throw new Error("Cannot resolve object");
+        }
+
+        var id = obj.constructor.id;
+        var type = obj.constructor.type;
+
+        if (!this.instances[type]) {
+          throw new Error("Context does not have any instances of " + type);
+        }
+
+        if (!this.instances[type][id]) {
+          throw new Error("Context does not have an instance of the " + type + " id");
+        }
+
+        return this.instances[type][id];
+      },
+      writable: true,
+      configurable: true
+    },
+    getAll: {
+      value: function getAll(type) {
+        return _.values(this.instances[type]);
+      },
+      writable: true,
+      configurable: true
     }
-  }
-
-  function createInstancesOfType(classes, type) {
-    var options = {
-      context: this,
-      dispatcher: this.dispatcher
-    };
-
-    this.instances[type] = {};
-
-    _.each(classes, function (clazz) {
-      this.instances[type][clazz.id] = container.resolve(type, clazz.id, options);
-    }, this);
-  }
-}
-
-function deferred() {
-  var result = {};
-  result.promise = new Promise(function (resolve, reject) {
-    result.resolve = resolve;
-    result.reject = reject;
   });
-  return result;
-}
 
-Context.getCurrent = function () {
-  return currentContext;
-};
-
-Context.prototype = {
-  dispose: function dispose() {
-    this.instances = null;
-    this.dispatcher = null;
-  },
-  resolve: function resolve(obj) {
-    if (!obj.constructor) {
-      throw new Error("Cannot resolve object");
-    }
-
-    var id = obj.constructor.id;
-    var type = obj.constructor.type;
-
-    if (!this.instances[type]) {
-      throw new Error("Context does not have any instances of " + type);
-    }
-
-    if (!this.instances[type][id]) {
-      throw new Error("Context does not have an instance of the " + type + " " + id);
-    }
-
-    return this.instances[type][id];
-  },
-  getAll: function getAll(type) {
-    return _.values(this.instances[type]);
-  }
-};
+  return Context;
+})();
 
 addTypeHelpers("Store");
 addTypeHelpers("StateSource");
 addTypeHelpers("ActionCreators");
 
 module.exports = Context;
+
+function getInstance(context) {
+  return Instances.get(context);
+}
 
 function addTypeHelpers(type) {
   var proto = Context.prototype;
@@ -996,15 +1270,24 @@ function addTypeHelpers(type) {
   proto["getAll" + pluralType] = _.partial(proto.getAll, type);
 }
 
+function deferred() {
+  var result = {};
+  result.promise = new Promise(function (resolve, reject) {
+    result.resolve = resolve;
+    result.reject = reject;
+  });
+  return result;
+}
 
-},{"./dispatcher":23,"./utils/uuid":52,"underscore":67}],20:[function(require,module,exports){
+
+},{"./dispatcher":24,"./instances":27,"./utils/uuid":49,"underscore":65}],21:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
 var warnings = require("./warnings");
 var constants = require("./constants");
+var StateMixin = require("./stateMixin");
 var STORE_CHANGED_EVENT = "store-changed";
-var StateMixin = require("./mixins/stateMixin");
 var createStoreClass = require("./store/createStoreClass");
 var createStateSourceClass = require("./stateSource/createStateSourceClass");
 var createActionCreatorsClass = require("./actionCreators/createActionCreatorsClass");
@@ -1037,7 +1320,16 @@ function register(id, clazz) {
     clazz.displayName = clazz.id;
   }
 
-  return this.container.register(clazz);
+  var defaultInstance = this.container.register(clazz);
+
+  // TODO: Find a nicer way of listening to objects being registered
+  if (defaultInstance.constructor.type === "Store") {
+    warnings.without("callingResolverOnServer", function () {
+      defaultInstance.addChangeListener(_.bind(onStoreChanged, this));
+    }, this);
+  }
+
+  return defaultInstance;
 }
 
 function addStoreChangeListener(callback, context) {
@@ -1063,10 +1355,6 @@ function createContext(req) {
 function createStore(properties) {
   var StoreClass = createStoreClass(properties);
   var defaultInstance = this.register(StoreClass);
-
-  warnings.without("callingResolverOnServer", function () {
-    defaultInstance.addChangeListener(_.bind(onStoreChanged, this));
-  }, this);
 
   return defaultInstance;
 }
@@ -1110,20 +1398,19 @@ function createStateSource(properties) {
 }
 
 
-},{"./actionCreators/createActionCreatorsClass":13,"./constants":17,"./mixins/stateMixin":28,"./stateSource/createStateSourceClass":31,"./store/createStoreClass":39,"./warnings":53,"underscore":67}],21:[function(require,module,exports){
+},{"./actionCreators/createActionCreatorsClass":13,"./constants":18,"./stateMixin":31,"./stateSource/createStateSourceClass":32,"./store/createStoreClass":35,"./warnings":50,"underscore":65}],22:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
 
-function createClass(properties, BaseType) {
+function createClass(properties, defaultOptions, BaseType) {
   function Class(options) {
     classCallCheck(this, Class);
-
     this.id = properties.id;
     this.displayName = properties.displayName;
 
     var base = get(Object.getPrototypeOf(Class.prototype), "constructor", this);
-    var baseOptions = _.extend({}, options, properties);
+    var baseOptions = _.extend({}, defaultOptions, options, properties);
 
     base.call(this, baseOptions);
   }
@@ -1202,7 +1489,7 @@ function classCallCheck(instance, Constructor) {
 module.exports = createClass;
 
 
-},{"underscore":67}],22:[function(require,module,exports){
+},{"underscore":65}],23:[function(require,module,exports){
 "use strict";
 
 var diagnostics = {
@@ -1219,7 +1506,7 @@ function trace() {
 }
 
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 var uuid = require("./utils/uuid");
@@ -1250,7 +1537,7 @@ function createDispatcher() {
 }
 
 
-},{"./utils/uuid":52,"flux":62}],24:[function(require,module,exports){
+},{"./utils/uuid":49,"flux":60}],25:[function(require,module,exports){
 "use strict";
 
 var Dispatcher = require("./dispatcher");
@@ -1263,7 +1550,7 @@ function dispose() {
 module.exports = dispose;
 
 
-},{"./dispatcher":23}],25:[function(require,module,exports){
+},{"./dispatcher":24}],26:[function(require,module,exports){
 "use strict";
 
 var windowDefined = typeof window !== "undefined";
@@ -1276,7 +1563,7 @@ module.exports = {
 };
 
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 var instances = {};
@@ -1291,6 +1578,10 @@ var Instances = {
     var id = obj.__id;
 
     if (!id) {
+      id = obj.id;
+    }
+
+    if (!id) {
       throw new Error("Object does not have an Id");
     }
 
@@ -1302,7 +1593,7 @@ var Instances = {
     var id = this.getId(obj);
 
     if (instances[id]) {
-      throw new Error("There is already an instance for the " + instance.__type + " " + id);
+      throw new Error("There is already an instance for the " + instance.__type + " id");
     }
 
     _.defaults(instance, {
@@ -1321,13 +1612,19 @@ var Instances = {
 module.exports = Instances;
 
 
-},{"../dispatcher":4,"underscore":67}],27:[function(require,module,exports){
+},{"../dispatcher":4,"underscore":65}],28:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
+var Diagnostics = require("./diagnostics");
 
 if (console) {
   module.exports = console;
+  module.exports.trace = function trace() {
+    if (Diagnostics.enabled) {
+      console.log.apply(console, arguments);
+    }
+  };
 } else {
   module.exports = {
     log: _.noop,
@@ -1337,14 +1634,200 @@ if (console) {
 }
 
 
-},{"underscore":67}],28:[function(require,module,exports){
+},{"./diagnostics":23,"underscore":65}],29:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+var _ = require("underscore");
+var Context = require("./context");
+var timeout = require("./utils/timeout");
+
+var DEFAULT_TIMEOUT = 1000;
+
+function renderToString(createElement, context, options) {
+  var Marty = this;
+
+  options = _.defaults(options || {}, {
+    timeout: DEFAULT_TIMEOUT
+  });
+
+  return new Promise(function (resolve, reject) {
+    if (!_.isFunction(createElement)) {
+      throw new Error("createElement must be a function");
+    }
+    if (!context) {
+      reject(new Error("must pass in a context"));
+      return;
+    }
+
+    if (!context instanceof Context) {
+      reject(new Error("context must be an instance of Context"));
+      return;
+    }
+
+    var fetchData = Promise.race([renderToStringInContext(), timeout(options.timeout)]);
+
+    fetchData.then(function () {
+      context.renderInContext(function () {
+        try {
+          var element = createElement();
+
+          if (!element) {
+            reject(new Error("createElement must return an element"));
+            return;
+          }
+
+          var html = React.renderToString(element);
+          html += dehydratedState(context);
+          resolve(html);
+
+          context.dispose();
+        } catch (e) {
+          reject(e);
+          context.dispose();
+        }
+      });
+    });
+
+    function renderToStringInContext() {
+      return context.renderInContext(function () {
+        try {
+          var element = createElement();
+
+          if (!element) {
+            reject(new Error("createElement must return an element"));
+            return;
+          }
+
+          React.renderToString(element);
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
+
+    function dehydratedState(context) {
+      var state = Marty.dehydrate(context);
+
+      return "<script id=\"__marty-state\">" + state + "</script>";
+    }
+  });
+}
+
+module.exports = renderToString;
+
+
+},{"./context":20,"./utils/timeout":48,"react":undefined,"underscore":65}],30:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
-var log = require("../logger");
-var Context = require("../context");
-var uuid = require("../utils/uuid");
-var Diagnostics = require("../diagnostics");
+var log = require("./logger");
+var UnknownStoreError = require("../errors/unknownStore");
+
+var SERIALIZED_WINDOW_OBJECT = "__marty";
+
+module.exports = {
+  rehydrate: rehydrate,
+  dehydrate: dehydrate,
+  clearState: clearState,
+  replaceState: replaceState
+};
+
+function getDefaultStores(context) {
+  return context.container.getAllDefaultStores();
+}
+
+function clearState() {
+  _.each(getDefaultStores(this), function (store) {
+    store.clear();
+  });
+}
+
+function replaceState(states) {
+  _.each(getDefaultStores(this), function (store) {
+    var id = storeId(store);
+
+    if (states[id]) {
+      store.replaceState(states[id]);
+    }
+  });
+}
+
+function rehydrate(storeStates) {
+  var stores = indexById(getDefaultStores(this));
+  storeStates = storeStates || getStoreStatesFromWindow();
+
+  _.each(storeStates, function (state, storeName) {
+    var store = stores[storeName];
+
+    if (!store) {
+      throw new UnknownStoreError(storeName);
+    }
+
+    if (_.isFunction(store.rehydrate)) {
+      store.rehydrate(state);
+    } else {
+      try {
+        store.replaceState(state);
+      } catch (e) {
+        log.error("Failed to rehydrate the state of " + storeName + ". You might be able " + "to solve this problem by implementing Store#rehydrate()");
+
+        throw e;
+      }
+    }
+  });
+
+  function indexById(stores) {
+    return _.object(_.map(stores, function (store) {
+      return storeId(store);
+    }), stores);
+  }
+
+  function getStoreStatesFromWindow() {
+    if (!window || !window[SERIALIZED_WINDOW_OBJECT]) {
+      return;
+    }
+
+    return window[SERIALIZED_WINDOW_OBJECT].state;
+  }
+}
+
+function dehydrate(context) {
+  var state = {};
+  var stores = context ? context.getAllStores() : getDefaultStores(this);
+
+  _.each(stores, function (store) {
+    var id = storeId(store);
+
+    if (id) {
+      state[id] = (store.hydrate || store.getState).call(store);
+    }
+  });
+
+  state.toString = function () {
+    return "(window.__marty||(window.__marty={})).state=" + JSON.stringify(state);
+  };
+
+  state.toJSON = function () {
+    return _.omit(state, "toString", "toJSON");
+  };
+
+  return state;
+}
+
+function storeId(store) {
+  return store.constructor.id;
+}
+
+
+},{"../errors/unknownStore":9,"./logger":28,"underscore":65}],31:[function(require,module,exports){
+"use strict";
+
+var _ = require("underscore");
+var Context = require("./context");
+var uuid = require("./utils/uuid");
+var Instances = require("./instances");
+var StoreObserver = require("./storeObserver");
 var reservedKeys = ["listenTo", "getState", "getInitialState"];
 
 function StateMixin(options) {
@@ -1362,52 +1845,21 @@ function StateMixin(options) {
   }
 
   var mixin = _.extend({
-    onStoreChanged: function onStoreChanged(state, store) {
-      Diagnostics.trace(store.displayName, "store has changed. The", this.displayName, "component (" + this._marty.id + ") is updating");
-
-      if (this._lifeCycleState === "UNMOUNTED") {
-        log.warn("Warning: Trying to set the state of ", this.displayName, "component (" + this._marty.id + ") which is unmounted");
-      } else {
-        this.setState(this.tryGetState(store));
-      }
-    },
-    tryGetState: function tryGetState(store) {
-      var handler;
-
-      if (store && store.action) {
-        handler = store.action.addViewHandler(this.displayName, this);
-      }
-
-      try {
-        return this.getState();
-      } catch (e) {
-        var errorMessage = "An error occured while trying to get the latest state in the view " + this.displayName;
-
-        log.error(errorMessage, e, this);
-
-        if (handler) {
-          handler.failed(e);
-        }
-
-        return {};
-      } finally {
-        if (handler) {
-          handler.dispose();
-        }
-      }
-    },
     componentDidMount: function componentDidMount() {
-      Diagnostics.trace("The", this.displayName, "component (" + this._marty.id + ") has mounted.");
+      Instances.add(this, {
+        observer: new StoreObserver(this, config.stores)
+      });
+    },
+    componentWillUnmount: function componentWillUnmount() {
+      var instance = Instances.get(this);
 
-      var context = Context.getCurrent();
+      if (instance) {
+        if (instance.observer) {
+          instance.observer.dispose();
+        }
 
-      this._marty.listeners = _.map(config.stores, function (store) {
-        store = store["for"](context);
-
-        Diagnostics.trace("The", this.displayName, "component  (" + this._marty.id + ") is listening to the", store.displayName, "store");
-
-        return store.addChangeListener(this.onStoreChanged);
-      }, this);
+        Instances.dispose(this);
+      }
     },
     componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
       var oldProps = this.props;
@@ -1417,15 +1869,6 @@ function StateMixin(options) {
 
       this.props = oldProps;
       this.setState(newState);
-    },
-    componentWillUnmount: function componentWillUnmount() {
-      Diagnostics.trace("The", this.displayName, "component (" + this._marty.id + ") is unmounting.", "It is listening to", this._marty.listeners.length, "stores");
-
-      _.each(this._marty.listeners, function (listener) {
-        listener.dispose();
-      });
-
-      this._marty.listeners = [];
     },
     getState: function getState() {
       return config.getState(this);
@@ -1438,11 +1881,7 @@ function StateMixin(options) {
       }
 
       this.state = {};
-
-      this._marty = {
-        listeners: [],
-        id: uuid.small()
-      };
+      this.__id = uuid.type("Component");
 
       if (options.getInitialState) {
         this.state = options.getInitialState();
@@ -1536,181 +1975,16 @@ function StateMixin(options) {
 module.exports = StateMixin;
 
 
-},{"../context":19,"../diagnostics":22,"../logger":27,"../utils/uuid":52,"underscore":67}],29:[function(require,module,exports){
-"use strict";
-
-var React = require("react");
-var _ = require("underscore");
-var Context = require("./context");
-var timeout = require("./utils/timeout");
-
-var DEFAULT_TIMEOUT = 1000;
-
-function renderToString(createElement, context, options) {
-  var Marty = this;
-
-  options = _.defaults(options || {}, {
-    timeout: DEFAULT_TIMEOUT
-  });
-
-  return new Promise(function (resolve, reject) {
-    if (!_.isFunction(createElement)) {
-      throw new Error("createElement must be a function");
-    }
-    if (!context) {
-      reject(new Error("must pass in a context"));
-      return;
-    }
-
-    if (!context instanceof Context) {
-      reject(new Error("context must be an instance of Context"));
-      return;
-    }
-
-    var fetchData = Promise.race([renderToStringInContext(), timeout(options.timeout)]);
-
-    fetchData.then(function () {
-      context.renderInContext(function () {
-        try {
-          var element = createElement();
-
-          if (!element) {
-            reject(new Error("createElement must return an element"));
-            return;
-          }
-
-          var html = React.renderToString(element);
-          html += serializedState(context);
-          resolve(html);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-
-    function renderToStringInContext() {
-      return context.renderInContext(function () {
-        try {
-          var element = createElement();
-
-          if (!element) {
-            reject(new Error("createElement must return an element"));
-            return;
-          }
-
-          React.renderToString(element);
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-
-    function serializedState(context) {
-      var state = Marty.serializeState(context);
-
-      return "<script id=\"__marty-state\">" + state + "</script>";
-    }
-  });
-}
-
-module.exports = renderToString;
-
-
-},{"./context":19,"./utils/timeout":51,"react":undefined,"underscore":67}],30:[function(require,module,exports){
+},{"./context":20,"./instances":27,"./storeObserver":43,"./utils/uuid":49,"underscore":65}],32:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
-var UnknownStoreError = require("../errors/unknownStore");
-
-var SERIALIZED_WINDOW_OBJECT = "__marty";
-
-module.exports = {
-  clearState: clearState,
-  rehydrateState: rehydrateState,
-  serializeState: serializeState,
-  setInitialState: setInitialState
-};
-
-function getDefaultStores(context) {
-  return context.container.getAllDefaultStores();
-}
-
-function rehydrateState() {
-  if (!window || !window[SERIALIZED_WINDOW_OBJECT]) {
-    return;
-  }
-
-  var serializeState = window[SERIALIZED_WINDOW_OBJECT].state;
-
-  if (serializeState) {
-    this.setInitialState(serializeState);
-  }
-}
-
-function clearState() {
-  _.each(getDefaultStores(this), function (store) {
-    store.clear();
-  });
-}
-
-function setInitialState(states) {
-  var stores = indexById(getDefaultStores(this));
-
-  _.each(states, function (state, storeName) {
-    var store = stores[storeName];
-
-    if (!store) {
-      throw new UnknownStoreError(storeName);
-    }
-
-    store.setInitialState(state);
-  });
-
-  function indexById(stores) {
-    return _.object(_.map(stores, function (store) {
-      return storeId(store);
-    }), stores);
-  }
-}
-
-function serializeState(context) {
-  var state = {};
-  var stores = context ? context.getAllStores() : getDefaultStores(this);
-
-  _.each(stores, function (store) {
-    var id = storeId(store);
-
-    if (id) {
-      state[id] = (store.serialize || store.getState).call(store);
-    }
-  });
-
-  state.toString = function () {
-    return "(window.__marty||(window.__marty={})).state=" + JSON.stringify(state);
-  };
-
-  state.toJSON = function () {
-    return _.omit(state, "toString", "toJSON");
-  };
-
-  return state;
-}
-
-function storeId(store) {
-  return store.id || store.displayName;
-}
-
-
-},{"../errors/unknownStore":9,"underscore":67}],31:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var HttpStateSource = require("./http");
 var StateSource = require("./stateSource");
 var createClass = require("../createClass");
-var JSONStorageStateSource = require("./jsonStorage");
-var LocalStorageStateSource = require("./localStorage");
-var SessionStorageStateSource = require("./sessionStorage");
+var HttpStateSource = require("../../stateSources/http");
+var JSONStorageStateSource = require("../../stateSources/jsonStorage");
+var LocalStorageStateSource = require("../../stateSources/localStorage");
+var SessionStorageStateSource = require("../../stateSources/sessionStorage");
 
 function createStateSourceClass(properties) {
   properties = properties || {};
@@ -1719,7 +1993,7 @@ function createStateSourceClass(properties) {
 
   properties = _.extend.apply(_, merge);
 
-  return createClass(properties, baseType(properties.type));
+  return createClass(properties, properties, baseType(properties.type));
 }
 
 function baseType(type) {
@@ -1740,440 +2014,13 @@ function baseType(type) {
 module.exports = createStateSourceClass;
 
 
-},{"../createClass":21,"./http":32,"./jsonStorage":34,"./localStorage":35,"./sessionStorage":37,"./stateSource":38,"underscore":67}],32:[function(require,module,exports){
-"use strict";
-
-var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
-
-var _inherits = function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
-};
-
-var _classCallCheck = function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-require("isomorphic-fetch");
-
-var hooks = [];
-var _ = require("underscore");
-var log = require("../logger");
-var StateSource = require("./stateSource");
-
-var HttpStateSource = (function (StateSource) {
-  function HttpStateSource() {
-    _classCallCheck(this, HttpStateSource);
-
-    this._isHttpStateSource = true;
-  }
-
-  _inherits(HttpStateSource, StateSource);
-
-  _prototypeProperties(HttpStateSource, null, {
-    request: {
-      value: function request(req) {
-        var _this = this;
-
-        if (!req.headers) {
-          req.headers = {};
-        }
-
-        beforeRequest(this, req);
-
-        return fetch(req.url, req).then(function (res) {
-          return afterRequest(_this, res);
-        });
-      },
-      writable: true,
-      configurable: true
-    },
-    get: {
-      value: function get(options) {
-        return this.request(requestOptions("GET", this, options));
-      },
-      writable: true,
-      configurable: true
-    },
-    put: {
-      value: function put(options) {
-        return this.request(requestOptions("PUT", this, options));
-      },
-      writable: true,
-      configurable: true
-    },
-    post: {
-      value: function post(options) {
-        return this.request(requestOptions("POST", this, options));
-      },
-      writable: true,
-      configurable: true
-    },
-    "delete": {
-      value: function _delete(options) {
-        return this.request(requestOptions("DELETE", this, options));
-      },
-      writable: true,
-      configurable: true
-    },
-    patch: {
-      value: function patch(options) {
-        return this.request(requestOptions("PATCH", this, options));
-      },
-      writable: true,
-      configurable: true
-    }
-  });
-
-  return HttpStateSource;
-})(StateSource);
-
-HttpStateSource.addHook = addHook;
-HttpStateSource.defaultBaseUrl = "";
-HttpStateSource.removeHook = removeHook;
-HttpStateSource.addHook(require("../../http/hooks/parseJSON"));
-HttpStateSource.addHook(require("../../http/hooks/stringifyJSON"));
-
-module.exports = HttpStateSource;
-
-function requestOptions(method, source, options) {
-  var baseUrl = source.baseUrl || HttpStateSource.defaultBaseUrl;
-
-  if (_.isString(options)) {
-    options = _.extend({
-      url: options
-    });
-  }
-
-  options.method = method.toLowerCase();
-
-  if (baseUrl) {
-    var separator = "";
-    var firstCharOfUrl = options.url[0];
-    var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
-
-    // Do some text wrangling to make sure concatenation of base url
-    // stupid people (i.e. me)
-    if (lastCharOfBaseUrl !== "/" && firstCharOfUrl !== "/") {
-      separator = "/";
-    } else if (lastCharOfBaseUrl === "/" && firstCharOfUrl === "/") {
-      options.url = options.url.substring(1);
-    }
-
-    options.url = baseUrl + separator + options.url;
-  }
-
-  return options;
-}
-
-function beforeRequest(source, req) {
-  _.each(getHooks("before"), function (hook) {
-    try {
-      hook.before.call(source, req);
-    } catch (e) {
-      log.error("Failed to execute hook before http request", e, hook);
-      throw e;
-    }
-  });
-}
-
-function afterRequest(source, res) {
-  var current;
-
-  _.each(getHooks("after"), function (hook) {
-    var execute = function execute(res) {
-      try {
-        return hook.after.call(source, res);
-      } catch (e) {
-        log.error("Failed to execute hook after http response", e, hook);
-        throw e;
-      }
-    };
-
-    if (current) {
-      current = current.then(function (res) {
-        return execute(res);
-      });
-    } else {
-      current = execute(res);
-
-      if (current && !_.isFunction(current.then)) {
-        current = Promise.resolve(current);
-      }
-    }
-  });
-
-  return current || res;
-}
-
-function getHooks(func) {
-  return _.chain(hooks).filter(has(func)).sortBy(priority).value();
-
-  function priority(hook) {
-    return hook.priority;
-  }
-
-  function has(func) {
-    return function (hook) {
-      return hook && _.isFunction(hook[func]);
-    };
-  }
-}
-
-function addHook(hook) {
-  if (hook) {
-    hooks.push(hook);
-  }
-}
-
-function removeHook(hook) {
-  hooks = _.without(hooks, hook);
-}
-
-
-},{"../../http/hooks/parseJSON":10,"../../http/hooks/stringifyJSON":11,"../logger":27,"./stateSource":38,"isomorphic-fetch":66,"underscore":67}],33:[function(require,module,exports){
+},{"../../stateSources/http":67,"../../stateSources/jsonStorage":68,"../../stateSources/localStorage":69,"../../stateSources/sessionStorage":71,"../createClass":22,"./stateSource":34,"underscore":65}],33:[function(require,module,exports){
 "use strict";
 
 module.exports = require("./stateSource");
 
 
-},{"./stateSource":38}],34:[function(require,module,exports){
-"use strict";
-
-var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
-
-var _inherits = function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
-};
-
-var _classCallCheck = function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var StateSource = require("./stateSource");
-var noopStorage = require("./noopStorage");
-
-var JSONStorageStateSource = (function (StateSource) {
-  function JSONStorageStateSource() {
-    _classCallCheck(this, JSONStorageStateSource);
-
-    this._isJSONStorageStateSource = true;
-
-    if (!this.storage) {
-      this.storage = JSONStorageStateSource.defaultStorage;
-    }
-  }
-
-  _inherits(JSONStorageStateSource, StateSource);
-
-  _prototypeProperties(JSONStorageStateSource, null, {
-    get: {
-      value: function get(key) {
-        var raw = getStorage(this).getItem(getNamespacedKey(this, key));
-
-        if (!raw) {
-          return raw;
-        }
-
-        try {
-          var payload = JSON.parse(raw);
-          return payload.value;
-        } catch (e) {
-          throw new Error("Unable to parse JSON from storage");
-        }
-      },
-      writable: true,
-      configurable: true
-    },
-    set: {
-      value: function set(key, value) {
-        // Wrap the value in an object so as to preserve it's type
-        // during serialization.
-        var payload = {
-          value: value
-        };
-        var raw = JSON.stringify(payload);
-        getStorage(this).setItem(getNamespacedKey(this, key), raw);
-      },
-      writable: true,
-      configurable: true
-    }
-  });
-
-  return JSONStorageStateSource;
-})(StateSource);
-
-function getNamespacedKey(source, key) {
-  return getNamespace(source) + key;
-}
-
-function getNamespace(source) {
-  return source.namespace || JSONStorageStateSource.defaultNamespace;
-}
-
-function getStorage(source) {
-  return source.storage || JSONStorageStateSource.defaultStorage || noopStorage;
-}
-
-JSONStorageStateSource.defaultNamespace = "";
-JSONStorageStateSource.defaultStorage = typeof window === "undefined" ? noopStorage : window.localStorage;
-
-module.exports = JSONStorageStateSource;
-
-
-},{"./noopStorage":36,"./stateSource":38}],35:[function(require,module,exports){
-"use strict";
-
-var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
-
-var _inherits = function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
-};
-
-var _classCallCheck = function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var StateSource = require("./stateSource");
-var noopStorage = require("./noopStorage");
-
-var LocalStorageStateSource = (function (StateSource) {
-  function LocalStorageStateSource() {
-    _classCallCheck(this, LocalStorageStateSource);
-
-    this._isLocalStorageStateSource = true;
-    this.storage = typeof window === "undefined" ? noopStorage : window.localStorage;
-  }
-
-  _inherits(LocalStorageStateSource, StateSource);
-
-  _prototypeProperties(LocalStorageStateSource, null, {
-    get: {
-      value: function get(key) {
-        return this.storage.getItem(getNamespacedKey(this, key));
-      },
-      writable: true,
-      configurable: true
-    },
-    set: {
-      value: function set(key, value) {
-        return this.storage.setItem(getNamespacedKey(this, key), value);
-      },
-      writable: true,
-      configurable: true
-    }
-  });
-
-  return LocalStorageStateSource;
-})(StateSource);
-
-function getNamespacedKey(source, key) {
-  return getNamespace(source) + key;
-}
-
-function getNamespace(source) {
-  return source.namespace || LocalStorageStateSource.defaultNamespace;
-}
-
-LocalStorageStateSource.defaultNamespace = "";
-
-module.exports = LocalStorageStateSource;
-
-
-},{"./noopStorage":36,"./stateSource":38}],36:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-
-module.exports = {
-  getItem: _.noop,
-  setItem: _.noop
-};
-
-
-},{"underscore":67}],37:[function(require,module,exports){
-"use strict";
-
-var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
-  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
-};
-
-var _inherits = function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
-};
-
-var _classCallCheck = function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var StateSource = require("./stateSource");
-var noopStorage = require("./noopStorage");
-
-var SessionStorageStateSource = (function (StateSource) {
-  function SessionStorageStateSource() {
-    _classCallCheck(this, SessionStorageStateSource);
-
-    this._isSessionStorageStateSource = true;
-    this.storage = typeof window === "undefined" ? noopStorage : window.sessionStorage;
-  }
-
-  _inherits(SessionStorageStateSource, StateSource);
-
-  _prototypeProperties(SessionStorageStateSource, null, {
-    get: {
-      value: function get(key) {
-        return this.storage.getItem(getNamespacedKey(this, key));
-      },
-      writable: true,
-      configurable: true
-    },
-    set: {
-      value: function set(key, value) {
-        return this.storage.setItem(getNamespacedKey(this, key), value);
-      },
-      writable: true,
-      configurable: true
-    }
-  });
-
-  return SessionStorageStateSource;
-})(StateSource);
-
-function getNamespacedKey(source, key) {
-  return getNamespace(source) + key;
-}
-
-function getNamespace(source) {
-  return source.namespace || SessionStorageStateSource.defaultNamespace;
-}
-
-SessionStorageStateSource.defaultNamespace = "";
-
-module.exports = SessionStorageStateSource;
-
-
-},{"./noopStorage":36,"./stateSource":38}],38:[function(require,module,exports){
+},{"./stateSource":34}],34:[function(require,module,exports){
 "use strict";
 
 var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
@@ -2213,6 +2060,13 @@ var StateSource = (function () {
       },
       writable: true,
       configurable: true
+    },
+    dispose: {
+      value: function dispose() {
+        Instances.dispose(this);
+      },
+      writable: true,
+      configurable: true
     }
   });
 
@@ -2222,7 +2076,7 @@ var StateSource = (function () {
 module.exports = StateSource;
 
 
-},{"../instances":26,"../utils/resolve":49,"../utils/uuid":52}],39:[function(require,module,exports){
+},{"../instances":27,"../utils/resolve":46,"../utils/uuid":49}],35:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
@@ -2232,7 +2086,6 @@ var warnings = require("../warnings");
 var createClass = require("../createClass");
 
 var RESERVED_FUNCTIONS = ["getState"];
-var REQUIRED_FUNCTIONS = ["getInitialState"];
 var VIRTUAL_FUNCTIONS = ["clear", "dispose"];
 
 function createStoreClass(properties) {
@@ -2243,7 +2096,7 @@ function createStoreClass(properties) {
   var functionsToOmit = _.union(VIRTUAL_FUNCTIONS, RESERVED_FUNCTIONS);
   var classProperties = _.extend(_.omit(properties, functionsToOmit), overrideFunctions);
 
-  return createClass(classProperties, Store);
+  return createClass(classProperties, classProperties, Store);
 }
 
 function getOverrideFunctions(properties) {
@@ -2275,7 +2128,6 @@ function addMixins(properties) {
 }
 
 function validateStoreOptions(properties) {
-  var missingFunctions = [];
   var displayName = properties.displayName;
 
   _.each(RESERVED_FUNCTIONS, function (functionName) {
@@ -2289,28 +2141,12 @@ function validateStoreOptions(properties) {
       }
     }
   });
-
-  _.each(REQUIRED_FUNCTIONS, function (functionName) {
-    if (!properties[functionName]) {
-      missingFunctions.push(functionName);
-    }
-  });
-
-  if (missingFunctions.length) {
-    var error = "You must implement " + missingFunctions.join(",");
-
-    if (displayName) {
-      error += " in " + displayName;
-    }
-
-    throw new Error(error);
-  }
 }
 
 module.exports = createStoreClass;
 
 
-},{"../createClass":21,"../logger":27,"../warnings":53,"./store":44,"underscore":67}],40:[function(require,module,exports){
+},{"../createClass":22,"../logger":28,"../warnings":50,"./store":40,"underscore":65}],36:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
@@ -2329,7 +2165,7 @@ function fetch(id, local, remote) {
       result,
       error,
       cacheError,
-      context = this.__context;
+      context = this.context;
 
   if (_.isObject(id)) {
     options = id;
@@ -2517,7 +2353,7 @@ fetch.notFound = fetchResult.notFound;
 module.exports = fetch;
 
 
-},{"../../constants/status":3,"../../errors/compound":7,"../../errors/notFound":8,"../instances":26,"../logger":27,"../warnings":53,"./fetchResult":41,"underscore":67}],41:[function(require,module,exports){
+},{"../../constants/status":3,"../../errors/compound":7,"../../errors/notFound":8,"../instances":27,"../logger":28,"../warnings":50,"./fetchResult":37,"underscore":65}],37:[function(require,module,exports){
 "use strict";
 
 var when = require("./when");
@@ -2572,7 +2408,7 @@ function fetchResult(result, store) {
 }
 
 
-},{"../../errors/notFound":8,"./when":46}],42:[function(require,module,exports){
+},{"../../errors/notFound":8,"./when":42}],38:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
@@ -2659,13 +2495,13 @@ function getHandlerWithPredicates(actionPredicates, handler) {
 module.exports = handleAction;
 
 
-},{"../../errors/actionHandlerNotFound":5,"../instances":26,"../logger":27,"underscore":67}],43:[function(require,module,exports){
+},{"../../errors/actionHandlerNotFound":5,"../instances":27,"../logger":28,"underscore":65}],39:[function(require,module,exports){
 "use strict";
 
 module.exports = require("./store");
 
 
-},{"./store":44}],44:[function(require,module,exports){
+},{"./store":40}],40:[function(require,module,exports){
 "use strict";
 
 var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
@@ -2686,16 +2522,11 @@ var uuid = require("../utils/uuid");
 var warnings = require("../warnings");
 var Instances = require("../instances");
 var resolve = require("../utils/resolve");
-var Diagnostics = require("../diagnostics");
 var handleAction = require("./handleAction");
 var EventEmitter = require("events").EventEmitter;
 var validateHandlers = require("./validateHandlers");
 
 var DEFAULT_MAX_LISTENERS = 1000000;
-
-function getInstance(store) {
-  return Instances.get(store);
-}
 
 var Store = (function () {
   function Store(options) {
@@ -2757,14 +2588,7 @@ var Store = (function () {
     },
     getInitialState: {
       value: function getInitialState() {
-        throw new Error("You must implement `getInitialState`");
-      },
-      writable: true,
-      configurable: true
-    },
-    setInitialState: {
-      value: function setInitialState(state) {
-        this.state = this.getInitialState(state);
+        return {};
       },
       writable: true,
       configurable: true
@@ -2807,11 +2631,11 @@ var Store = (function () {
       configurable: true
     },
     clear: {
-      value: function clear() {
+      value: function clear(newState) {
         var instance = getInstance(this);
         instance.failedFetches = {};
         instance.fetchInProgress = {};
-        this.state = this.getInitialState();
+        this.state = newState || {};
       },
       writable: true,
       configurable: true
@@ -2865,13 +2689,13 @@ var Store = (function () {
           callback = _.bind(callback, context);
         }
 
-        Diagnostics.trace("The", this.displayName, "store (" + this.id + ") is adding a change listener");
+        log.trace("The", this.displayName, "store (" + this.id + ") is adding a change listener");
 
         emitter.on(CHANGE_EVENT, callback);
 
         return {
           dispose: function dispose() {
-            Diagnostics.trace("The", _this.displayName, "store (" + _this.id + ") is disposing of a change listener");
+            log.trace("The", _this.displayName, "store (" + _this.id + ") is disposing of a change listener");
 
             emitter.removeListener(CHANGE_EVENT, callback);
           }
@@ -2917,10 +2741,14 @@ var Store = (function () {
 Store.prototype.fetch = fetch;
 Store.prototype.handleAction = handleAction;
 
+function getInstance(store) {
+  return Instances.get(store);
+}
+
 module.exports = Store;
 
 
-},{"../diagnostics":22,"../instances":26,"../logger":27,"../utils/resolve":49,"../utils/uuid":52,"../warnings":53,"./fetch":40,"./handleAction":42,"./validateHandlers":45,"events":59,"underscore":67}],45:[function(require,module,exports){
+},{"../instances":27,"../logger":28,"../utils/resolve":46,"../utils/uuid":49,"../warnings":50,"./fetch":36,"./handleAction":38,"./validateHandlers":41,"events":57,"underscore":65}],41:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
@@ -2944,7 +2772,7 @@ function validateHandlers(store) {
 module.exports = validateHandlers;
 
 
-},{"../../errors/actionHandlerNotFound":5,"../../errors/actionPredicateUndefined":6,"underscore":67}],46:[function(require,module,exports){
+},{"../../errors/actionHandlerNotFound":5,"../../errors/actionPredicateUndefined":6,"underscore":65}],42:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
@@ -3051,7 +2879,106 @@ module.exports = when;
 /* fetchResults, handlers */
 
 
-},{"../../constants/status":3,"../logger":27,"underscore":67}],47:[function(require,module,exports){
+},{"../../constants/status":3,"../logger":28,"underscore":65}],43:[function(require,module,exports){
+"use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var log = require("./logger");
+var _ = require("underscore");
+var Context = require("./context");
+
+var StoreObserver = (function () {
+  function StoreObserver(component, stores) {
+    _classCallCheck(this, StoreObserver);
+
+    this.component = component;
+    this.listeners = _.map(stores, _.partial(_.bind(this.listenToStore, this), _, component));
+  }
+
+  _prototypeProperties(StoreObserver, null, {
+    dispose: {
+      value: function dispose() {
+        _.invoke(this.listeners, "dispose");
+      },
+      writable: true,
+      configurable: true
+    },
+    listenToStore: {
+      value: function listenToStore(store, component) {
+        var storeDisplayName = store.displayName || store.id;
+        var listener = _.partial(this.onStoreChanged, _, _, component);
+
+        log.trace("The " + component.displayName + " component  (" + component.__id + ") is listening to the " + storeDisplayName + " store");
+
+        return store["for"](getContext(component)).addChangeListener(listener);
+      },
+      writable: true,
+      configurable: true
+    },
+    onStoreChanged: {
+      value: function onStoreChanged(state, store, component) {
+        var storeDisplayName = store.displayName || store.id;
+
+        log.trace("" + storeDisplayName + " store has changed. The " + component.displayName + " component (" + component.__id + ") is updating");
+
+        if (component._lifeCycleState === "UNMOUNTED") {
+          log.warn("Warning: Trying to set the state of " + component.displayName + " component (" + component.__id + ") which is unmounted");
+        } else {
+          component.setState(tryGetState(component, store));
+        }
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return StoreObserver;
+})();
+
+function tryGetState(component, store) {
+  var handler;
+  var displayName = component.displayName;
+
+  if (store && store.action) {
+    handler = store.action.addViewHandler(displayName, component);
+  }
+
+  try {
+    return component.getState();
+  } catch (e) {
+    var errorMessage = "An error occured while trying to get the latest state in the view " + component.displayName;
+
+    log.error(errorMessage, e, component);
+
+    if (handler) {
+      handler.failed(e);
+    }
+
+    return {};
+  } finally {
+    if (handler) {
+      handler.dispose();
+    }
+  }
+}
+
+function getContext() {
+  return Context.getCurrent();
+}
+
+module.exports = StoreObserver;
+
+
+},{"./context":20,"./logger":28,"underscore":65}],44:[function(require,module,exports){
 "use strict";
 
 var uuid = require("./uuid");
@@ -3070,7 +2997,7 @@ function classId(clazz, type) {
   }
 
   if (warnings.classDoesNotHaveAnId) {
-    log.warn("Warning: The " + type + displayName + " does not have an Id");
+    log.warn("Warning: The " + type + " " + displayName + " does not have an Id");
   }
 
   return clazz.displayName || uuid.generate();
@@ -3079,7 +3006,7 @@ function classId(clazz, type) {
 module.exports = classId;
 
 
-},{"../logger":27,"../warnings":53,"./uuid":52}],48:[function(require,module,exports){
+},{"../logger":28,"../warnings":50,"./uuid":49}],45:[function(require,module,exports){
 "use strict";
 
 var Context = require("../context");
@@ -3105,7 +3032,7 @@ function getContext(obj) {
 module.exports = getContext;
 
 
-},{"../context":19}],49:[function(require,module,exports){
+},{"../context":20}],46:[function(require,module,exports){
 "use strict";
 
 var getContext = require("./getContext");
@@ -3123,7 +3050,7 @@ function resolve(obj, subject) {
 module.exports = resolve;
 
 
-},{"./getContext":48}],50:[function(require,module,exports){
+},{"./getContext":45}],47:[function(require,module,exports){
 "use strict";
 
 function serializeError(error) {
@@ -3144,7 +3071,7 @@ function serializeError(error) {
 module.exports = serializeError;
 
 
-},{}],51:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 function timeout(time) {
@@ -3156,11 +3083,11 @@ function timeout(time) {
 module.exports = timeout;
 
 
-},{}],52:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 function generate() {
-  return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
+  return "" + (s4() + s4()) + "-" + s4() + "-" + s4() + "-" + s4() + "-" + (s4() + s4() + s4());
 }
 
 function small() {
@@ -3168,7 +3095,7 @@ function small() {
 }
 
 function type(instanceType) {
-  return instanceType + "-" + s4() + s4() + s4() + s4();
+  return "" + instanceType + "-" + (s4() + s4() + s4() + s4());
 }
 
 function s4() {
@@ -3182,13 +3109,14 @@ module.exports = {
 };
 
 
-},{}],53:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 var _ = require("underscore");
 
 var warnings = {
   without: without,
+  invokeConstant: true,
   reservedFunction: true,
   classDoesNotHaveAnId: true,
   stateIsNullOrUndefined: true,
@@ -3222,7 +3150,13 @@ function without(warningsToDisable, cb, context) {
 }
 
 
-},{"underscore":67}],54:[function(require,module,exports){
+},{"underscore":65}],51:[function(require,module,exports){
+"use strict";
+
+module.exports = require("./lib/logger");
+
+
+},{"./lib/logger":28}],52:[function(require,module,exports){
 "use strict";
 
 // required to safely use babel/register within a browserify codebase
@@ -3231,7 +3165,7 @@ module.exports = function () {};
 
 require("../../polyfill");
 
-},{"../../polyfill":55}],55:[function(require,module,exports){
+},{"../../polyfill":53}],53:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -3244,7 +3178,7 @@ require("core-js/shim");
 require("regenerator-babel/runtime");
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"core-js/shim":56,"regenerator-babel/runtime":57}],56:[function(require,module,exports){
+},{"core-js/shim":54,"regenerator-babel/runtime":55}],54:[function(require,module,exports){
 /**
  * Core.js 0.5.4
  * https://github.com/zloirock/core-js
@@ -5153,7 +5087,7 @@ $define(GLOBAL + BIND, {
   Iterators.NodeList = Iterators[ARRAY];
 }(global.NodeList);
 }(typeof self != 'undefined' && self.Math === Math ? self : Function('return this')(), true);
-},{}],57:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 (function (global){
 /**
  * Copyright (c) 2014, Facebook, Inc.
@@ -5684,10 +5618,10 @@ $define(GLOBAL + BIND, {
 );
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],58:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports = require("./lib/babel/api/register/node");
 
-},{"./lib/babel/api/register/node":54}],59:[function(require,module,exports){
+},{"./lib/babel/api/register/node":52}],57:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5990,7 +5924,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],60:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -6055,7 +5989,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],61:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -7018,7 +6952,7 @@ process.chdir = function (dir) {
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":60}],62:[function(require,module,exports){
+},{"_process":58}],60:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -7030,7 +6964,7 @@ process.chdir = function (dir) {
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":63}],63:[function(require,module,exports){
+},{"./lib/Dispatcher":61}],61:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -7282,7 +7216,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":64}],64:[function(require,module,exports){
+},{"./invariant":62}],62:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -7337,7 +7271,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],65:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -7663,10 +7597,10 @@ module.exports = invariant;
   self.fetch.polyfill = true
 })();
 
-},{}],66:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 require('whatwg-fetch');
 
-},{"whatwg-fetch":65}],67:[function(require,module,exports){
+},{"whatwg-fetch":63}],65:[function(require,module,exports){
 //     Underscore.js 1.8.1
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -9181,5 +9115,468 @@ require('whatwg-fetch');
   }
 }.call(this));
 
-},{}]},{},[])("./index.js")
+},{}],66:[function(require,module,exports){
+"use strict";
+
+module.exports = require("./lib/stateSource");
+
+
+},{"./lib/stateSource":33}],67:[function(require,module,exports){
+"use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _inherits = function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+require("isomorphic-fetch");
+
+var hooks = [];
+var _ = require("underscore");
+var log = require("../logger");
+var StateSource = require("../stateSource");
+
+var HttpStateSource = (function (StateSource) {
+  function HttpStateSource() {
+    _classCallCheck(this, HttpStateSource);
+
+    this._isHttpStateSource = true;
+  }
+
+  _inherits(HttpStateSource, StateSource);
+
+  _prototypeProperties(HttpStateSource, {
+    addHook: {
+      value: function addHook(hook) {
+        if (hook) {
+          hooks.push(hook);
+        }
+      },
+      writable: true,
+      configurable: true
+    },
+    removeHook: {
+      value: function removeHook(hook) {
+        hooks = _.without(hooks, hook);
+      },
+      writable: true,
+      configurable: true
+    },
+    defaultBaseUrl: {
+      get: function get() {
+        return "";
+      },
+      configurable: true
+    }
+  }, {
+    request: {
+      value: function request(req) {
+        var _this = this;
+
+        if (!req.headers) {
+          req.headers = {};
+        }
+
+        beforeRequest(this, req);
+
+        return fetch(req.url, req).then(function (res) {
+          return afterRequest(_this, res);
+        });
+      },
+      writable: true,
+      configurable: true
+    },
+    get: {
+      value: function get(options) {
+        return this.request(requestOptions("GET", this, options));
+      },
+      writable: true,
+      configurable: true
+    },
+    put: {
+      value: function put(options) {
+        return this.request(requestOptions("PUT", this, options));
+      },
+      writable: true,
+      configurable: true
+    },
+    post: {
+      value: function post(options) {
+        return this.request(requestOptions("POST", this, options));
+      },
+      writable: true,
+      configurable: true
+    },
+    "delete": {
+      value: function _delete(options) {
+        return this.request(requestOptions("DELETE", this, options));
+      },
+      writable: true,
+      configurable: true
+    },
+    patch: {
+      value: function patch(options) {
+        return this.request(requestOptions("PATCH", this, options));
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return HttpStateSource;
+})(StateSource);
+
+HttpStateSource.addHook(require("../http/hooks/parseJSON"));
+HttpStateSource.addHook(require("../http/hooks/stringifyJSON"));
+
+module.exports = HttpStateSource;
+
+function requestOptions(method, source, options) {
+  var baseUrl = source.baseUrl || HttpStateSource.defaultBaseUrl;
+
+  if (_.isString(options)) {
+    options = _.extend({
+      url: options
+    });
+  }
+
+  options.method = method.toLowerCase();
+
+  if (baseUrl) {
+    var separator = "";
+    var firstCharOfUrl = options.url[0];
+    var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
+
+    // Do some text wrangling to make sure concatenation of base url
+    // stupid people (i.e. me)
+    if (lastCharOfBaseUrl !== "/" && firstCharOfUrl !== "/") {
+      separator = "/";
+    } else if (lastCharOfBaseUrl === "/" && firstCharOfUrl === "/") {
+      options.url = options.url.substring(1);
+    }
+
+    options.url = baseUrl + separator + options.url;
+  }
+
+  return options;
+}
+
+function beforeRequest(source, req) {
+  _.each(getHooks("before"), function (hook) {
+    try {
+      hook.before.call(source, req);
+    } catch (e) {
+      log.error("Failed to execute hook before http request", e, hook);
+      throw e;
+    }
+  });
+}
+
+function afterRequest(source, res) {
+  var current;
+
+  _.each(getHooks("after"), function (hook) {
+    var execute = function execute(res) {
+      try {
+        return hook.after.call(source, res);
+      } catch (e) {
+        log.error("Failed to execute hook after http response", e, hook);
+        throw e;
+      }
+    };
+
+    if (current) {
+      current = current.then(function (res) {
+        return execute(res);
+      });
+    } else {
+      current = execute(res);
+
+      if (current && !_.isFunction(current.then)) {
+        current = Promise.resolve(current);
+      }
+    }
+  });
+
+  return current || res;
+}
+
+function getHooks(func) {
+  return _.chain(hooks).filter(has(func)).sortBy(priority).value();
+
+  function priority(hook) {
+    return hook.priority;
+  }
+
+  function has(func) {
+    return function (hook) {
+      return hook && _.isFunction(hook[func]);
+    };
+  }
+}
+
+
+},{"../http/hooks/parseJSON":10,"../http/hooks/stringifyJSON":11,"../logger":51,"../stateSource":66,"isomorphic-fetch":64,"underscore":65}],68:[function(require,module,exports){
+"use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _inherits = function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var noopStorage = require("./noopStorage");
+var StateSource = require("../stateSource");
+
+var JSONStorageStateSource = (function (StateSource) {
+  function JSONStorageStateSource() {
+    _classCallCheck(this, JSONStorageStateSource);
+
+    this._isJSONStorageStateSource = true;
+
+    if (!this.storage) {
+      this.storage = JSONStorageStateSource.defaultStorage;
+    }
+  }
+
+  _inherits(JSONStorageStateSource, StateSource);
+
+  _prototypeProperties(JSONStorageStateSource, {
+    defaultNamespace: {
+      get: function get() {
+        return "";
+      },
+      configurable: true
+    },
+    defaultStorage: {
+      get: function get() {
+        return typeof window === "undefined" ? noopStorage : window.localStorage;
+      },
+      configurable: true
+    }
+  }, {
+    get: {
+      value: function get(key) {
+        var raw = getStorage(this).getItem(getNamespacedKey(this, key));
+
+        if (!raw) {
+          return raw;
+        }
+
+        try {
+          var payload = JSON.parse(raw);
+          return payload.value;
+        } catch (e) {
+          throw new Error("Unable to parse JSON from storage");
+        }
+      },
+      writable: true,
+      configurable: true
+    },
+    set: {
+      value: function set(key, value) {
+        // Wrap the value in an object so as to preserve it's type
+        // during serialization.
+        var payload = {
+          value: value
+        };
+        var raw = JSON.stringify(payload);
+        getStorage(this).setItem(getNamespacedKey(this, key), raw);
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return JSONStorageStateSource;
+})(StateSource);
+
+function getNamespacedKey(source, key) {
+  return getNamespace(source) + key;
+}
+
+function getNamespace(source) {
+  return source.namespace || JSONStorageStateSource.defaultNamespace;
+}
+
+function getStorage(source) {
+  return source.storage || JSONStorageStateSource.defaultStorage || noopStorage;
+}
+
+module.exports = JSONStorageStateSource;
+
+
+},{"../stateSource":66,"./noopStorage":70}],69:[function(require,module,exports){
+"use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _inherits = function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var noopStorage = require("./noopStorage");
+var StateSource = require("../stateSource");
+
+var LocalStorageStateSource = (function (StateSource) {
+  function LocalStorageStateSource() {
+    _classCallCheck(this, LocalStorageStateSource);
+
+    this._isLocalStorageStateSource = true;
+    this.storage = typeof window === "undefined" ? noopStorage : window.localStorage;
+  }
+
+  _inherits(LocalStorageStateSource, StateSource);
+
+  _prototypeProperties(LocalStorageStateSource, {
+    defaultNamespace: {
+      get: function get() {
+        return "";
+      },
+      configurable: true
+    }
+  }, {
+    get: {
+      value: function get(key) {
+        return this.storage.getItem(getNamespacedKey(this, key));
+      },
+      writable: true,
+      configurable: true
+    },
+    set: {
+      value: function set(key, value) {
+        return this.storage.setItem(getNamespacedKey(this, key), value);
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return LocalStorageStateSource;
+})(StateSource);
+
+function getNamespacedKey(source, key) {
+  return getNamespace(source) + key;
+}
+
+function getNamespace(source) {
+  return source.namespace || LocalStorageStateSource.defaultNamespace;
+}
+
+module.exports = LocalStorageStateSource;
+
+
+},{"../stateSource":66,"./noopStorage":70}],70:[function(require,module,exports){
+"use strict";
+
+var _ = require("underscore");
+
+module.exports = {
+  getItem: _.noop,
+  setItem: _.noop
+};
+
+
+},{"underscore":65}],71:[function(require,module,exports){
+"use strict";
+
+var _prototypeProperties = function _prototypeProperties(child, staticProps, instanceProps) {
+  if (staticProps) Object.defineProperties(child, staticProps);if (instanceProps) Object.defineProperties(child.prototype, instanceProps);
+};
+
+var _inherits = function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+};
+
+var _classCallCheck = function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var noopStorage = require("./noopStorage");
+var StateSource = require("../stateSource");
+
+var SessionStorageStateSource = (function (StateSource) {
+  function SessionStorageStateSource() {
+    _classCallCheck(this, SessionStorageStateSource);
+
+    this._isSessionStorageStateSource = true;
+    this.storage = typeof window === "undefined" ? noopStorage : window.sessionStorage;
+  }
+
+  _inherits(SessionStorageStateSource, StateSource);
+
+  _prototypeProperties(SessionStorageStateSource, {
+    defaultNamespace: {
+      get: function get() {
+        return "";
+      },
+      configurable: true
+    }
+  }, {
+    get: {
+      value: function get(key) {
+        return this.storage.getItem(getNamespacedKey(this, key));
+      },
+      writable: true,
+      configurable: true
+    },
+    set: {
+      value: function set(key, value) {
+        return this.storage.setItem(getNamespacedKey(this, key), value);
+      },
+      writable: true,
+      configurable: true
+    }
+  });
+
+  return SessionStorageStateSource;
+})(StateSource);
+
+function getNamespacedKey(source, key) {
+  return getNamespace(source) + key;
+}
+
+function getNamespace(source) {
+  return source.namespace || SessionStorageStateSource.defaultNamespace;
+}
+
+module.exports = SessionStorageStateSource;
+
+
+},{"../stateSource":66,"./noopStorage":70}]},{},[])("./index.js")
 });

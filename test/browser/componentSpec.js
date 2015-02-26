@@ -5,7 +5,7 @@ var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('Component', function () {
-  var Store, Component, getState, expectedId, dispose;
+  var Store, Component, getState, expectedId;
 
   beforeEach(function () {
     expectedId = 123;
