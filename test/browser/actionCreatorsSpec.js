@@ -7,7 +7,7 @@ var constants = require('../../lib/constants');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var serializeError = require('../../lib/utils/serializeError');
-var describeStyles = require('./lib/describeStyles');
+var describeStyles = require('./../lib/describeStyles');
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, actualResult, actualError, Marty;

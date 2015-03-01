@@ -2,58 +2,57 @@ var React = require('react');
 var _ = require('underscore');
 
 module.exports = function (Marty) {
-  var MessageStore = Marty.createStore({
-    id: 'messages',
-    displayName: 'Messages',
-    getInitialState: function () {
-      return {};
-    },
-    setContextName: function (name) {
+  var MessageStore, MessageAPI;
+
+  class _MessageStore extends Marty.Store {
+    constructor(options) {
+      super(options);
+      this.state = {};
+    }
+
+    setContextName(name) {
       this.state.contextName = name;
-    },
-    addMessage: function (id, message) {
+    }
+    addMessage(id, message) {
       this.state[id] = _.extend(message, {
         id: id,
         context: this.state.contextName
       });
-    },
-    getMessage: function (id) {
+    }
+    getMessage(id) {
       return this.fetch({
         id: id,
-        locally: function () {
+        locally() {
           return this.state[id];
         },
-        remotely: function () {
+        remotely() {
           return MessageAPI.for(this).getMessage(id);
         }
       });
     }
-  });
+  }
 
-  var MessageAPI = Marty.createStateSource({
-    delay: 10,
-    id: 'MessageAPI',
-    getMessage: function (id) {
-      return new Promise(function (resolve) {
-        setTimeout(function () {
+  class _MessageAPI extends Marty.HttpStateSource {
+    constructor(options) {
+      super(options);
+      this.delay = 10;
+    }
+    getMessage(id) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
           MessageStore.for(this).addMessage(id, { text: 'remote' });
           resolve();
-        }.bind(this), this.delay);
-      }.bind(this));
+        }, this.delay);
+      });
     }
-  });
+  }
 
-  var MessageState = Marty.createStateMixin({
-    getState: function () {
-      return {
-        message: MessageStore.for(this).getMessage(this.props.id)
-      };
+  class Message extends Marty.Component {
+    constructor(props, context) {
+      super(props, context);
+      this.listenTo = MessageStore;
     }
-  });
-
-  var Message = React.createClass({
-    mixins: [MessageState],
-    render: function () {
+    render() {
       var message = this.state.message.when({
         pending: function () {
           return {
@@ -75,7 +74,15 @@ module.exports = function (Marty) {
         React.createElement('div', { className: 'context' }, message.context)
       );
     }
-  });
+    getState() {
+      return {
+        message: MessageStore.for(this).getMessage(this.props.id)
+      };
+    }
+  }
+
+  MessageAPI = Marty.register(_MessageAPI);
+  MessageStore = Marty.register(_MessageStore);
 
   return {
     Message: Message,

@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
 var HttpStateSource = require('../../../stateSources/http');
-var describeStyles = require('../lib/describeStyles');
+var describeStyles = require('../../lib/describeStyles');
 
 require('es6-promise').polyfill();
 

@@ -2,7 +2,8 @@ var noopStorage = require('./noopStorage');
 var StateSource = require('../stateSource');
 
 class SessionStorageStateSource extends StateSource {
-  constructor() {
+  constructor(options) {
+    super(options);
     this._isSessionStorageStateSource = true;
     this.storage = typeof window === 'undefined' ? noopStorage : window.sessionStorage;
   }

@@ -5,7 +5,7 @@ var expect = require('chai').expect;
 var Dispatcher = require('../../dispatcher');
 var stubbedLogger = require('../lib/stubbedLogger');
 var ActionPayload = require('../../lib/actionPayload');
-var describeStyles = require('./lib/describeStyles');
+var describeStyles = require('./../lib/describeStyles');
 var ActionHandlerNotFoundError = require('../../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../../errors/actionPredicateUndefined');
 

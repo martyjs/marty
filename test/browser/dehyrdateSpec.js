@@ -1,6 +1,6 @@
 var _ = require('underscore');
 var expect = require('chai').expect;
-var describeStyles = require('./lib/describeStyles');
+var describeStyles = require('./../lib/describeStyles');
 
 describeStyles('Marty#dehydrate()', function (styles) {
   var Marty, store1ExpectedState, storeSerializedState, serializedState;

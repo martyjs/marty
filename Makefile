@@ -6,7 +6,7 @@ SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
 
 test: lint test-server test-browser
 
-test-server: lint
+test-server:
 	@./build/test-server.sh
 
 test-browser: lint

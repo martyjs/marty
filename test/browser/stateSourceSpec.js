@@ -1,6 +1,6 @@
 var Marty = require('../../index');
 var expect = require('chai').expect;
-var describeStyles = require('./lib/describeStyles');
+var describeStyles = require('./../lib/describeStyles');
 
 describe('StateSource', function () {
   var stateSource;

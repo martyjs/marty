@@ -6,7 +6,8 @@ var log = require('../logger');
 var StateSource = require('../stateSource');
 
 class HttpStateSource extends StateSource {
-  constructor() {
+  constructor(options) {
+    super(options);
     this._isHttpStateSource = true;
   }
 
