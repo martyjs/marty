@@ -905,6 +905,17 @@ describeStyles('Store', function (styles, currentStyle) {
       it('should replace the state with the original state', function () {
         expect(store.state).to.eql({});
       });
+
+      it('should clear the fetchHistory', function () {
+        var fetchId = 'foo';
+        store.fetch(fetchId, function () { return {} });
+
+        expect(store.hasAlreadyFetched(fetchId)).to.be.true;
+
+        store.clear();
+
+        expect(store.hasAlreadyFetched(fetchId)).to.be.false;
+      })
     });
 
     describe('when you pass in a clear function', function () {
