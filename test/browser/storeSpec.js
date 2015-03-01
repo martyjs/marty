@@ -908,14 +908,14 @@ describeStyles('Store', function (styles, currentStyle) {
 
       it('should clear the fetchHistory', function () {
         var fetchId = 'foo';
-        store.fetch(fetchId, function () { return {} });
+        store.fetch(fetchId, function () { return {}; });
 
         expect(store.hasAlreadyFetched(fetchId)).to.be.true;
 
         store.clear();
 
         expect(store.hasAlreadyFetched(fetchId)).to.be.false;
-      })
+      });
     });
 
     describe('when you pass in a clear function', function () {
