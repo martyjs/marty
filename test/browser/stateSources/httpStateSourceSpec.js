@@ -8,11 +8,10 @@ var describeStyles = require('../lib/describeStyles');
 
 require('es6-promise').polyfill();
 
-describeStyles('HttpStateSource', function () {
+describeStyles('HttpStateSource', function (styles) {
   this.timeout(10000);
 
   var API, baseUrl, response;
-  var factory = this.factory;
   var hook1, hook2, hook3, executionOrder;
 
   beforeEach(function () {
@@ -417,7 +416,7 @@ describeStyles('HttpStateSource', function () {
   });
 
   function httpStateSource(baseUrl) {
-    return factory({
+    return styles({
       classic: function () {
         return Marty.createStateSource({
           type: 'http',

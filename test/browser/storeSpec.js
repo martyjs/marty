@@ -9,10 +9,10 @@ var describeStyles = require('./lib/describeStyles');
 var ActionHandlerNotFoundError = require('../../errors/actionHandlerNotFound');
 var ActionPredicateUndefinedError = require('../../errors/actionPredicateUndefined');
 
-describeStyles('Store', function () {
+describeStyles('Store', function (styles, currentStyle) {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
   var actualAction, actualChangeListenerFunctionContext, expectedChangeListenerFunctionContext;
-  var expectedError, logger, factory = this.factory, style = this.style;
+  var expectedError, logger;
 
   beforeEach(function () {
     logger = stubbedLogger();
@@ -43,7 +43,7 @@ describeStyles('Store', function () {
       })
     };
 
-    store = factory({
+    store = styles({
       classic: function () {
         return Marty.createStore(_.extend({
           id: 'test',
@@ -89,7 +89,7 @@ describeStyles('Store', function () {
     expect(dispatcher.register).to.have.been.called;
   });
 
-  if (style === 'classic') {
+  if (currentStyle === 'classic') {
 
     describe('#mixins', function () {
       describe('when you have multiple mixins', function () {
@@ -266,7 +266,7 @@ describeStyles('Store', function () {
 
     describe('when you dont pass in a dispose function', function () {
       beforeEach(function () {
-        store = factory({
+        store = styles({
           classic: function () {
             return Marty.createStore({
               id: 'no dispose',
@@ -317,7 +317,7 @@ describeStyles('Store', function () {
 
       beforeEach(function () {
         dispose = sinon.spy();
-        store = factory({
+        store = styles({
           classic: function () {
             return Marty.createStore({
               id: 'dispose',
@@ -385,7 +385,7 @@ describeStyles('Store', function () {
 
     beforeEach(function () {
       one = sinon.spy();
-      store = factory({
+      store = styles({
         classic: function () {
           return Marty.createStore({
             id: 'createStore',
@@ -434,7 +434,7 @@ describeStyles('Store', function () {
         expect(createStoreWithMissingActionHandler).to.throw(ActionHandlerNotFoundError);
 
         function createStoreWithMissingActionHandler() {
-          var Store = factory({
+          var Store = styles({
             classic: function () {
               return Marty.createStore({
                 id: 'createStoreWithMissingActionHandler',
@@ -471,7 +471,7 @@ describeStyles('Store', function () {
         expect(createStoreWithANullActionPredicate).to.throw(ActionPredicateUndefinedError);
 
         function createStoreWithANullActionPredicate() {
-          var Store = factory({
+          var Store = styles({
             classic: function () {
               return Marty.createStore({
                 id: 'createStoreWithANullActionPredicate',
@@ -565,7 +565,7 @@ describeStyles('Store', function () {
     function waitFor(waitForCb) {
       var order = [];
 
-      factory({
+      styles({
         classic: function () {
           testActionCreators = Marty.createActionCreators({
             id: 'test',
@@ -765,7 +765,7 @@ describeStyles('Store', function () {
       var Store, ActionCreators, interimState;
 
       beforeEach(function () {
-        Store = factory({
+        Store = styles({
           classic: function () {
             ActionCreators = Marty.createActionCreators({
               id: 'rollbacks',
@@ -874,7 +874,7 @@ describeStyles('Store', function () {
   describe('#clear()', function () {
     describe('when you do not pass in a clear function', function () {
       beforeEach(function () {
-        store = factory({
+        store = styles({
           classic: function () {
             return Marty.createStore({
               id: 'clear',
@@ -912,7 +912,7 @@ describeStyles('Store', function () {
 
       beforeEach(function () {
         clear = sinon.spy();
-        store = factory({
+        store = styles({
           classic: function () {
             return Marty.createStore({
               id: 'clear',

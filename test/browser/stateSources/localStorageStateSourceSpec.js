@@ -3,15 +3,14 @@ var Marty = require('../../../index');
 var warnings = require('../../../warnings');
 var describeStyles = require('../lib/describeStyles');
 
-describeStyles('LocalStorageStateSource', function () {
+describeStyles('LocalStorageStateSource', function (styles) {
   var source;
-  var factory = this.factory;
 
   beforeEach(function () {
     warnings.classDoesNotHaveAnId = false;
 
     localStorage.clear();
-    source = factory({
+    source = styles({
       classic: function () {
         return Marty.createStateSource({
           type: 'localStorage'
@@ -59,7 +58,7 @@ describeStyles('LocalStorageStateSource', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      source = factory({
+      source = styles({
         classic: function () {
           return Marty.createStateSource({
             namespace: 'baz',

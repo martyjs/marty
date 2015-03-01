@@ -3,6 +3,7 @@ var React = require('react');
 var Marty = require('../../index');
 var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
+var ContextComponent = require('../../lib/contextComponent');
 
 describe('Component', function () {
   var Store, Component, getState, expectedId;
@@ -142,7 +143,9 @@ describe('Component', function () {
       Component = TestUtils.renderIntoDocument(
         React.createElement(ContextComponent, {
           context: context,
-          type: RootComponent
+          subject: {
+            type: RootComponent
+          }
         })
       ).refs.subject;
     });
@@ -207,22 +210,6 @@ describe('Component', function () {
         return {
           foo: Store.for(this).getFoo(expectedId)
         };
-      }
-    }
-
-    class ContextComponent extends React.Component {
-      static get childContextTypes() {
-        return {
-           martyContext: React.PropTypes.object.isRequired
-        };
-      }
-      getChildContext() {
-        return {
-          martyContext: this.props.context
-        };
-      }
-      render() {
-        return React.createElement(this.props.type, { ref: 'subject' });
       }
     }
   });

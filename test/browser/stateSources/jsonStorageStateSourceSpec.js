@@ -3,8 +3,7 @@ var Marty = require('../../../index');
 var warnings = require('../../../warnings');
 var describeStyles = require('../lib/describeStyles');
 
-describeStyles('JSONStorageStateSource', function () {
-  var factory = this.factory;
+describeStyles('JSONStorageStateSource', function (styles) {
   var source, payload, serializedPayload;
 
   payload = {
@@ -19,7 +18,7 @@ describeStyles('JSONStorageStateSource', function () {
 
     localStorage.clear();
     sessionStorage.clear();
-    source = factory({
+    source = styles({
       classic: function () {
         return Marty.createStateSource({
           id: 'jsonStorage',
@@ -82,7 +81,7 @@ describeStyles('JSONStorageStateSource', function () {
   describe('#storage', function () {
     describe('when you pass in a custom web storage object', function () {
       beforeEach(function () {
-        source = factory({
+        source = styles({
           classic: function () {
             return Marty.createStateSource({
               type: 'jsonStorage',

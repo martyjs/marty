@@ -10,14 +10,12 @@ function describeStyles(description, cb, options = {}) {
   function classicAndClass() {
     describe(description + ' (Classic)', function () {
       this.style = 'classic';
-      this.factory = factory(this.style);
-      cb.call(this);
+      cb.call(this, factory(this.style), this.style);
     });
 
     describe(description + ' (ES6)', function () {
       this.style = 'es6';
-      this.factory = factory(this.style);
-      cb.call(this);
+      cb.call(this, factory(this.style), this.style);
     });
   }
 
