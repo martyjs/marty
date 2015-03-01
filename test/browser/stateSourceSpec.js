@@ -1,18 +1,17 @@
 var Marty = require('../../index');
 var expect = require('chai').expect;
-var describeStyles = require('./lib/describeStyles');
+var describeStyles = require('./../lib/describeStyles');
 
 describe('StateSource', function () {
   var stateSource;
 
   describe('#createStateSource()', function () {
-    describeStyles('when you pass in a function', function () {
+    describeStyles('when you pass in a function', function (styles) {
       var expectedResult;
-      var factory = this.factory;
 
       beforeEach(function () {
         expectedResult = 'foo';
-        stateSource = factory({
+        stateSource = styles({
           classic: function () {
             return Marty.createStateSource({
               id: 'createStateSource',

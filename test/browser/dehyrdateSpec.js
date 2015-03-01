@@ -1,16 +1,15 @@
 var _ = require('underscore');
 var expect = require('chai').expect;
-var describeStyles = require('./lib/describeStyles');
+var describeStyles = require('./../lib/describeStyles');
 
-describeStyles('Marty#dehydrate()', function () {
-  var Marty, factory = this.factory;
-  var store1ExpectedState, storeSerializedState, serializedState;
+describeStyles('Marty#dehydrate()', function (styles) {
+  var Marty, store1ExpectedState, storeSerializedState, serializedState;
 
   beforeEach(function () {
     storeSerializedState = { bar: 'bar' };
     store1ExpectedState = { initial: 'store1' };
     Marty = require('../../index').createInstance();
-    factory({
+    styles({
       classic: function () {
         Marty.createStore({
           id: 'Store1',

@@ -2,7 +2,8 @@ var noopStorage = require('./noopStorage');
 var StateSource = require('../stateSource');
 
 class LocalStorageStateSource extends StateSource {
-  constructor() {
+  constructor(options) {
+    super(options);
     this._isLocalStorageStateSource = true;
     this.storage = typeof window === 'undefined' ? noopStorage : window.localStorage;
   }

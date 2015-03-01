@@ -33,8 +33,8 @@ es6
 var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
 
 class UserActionCreators extends Marty.ActionCreators {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.types = {
       updateEmail: UserConstants.UPDATE_EMAIL
     };
@@ -56,7 +56,7 @@ var Dispatcher = require('marty/dispatcher');
 
 var UserActionCreators = Marty.createActionCreators({
   types: {
-    updateEmail: UserConstants.UPDATE_EMAIL  
+    updateEmail: UserConstants.UPDATE_EMAIL
   },
   updateEmail: function (userId, email) {
     this.dispatch(userId, email);
@@ -74,10 +74,10 @@ es6
 var Dispatcher = require('marty/dispatcher');
 
 class UserActionCreators extends Marty.ActionCreators {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.types = {
-      updateEmail: UserConstants.UPDATE_EMAIL  
+      updateEmail: UserConstants.UPDATE_EMAIL
     };
   }
   updateEmail(userId, email) {
@@ -115,8 +115,8 @@ UserActionCreators.bar('baz'); // Dispatch BAR('baz')
 es6
 ===
 class UserActionCreators extends Marty.ActionCreators {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.types = {
       foo: Constants.FOO,
       bar: Constants.BAR

@@ -1,16 +1,15 @@
 var expect = require('chai').expect;
 var Marty = require('../../../index');
 var warnings = require('../../../warnings');
-var describeStyles = require('../lib/describeStyles');
+var describeStyles = require('../../lib/describeStyles');
 
-describeStyles('SessionStorageStateSource', function () {
+describeStyles('SessionStorageStateSource', function (styles) {
   var source;
-  var factory = this.factory;
 
   beforeEach(function () {
     warnings.classDoesNotHaveAnId = false;
     sessionStorage.clear();
-    source = factory({
+    source = styles({
       classic: function () {
         return Marty.createStateSource({
           type: 'sessionStorage'
@@ -58,7 +57,7 @@ describeStyles('SessionStorageStateSource', function () {
 
   describe('#namespace', function () {
     beforeEach(function () {
-      source = factory({
+      source = styles({
         classic: function () {
           return Marty.createStateSource({
             namespace: 'baz',

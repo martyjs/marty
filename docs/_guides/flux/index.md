@@ -37,8 +37,8 @@ es6
 var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
 
 class UserActionCreators extends Marty.ActionCreators {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.types = {
       updateUserEmail: UserConstants.UPDATE_USER_EMAIL
     };
@@ -92,8 +92,8 @@ var UserStore = Marty.createStore({
 es6
 ===
 class UserStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = {};
     this.handlers = {
       updateEmail: UserConstants.UPDATE_USER_EMAIL
@@ -121,7 +121,9 @@ UserStore.addChangeListener(function (state) {
 
 If you have a view that's interested in a domain, it can ask the store to notify it of any changes. When the store updates, your view just rerenders itself with the new state. You might ask, "what if the store changed something your view isn't interested in (e.g. a different entity)?". Thanks to React's virtual DOM it doesn't really matter, if the state is the same then the view just returns the same DOM tree and React does nothing. This makes your views *significantly simpler* since you just render whatever the store tells you to render.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var User = React.createClass({
   render: function () {
     return (
@@ -153,11 +155,47 @@ var User = React.createClass({
     });
   }
 });
-{% endhighlight %}
+
+es6
+===
+class User extends React.Component {
+  render() {
+    return (
+      <div className="user">
+        <input type="text"
+               onChange={this.updateEmail}
+               value={this.state.user.email}></input>
+      </div>
+    );
+  }
+  updateEmail(e) {
+    var email = e.target.value;
+    UserActionCreators.updateUserEmail(this.props.userId, email);
+  }
+  getInitialState() {
+    return {
+      user: UserStore.getUser(this.props.userId)
+    };
+  }
+  componentDidMount() {
+    this.userStoreListener = UserStore.addChangeListener(this.onUserStoreChanged);
+  }
+  componentWillUnmount(nextProps) {
+    this.userStoreListener.dispose();
+  }
+  onUserStoreChanged() {
+    this.setState({
+      user: UserStore.getUser(this.props.userId)
+    });
+  }
+}
+{% endsample %}
 
 As your application grows you start to find that there is a lot of boilerplate code to get views to listen to stores. [State mixins](/guides/state-mixin/index.html) are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserStateMixin = Marty.createStateMixin({
   listenTo: UserStore,
   getState: function () {
@@ -183,7 +221,33 @@ var User = React.createClass({
     UserActionCreators.updateUserEmail(this.props.userId, email);
   }
 });
-{% endhighlight %}
+es6
+===
+class User extends Marty.Component {
+  constructor(props, context) {
+    super(props, context);
+    this.listenTo = UserStore;
+  }
+  render() {
+    return (
+      <div className="user">
+        <input type="text"
+               onChange={this.updateEmail}
+               value={this.state.user.email}></input>
+      </div>
+    );
+  }
+  getState() {
+    return {
+      user: UserStore.getUser(this.props.userId)
+    };
+  }
+  updateEmail(e) {
+    var email = e.target.value;
+    UserActionCreators.updateUserEmail(this.props.userId, email);
+  }
+}
+{% endsample %}
 
 Whenever you want to change a value within your application, your data must follow this flow of [Action creator](/guides/action-creators/index.html) **->** [Dispatcher](/guides/dispatcher/index.html) **->** [Store](/guides/stores/index.html) **->** [State mixin](/guides/state-mixin/index.html) **->** View. This is known as a **unidirectional data flow**.
 

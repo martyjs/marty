@@ -2,7 +2,8 @@ var noopStorage = require('./noopStorage');
 var StateSource = require('../stateSource');
 
 class JSONStorageStateSource extends StateSource {
-  constructor() {
+  constructor(options) {
+    super(options);
     this._isJSONStorageStateSource = true;
 
     if (!this.storage) {

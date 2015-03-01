@@ -126,8 +126,8 @@ class UserAPI extends Marty.HttpStateSource {
 }
 
 class UserSourceActionCreators extends Marty.ActionCreators {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.types = {
       receiveUser: UserConstants.RECEIVE_USER
     }
@@ -138,8 +138,8 @@ class UserSourceActionCreators extends Marty.ActionCreators {
 }
 
 class UserStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = {};
     this.handlers = {
       addUser: UserConstants.RECEIVE_USER,
@@ -169,7 +169,9 @@ class UserStore extends Marty.Store {
 
 The result of the fetch function is a [fetch result](/api/stores/#fetch-result) which represents the current state of the fetch. A fetch can either be **PENDING**, **FAILED** or **DONE** (``fetch.status``). If a fetch has failed then the result will have the error (``fetch.error``) and if done it will have the result (``fetch.result``). Your views normally have to deal with each state of a fetch so the fetch result has a ``when()`` function which allows you to render different views for each state
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserStateMixin = Marty.createStateMixin({
   listenTo: UserStore,
   getState: function () {
@@ -195,4 +197,31 @@ var User = React.createClass({
     })
   }
 });
-{% endhighlight %}
+
+es6
+===
+class User extends Marty.Component {
+  constructor(props, context) {
+    super(props, context);
+    this.listenTo = UserStore;
+  }
+  render() {
+    return this.state.user.when({
+      pending: function () {
+        return <div class="user-loading">Loading...</div>;
+      },
+      failed: function (error) {
+        return <div class="user-error">{error.message}</div>;
+      },
+      done: function (user) {
+        return <div className="user">{user.name}</div>;
+      }
+    })
+  }
+  getState() {
+    return {
+      user: UserStore.getUser(this.props.id)
+    };
+  }
+}
+{% endsample %}

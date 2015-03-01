@@ -7,7 +7,7 @@ var constants = require('../../lib/constants');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var serializeError = require('../../lib/utils/serializeError');
-var describeStyles = require('./lib/describeStyles');
+var describeStyles = require('./../lib/describeStyles');
 
 describe('ActionCreators', function () {
   var actionCreators, dispatcher, actualResult, actualError, Marty;
@@ -107,9 +107,7 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStyles('when the action returns a promise', function () {
-    var factory = this.factory;
-
+  describeStyles('when the action returns a promise', function (styles) {
     describe('when the promise fails', function () {
       beforeEach(function (done) {
         expectedError = new Error('foo');
@@ -119,7 +117,7 @@ describe('ActionCreators', function () {
           });
         });
 
-        actionCreators = factory({
+        actionCreators = styles({
           classic: function () {
             return Marty.createActionCreators({
               dispatcher: dispatcher,
@@ -187,7 +185,7 @@ describe('ActionCreators', function () {
           }, 2);
         });
 
-        actionCreators = factory({
+        actionCreators = styles({
           classic: function () {
             return Marty.createActionCreators({
               dispatcher: dispatcher,
@@ -231,12 +229,10 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStyles('when the action throws an error', function () {
-    var factory = this.factory;
-
+  describeStyles('when the action throws an error', function (styles) {
     beforeEach(function () {
       expectedError = new Error('foo');
-      actionCreators = factory({
+      actionCreators = styles({
         classic: function () {
           return Marty.createActionCreators({
             displayName: 'Test',
@@ -301,14 +297,12 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStyles('when the action does not return anything', function () {
-    var factory = this.factory;
-
+  describeStyles('when the action does not return anything', function (styles) {
     beforeEach(function () {
       expectedArg = { foo: 'bar' };
       expectedOtherArg = { baz: 'bim' };
       expectedActionType = 'SOME_ACTION';
-      actionCreators = factory({
+      actionCreators = styles({
         classic: function () {
           return Marty.createActionCreators({
             dispatcher: dispatcher,
@@ -429,14 +423,13 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStyles('#types', function () {
-    var factory = this.factory;
+  describeStyles('#types', function (styles) {
     var Creators, Constants, fooAction, barAction, expectedArg;
 
     beforeEach(function () {
       expectedArg = 'foo';
       Constants = constants(['FOO', 'BAR']);
-      Creators = factory({
+      Creators = styles({
         classic: function () {
           return Marty.createActionCreators({
             id: 'TypeActionCreators',

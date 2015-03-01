@@ -23,8 +23,8 @@ var UserStorage = Marty.createStateSource({
 es6
 ===
 class UserStorage extends Marty.JSONStorageStateSource {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.namespace = 'users';
   }
   createUser(user) {

@@ -23,8 +23,8 @@ var FooStorage = Marty.createStateSource({
 es6
 ===
 class FooStorage extends Marty.LocalStorageStateSource {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.namespace = 'foos';
   }
   saveFoo(foo) {

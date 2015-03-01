@@ -1,22 +1,31 @@
-var React = require('react');
 var sinon = require('sinon');
 var _ = require('underscore');
 var cheerio = require('cheerio');
 var expect = require('chai').expect;
-var Context = require('../../lib/context');
 var uuid = require('../../lib/utils/uuid');
-var messagesFixture = require('./fixtures/messages');
+var describeStyles = require('../lib/describeStyles');
+var es6MessagesFixtures = require('./fixtures/es6Messages');
+var classicMessagesFixtures = require('./fixtures/classicMessages');
 
 var MARTY_STATE_ID = '__marty-state';
 
-describe('Marty#renderToString', function () {
+describeStyles('Marty#renderToString', function (styles) {
   var $, context, Marty, fixture, expectedId, dispose;
 
   beforeEach(function () {
     expectedId = uuid.small();
     Marty = require('../../index').createInstance();
-    fixture = messagesFixture(Marty);
+    fixture = styles({
+      classic: function () {
+        return classicMessagesFixtures(Marty);
+      },
+      es6: function () {
+        return es6MessagesFixtures(Marty);
+      }
+    });
+
     context = Marty.createContext();
+
     dispose = sinon.stub(context, 'dispose');
     fixture.MessageStore.for(context).setContextName('local-context');
   });
@@ -25,27 +34,29 @@ describe('Marty#renderToString', function () {
     dispose.restore();
   });
 
-  describe('when you dont pass in a createElement function', function () {
+  describe('when you dont pass in a component type', function () {
     it('should reject', function () {
-      return expect(Marty.renderToString(null)).to.be.rejected;
+      return expect(Marty.renderToString({
+        context: context
+      })).to.be.rejected;
     });
   });
 
-  describe('when you don\'t pass in a context', function () {
+  describe('when you dont pass in something that isn\'t a react component', function () {
     it('should reject', function () {
-      return expect(Marty.renderToString(_.noop)).to.be.rejected;
+      return expect(Marty.renderToString({
+        type: {},
+        context: context
+      })).to.be.rejected;
     });
   });
 
   describe('when you pass in an object that isn\'t a context', function () {
     it('should reject', function () {
-      return expect(Marty.renderToString(_.noop, {})).to.be.rejected;
-    });
-  });
-
-  describe('when createElement returns null', function () {
-    it('should reject', function () {
-      return expect(Marty.renderToString(_.noop, new Context())).to.be.rejected;
+      return expect(Marty.renderToString({
+        context: {},
+        type: fixture.Message
+      })).to.be.rejected;
     });
   });
 
@@ -113,9 +124,11 @@ describe('Marty#renderToString', function () {
   });
 
   function renderToString(options) {
-    return Marty.renderToString(function () {
-      return React.createElement(fixture.Message, { id: expectedId });
-    }, context, options).then(loadDOM);
+    return Marty.renderToString(_.extend({
+      context: context,
+      type: fixture.Message,
+      props: { id: expectedId }
+    }, options)).then(loadDOM);
   }
 
   function loadDOM(html) {

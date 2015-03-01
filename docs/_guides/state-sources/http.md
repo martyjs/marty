@@ -32,8 +32,8 @@ var UsersAPI = Marty.createStateSource({
 es6
 ===
 class UsersAPI extends Marty.HttpStateSource {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.baseUrl = 'http://foo.com';
   }
   getAll(users) {
@@ -49,7 +49,10 @@ class UsersAPI extends Marty.HttpStateSource {
 
 If the request is successful then the promise resolves with a response object. If the response content type is ``application/json`` then Marty will attempt to deserialize the body which is accessible at ``res.body``.
 
-{% highlight js %}
+
+{% sample %}
+classic
+=======
 this.get('/foo').then(function(res) {
   console.log(res.body);
   console.log(res.headers.get('Content-Type'));
@@ -57,4 +60,14 @@ this.get('/foo').then(function(res) {
   console.log(res.status);
   console.log(res.statusText);
 })
-{% endhighlight %}
+
+es6
+===
+this.get('/foo').then((res) => {
+  console.log(res.body);
+  console.log(res.headers.get('Content-Type'));
+  console.log(res.headers.get('Date'));
+  console.log(res.status);
+  console.log(res.statusText);
+})
+{% endsample %}

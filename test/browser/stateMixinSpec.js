@@ -2,6 +2,7 @@ var React = require('react');
 var sinon = require('sinon');
 var expect = require('chai').expect;
 var uuid = require('../../lib/utils/uuid');
+var Instances = require('../../lib/instances');
 var StateMixin = require('../../lib/stateMixin');
 var Diagnostics = require('../../lib/diagnostics');
 var stubbedLogger = require('../lib/stubbedLogger');
@@ -37,30 +38,6 @@ describe('StateMixin', function () {
     expect(function () { StateMixin(); }).to.throw(Error);
   });
 
-  describe('when an error is thrown when getting state', function () {
-    var expectedError;
-
-    beforeEach(function () {
-      expectedError = new Error('Bar');
-      mixin = new StateMixin({
-        displayName: 'Test',
-        getState: function () {
-          throw expectedError;
-        }
-      });
-
-      try {
-        mixin.tryGetState();
-      } catch (e) { }
-    });
-
-    it('should log the error and any additional metadata', function () {
-      var expectedMessage = 'An error occured while trying to get the latest state in the view Test';
-
-      expect(logger.error).to.be.calledWith(expectedMessage, expectedError, mixin);
-    });
-  });
-
   describe('when a store changes', function () {
     var expectedState, expectedId, action, store, log;
 
@@ -90,6 +67,7 @@ describe('StateMixin', function () {
 
       action.addStoreHandler(store, 'test');
       element = renderClassWithMixin(mixin);
+      element.displayName = mixin.displayName;
     });
 
     describe('when the handler fails', function () {
@@ -98,7 +76,7 @@ describe('StateMixin', function () {
       beforeEach(function () {
         expectedError = new Error();
         store.getState = sinon.stub().throws(expectedError);
-        element.onStoreChanged(null, store);
+        getObserver(element).onStoreChanged(null, store, element);
       });
 
       it('should add a view to the handler', function () {
@@ -113,7 +91,7 @@ describe('StateMixin', function () {
 
     describe('when the handler is successful', function () {
       beforeEach(function () {
-        element.onStoreChanged(null, store);
+        getObserver(element).onStoreChanged(null, store, element);
       });
 
       it('should add a view to the handler', function () {
@@ -418,6 +396,14 @@ describe('StateMixin', function () {
       store.dispose();
     });
   });
+
+  function getObserver(component) {
+    var instance = Instances.get(component);
+
+    if (instance) {
+      return instance.observer;
+    }
+  }
 
   function createStore(state) {
     return Marty.createStore({
