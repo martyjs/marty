@@ -2,8 +2,11 @@
 - Flux
 - Stores
 - Action Creators
+- Component
 - State Mixin
 - State Sources
+- Isomorphism
+- ES6
 - Constants
 - Dispatcher
 - Further reading

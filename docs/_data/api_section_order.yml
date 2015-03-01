@@ -1,6 +1,8 @@
+- Top-Level API
 - Stores
 - Action Creators
 - Component
 - State Mixin
 - State Sources
+- Isomorphism
 - Constants

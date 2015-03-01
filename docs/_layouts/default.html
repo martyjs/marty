@@ -47,7 +47,7 @@
             </ul>
           </li>
           <li{% if page.collection == "api" %} class="active"{% endif %}>
-            <a href="/api/stores">API</a>
+            <a href="/api/top-level-api">API</a>
             <ul class="nav sub-nav visible-xs-block">
               {% assign sections = site.api | group_by:"section" %}
               {% for section_name in site.data.api_section_order %}
