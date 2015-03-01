@@ -36,8 +36,8 @@ var listener = UsersStore.addChangeListener(function () {
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = {};
     this.handlers = {
       addUser: Constants.RECEIVE_USER

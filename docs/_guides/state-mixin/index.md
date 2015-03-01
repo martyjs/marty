@@ -5,6 +5,10 @@ id: state-mixin
 section: State Mixin
 ---
 
+<div class="alert alert-info">
+If you are using ES6 classes we recommend you use <a href="/guides/component/index.html"><code>Marty.Component</code></a>
+</div>
+
 We found that there was a lot of boilerplate code in React components to start listening to [stores](/guides/stores/index.html) and get their states. The State mixin helps to reduce the amount of code you have to write.
 
 Firstly, it automatically [adds change listeners](/api/stores/index.html#addChangeListener) to [stores you want to listen to](/api/state-mixin/index.html#listenTo), as well as disposing of those listeners when the component unmounts.

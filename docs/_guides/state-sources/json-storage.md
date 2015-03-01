@@ -26,8 +26,8 @@ UserStorage.saveUser({id: 123, name: 'Foo'});
 es6
 ===
 class UserStorage extends Marty.JSONStorageStateSource {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.storage = sessionStorage;
   }
   saveUser(user) {

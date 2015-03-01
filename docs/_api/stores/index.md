@@ -25,8 +25,8 @@ var UsersStore = Marty.createStore({
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = [];
     this.handlers = {
       addUser: Constants.RECEIVE_USER
@@ -74,8 +74,8 @@ var UsersStore = Marty.createStore({
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = {};
     this.handlers = {
       addUser: Constants.RECEIVE_USER
@@ -111,8 +111,8 @@ var UsersStore = Marty.createStore({
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.handlers = {
       foo: UserConstants.ADD_USER,
       bar: [UserConstants.ADD_USER, 'UPDATE_USER']
@@ -157,8 +157,8 @@ var UsersStore = Marty.createStore({
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = {};
     this.handlers = {
       addUser: Constants.RECEIVE_USER
@@ -284,8 +284,8 @@ var UsersStore = Marty.createStore({
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = {};
     this.handlers = {
       addUser: Constants.RECEIVE_USER
@@ -684,8 +684,8 @@ var UsersStore = Marty.createStore({
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.handlers = {
       addUser: Constants.RECEIVE_USER
     };

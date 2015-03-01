@@ -49,8 +49,8 @@ es6
 ===
 // actions/userActionCreators.js
 class UserActionCreators extends Marty.ActionCreators {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.types = {
       saveUser: UserConstants.SAVE_USER
     };
@@ -62,8 +62,8 @@ class UserActionCreators extends Marty.ActionCreators {
 
 // actions/userSourceActionCreators.js
 class UserSourceActionCreators extends Marty.ActionCreators {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.types = {
       addUser: UserConstants.ADD_USER
     };

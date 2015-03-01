@@ -40,8 +40,8 @@ var UsersStore = Marty.createStore({
 es6
 ===
 class UsersStore extends Marty.Store {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.state = Immutable.List();
     this.handlers = {
       addUser: Constants.RECEIVE_USER

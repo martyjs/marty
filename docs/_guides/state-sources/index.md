@@ -29,8 +29,8 @@ UserAPI.getUsers();
 es6
 ===
 class UserAPI extends Marty.HttpStateSource {
-  constructor() {
-    super();
+  constructor(options) {
+    super(options);
     this.baseUrl = 'http://foo.com';
   }
   getUsers() {
