@@ -1,5 +1,5 @@
 function dispatch() {
-  var dispatcher = require('../../../browser').Dispatcher;
+  var dispatcher = require('../../../marty').Dispatcher;
 
   return dispatcher.dispatch.apply(dispatcher, arguments);
 }

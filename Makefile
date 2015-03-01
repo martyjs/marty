@@ -1,8 +1,8 @@
 BIN = ./node_modules/.bin
 
-.PHONY: bootstrap bootstrap-js bootstrap-ruby start test test-server test-browser docs release-docs;
+.PHONY: bootstrap bootstrap-js bootstrap-ruby start test test-server test-browser docs release-docs build build-browser build-server server-watch;
 
-SRC = $(shell find ./lib ./server.js ./browser.js ./test -type f -name '*.js')
+SRC = $(shell find ./lib ./errors ./http ./constants ./*.js -type f -name '*.js')
 
 test: lint test-server test-browser
 
@@ -31,7 +31,18 @@ lint: bootstrap-js
 release: test
 	@inc=$(inc) sh ./build/release.sh
 
-build: lint
+server-watch:
+	@mkdir -p dist
+	@$(BIN)/babel -w -d dist/es6 $(SRC)
+
+build: lint build-browser build-server
+
+build-server:
+	@mkdir -p dist
+	@rm -rf dist/es6
+	@$(BIN)/babel -d dist/es6 $(SRC)
+
+build-browser:
 	@mkdir -p dist
 	@$(BIN)/browserify --transform babelify --require ./browser.js --exclude react --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js

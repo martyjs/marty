@@ -2,8 +2,8 @@
   "name": "marty",
   "version": "0.0.9-alpha",
   "description": "A Javascript library for state management in React applications",
-  "main": "server.js",
-  "browser": "browser.js",
+  "main": "dist/es6/marty.js",
+  "browser": "marty.js",
   "directories": {
     "doc": "./doc",
     "lib": "./lib"
@@ -20,7 +20,7 @@
     "flux"
   ],
   "devDependencies": {
-    "babel": "^4.3.0",
+    "babel": "^4.6.3",
     "babelify": "^5.0.3",
     "bluebird": "^2.3.11",
     "body-parser": "^1.9.3",

@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var Marty = require('../../../browser');
+var Marty = require('../../../marty');
 var warnings = require('../../../warnings');
 var describeStyles = require('../../lib/describeStyles');
 

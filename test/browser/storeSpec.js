@@ -1,6 +1,6 @@
 var sinon = require('sinon');
 var _ = require('lodash-node');
-var Marty = require('../../browser');
+var Marty = require('../../marty');
 var expect = require('chai').expect;
 var Dispatcher = require('../../dispatcher');
 var stubbedLogger = require('../lib/stubbedLogger');

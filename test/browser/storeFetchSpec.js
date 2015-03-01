@@ -1,6 +1,6 @@
 var sinon = require('sinon');
 var _ = require('underscore');
-var Marty = require('../../browser');
+var Marty = require('../../marty');
 var expect = require('chai').expect;
 var warnings = require('../../warnings');
 var Promise = require('es6-promise').Promise;

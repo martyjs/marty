@@ -1,10 +1,10 @@
 var sinon = require('sinon');
 var _ = require('lodash-node');
 var expect = require('chai').expect;
-var Marty = require('../../../browser');
-var warnings = require('../../../warnings');
-var HttpStateSource = require('../../../stateSources/http');
+var Marty = require('../../../marty');
+var warnings = require('../../../lib/warnings');
 var describeStyles = require('../../lib/describeStyles');
+var HttpStateSource = require('../../../lib/stateSource/inbuilt/http');
 
 require('es6-promise').polyfill();
 
@@ -58,6 +58,7 @@ describeStyles('HttpStateSource', function (styles) {
         beforeEach(function () {
           executionOrder = [];
           hook1 = {
+            id: '1',
             priority: 2,
             before: sinon.spy(function () {
               actualContext = this;
@@ -66,12 +67,14 @@ describeStyles('HttpStateSource', function (styles) {
           };
 
           hook2 = {
+            id: '2',
             before: sinon.spy(function () {
               executionOrder.push(2);
             })
           };
 
           hook3 = {
+            id: '3',
             priority: 1,
             before: sinon.spy(function () {
               executionOrder.push(3);
@@ -110,6 +113,7 @@ describeStyles('HttpStateSource', function (styles) {
         beforeEach(function () {
           executionOrder = [];
           hook1 = {
+            id: '1',
             priority: 2,
             after: sinon.spy(function () {
               actualContext = this;
@@ -118,12 +122,14 @@ describeStyles('HttpStateSource', function (styles) {
           };
 
           hook2 = {
+            id: '2',
             after: sinon.spy(function () {
               executionOrder.push(2);
             })
           };
 
           hook3 = {
+            id: '3',
             priority: 1,
             after: sinon.spy(function () {
               executionOrder.push(3);

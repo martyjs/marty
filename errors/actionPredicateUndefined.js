@@ -4,7 +4,7 @@ function ActionPredicateUndefinedError(actionHandler, store) {
 
   if (store) {
     var displayName = store.displayName || store.id;
-    this.message += ` in the ${displayName} store`;
+    this.message += ' in the ' + displayName + ' store';
   }
 }
 

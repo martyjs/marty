@@ -1,4 +1,4 @@
-var Marty = require('../../browser');
+var Marty = require('../../marty');
 var expect = require('chai').expect;
 var describeStyles = require('./../lib/describeStyles');
 
