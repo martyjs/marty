@@ -1,6 +1,6 @@
 var sinon = require('sinon');
 var React = require('react');
-var Marty = require('../../index');
+var Marty = require('../../browser');
 var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
 var ContextComponent = require('../../lib/contextComponent');

@@ -17,7 +17,7 @@ describe('ActionCreators', function () {
   beforeEach(function () {
     logger = stubbedLogger();
     dispatcher = new MockDispatcher();
-    Marty = require('../../index').createInstance();
+    Marty = require('../../browser').createInstance();
   });
 
   afterEach(function () {

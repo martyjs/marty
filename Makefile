@@ -2,7 +2,7 @@ BIN = ./node_modules/.bin
 
 .PHONY: bootstrap bootstrap-js bootstrap-ruby start test test-server test-browser docs release-docs;
 
-SRC = $(shell find ./lib ./index.js ./test -type f -name '*.js')
+SRC = $(shell find ./lib ./server.js ./browser.js ./test -type f -name '*.js')
 
 test: lint test-server test-browser
 
@@ -33,7 +33,7 @@ release: test
 
 build: lint
 	@mkdir -p dist
-	@$(BIN)/browserify --transform babelify --require ./index.js --exclude react  --standalone Marty > dist/marty.js
+	@$(BIN)/browserify --transform babelify --require ./browser.js --exclude react --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 	@gzip dist/marty.min.js -c > dist/marty.min.js.gz
 

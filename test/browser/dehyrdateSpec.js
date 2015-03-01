@@ -8,7 +8,7 @@ describeStyles('Marty#dehydrate()', function (styles) {
   beforeEach(function () {
     storeSerializedState = { bar: 'bar' };
     store1ExpectedState = { initial: 'store1' };
-    Marty = require('../../index').createInstance();
+    Marty = require('../../browser').createInstance();
     styles({
       classic: function () {
         Marty.createStore({

@@ -10,8 +10,8 @@ describe('Marty#rehydrate()', function () {
     store2ExpectedState = { bar: 'bar' };
     store1ExpectedState = { initial: 'store1' };
 
-    ServerMarty = require('../../index').createInstance();
-    BrowserMarty = require('../../index').createInstance();
+    ServerMarty = require('../../browser').createInstance();
+    BrowserMarty = require('../../browser').createInstance();
 
     serverStores = createStoresFor(ServerMarty);
     browserStores = createStoresFor(BrowserMarty);

@@ -1,4 +1,3 @@
-require('babel/register');
 require('es6-promise').polyfill();
 
 var _ = require('underscore');

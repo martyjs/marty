@@ -19,7 +19,7 @@ describe('StateMixin', function () {
       name: 'hello'
     };
     Diagnostics.devtoolsEnabled = true;
-    Marty = require('../../index').createInstance();
+    Marty = require('../../browser').createInstance();
 
     mixin = new StateMixin({
       getInitialState: function () {

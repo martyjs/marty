@@ -2,7 +2,8 @@
   "name": "marty",
   "version": "0.0.9-alpha",
   "description": "A Javascript library for state management in React applications",
-  "main": "index.js",
+  "main": "server.js",
+  "browser": "browser.js",
   "directories": {
     "doc": "./doc",
     "lib": "./lib"

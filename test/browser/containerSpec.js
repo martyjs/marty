@@ -16,7 +16,7 @@ describe('Container', function () {
     defaultActionHandler = sinon.spy();
     defaultDispatcher = new Dispatcher();
     defaultDispatcher.isDefault = true;
-    Marty = require('../../index').createInstance();
+    Marty = require('../../browser').createInstance();
     defaultDispatcher.register(defaultActionHandler);
     sandbox.stub(uuid, 'generate').returns(expectedId);
     sandbox.stub(Dispatcher, 'getDefault').returns(defaultDispatcher);

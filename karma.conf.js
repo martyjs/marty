@@ -102,7 +102,7 @@ module.exports = function (config) {
         debug: true
       },
       files: [
-        'index.js',
+        'browser.js',
         'lib/*.js',
         'test/browser/**/*.js'
       ],
@@ -111,7 +111,7 @@ module.exports = function (config) {
       ],
       preprocessors: {
         'lib/*': ['browserify'],
-        'index.js': ['browserify'],
+        'browser.js': ['browserify'],
         'test/browser/**/*.js': ['browserify']
       },
       port: 9876,
