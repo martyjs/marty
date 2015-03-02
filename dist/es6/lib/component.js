@@ -16,62 +16,71 @@ var warnings = require("./warnings");
 var Instances = require("./instances");
 var StoreObserver = require("./storeObserver");
 
-var Component = (function (_React$Component) {
-  function Component(props, context) {
-    _classCallCheck(this, Component);
+// React.Component not present in React v0.12 so Marty.Component isn't supported
+if (React.Component) {
+  (function () {
+    var Component = (function (_React$Component) {
+      function Component(props, context) {
+        _classCallCheck(this, Component);
 
-    _get(Object.getPrototypeOf(Component.prototype), "constructor", this).call(this, props, context);
+        _get(Object.getPrototypeOf(Component.prototype), "constructor", this).call(this, props, context);
 
-    if (!context && warnings.contextNotPassedInToConstructor) {
-      log.warn(contextNotPassedInWarning(this));
-    }
-    this.__id = uuid.type("Component");
-    Instances.add(this);
-    this.state = this.getState();
-  }
-
-  _inherits(Component, _React$Component);
-
-  _prototypeProperties(Component, null, {
-    componentDidMount: {
-      value: function componentDidMount() {
-        var observer = new StoreObserver(this, getStoresToListenTo(this));
-
-        Instances.get(this).observer = observer;
-      },
-      writable: true,
-      configurable: true
-    },
-    componentWillUnmount: {
-      value: function componentWillUnmount() {
-        var instance = Instances.get(this);
-
-        if (instance) {
-          if (instance.observer) {
-            instance.observer.dispose();
-          }
-
-          Instances.dispose(this);
+        if (!context && warnings.contextNotPassedInToConstructor) {
+          log.warn(contextNotPassedInWarning(this));
         }
-      },
-      writable: true,
-      configurable: true
-    },
-    getState: {
-      value: function getState() {
-        return {};
-      },
-      writable: true,
-      configurable: true
-    }
-  });
+        this.__id = uuid.type("Component");
+        Instances.add(this);
+        this.state = this.getState();
+      }
 
-  return Component;
-})(React.Component);
+      _inherits(Component, _React$Component);
 
-Component.contextTypes = {
-  martyContext: React.PropTypes.object
-};
+      _prototypeProperties(Component, null, {
+        componentDidMount: {
+          value: function componentDidMount() {
+            var observer = new StoreObserver(this, getStoresToListenTo(this));
+
+            Instances.get(this).observer = observer;
+          },
+          writable: true,
+          configurable: true
+        },
+        componentWillUnmount: {
+          value: function componentWillUnmount() {
+            var instance = Instances.get(this);
+
+            if (instance) {
+              if (instance.observer) {
+                instance.observer.dispose();
+              }
+
+              Instances.dispose(this);
+            }
+          },
+          writable: true,
+          configurable: true
+        },
+        getState: {
+          value: function getState() {
+            return {};
+          },
+          writable: true,
+          configurable: true
+        }
+      });
+
+      return Component;
+    })(React.Component);
+
+    Component.contextTypes = {
+      martyContext: React.PropTypes.object
+    };
+
+    module.exports = Component;
+  })();
+} else {
+  module.exports = null;
+}
 
 function contextNotPassedInWarning(component) {
   var suffix;
@@ -106,5 +115,3 @@ function getStoresToListenTo(component) {
     return isStore;
   });
 }
-
-module.exports = Component;
