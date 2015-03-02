@@ -19,9 +19,15 @@
     "react",
     "flux"
   ],
+  "dependencies": {
+    "babelify": "^5.0.3",
+    "es6-promise": "^2.0.0",
+    "flux": "^2.0.1",
+    "isomorphic-fetch": "1.6.0",
+    "underscore": "^1.7.0"
+  },
   "devDependencies": {
     "babel": "^4.6.3",
-    "babelify": "^5.0.3",
     "bluebird": "^2.3.11",
     "body-parser": "^1.9.3",
     "browserify": "^5.12.0",
@@ -71,11 +77,5 @@
       "babelify"
     ]
   },
-  "homepage": "https://martyjs.org",
-  "dependencies": {
-    "es6-promise": "^2.0.0",
-    "flux": "^2.0.1",
-    "isomorphic-fetch": "1.6.0",
-    "underscore": "^1.7.0"
-  }
+  "homepage": "https://martyjs.org"
 }
