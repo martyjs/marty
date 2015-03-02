@@ -6,7 +6,7 @@ describe('Marty#addStoreChangeListener()', function () {
   var Marty, Store1, Store2, listener, disposable;
 
   beforeEach(function () {
-    Marty = require('../../browser').createInstance();
+    Marty = require('../../marty').createInstance();
     listener = sinon.spy();
 
     Store1 = Marty.createStore({

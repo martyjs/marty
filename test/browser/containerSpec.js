@@ -1,8 +1,8 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var warnings = require('../../warnings');
+var warnings = require('../../lib/warnings');
 var uuid = require('../../lib/utils/uuid');
-var Dispatcher = require('../../dispatcher');
+var Dispatcher = require('../../lib/dispatcher');
 
 describe('Container', function () {
   var container, action, id, context, expectedId;
@@ -16,7 +16,7 @@ describe('Container', function () {
     defaultActionHandler = sinon.spy();
     defaultDispatcher = new Dispatcher();
     defaultDispatcher.isDefault = true;
-    Marty = require('../../browser').createInstance();
+    Marty = require('../../marty').createInstance();
     defaultDispatcher.register(defaultActionHandler);
     sandbox.stub(uuid, 'generate').returns(expectedId);
     sandbox.stub(Dispatcher, 'getDefault').returns(defaultDispatcher);

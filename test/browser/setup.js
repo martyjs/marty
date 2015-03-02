@@ -8,5 +8,5 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 afterEach(function () {
-  require('../../browser').dispose();
+  require('../../marty').dispose();
 });
