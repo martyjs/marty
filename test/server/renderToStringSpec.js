@@ -14,7 +14,7 @@ describeStyles('Marty#renderToString', function (styles) {
 
   beforeEach(function () {
     expectedId = uuid.small();
-    Marty = require('../../server').createInstance();
+    Marty = require('../../marty').createInstance();
     fixture = styles({
       classic: function () {
         return classicMessagesFixtures(Marty);

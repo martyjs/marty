@@ -7,7 +7,7 @@ describe('calling resolver warnings', function () {
 
   beforeEach(function () {
     logger = stubbedLogger();
-    Marty = require('../../server').createInstance();
+    Marty = require('../../marty').createInstance();
   });
 
   afterEach(function () {

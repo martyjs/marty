@@ -1,11 +1,11 @@
 var sinon = require('sinon');
 var _ = require('underscore');
-var logger = require('../../lib/logger');
+var logger = require('../../logger');
 
-function stubbedLogger() {
+function stubLogger(Marty) {
   var sandbox = sinon.sandbox.create();
 
-  _.each(logger, function (func, key) {
+  _.each(Marty.logger, function (func, key) {
     sandbox.stub(logger, key);
   });
 
@@ -16,4 +16,4 @@ function stubbedLogger() {
   }, logger);
 }
 
-module.exports = stubbedLogger;
+module.exports = stubLogger;

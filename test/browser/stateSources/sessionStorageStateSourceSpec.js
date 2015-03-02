@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var Marty = require('../../../marty');
-var warnings = require('../../../warnings');
+var warnings = require('../../../lib/warnings');
 var describeStyles = require('../../lib/describeStyles');
 
 describeStyles('SessionStorageStateSource', function (styles) {

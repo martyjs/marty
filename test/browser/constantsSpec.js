@@ -1,7 +1,7 @@
 var sinon = require('sinon');
 var _ = require('underscore');
 var expect = require('chai').expect;
-var warnings = require('../../warnings');
+var warnings = require('../../lib/warnings');
 var constants = require('../../lib/constants');
 
 describe('Constants', function () {
