@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "main": "dist/marty.js",
+  "main": "dist/browser/marty.js",
   "version": "0.8.12",
   "homepage": "martyjs.org",
   "authors": [

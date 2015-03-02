@@ -31,22 +31,22 @@ lint: bootstrap-js
 release: test
 	@inc=$(inc) sh ./build/release.sh
 
-server-watch:
+watch:
 	@mkdir -p dist
-	@$(BIN)/babel -w -d dist/es6 $(SRC)
+	@$(BIN)/babel -w -d dist/node $(SRC)
 
 build: lint build-browser build-server
 
 build-server:
-	@mkdir -p dist
-	@rm -rf dist/es6
-	@$(BIN)/babel -d dist/es6 $(SRC)
+	@mkdir -p dist/node
+	@rm -rf dist/node
+	@$(BIN)/babel -d dist/node $(SRC)
 
 build-browser:
-	@mkdir -p dist
-	@$(BIN)/browserify --transform babelify --require ./browser.js --exclude react --standalone Marty > dist/marty.js
-	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
-	@gzip dist/marty.min.js -c > dist/marty.min.js.gz
+	@mkdir -p dist/browser
+	@$(BIN)/browserify --transform babelify --require ./marty.js --exclude react --standalone Marty > dist/browser/marty.js
+	@cat dist/browser/marty.js | $(BIN)/uglifyjs > dist/browser/marty.min.js
+	@gzip dist/browser/marty.min.js -c > dist/browser/marty.min.js.gz
 
 docs: bootstrap-ruby
 	@cd docs && bundle exec jekyll serve -w
