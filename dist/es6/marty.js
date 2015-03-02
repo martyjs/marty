@@ -2,6 +2,13 @@
 
 require("es6-promise").polyfill();
 
+
+console.time('react');
+var React = require('react');
+
+console.log(React.version);
+console.timeEnd('react')
+
 var _ = require("underscore");
 var state = require("./lib/state");
 var create = require("./lib/create");
