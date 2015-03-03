@@ -1,34 +1,48 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Marty=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./index.js":[function(require,module,exports){
-var _ = require('underscore');
-var state = require('./lib/state');
-var create = require('./lib/create');
-var Dispatcher = require('./lib/dispatcher');
-var Diagnostics = require('./lib/diagnostics');
+"use strict";
+
+var _ = require("underscore");
+var state = require("./lib/state");
+var create = require("./lib/create");
+var Dispatcher = require("./lib/dispatcher");
+var Diagnostics = require("./lib/diagnostics");
 
 var Marty = _.extend({
-  version: '0.8.12',
+  version: "0.8.13",
   Diagnostics: Diagnostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
+
 },{"./lib/create":12,"./lib/diagnostics":13,"./lib/dispatcher":14,"./lib/state":18,"underscore":39}],1:[function(require,module,exports){
-var constants = require('./index');
+"use strict";
 
-module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
+var constants = require("./index");
+
+module.exports = constants(["ACTION_STARTING", "ACTION_DONE", "ACTION_FAILED"]);
+
 },{"./index":2}],2:[function(require,module,exports){
-module.exports = require('../lib/constants');
-},{"../lib/constants":11}],3:[function(require,module,exports){
-var constants = require('./index');
+"use strict";
 
-module.exports = constants(['PENDING', 'FAILED', 'DONE']);
+module.exports = require("../lib/constants");
+
+},{"../lib/constants":11}],3:[function(require,module,exports){
+"use strict";
+
+var constants = require("./index");
+
+module.exports = constants(["PENDING", "FAILED", "DONE"]);
+
 },{"./index":2}],4:[function(require,module,exports){
+"use strict";
+
 function ActionHandlerNotFoundError(actionHandler, store) {
-  this.name = 'Action handler not found';
-  this.message = 'The action handler "' + actionHandler + '" could not be found';
+  this.name = "Action handler not found";
+  this.message = "The action handler \"" + actionHandler + "\" could not be found";
 
   if (store && store.displayName) {
-    this.message += ' in the ' + store.displayName + ' store';
+    this.message += " in the " + store.displayName + " store";
   }
 }
 
@@ -37,12 +51,14 @@ ActionHandlerNotFoundError.prototype = Error.prototype;
 module.exports = ActionHandlerNotFoundError;
 
 },{}],5:[function(require,module,exports){
+"use strict";
+
 function ActionPredicateUndefinedError(actionHandler, store) {
-  this.name = 'Action predicate undefined';
-  this.message = 'The action predicate for "' + actionHandler + '" was undefined';
+  this.name = "Action predicate undefined";
+  this.message = "The action predicate for \"" + actionHandler + "\" was undefined";
 
   if (store && store.displayName) {
-    this.message += ' in the ' + store.displayName + ' store';
+    this.message += " in the " + store.displayName + " store";
   }
 }
 
@@ -51,42 +67,53 @@ ActionPredicateUndefinedError.prototype = Error.prototype;
 module.exports = ActionPredicateUndefinedError;
 
 },{}],6:[function(require,module,exports){
+"use strict";
+
 function CompoundError(errors) {
   this.errors = errors;
-  this.name = 'Compound error';
+  this.name = "Compound error";
 }
 
 CompoundError.prototype = Error.prototype;
 
 module.exports = CompoundError;
+
 },{}],7:[function(require,module,exports){
+"use strict";
+
 function NotFoundError(message) {
-  this.name = 'Not found';
-  this.message = message || 'Not found';
+  this.name = "Not found";
+  this.message = message || "Not found";
   this.status = 404;
 }
 
 NotFoundError.prototype = Error.prototype;
 
 module.exports = NotFoundError;
+
 },{}],8:[function(require,module,exports){
+"use strict";
+
 function UnkownStoreError(store) {
-  this.name = 'Unknown store';
-  this.message = 'Unknown store ' + store;
+  this.name = "Unknown store";
+  this.message = "Unknown store " + store;
 }
 
 UnkownStoreError.prototype = Error.prototype;
 
 module.exports = UnkownStoreError;
+
 },{}],9:[function(require,module,exports){
-var _ = require('underscore');
-var log = require('./logger');
-var uuid = require('./utils/uuid');
-var RESERVED_KEYWORDS = ['dispatch'];
-var Dispatcher = require('./dispatcher');
-var ActionPayload = require('./actionPayload');
-var ActionConstants = require('../constants/actions');
-var serializeError = require('./utils/serializeError');
+"use strict";
+
+var _ = require("underscore");
+var log = require("./logger");
+var uuid = require("./utils/uuid");
+var RESERVED_KEYWORDS = ["dispatch"];
+var Dispatcher = require("./dispatcher");
+var ActionPayload = require("./actionPayload");
+var ActionConstants = require("../constants/actions");
+var serializeError = require("./utils/serializeError");
 
 function ActionCreators(options) {
   var creator = this;
@@ -96,19 +123,16 @@ function ActionCreators(options) {
 
   _.each(RESERVED_KEYWORDS, function (keyword) {
     if (options[keyword]) {
-      throw new Error(keyword + ' is a reserved keyword');
+      throw new Error(keyword + " is a reserved keyword");
     }
   });
 
   this.getActionType = getActionType;
 
-  _.extend.apply(_, [
-    this,
-    wrapFunctions(options)
-  ].concat(options.mixins));
+  _.extend.apply(_, [this, wrapFunctions(options)].concat(options.mixins));
 
   function getActionType(name) {
-    return name.replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toUpperCase();
+    return name.replace(/([a-z\d])([A-Z]+)/g, "$1_$2").replace(/[-\s]+/g, "_").toUpperCase();
   }
 
   function wrapFunctions(functions) {
@@ -120,11 +144,11 @@ function ActionCreators(options) {
       if (_.isFunction(func)) {
         if (func.properties) {
           if (!func.properties.type) {
-            throw new Error('Unknown action type');
+            throw new Error("Unknown action type");
           }
 
           actionType = func.properties.type;
-          properties = _.omit(func.properties, 'type');
+          properties = _.omit(func.properties, "type");
         } else if (options.types && options.types[name]) {
           actionType = options.types[name];
         } else {
@@ -157,8 +181,8 @@ function ActionCreators(options) {
 
           return result;
         } catch (e) {
-          var error = 'An error occured when creating a \'' + actionType + '\' action in ';
-          error += (creator.displayName || creator.id || ' ') + '#' + name;
+          var error = "An error occured when creating a '" + actionType + "' action in ";
+          error += (creator.displayName || creator.id || " ") + "#" + name;
           log.error(error, e);
 
           dispatchFailed(e);
@@ -168,7 +192,17 @@ function ActionCreators(options) {
 
         function actionContext() {
           return _.extend({
-            dispatch: function () {
+            dispatch: (function (_dispatch) {
+              var _dispatchWrapper = function dispatch() {
+                return _dispatch.apply(this, arguments);
+              };
+
+              _dispatchWrapper.toString = function () {
+                return _dispatch.toString();
+              };
+
+              return _dispatchWrapper;
+            })(function () {
               dispatchedAction = dispatch({
                 id: actionId,
                 type: actionType,
@@ -177,7 +211,7 @@ function ActionCreators(options) {
               }, properties);
 
               return dispatchedAction;
-            }
+            })
           }, creator);
         }
 
@@ -188,7 +222,7 @@ function ActionCreators(options) {
 
           dispatch({
             internal: true,
-            type: actionType + '_STARTING',
+            type: actionType + "_STARTING",
             arguments: [{
               id: actionId
             }]
@@ -213,7 +247,7 @@ function ActionCreators(options) {
 
           dispatch({
             internal: true,
-            type: actionType + '_DONE',
+            type: actionType + "_DONE",
             arguments: [{
               id: actionId,
               handlers: handlers
@@ -235,7 +269,7 @@ function ActionCreators(options) {
 
           dispatch({
             internal: true,
-            type: actionType + '_FAILED',
+            type: actionType + "_FAILED",
             arguments: [{
               error: err,
               id: actionId,
@@ -274,10 +308,12 @@ function ActionCreators(options) {
 module.exports = ActionCreators;
 
 },{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./logger":16,"./utils/serializeError":25,"./utils/uuid":26,"underscore":39}],10:[function(require,module,exports){
-var _ = require('underscore');
-var uuid = require('./utils/uuid');
-var Diagnostics = require('./diagnostics');
-var StatusConstants = require('../constants/status');
+"use strict";
+
+var _ = require("underscore");
+var uuid = require("./utils/uuid");
+var Diagnostics = require("./diagnostics");
+var StatusConstants = require("../constants/status");
 
 function ActionPayload(options) {
   options || (options = {});
@@ -302,32 +338,32 @@ function ActionPayload(options) {
   this.addRollbackHandler = addRollbackHandler;
   this.timestamp = options.timestamp || new Date();
 
-  Object.defineProperty(this, 'handlers', {
-    get: function () {
+  Object.defineProperty(this, "handlers", {
+    get: function get() {
       return handlers;
     }
   });
 
-  Object.defineProperty(this, 'status', {
-    get: function () {
+  Object.defineProperty(this, "status", {
+    get: function get() {
       return status;
     }
   });
 
-  Object.defineProperty(this, 'pending', {
-    get: function () {
+  Object.defineProperty(this, "pending", {
+    get: function get() {
       return status === StatusConstants.PENDING;
     }
   });
 
-  Object.defineProperty(this, 'failed', {
-    get: function () {
+  Object.defineProperty(this, "failed", {
+    get: function get() {
       return status === StatusConstants.FAILED;
     }
   });
 
-  Object.defineProperty(this, 'done', {
-    get: function () {
+  Object.defineProperty(this, "done", {
+    get: function get() {
       return status === StatusConstants.DONE;
     }
   });
@@ -345,17 +381,7 @@ function ActionPayload(options) {
   }
 
   function toJSON() {
-    var json = _.pick(this,
-      'id',
-      'type',
-      'error',
-      'source',
-      'creator',
-      'internal',
-      'handlers',
-      'arguments',
-      'timestamp'
-    );
+    var json = _.pick(this, "id", "type", "error", "source", "creator", "internal", "handlers", "arguments", "timestamp");
 
     json.status = this.status.toString();
 
@@ -374,13 +400,12 @@ function ActionPayload(options) {
     var viewHandler = {
       name: name,
       error: null,
-      id: uuid.small(),
-    };
+      id: uuid.small() };
 
     storeHandler.views.push(viewHandler);
 
     return {
-      dispose: function () {
+      dispose: function dispose() {
         if (Diagnostics.devtoolsEnabled) {
           var state = view.state;
           if (state) {
@@ -388,7 +413,7 @@ function ActionPayload(options) {
           }
         }
       },
-      failed: function (err) {
+      failed: function failed(err) {
         viewHandler.error = err;
       }
     };
@@ -398,16 +423,15 @@ function ActionPayload(options) {
     var handler = {
       views: [],
       error: null,
-      type: 'Store',
+      type: "Store",
       id: uuid.small(),
       name: handlerName,
-      store: store.displayName,
-    };
+      store: store.displayName };
 
     handlers.push(handler);
 
     return {
-      dispose: function () {
+      dispose: function dispose() {
         if (Diagnostics.devtoolsEnabled) {
           var state = (store.serialize || store.getState)();
 
@@ -416,7 +440,7 @@ function ActionPayload(options) {
           }
         }
       },
-      failed: function (err) {
+      failed: function failed(err) {
         handler.error = err;
       }
     };
@@ -434,8 +458,11 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
+
 },{"../constants/status":3,"./diagnostics":13,"./utils/uuid":26,"underscore":39}],11:[function(require,module,exports){
-var _ = require('underscore');
+"use strict";
+
+var _ = require("underscore");
 
 function constants(obj) {
   return toConstant(obj);
@@ -471,7 +498,7 @@ function constants(obj) {
   }
 
   function createActionCreator(actionType) {
-    var constantActionCreator = function (actionCreator, properties) {
+    var constantActionCreator = function constantActionCreator(actionCreator, properties) {
       if (!actionCreator) {
         actionCreator = dispatchActionCreator;
       } else if (!_.isFunction(actionCreator)) {
@@ -501,17 +528,20 @@ function constants(obj) {
 }
 
 module.exports = constants;
-},{"underscore":39}],12:[function(require,module,exports){
-var _ = require('underscore');
-var Store = require('./store');
-var constants = require('./constants');
-var Dispatcher = require('./dispatcher');
-var StateSource = require('./stateSource');
-var StateMixin = require('./mixins/stateMixin');
-var ActionCreators = require('./actionCreators');
-var EventEmitter = require('events').EventEmitter;
 
-var STORE_CHANGED_EVENT = 'store-changed';
+},{"underscore":39}],12:[function(require,module,exports){
+"use strict";
+
+var _ = require("underscore");
+var Store = require("./store");
+var constants = require("./constants");
+var Dispatcher = require("./dispatcher");
+var StateSource = require("./stateSource");
+var StateMixin = require("./mixins/stateMixin");
+var ActionCreators = require("./actionCreators");
+var EventEmitter = require("events").EventEmitter;
+
+var STORE_CHANGED_EVENT = "store-changed";
 
 var stores = [];
 var emitter = new EventEmitter();
@@ -534,7 +564,7 @@ function addStoreChangeListener(callback, context) {
   emitter.on(STORE_CHANGED_EVENT, callback);
 
   return {
-    dispose: function () {
+    dispose: function dispose() {
       emitter.removeListener(STORE_CHANGED_EVENT, callback);
     }
   };
@@ -586,14 +616,16 @@ function defaults(marty, options) {
 
   return options;
 }
+
 },{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./mixins/stateMixin":17,"./stateSource":19,"./store":24,"events":28,"underscore":39}],13:[function(require,module,exports){
+"use strict";
+
 var diagnostics = {
   log: log,
   trace: log,
   warn: warn,
   enabled: false,
-  devtoolsEnabled: false,
-};
+  devtoolsEnabled: false };
 
 module.exports = diagnostics;
 
@@ -610,8 +642,10 @@ function warn() {
 }
 
 },{}],14:[function(require,module,exports){
-var uuid = require('./utils/uuid');
-var Dispatcher = require('flux').Dispatcher;
+"use strict";
+
+var uuid = require("./utils/uuid");
+var Dispatcher = require("flux").Dispatcher;
 var instance = new Dispatcher();
 
 instance.id = uuid.small();
@@ -621,9 +655,12 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
+
 },{"./utils/uuid":26,"flux":34}],15:[function(require,module,exports){
-var when = require('./when');
-var NotFoundError = require('../errors/notFound');
+"use strict";
+
+var when = require("./when");
+var NotFoundError = require("../errors/notFound");
 
 module.exports = {
   done: done,
@@ -636,7 +673,7 @@ function pending(id, store) {
   return fetchResult({
     id: id,
     pending: true,
-    status: 'PENDING'
+    status: "PENDING"
   }, store);
 }
 
@@ -645,7 +682,7 @@ function failed(error, id, store) {
     id: id,
     error: error,
     failed: true,
-    status: 'FAILED'
+    status: "FAILED"
   }, store);
 }
 
@@ -653,7 +690,7 @@ function done(result, id, store) {
   return fetchResult({
     id: id,
     done: true,
-    status: 'DONE',
+    status: "DONE",
     result: result
   }, store);
 }
@@ -672,8 +709,11 @@ function fetchResult(result, store) {
 
   return result;
 }
+
 },{"../errors/notFound":7,"./when":27}],16:[function(require,module,exports){
-var _ = require('underscore');
+"use strict";
+
+var _ = require("underscore");
 
 if (console) {
   module.exports = console;
@@ -684,18 +724,21 @@ if (console) {
     error: _.noop
   };
 }
+
 },{"underscore":39}],17:[function(require,module,exports){
-var _ = require('underscore');
-var log = require('../logger');
-var uuid = require('../utils/uuid');
-var Diagnostics = require('../diagnostics');
-var reservedKeys = ['listenTo', 'getState', 'getInitialState'];
+"use strict";
+
+var _ = require("underscore");
+var log = require("../logger");
+var uuid = require("../utils/uuid");
+var Diagnostics = require("../diagnostics");
+var reservedKeys = ["listenTo", "getState", "getInitialState"];
 
 function StateMixin(options) {
   var config, instanceMethods;
 
   if (!options) {
-    throw new Error('The state mixin is expecting some options');
+    throw new Error("The state mixin is expecting some options");
   }
 
   if (isStore(options)) {
@@ -706,20 +749,16 @@ function StateMixin(options) {
   }
 
   var mixin = _.extend({
-    onStoreChanged: function (state, store) {
-      Diagnostics.trace(
-        store.displayName, 'store has changed. The', this.displayName, 'component (' + this._marty.id + ') is updating'
-      );
+    onStoreChanged: function onStoreChanged(state, store) {
+      Diagnostics.trace(store.displayName, "store has changed. The", this.displayName, "component (" + this._marty.id + ") is updating");
 
-      if (this._lifeCycleState === 'UNMOUNTED') {
-        log.warn(
-          'Trying to set the state of ', this.displayName, 'component (' + this._marty.id + ') which is unmounted'
-        );
+      if (this._lifeCycleState === "UNMOUNTED") {
+        log.warn("Trying to set the state of ", this.displayName, "component (" + this._marty.id + ") which is unmounted");
       } else {
         this.setState(this.tryGetState(store));
       }
     },
-    tryGetState: function (store) {
+    tryGetState: function tryGetState(store) {
       var handler;
 
       if (store && store.action) {
@@ -729,7 +768,7 @@ function StateMixin(options) {
       try {
         return this.getState();
       } catch (e) {
-        var errorMessage = 'An error occured while trying to get the latest state in the view ' + this.displayName;
+        var errorMessage = "An error occured while trying to get the latest state in the view " + this.displayName;
 
         log.error(errorMessage, e, this);
 
@@ -744,22 +783,16 @@ function StateMixin(options) {
         }
       }
     },
-    componentDidMount: function () {
-      Diagnostics.trace(
-        'The', this.displayName,
-        'component (' + this._marty.id + ') has mounted.'
-      );
+    componentDidMount: function componentDidMount() {
+      Diagnostics.trace("The", this.displayName, "component (" + this._marty.id + ") has mounted.");
 
       this._marty.listeners = _.map(config.stores, function (store) {
-        Diagnostics.trace(
-          'The', this.displayName,
-          'component  (' + this._marty.id + ') is listening to the', store.displayName, 'store'
-        );
+        Diagnostics.trace("The", this.displayName, "component  (" + this._marty.id + ") is listening to the", store.displayName, "store");
 
         return store.addChangeListener(this.onStoreChanged);
       }, this);
     },
-    componentWillReceiveProps: function (nextProps) {
+    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
       var oldProps = this.props;
       this.props = nextProps;
 
@@ -768,11 +801,8 @@ function StateMixin(options) {
       this.props = oldProps;
       this.setState(newState);
     },
-    componentWillUnmount: function () {
-      Diagnostics.trace(
-        'The', this.displayName, 'component (' + this._marty.id + ') is unmounting.',
-        'It is listening to', this._marty.listeners.length, 'stores'
-      );
+    componentWillUnmount: function componentWillUnmount() {
+      Diagnostics.trace("The", this.displayName, "component (" + this._marty.id + ") is unmounting.", "It is listening to", this._marty.listeners.length, "stores");
 
       _.each(this._marty.listeners, function (listener) {
         listener.dispose();
@@ -780,10 +810,10 @@ function StateMixin(options) {
 
       this._marty.listeners = [];
     },
-    getState: function () {
+    getState: function getState() {
       return config.getState(this);
     },
-    getInitialState: function () {
+    getInitialState: function getInitialState() {
       var el = this._currentElement;
 
       if (!this.displayName && el && el.type) {
@@ -812,14 +842,14 @@ function StateMixin(options) {
   function storeMixinConfig(store) {
     return {
       stores: [store],
-      getState: function () {
+      getState: function getState() {
         return store.getState();
       }
     };
   }
 
   function simpleMixinConfig(options) {
-    var stores = (options.listenTo || []);
+    var stores = options.listenTo || [];
     var storesToGetStateFrom = findStoresToGetStateFrom(options);
 
     if (!_.isArray(stores)) {
@@ -827,7 +857,7 @@ function StateMixin(options) {
     }
 
     if (!areStores(stores)) {
-      throw new Error('Can only listen to stores');
+      throw new Error("Can only listen to stores");
     }
 
     stores = stores.concat(_.values(storesToGetStateFrom));
@@ -878,9 +908,12 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
+
 },{"../diagnostics":13,"../logger":16,"../utils/uuid":26,"underscore":39}],18:[function(require,module,exports){
-var _ = require('underscore');
-var UnknownStoreError = require('../errors/unknownStore');
+"use strict";
+
+var _ = require("underscore");
+var UnknownStoreError = require("../errors/unknownStore");
 
 module.exports = {
   setState: setState,
@@ -924,67 +957,69 @@ function serializeState() {
   });
 
   state.toString = function () {
-    return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
+    return "(window.__marty||(window.__marty={})).state=" + JSON.stringify(state);
   };
 
   state.toJSON = function () {
-    return _.omit(state, 'toString', 'toJSON');
+    return _.omit(state, "toString", "toJSON");
   };
 
   return state;
 }
+
 },{"../errors/unknownStore":8,"underscore":39}],19:[function(require,module,exports){
-var _ = require('underscore');
-var HttpStateSource = require('./stateSources/http');
-var JSONStorageStateSource = require('./stateSources/jsonStorage');
-var LocalStorageStateSource = require('./stateSources/localStorage');
-var SessionStorageStateSource = require('./stateSources/sessionStorage');
+"use strict";
+
+var _ = require("underscore");
+var HttpStateSource = require("./stateSources/http");
+var JSONStorageStateSource = require("./stateSources/jsonStorage");
+var LocalStorageStateSource = require("./stateSources/localStorage");
+var SessionStorageStateSource = require("./stateSources/sessionStorage");
 
 function StateSource(options) {
   options = options || {};
   extendStateSource(this, options);
 
   function extendStateSource(stateSource, options) {
-    _.extend.apply(_, [stateSource].concat(
-      options,
-      options.mixins,
-      stateSourceMixin(options))
-    );
+    _.extend.apply(_, [stateSource].concat(options, options.mixins, stateSourceMixin(options)));
   }
 
   function stateSourceMixin(options) {
     switch (options.type) {
-      case 'http':
+      case "http":
         return HttpStateSource(options);
-      case 'jsonStorage':
+      case "jsonStorage":
         return JSONStorageStateSource(options);
-      case 'localStorage':
+      case "localStorage":
         return LocalStorageStateSource(options);
-      case 'sessionStorage':
+      case "sessionStorage":
         return SessionStorageStateSource(options);
     }
   }
 }
 
 module.exports = StateSource;
-},{"./stateSources/http":20,"./stateSources/jsonStorage":21,"./stateSources/localStorage":22,"./stateSources/sessionStorage":23,"underscore":39}],20:[function(require,module,exports){
-require('isomorphic-fetch');
-require('es6-promise').polyfill();
 
-var _ = require('underscore');
-var CONTENT_TYPE = 'Content-Type';
-var JSON_CONTENT_TYPE = 'application/json';
+},{"./stateSources/http":20,"./stateSources/jsonStorage":21,"./stateSources/localStorage":22,"./stateSources/sessionStorage":23,"underscore":39}],20:[function(require,module,exports){
+"use strict";
+
+require("isomorphic-fetch");
+require("es6-promise").polyfill();
+
+var _ = require("underscore");
+var CONTENT_TYPE = "Content-Type";
+var JSON_CONTENT_TYPE = "application/json";
 
 function HttpStateSource(mixinOptions) {
 
   mixinOptions = mixinOptions || {};
 
-  var defaultBaseUrl = '';
-  var methods = ['get', 'put', 'post', 'delete', 'patch'];
+  var defaultBaseUrl = "";
+  var methods = ["get", "put", "post", "delete", "patch"];
 
   var mixin = {
     _isHttpStateSource: true,
-    request: function (options) {
+    request: function request(options) {
       if (!options.headers) {
         options.headers = {};
       }
@@ -1011,7 +1046,7 @@ function HttpStateSource(mixinOptions) {
       });
 
       function isJson(res) {
-        var contentTypes = getHeader(res, CONTENT_TYPE);
+        var contentTypes = res.headers.get(CONTENT_TYPE);
 
         if (!_.isArray(contentTypes)) {
           if (contentTypes === undefined || contentTypes === null) {
@@ -1023,12 +1058,6 @@ function HttpStateSource(mixinOptions) {
 
         return _.any(contentTypes, function (contentType) {
           return contentType.indexOf(JSON_CONTENT_TYPE) !== -1;
-        });
-      }
-
-      function getHeader(res, name) {
-        return _.find(res.headers.map, function (value, key) {
-          return key.toLowerCase() === name.toLowerCase();
         });
       }
 
@@ -1058,15 +1087,15 @@ function requestOptions(method, baseUrl, options) {
   options.method = method.toLowerCase();
 
   if (baseUrl) {
-    var separator = '';
+    var separator = "";
     var firstCharOfUrl = options.url[0];
     var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
 
     // Do some text wrangling to make sure concatenation of base url
     // stupid people (i.e. me)
-    if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
-      separator = '/';
-    } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
+    if (lastCharOfBaseUrl !== "/" && firstCharOfUrl !== "/") {
+      separator = "/";
+    } else if (lastCharOfBaseUrl === "/" && firstCharOfUrl === "/") {
       options.url = options.url.substring(1);
     }
 
@@ -1079,15 +1108,17 @@ function requestOptions(method, baseUrl, options) {
 module.exports = HttpStateSource;
 
 },{"es6-promise":33,"isomorphic-fetch":38,"underscore":39}],21:[function(require,module,exports){
+"use strict";
+
 function JSONStorageStateSource(options) {
   options = options || {};
 
-  var defaultNamespace = '';
+  var defaultNamespace = "";
   var defaultStorage = localStorage;
 
-  var mixin  = {
+  var mixin = {
     _isJSONStorageStateSource: true,
-    get: function (key) {
+    get: function get(key) {
       var raw = getStorage().getItem(getNamespacedKey(key));
 
       if (!raw) {
@@ -1098,10 +1129,10 @@ function JSONStorageStateSource(options) {
         var payload = JSON.parse(raw);
         return payload.value;
       } catch (e) {
-        throw new Error('Unable to parse JSON from storage');
+        throw new Error("Unable to parse JSON from storage");
       }
     },
-    set: function (key, value) {
+    set: function set(key, value) {
       // Wrap the value in an object so as to preserve it's type
       // during serialization.
       var payload = {
@@ -1128,18 +1159,21 @@ function JSONStorageStateSource(options) {
 }
 
 module.exports = JSONStorageStateSource;
+
 },{}],22:[function(require,module,exports){
+"use strict";
+
 function LocalStorageStateSource(options) {
   options = options || {};
 
-  var defaultNamespace = '';
+  var defaultNamespace = "";
 
-  var mixin  = {
+  var mixin = {
     _isLocalStorageStateSource: true,
-    get: function (key) {
+    get: function get(key) {
       return localStorage.getItem(getNamespacedKey(key));
     },
-    set: function (key, value) {
+    set: function set(key, value) {
       localStorage.setItem(getNamespacedKey(key), value);
     }
   };
@@ -1156,18 +1190,21 @@ function LocalStorageStateSource(options) {
 }
 
 module.exports = LocalStorageStateSource;
+
 },{}],23:[function(require,module,exports){
+"use strict";
+
 function SessionStorageStateSource(options) {
 
   options = options || {};
-  var defaultNamespace = '';
+  var defaultNamespace = "";
 
-  var mixin  = {
+  var mixin = {
     _isSessionStorageStateSource: true,
-    get: function (key) {
+    get: function get(key) {
       return sessionStorage.getItem(getNamespacedKey(key));
     },
-    set: function (key, value) {
+    set: function set(key, value) {
       sessionStorage.setItem(getNamespacedKey(key), value);
     }
   };
@@ -1184,24 +1221,27 @@ function SessionStorageStateSource(options) {
 }
 
 module.exports = SessionStorageStateSource;
-},{}],24:[function(require,module,exports){
-var CHANGE_EVENT = 'changed';
-var _ = require('underscore');
-var log = require('./logger');
-var uuid = require('./utils/uuid');
-var fetchResult = require('./fetch');
-var Dispatcher = require('./dispatcher');
-var Diagnostics = require('./diagnostics');
-var CompoundError = require('../errors/compound');
-var NotFoundError = require('../errors/notFound');
-var EventEmitter = require('events').EventEmitter;
-var StatusConstants = require('../constants/status');
-var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
-var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
 
-var RESERVED_FUNCTIONS = ['getState'];
-var REQUIRED_FUNCTIONS = ['getInitialState'];
-var PROTECTED_FUNCTIONS = ['clear', 'dispose'];
+},{}],24:[function(require,module,exports){
+"use strict";
+
+var CHANGE_EVENT = "changed";
+var _ = require("underscore");
+var log = require("./logger");
+var uuid = require("./utils/uuid");
+var fetchResult = require("./fetch");
+var Dispatcher = require("./dispatcher");
+var Diagnostics = require("./diagnostics");
+var CompoundError = require("../errors/compound");
+var NotFoundError = require("../errors/notFound");
+var EventEmitter = require("events").EventEmitter;
+var StatusConstants = require("../constants/status");
+var ActionHandlerNotFoundError = require("../errors/actionHandlerNotFound");
+var ActionPredicateUndefinedError = require("../errors/actionPredicateUndefined");
+
+var RESERVED_FUNCTIONS = ["getState"];
+var REQUIRED_FUNCTIONS = ["getInitialState"];
+var PROTECTED_FUNCTIONS = ["clear", "dispose"];
 
 Store.defaultMaxListeners = 10000000;
 
@@ -1246,11 +1286,11 @@ function Store(options) {
     state = defaultState;
   }
 
-  Object.defineProperty(this, 'state', {
-    get: function () {
+  Object.defineProperty(this, "state", {
+    get: function get() {
       return getState();
     },
-    set: function (value) {
+    set: function set(value) {
       this.setState(value);
     }
   });
@@ -1261,10 +1301,10 @@ function Store(options) {
     _.each(RESERVED_FUNCTIONS, function (functionName) {
       if (options[functionName]) {
         if (options.displayName) {
-          functionName += ' in ' + options.displayName;
+          functionName += " in " + options.displayName;
         }
 
-        Diagnostics.warn(functionName + ' is reserved for use by Marty. Please use a different name');
+        Diagnostics.warn(functionName + " is reserved for use by Marty. Please use a different name");
       }
     });
 
@@ -1275,10 +1315,10 @@ function Store(options) {
     });
 
     if (missingFunctions.length) {
-      var error = 'You must implement ' + missingFunctions.join(',');
+      var error = "You must implement " + missingFunctions.join(",");
 
       if (options.displayName) {
-        error += ' in ' + options.displayName;
+        error += " in " + options.displayName;
       }
 
       throw new Error(error);
@@ -1305,7 +1345,7 @@ function Store(options) {
     });
 
     var mixins = _.map(options.mixins, function (mixin) {
-      return _.omit(mixin, 'handlers');
+      return _.omit(mixin, "handlers");
     });
 
     _.extend.apply(_, [store, options].concat(mixins));
@@ -1349,7 +1389,7 @@ function Store(options) {
     });
 
     if (!options || !options.id) {
-      throw new Error('must specify an id');
+      throw new Error("must specify an id");
     }
 
     result = dependencyResult(options);
@@ -1414,7 +1454,7 @@ function Store(options) {
                 notFound();
                 hasChanged();
               }
-            }).catch(function (error) {
+            })["catch"](function (error) {
               failed(error);
               hasChanged();
             });
@@ -1439,15 +1479,12 @@ function Store(options) {
     }
 
     function promiseNotReturnedWarning() {
-      var inStore = '';
+      var inStore = "";
       if (store.displayName) {
-        inStore = ' in ' + store.displayName;
+        inStore = " in " + store.displayName;
       }
 
-      return 'The remote fetch for \'' + options.id + '\'' +
-        inStore + ' did not return a promise and the state was ' +
-        'not present after remotely finished executing. ' +
-        'This might be because you forgot to return a promise.';
+      return "The remote fetch for '" + options.id + "'" + inStore + " did not return a promise and the state was " + "not present after remotely finished executing. " + "This might be because you forgot to return a promise.";
     }
 
     function finished() {
@@ -1529,12 +1566,12 @@ function Store(options) {
       callback = _.bind(callback, context);
     }
 
-    Diagnostics.trace('The', store.displayName, 'store (' + store.id + ') is adding a change listener');
+    Diagnostics.trace("The", store.displayName, "store (" + store.id + ") is adding a change listener");
     emitter.on(CHANGE_EVENT, callback);
 
     return {
-      dispose: function () {
-        Diagnostics.trace('The', store.displayName, 'store (' + store.id + ') is disposing of a change listener');
+      dispose: function dispose() {
+        Diagnostics.trace("The", store.displayName, "store (" + store.id + ") is disposing of a change listener");
         emitter.removeListener(CHANGE_EVENT, callback);
       }
     };
@@ -1563,13 +1600,12 @@ function Store(options) {
               throw new ActionHandlerNotFoundError(handlerName, this);
             }
           } catch (e) {
-            var errorMessage = 'An error occured while trying to handle an \'' +
-            action.type.toString() + '\' action in the action handler `' + handlerName + '`';
+            var errorMessage = "An error occured while trying to handle an '" + action.type.toString() + "' action in the action handler `" + handlerName + "`";
 
             var displayName = store.displayName || store.id;
 
             if (displayName) {
-              errorMessage += ' within the store ' + displayName;
+              errorMessage += " within the store " + displayName;
             }
 
             log.error(errorMessage, e, action);
@@ -1646,6 +1682,8 @@ function Store(options) {
 module.exports = Store;
 
 },{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./logger":16,"./utils/uuid":26,"events":28,"underscore":39}],25:[function(require,module,exports){
+"use strict";
+
 function serializeError(error) {
   if (!error) {
     return null;
@@ -1662,27 +1700,33 @@ function serializeError(error) {
 }
 
 module.exports = serializeError;
+
 },{}],26:[function(require,module,exports){
-var format = require('util').format;
+"use strict";
+
+var format = require("util").format;
 
 function uuid() {
-  return format('%s%s-%s-%s-%s-%s%s%s', s4(), s4(), s4(), s4(), s4(), s4(), s4(), s4());
+  return format("%s%s-%s-%s-%s-%s%s%s", s4(), s4(), s4(), s4(), s4(), s4(), s4(), s4());
 }
 
 function s4() {
-  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+  return Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
 }
 
 module.exports = {
   generate: uuid,
-  small: function () {
+  small: function small() {
     return uuid().substring(0, 6);
   }
 };
+
 },{"util":32}],27:[function(require,module,exports){
-var _ = require('underscore');
-var log = require('./logger');
-var StatusConstants = require('../constants/status');
+"use strict";
+
+var _ = require("underscore");
+var log = require("./logger");
+var StatusConstants = require("../constants/status");
 
 when.all = all;
 when.join = join;
@@ -1693,7 +1737,7 @@ function when(handlers) {
   var handler = handlers[this.status.toLowerCase()];
 
   if (!handler) {
-    throw new Error('Could not find a ' + this.status + ' handler');
+    throw new Error("Could not find a " + this.status + " handler");
   }
 
   try {
@@ -1705,19 +1749,19 @@ function when(handlers) {
       case StatusConstants.DONE.toString():
         return handler.call(handlers, this.result);
       default:
-        throw new Error('Unknown fetch result status');
+        throw new Error("Unknown fetch result status");
     }
   } catch (e) {
-    var errorMessage = 'An error occured when handling the DONE state of ';
+    var errorMessage = "An error occured when handling the DONE state of ";
 
     if (this.id) {
-      errorMessage += 'the fetch \'' + this.id + '\'';
+      errorMessage += "the fetch '" + this.id + "'";
     } else {
-      errorMessage += 'a fetch';
+      errorMessage += "a fetch";
     }
 
     if (this.store) {
-      errorMessage += ' from the store ' + this.store;
+      errorMessage += " from the store " + this.store;
     }
 
     log.error(errorMessage, e);
@@ -1726,17 +1770,17 @@ function when(handlers) {
   }
 }
 
-function join(/* fetchResults, handlers */) {
+function join() {
   return all(_.initial(arguments), _.last(arguments));
 }
 
 function all(fetchResults, handlers) {
   if (!fetchResults || !handlers) {
-    throw new Error('No fetch results or handlers specified');
+    throw new Error("No fetch results or handlers specified");
   }
 
   if (!_.isArray(fetchResults) || _.any(fetchResults, notFetchResult)) {
-    throw new Error('Must specify a set of fetch results');
+    throw new Error("Must specify a set of fetch results");
   }
 
   var context = {
@@ -1772,8 +1816,7 @@ function aggregateStatus(fetchResults) {
   for (var i = fetchResults.length - 1; i >= 0; i--) {
     var status = fetchResults[i].status;
 
-    if (status === StatusConstants.FAILED.toString() ||
-        status === StatusConstants.PENDING.toString()) {
+    if (status === StatusConstants.FAILED.toString() || status === StatusConstants.PENDING.toString()) {
       return status;
     }
   }
@@ -1782,6 +1825,8 @@ function aggregateStatus(fetchResults) {
 }
 
 module.exports = when;
+/* fetchResults, handlers */
+
 },{"../constants/status":3,"./logger":16,"underscore":39}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4062,6 +4107,23 @@ module.exports = invariant;
     return
   }
 
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = name.toString();
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = value.toString();
+    }
+    return value
+  }
+
   function Headers(headers) {
     this.map = {}
 
@@ -4081,7 +4143,8 @@ module.exports = invariant;
   }
 
   Headers.prototype.append = function(name, value) {
-    name = name.toLowerCase()
+    name = normalizeName(name)
+    value = normalizeValue(value)
     var list = this.map[name]
     if (!list) {
       list = []
@@ -4091,24 +4154,24 @@ module.exports = invariant;
   }
 
   Headers.prototype['delete'] = function(name) {
-    delete this.map[name.toLowerCase()]
+    delete this.map[normalizeName(name)]
   }
 
   Headers.prototype.get = function(name) {
-    var values = this.map[name.toLowerCase()]
+    var values = this.map[normalizeName(name)]
     return values ? values[0] : null
   }
 
   Headers.prototype.getAll = function(name) {
-    return this.map[name.toLowerCase()] || []
+    return this.map[normalizeName(name)] || []
   }
 
   Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(name.toLowerCase())
+    return this.map.hasOwnProperty(normalizeName(name))
   }
 
   Headers.prototype.set = function(name, value) {
-    this.map[name.toLowerCase()] = [value]
+    this.map[normalizeName(name)] = [normalizeValue(value)]
   }
 
   // Instead of iterable for now.
@@ -4158,7 +4221,8 @@ module.exports = invariant;
         return false
       }
     })(),
-    formData: 'FormData' in self
+    formData: 'FormData' in self,
+    XDomainRequest: 'XDomainRequest' in self
   }
 
   function Body() {
@@ -4299,8 +4363,18 @@ module.exports = invariant;
     var self = this
 
     return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest()
-      if (self.credentials === 'cors') {
+      var legacyCors = false;
+      if (support.XDomainRequest) {
+        var origin = location.protocol + '//' + location.host;
+        legacyCors = (/^\/\//.test(self.url) ? location.protocol + self.url : self.url).substring(0, origin.length) !== origin;
+      }
+      var xhr = legacyCors ? new XDomainRequest() : new XMLHttpRequest()
+
+      if (legacyCors) {
+        xhr.getAllResponseHeaders = function() {
+          return 'Content-Type: '+xhr.contentType;
+        };
+      } else if (self.credentials === 'cors') {
         xhr.withCredentials = true;
       }
 
@@ -4319,6 +4393,11 @@ module.exports = invariant;
 
       xhr.onload = function() {
         var status = (xhr.status === 1223) ? 204 : xhr.status
+
+        // If XDomainRequest there is no status code so just hope for the best...
+        if (legacyCors) {
+          status = 200;
+        }
         if (status < 100 || status > 599) {
           reject(new TypeError('Network request failed'))
           return
@@ -4338,6 +4417,7 @@ module.exports = invariant;
       }
 
       xhr.open(self.method, self.url, true)
+
       if ('responseType' in xhr && support.blob) {
         xhr.responseType = 'blob'
       }
@@ -4363,6 +4443,7 @@ module.exports = invariant;
     this.type = 'default'
     this.url = null
     this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
     this.statusText = options.statusText
     this.headers = options.headers
     this.url = options.url || ''
