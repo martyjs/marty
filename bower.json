@@ -20,7 +20,6 @@
     "tests"
   ],
   "dependencies": {
-    "superagent": "~0.20.0",
     "lodash": "~2.4.1"
   }
 }
