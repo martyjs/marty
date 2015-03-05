@@ -1,8 +1,6 @@
-unreleased
-==================
-
-- Replaced `reactify` for `babelify` as Babel now supports JSX transforms too and will help
-with an ES6 transition.
+0.8.14 / 2015-03-05
+===================
+- Remove dependency on Babel
 
 0.8.13 / 2015-03-03
 ===================
