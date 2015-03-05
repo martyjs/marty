@@ -1,48 +1,34 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Marty=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"./index.js":[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var state = require("./lib/state");
-var create = require("./lib/create");
-var Dispatcher = require("./lib/dispatcher");
-var Diagnostics = require("./lib/diagnostics");
+var _ = require('underscore');
+var state = require('./lib/state');
+var create = require('./lib/create');
+var Dispatcher = require('./lib/dispatcher');
+var Diagnostics = require('./lib/diagnostics');
 
 var Marty = _.extend({
-  version: "0.8.13",
+  version: '0.8.14',
   Diagnostics: Diagnostics,
   Dispatcher: Dispatcher.getCurrent()
 }, state, create);
 
 module.exports = Marty;
-
 },{"./lib/create":12,"./lib/diagnostics":13,"./lib/dispatcher":14,"./lib/state":18,"underscore":39}],1:[function(require,module,exports){
-"use strict";
+var constants = require('./index');
 
-var constants = require("./index");
-
-module.exports = constants(["ACTION_STARTING", "ACTION_DONE", "ACTION_FAILED"]);
-
+module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
 },{"./index":2}],2:[function(require,module,exports){
-"use strict";
-
-module.exports = require("../lib/constants");
-
+module.exports = require('../lib/constants');
 },{"../lib/constants":11}],3:[function(require,module,exports){
-"use strict";
+var constants = require('./index');
 
-var constants = require("./index");
-
-module.exports = constants(["PENDING", "FAILED", "DONE"]);
-
+module.exports = constants(['PENDING', 'FAILED', 'DONE']);
 },{"./index":2}],4:[function(require,module,exports){
-"use strict";
-
 function ActionHandlerNotFoundError(actionHandler, store) {
-  this.name = "Action handler not found";
-  this.message = "The action handler \"" + actionHandler + "\" could not be found";
+  this.name = 'Action handler not found';
+  this.message = 'The action handler "' + actionHandler + '" could not be found';
 
   if (store && store.displayName) {
-    this.message += " in the " + store.displayName + " store";
+    this.message += ' in the ' + store.displayName + ' store';
   }
 }
 
@@ -51,14 +37,12 @@ ActionHandlerNotFoundError.prototype = Error.prototype;
 module.exports = ActionHandlerNotFoundError;
 
 },{}],5:[function(require,module,exports){
-"use strict";
-
 function ActionPredicateUndefinedError(actionHandler, store) {
-  this.name = "Action predicate undefined";
-  this.message = "The action predicate for \"" + actionHandler + "\" was undefined";
+  this.name = 'Action predicate undefined';
+  this.message = 'The action predicate for "' + actionHandler + '" was undefined';
 
   if (store && store.displayName) {
-    this.message += " in the " + store.displayName + " store";
+    this.message += ' in the ' + store.displayName + ' store';
   }
 }
 
@@ -67,53 +51,42 @@ ActionPredicateUndefinedError.prototype = Error.prototype;
 module.exports = ActionPredicateUndefinedError;
 
 },{}],6:[function(require,module,exports){
-"use strict";
-
 function CompoundError(errors) {
   this.errors = errors;
-  this.name = "Compound error";
+  this.name = 'Compound error';
 }
 
 CompoundError.prototype = Error.prototype;
 
 module.exports = CompoundError;
-
 },{}],7:[function(require,module,exports){
-"use strict";
-
 function NotFoundError(message) {
-  this.name = "Not found";
-  this.message = message || "Not found";
+  this.name = 'Not found';
+  this.message = message || 'Not found';
   this.status = 404;
 }
 
 NotFoundError.prototype = Error.prototype;
 
 module.exports = NotFoundError;
-
 },{}],8:[function(require,module,exports){
-"use strict";
-
 function UnkownStoreError(store) {
-  this.name = "Unknown store";
-  this.message = "Unknown store " + store;
+  this.name = 'Unknown store';
+  this.message = 'Unknown store ' + store;
 }
 
 UnkownStoreError.prototype = Error.prototype;
 
 module.exports = UnkownStoreError;
-
 },{}],9:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var log = require("./logger");
-var uuid = require("./utils/uuid");
-var RESERVED_KEYWORDS = ["dispatch"];
-var Dispatcher = require("./dispatcher");
-var ActionPayload = require("./actionPayload");
-var ActionConstants = require("../constants/actions");
-var serializeError = require("./utils/serializeError");
+var _ = require('underscore');
+var log = require('./logger');
+var uuid = require('./utils/uuid');
+var RESERVED_KEYWORDS = ['dispatch'];
+var Dispatcher = require('./dispatcher');
+var ActionPayload = require('./actionPayload');
+var ActionConstants = require('../constants/actions');
+var serializeError = require('./utils/serializeError');
 
 function ActionCreators(options) {
   var creator = this;
@@ -123,16 +96,19 @@ function ActionCreators(options) {
 
   _.each(RESERVED_KEYWORDS, function (keyword) {
     if (options[keyword]) {
-      throw new Error(keyword + " is a reserved keyword");
+      throw new Error(keyword + ' is a reserved keyword');
     }
   });
 
   this.getActionType = getActionType;
 
-  _.extend.apply(_, [this, wrapFunctions(options)].concat(options.mixins));
+  _.extend.apply(_, [
+    this,
+    wrapFunctions(options)
+  ].concat(options.mixins));
 
   function getActionType(name) {
-    return name.replace(/([a-z\d])([A-Z]+)/g, "$1_$2").replace(/[-\s]+/g, "_").toUpperCase();
+    return name.replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toUpperCase();
   }
 
   function wrapFunctions(functions) {
@@ -144,11 +120,11 @@ function ActionCreators(options) {
       if (_.isFunction(func)) {
         if (func.properties) {
           if (!func.properties.type) {
-            throw new Error("Unknown action type");
+            throw new Error('Unknown action type');
           }
 
           actionType = func.properties.type;
-          properties = _.omit(func.properties, "type");
+          properties = _.omit(func.properties, 'type');
         } else if (options.types && options.types[name]) {
           actionType = options.types[name];
         } else {
@@ -181,8 +157,8 @@ function ActionCreators(options) {
 
           return result;
         } catch (e) {
-          var error = "An error occured when creating a '" + actionType + "' action in ";
-          error += (creator.displayName || creator.id || " ") + "#" + name;
+          var error = 'An error occured when creating a \'' + actionType + '\' action in ';
+          error += (creator.displayName || creator.id || ' ') + '#' + name;
           log.error(error, e);
 
           dispatchFailed(e);
@@ -192,17 +168,7 @@ function ActionCreators(options) {
 
         function actionContext() {
           return _.extend({
-            dispatch: (function (_dispatch) {
-              var _dispatchWrapper = function dispatch() {
-                return _dispatch.apply(this, arguments);
-              };
-
-              _dispatchWrapper.toString = function () {
-                return _dispatch.toString();
-              };
-
-              return _dispatchWrapper;
-            })(function () {
+            dispatch: function () {
               dispatchedAction = dispatch({
                 id: actionId,
                 type: actionType,
@@ -211,7 +177,7 @@ function ActionCreators(options) {
               }, properties);
 
               return dispatchedAction;
-            })
+            }
           }, creator);
         }
 
@@ -222,7 +188,7 @@ function ActionCreators(options) {
 
           dispatch({
             internal: true,
-            type: actionType + "_STARTING",
+            type: actionType + '_STARTING',
             arguments: [{
               id: actionId
             }]
@@ -247,7 +213,7 @@ function ActionCreators(options) {
 
           dispatch({
             internal: true,
-            type: actionType + "_DONE",
+            type: actionType + '_DONE',
             arguments: [{
               id: actionId,
               handlers: handlers
@@ -269,7 +235,7 @@ function ActionCreators(options) {
 
           dispatch({
             internal: true,
-            type: actionType + "_FAILED",
+            type: actionType + '_FAILED',
             arguments: [{
               error: err,
               id: actionId,
@@ -308,12 +274,10 @@ function ActionCreators(options) {
 module.exports = ActionCreators;
 
 },{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./logger":16,"./utils/serializeError":25,"./utils/uuid":26,"underscore":39}],10:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var uuid = require("./utils/uuid");
-var Diagnostics = require("./diagnostics");
-var StatusConstants = require("../constants/status");
+var _ = require('underscore');
+var uuid = require('./utils/uuid');
+var Diagnostics = require('./diagnostics');
+var StatusConstants = require('../constants/status');
 
 function ActionPayload(options) {
   options || (options = {});
@@ -338,32 +302,32 @@ function ActionPayload(options) {
   this.addRollbackHandler = addRollbackHandler;
   this.timestamp = options.timestamp || new Date();
 
-  Object.defineProperty(this, "handlers", {
-    get: function get() {
+  Object.defineProperty(this, 'handlers', {
+    get: function () {
       return handlers;
     }
   });
 
-  Object.defineProperty(this, "status", {
-    get: function get() {
+  Object.defineProperty(this, 'status', {
+    get: function () {
       return status;
     }
   });
 
-  Object.defineProperty(this, "pending", {
-    get: function get() {
+  Object.defineProperty(this, 'pending', {
+    get: function () {
       return status === StatusConstants.PENDING;
     }
   });
 
-  Object.defineProperty(this, "failed", {
-    get: function get() {
+  Object.defineProperty(this, 'failed', {
+    get: function () {
       return status === StatusConstants.FAILED;
     }
   });
 
-  Object.defineProperty(this, "done", {
-    get: function get() {
+  Object.defineProperty(this, 'done', {
+    get: function () {
       return status === StatusConstants.DONE;
     }
   });
@@ -381,7 +345,17 @@ function ActionPayload(options) {
   }
 
   function toJSON() {
-    var json = _.pick(this, "id", "type", "error", "source", "creator", "internal", "handlers", "arguments", "timestamp");
+    var json = _.pick(this,
+      'id',
+      'type',
+      'error',
+      'source',
+      'creator',
+      'internal',
+      'handlers',
+      'arguments',
+      'timestamp'
+    );
 
     json.status = this.status.toString();
 
@@ -400,12 +374,13 @@ function ActionPayload(options) {
     var viewHandler = {
       name: name,
       error: null,
-      id: uuid.small() };
+      id: uuid.small(),
+    };
 
     storeHandler.views.push(viewHandler);
 
     return {
-      dispose: function dispose() {
+      dispose: function () {
         if (Diagnostics.devtoolsEnabled) {
           var state = view.state;
           if (state) {
@@ -413,7 +388,7 @@ function ActionPayload(options) {
           }
         }
       },
-      failed: function failed(err) {
+      failed: function (err) {
         viewHandler.error = err;
       }
     };
@@ -423,15 +398,16 @@ function ActionPayload(options) {
     var handler = {
       views: [],
       error: null,
-      type: "Store",
+      type: 'Store',
       id: uuid.small(),
       name: handlerName,
-      store: store.displayName };
+      store: store.displayName,
+    };
 
     handlers.push(handler);
 
     return {
-      dispose: function dispose() {
+      dispose: function () {
         if (Diagnostics.devtoolsEnabled) {
           var state = (store.serialize || store.getState)();
 
@@ -440,7 +416,7 @@ function ActionPayload(options) {
           }
         }
       },
-      failed: function failed(err) {
+      failed: function (err) {
         handler.error = err;
       }
     };
@@ -458,11 +434,8 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
-
 },{"../constants/status":3,"./diagnostics":13,"./utils/uuid":26,"underscore":39}],11:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
+var _ = require('underscore');
 
 function constants(obj) {
   return toConstant(obj);
@@ -498,7 +471,7 @@ function constants(obj) {
   }
 
   function createActionCreator(actionType) {
-    var constantActionCreator = function constantActionCreator(actionCreator, properties) {
+    var constantActionCreator = function (actionCreator, properties) {
       if (!actionCreator) {
         actionCreator = dispatchActionCreator;
       } else if (!_.isFunction(actionCreator)) {
@@ -528,20 +501,17 @@ function constants(obj) {
 }
 
 module.exports = constants;
-
 },{"underscore":39}],12:[function(require,module,exports){
-"use strict";
+var _ = require('underscore');
+var Store = require('./store');
+var constants = require('./constants');
+var Dispatcher = require('./dispatcher');
+var StateSource = require('./stateSource');
+var StateMixin = require('./mixins/stateMixin');
+var ActionCreators = require('./actionCreators');
+var EventEmitter = require('events').EventEmitter;
 
-var _ = require("underscore");
-var Store = require("./store");
-var constants = require("./constants");
-var Dispatcher = require("./dispatcher");
-var StateSource = require("./stateSource");
-var StateMixin = require("./mixins/stateMixin");
-var ActionCreators = require("./actionCreators");
-var EventEmitter = require("events").EventEmitter;
-
-var STORE_CHANGED_EVENT = "store-changed";
+var STORE_CHANGED_EVENT = 'store-changed';
 
 var stores = [];
 var emitter = new EventEmitter();
@@ -564,7 +534,7 @@ function addStoreChangeListener(callback, context) {
   emitter.on(STORE_CHANGED_EVENT, callback);
 
   return {
-    dispose: function dispose() {
+    dispose: function () {
       emitter.removeListener(STORE_CHANGED_EVENT, callback);
     }
   };
@@ -616,16 +586,14 @@ function defaults(marty, options) {
 
   return options;
 }
-
 },{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./mixins/stateMixin":17,"./stateSource":19,"./store":24,"events":28,"underscore":39}],13:[function(require,module,exports){
-"use strict";
-
 var diagnostics = {
   log: log,
   trace: log,
   warn: warn,
   enabled: false,
-  devtoolsEnabled: false };
+  devtoolsEnabled: false,
+};
 
 module.exports = diagnostics;
 
@@ -642,10 +610,8 @@ function warn() {
 }
 
 },{}],14:[function(require,module,exports){
-"use strict";
-
-var uuid = require("./utils/uuid");
-var Dispatcher = require("flux").Dispatcher;
+var uuid = require('./utils/uuid');
+var Dispatcher = require('flux').Dispatcher;
 var instance = new Dispatcher();
 
 instance.id = uuid.small();
@@ -655,12 +621,9 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
-
 },{"./utils/uuid":26,"flux":34}],15:[function(require,module,exports){
-"use strict";
-
-var when = require("./when");
-var NotFoundError = require("../errors/notFound");
+var when = require('./when');
+var NotFoundError = require('../errors/notFound');
 
 module.exports = {
   done: done,
@@ -673,7 +636,7 @@ function pending(id, store) {
   return fetchResult({
     id: id,
     pending: true,
-    status: "PENDING"
+    status: 'PENDING'
   }, store);
 }
 
@@ -682,7 +645,7 @@ function failed(error, id, store) {
     id: id,
     error: error,
     failed: true,
-    status: "FAILED"
+    status: 'FAILED'
   }, store);
 }
 
@@ -690,7 +653,7 @@ function done(result, id, store) {
   return fetchResult({
     id: id,
     done: true,
-    status: "DONE",
+    status: 'DONE',
     result: result
   }, store);
 }
@@ -709,11 +672,8 @@ function fetchResult(result, store) {
 
   return result;
 }
-
 },{"../errors/notFound":7,"./when":27}],16:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
+var _ = require('underscore');
 
 if (console) {
   module.exports = console;
@@ -724,21 +684,18 @@ if (console) {
     error: _.noop
   };
 }
-
 },{"underscore":39}],17:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var log = require("../logger");
-var uuid = require("../utils/uuid");
-var Diagnostics = require("../diagnostics");
-var reservedKeys = ["listenTo", "getState", "getInitialState"];
+var _ = require('underscore');
+var log = require('../logger');
+var uuid = require('../utils/uuid');
+var Diagnostics = require('../diagnostics');
+var reservedKeys = ['listenTo', 'getState', 'getInitialState'];
 
 function StateMixin(options) {
   var config, instanceMethods;
 
   if (!options) {
-    throw new Error("The state mixin is expecting some options");
+    throw new Error('The state mixin is expecting some options');
   }
 
   if (isStore(options)) {
@@ -749,16 +706,20 @@ function StateMixin(options) {
   }
 
   var mixin = _.extend({
-    onStoreChanged: function onStoreChanged(state, store) {
-      Diagnostics.trace(store.displayName, "store has changed. The", this.displayName, "component (" + this._marty.id + ") is updating");
+    onStoreChanged: function (state, store) {
+      Diagnostics.trace(
+        store.displayName, 'store has changed. The', this.displayName, 'component (' + this._marty.id + ') is updating'
+      );
 
-      if (this._lifeCycleState === "UNMOUNTED") {
-        log.warn("Trying to set the state of ", this.displayName, "component (" + this._marty.id + ") which is unmounted");
+      if (this._lifeCycleState === 'UNMOUNTED') {
+        log.warn(
+          'Trying to set the state of ', this.displayName, 'component (' + this._marty.id + ') which is unmounted'
+        );
       } else {
         this.setState(this.tryGetState(store));
       }
     },
-    tryGetState: function tryGetState(store) {
+    tryGetState: function (store) {
       var handler;
 
       if (store && store.action) {
@@ -768,7 +729,7 @@ function StateMixin(options) {
       try {
         return this.getState();
       } catch (e) {
-        var errorMessage = "An error occured while trying to get the latest state in the view " + this.displayName;
+        var errorMessage = 'An error occured while trying to get the latest state in the view ' + this.displayName;
 
         log.error(errorMessage, e, this);
 
@@ -783,16 +744,22 @@ function StateMixin(options) {
         }
       }
     },
-    componentDidMount: function componentDidMount() {
-      Diagnostics.trace("The", this.displayName, "component (" + this._marty.id + ") has mounted.");
+    componentDidMount: function () {
+      Diagnostics.trace(
+        'The', this.displayName,
+        'component (' + this._marty.id + ') has mounted.'
+      );
 
       this._marty.listeners = _.map(config.stores, function (store) {
-        Diagnostics.trace("The", this.displayName, "component  (" + this._marty.id + ") is listening to the", store.displayName, "store");
+        Diagnostics.trace(
+          'The', this.displayName,
+          'component  (' + this._marty.id + ') is listening to the', store.displayName, 'store'
+        );
 
         return store.addChangeListener(this.onStoreChanged);
       }, this);
     },
-    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps: function (nextProps) {
       var oldProps = this.props;
       this.props = nextProps;
 
@@ -801,8 +768,11 @@ function StateMixin(options) {
       this.props = oldProps;
       this.setState(newState);
     },
-    componentWillUnmount: function componentWillUnmount() {
-      Diagnostics.trace("The", this.displayName, "component (" + this._marty.id + ") is unmounting.", "It is listening to", this._marty.listeners.length, "stores");
+    componentWillUnmount: function () {
+      Diagnostics.trace(
+        'The', this.displayName, 'component (' + this._marty.id + ') is unmounting.',
+        'It is listening to', this._marty.listeners.length, 'stores'
+      );
 
       _.each(this._marty.listeners, function (listener) {
         listener.dispose();
@@ -810,10 +780,10 @@ function StateMixin(options) {
 
       this._marty.listeners = [];
     },
-    getState: function getState() {
+    getState: function () {
       return config.getState(this);
     },
-    getInitialState: function getInitialState() {
+    getInitialState: function () {
       var el = this._currentElement;
 
       if (!this.displayName && el && el.type) {
@@ -842,14 +812,14 @@ function StateMixin(options) {
   function storeMixinConfig(store) {
     return {
       stores: [store],
-      getState: function getState() {
+      getState: function () {
         return store.getState();
       }
     };
   }
 
   function simpleMixinConfig(options) {
-    var stores = options.listenTo || [];
+    var stores = (options.listenTo || []);
     var storesToGetStateFrom = findStoresToGetStateFrom(options);
 
     if (!_.isArray(stores)) {
@@ -857,7 +827,7 @@ function StateMixin(options) {
     }
 
     if (!areStores(stores)) {
-      throw new Error("Can only listen to stores");
+      throw new Error('Can only listen to stores');
     }
 
     stores = stores.concat(_.values(storesToGetStateFrom));
@@ -908,12 +878,9 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
-
 },{"../diagnostics":13,"../logger":16,"../utils/uuid":26,"underscore":39}],18:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var UnknownStoreError = require("../errors/unknownStore");
+var _ = require('underscore');
+var UnknownStoreError = require('../errors/unknownStore');
 
 module.exports = {
   setState: setState,
@@ -957,69 +924,67 @@ function serializeState() {
   });
 
   state.toString = function () {
-    return "(window.__marty||(window.__marty={})).state=" + JSON.stringify(state);
+    return '(window.__marty||(window.__marty={})).state=' + JSON.stringify(state);
   };
 
   state.toJSON = function () {
-    return _.omit(state, "toString", "toJSON");
+    return _.omit(state, 'toString', 'toJSON');
   };
 
   return state;
 }
-
 },{"../errors/unknownStore":8,"underscore":39}],19:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var HttpStateSource = require("./stateSources/http");
-var JSONStorageStateSource = require("./stateSources/jsonStorage");
-var LocalStorageStateSource = require("./stateSources/localStorage");
-var SessionStorageStateSource = require("./stateSources/sessionStorage");
+var _ = require('underscore');
+var HttpStateSource = require('./stateSources/http');
+var JSONStorageStateSource = require('./stateSources/jsonStorage');
+var LocalStorageStateSource = require('./stateSources/localStorage');
+var SessionStorageStateSource = require('./stateSources/sessionStorage');
 
 function StateSource(options) {
   options = options || {};
   extendStateSource(this, options);
 
   function extendStateSource(stateSource, options) {
-    _.extend.apply(_, [stateSource].concat(options, options.mixins, stateSourceMixin(options)));
+    _.extend.apply(_, [stateSource].concat(
+      options,
+      options.mixins,
+      stateSourceMixin(options))
+    );
   }
 
   function stateSourceMixin(options) {
     switch (options.type) {
-      case "http":
+      case 'http':
         return HttpStateSource(options);
-      case "jsonStorage":
+      case 'jsonStorage':
         return JSONStorageStateSource(options);
-      case "localStorage":
+      case 'localStorage':
         return LocalStorageStateSource(options);
-      case "sessionStorage":
+      case 'sessionStorage':
         return SessionStorageStateSource(options);
     }
   }
 }
 
 module.exports = StateSource;
-
 },{"./stateSources/http":20,"./stateSources/jsonStorage":21,"./stateSources/localStorage":22,"./stateSources/sessionStorage":23,"underscore":39}],20:[function(require,module,exports){
-"use strict";
+require('isomorphic-fetch');
+require('es6-promise').polyfill();
 
-require("isomorphic-fetch");
-require("es6-promise").polyfill();
-
-var _ = require("underscore");
-var CONTENT_TYPE = "Content-Type";
-var JSON_CONTENT_TYPE = "application/json";
+var _ = require('underscore');
+var CONTENT_TYPE = 'Content-Type';
+var JSON_CONTENT_TYPE = 'application/json';
 
 function HttpStateSource(mixinOptions) {
 
   mixinOptions = mixinOptions || {};
 
-  var defaultBaseUrl = "";
-  var methods = ["get", "put", "post", "delete", "patch"];
+  var defaultBaseUrl = '';
+  var methods = ['get', 'put', 'post', 'delete', 'patch'];
 
   var mixin = {
     _isHttpStateSource: true,
-    request: function request(options) {
+    request: function (options) {
       if (!options.headers) {
         options.headers = {};
       }
@@ -1087,15 +1052,15 @@ function requestOptions(method, baseUrl, options) {
   options.method = method.toLowerCase();
 
   if (baseUrl) {
-    var separator = "";
+    var separator = '';
     var firstCharOfUrl = options.url[0];
     var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
 
     // Do some text wrangling to make sure concatenation of base url
     // stupid people (i.e. me)
-    if (lastCharOfBaseUrl !== "/" && firstCharOfUrl !== "/") {
-      separator = "/";
-    } else if (lastCharOfBaseUrl === "/" && firstCharOfUrl === "/") {
+    if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
+      separator = '/';
+    } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
       options.url = options.url.substring(1);
     }
 
@@ -1108,17 +1073,15 @@ function requestOptions(method, baseUrl, options) {
 module.exports = HttpStateSource;
 
 },{"es6-promise":33,"isomorphic-fetch":38,"underscore":39}],21:[function(require,module,exports){
-"use strict";
-
 function JSONStorageStateSource(options) {
   options = options || {};
 
-  var defaultNamespace = "";
+  var defaultNamespace = '';
   var defaultStorage = localStorage;
 
-  var mixin = {
+  var mixin  = {
     _isJSONStorageStateSource: true,
-    get: function get(key) {
+    get: function (key) {
       var raw = getStorage().getItem(getNamespacedKey(key));
 
       if (!raw) {
@@ -1129,10 +1092,10 @@ function JSONStorageStateSource(options) {
         var payload = JSON.parse(raw);
         return payload.value;
       } catch (e) {
-        throw new Error("Unable to parse JSON from storage");
+        throw new Error('Unable to parse JSON from storage');
       }
     },
-    set: function set(key, value) {
+    set: function (key, value) {
       // Wrap the value in an object so as to preserve it's type
       // during serialization.
       var payload = {
@@ -1159,21 +1122,18 @@ function JSONStorageStateSource(options) {
 }
 
 module.exports = JSONStorageStateSource;
-
 },{}],22:[function(require,module,exports){
-"use strict";
-
 function LocalStorageStateSource(options) {
   options = options || {};
 
-  var defaultNamespace = "";
+  var defaultNamespace = '';
 
-  var mixin = {
+  var mixin  = {
     _isLocalStorageStateSource: true,
-    get: function get(key) {
+    get: function (key) {
       return localStorage.getItem(getNamespacedKey(key));
     },
-    set: function set(key, value) {
+    set: function (key, value) {
       localStorage.setItem(getNamespacedKey(key), value);
     }
   };
@@ -1190,21 +1150,18 @@ function LocalStorageStateSource(options) {
 }
 
 module.exports = LocalStorageStateSource;
-
 },{}],23:[function(require,module,exports){
-"use strict";
-
 function SessionStorageStateSource(options) {
 
   options = options || {};
-  var defaultNamespace = "";
+  var defaultNamespace = '';
 
-  var mixin = {
+  var mixin  = {
     _isSessionStorageStateSource: true,
-    get: function get(key) {
+    get: function (key) {
       return sessionStorage.getItem(getNamespacedKey(key));
     },
-    set: function set(key, value) {
+    set: function (key, value) {
       sessionStorage.setItem(getNamespacedKey(key), value);
     }
   };
@@ -1221,27 +1178,24 @@ function SessionStorageStateSource(options) {
 }
 
 module.exports = SessionStorageStateSource;
-
 },{}],24:[function(require,module,exports){
-"use strict";
+var CHANGE_EVENT = 'changed';
+var _ = require('underscore');
+var log = require('./logger');
+var uuid = require('./utils/uuid');
+var fetchResult = require('./fetch');
+var Dispatcher = require('./dispatcher');
+var Diagnostics = require('./diagnostics');
+var CompoundError = require('../errors/compound');
+var NotFoundError = require('../errors/notFound');
+var EventEmitter = require('events').EventEmitter;
+var StatusConstants = require('../constants/status');
+var ActionHandlerNotFoundError = require('../errors/actionHandlerNotFound');
+var ActionPredicateUndefinedError = require('../errors/actionPredicateUndefined');
 
-var CHANGE_EVENT = "changed";
-var _ = require("underscore");
-var log = require("./logger");
-var uuid = require("./utils/uuid");
-var fetchResult = require("./fetch");
-var Dispatcher = require("./dispatcher");
-var Diagnostics = require("./diagnostics");
-var CompoundError = require("../errors/compound");
-var NotFoundError = require("../errors/notFound");
-var EventEmitter = require("events").EventEmitter;
-var StatusConstants = require("../constants/status");
-var ActionHandlerNotFoundError = require("../errors/actionHandlerNotFound");
-var ActionPredicateUndefinedError = require("../errors/actionPredicateUndefined");
-
-var RESERVED_FUNCTIONS = ["getState"];
-var REQUIRED_FUNCTIONS = ["getInitialState"];
-var PROTECTED_FUNCTIONS = ["clear", "dispose"];
+var RESERVED_FUNCTIONS = ['getState'];
+var REQUIRED_FUNCTIONS = ['getInitialState'];
+var PROTECTED_FUNCTIONS = ['clear', 'dispose'];
 
 Store.defaultMaxListeners = 10000000;
 
@@ -1286,11 +1240,11 @@ function Store(options) {
     state = defaultState;
   }
 
-  Object.defineProperty(this, "state", {
-    get: function get() {
+  Object.defineProperty(this, 'state', {
+    get: function () {
       return getState();
     },
-    set: function set(value) {
+    set: function (value) {
       this.setState(value);
     }
   });
@@ -1301,10 +1255,10 @@ function Store(options) {
     _.each(RESERVED_FUNCTIONS, function (functionName) {
       if (options[functionName]) {
         if (options.displayName) {
-          functionName += " in " + options.displayName;
+          functionName += ' in ' + options.displayName;
         }
 
-        Diagnostics.warn(functionName + " is reserved for use by Marty. Please use a different name");
+        Diagnostics.warn(functionName + ' is reserved for use by Marty. Please use a different name');
       }
     });
 
@@ -1315,10 +1269,10 @@ function Store(options) {
     });
 
     if (missingFunctions.length) {
-      var error = "You must implement " + missingFunctions.join(",");
+      var error = 'You must implement ' + missingFunctions.join(',');
 
       if (options.displayName) {
-        error += " in " + options.displayName;
+        error += ' in ' + options.displayName;
       }
 
       throw new Error(error);
@@ -1345,7 +1299,7 @@ function Store(options) {
     });
 
     var mixins = _.map(options.mixins, function (mixin) {
-      return _.omit(mixin, "handlers");
+      return _.omit(mixin, 'handlers');
     });
 
     _.extend.apply(_, [store, options].concat(mixins));
@@ -1389,7 +1343,7 @@ function Store(options) {
     });
 
     if (!options || !options.id) {
-      throw new Error("must specify an id");
+      throw new Error('must specify an id');
     }
 
     result = dependencyResult(options);
@@ -1454,7 +1408,7 @@ function Store(options) {
                 notFound();
                 hasChanged();
               }
-            })["catch"](function (error) {
+            }).catch(function (error) {
               failed(error);
               hasChanged();
             });
@@ -1479,12 +1433,15 @@ function Store(options) {
     }
 
     function promiseNotReturnedWarning() {
-      var inStore = "";
+      var inStore = '';
       if (store.displayName) {
-        inStore = " in " + store.displayName;
+        inStore = ' in ' + store.displayName;
       }
 
-      return "The remote fetch for '" + options.id + "'" + inStore + " did not return a promise and the state was " + "not present after remotely finished executing. " + "This might be because you forgot to return a promise.";
+      return 'The remote fetch for \'' + options.id + '\'' +
+        inStore + ' did not return a promise and the state was ' +
+        'not present after remotely finished executing. ' +
+        'This might be because you forgot to return a promise.';
     }
 
     function finished() {
@@ -1566,12 +1523,12 @@ function Store(options) {
       callback = _.bind(callback, context);
     }
 
-    Diagnostics.trace("The", store.displayName, "store (" + store.id + ") is adding a change listener");
+    Diagnostics.trace('The', store.displayName, 'store (' + store.id + ') is adding a change listener');
     emitter.on(CHANGE_EVENT, callback);
 
     return {
-      dispose: function dispose() {
-        Diagnostics.trace("The", store.displayName, "store (" + store.id + ") is disposing of a change listener");
+      dispose: function () {
+        Diagnostics.trace('The', store.displayName, 'store (' + store.id + ') is disposing of a change listener');
         emitter.removeListener(CHANGE_EVENT, callback);
       }
     };
@@ -1600,12 +1557,13 @@ function Store(options) {
               throw new ActionHandlerNotFoundError(handlerName, this);
             }
           } catch (e) {
-            var errorMessage = "An error occured while trying to handle an '" + action.type.toString() + "' action in the action handler `" + handlerName + "`";
+            var errorMessage = 'An error occured while trying to handle an \'' +
+            action.type.toString() + '\' action in the action handler `' + handlerName + '`';
 
             var displayName = store.displayName || store.id;
 
             if (displayName) {
-              errorMessage += " within the store " + displayName;
+              errorMessage += ' within the store ' + displayName;
             }
 
             log.error(errorMessage, e, action);
@@ -1682,8 +1640,6 @@ function Store(options) {
 module.exports = Store;
 
 },{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./logger":16,"./utils/uuid":26,"events":28,"underscore":39}],25:[function(require,module,exports){
-"use strict";
-
 function serializeError(error) {
   if (!error) {
     return null;
@@ -1700,33 +1656,27 @@ function serializeError(error) {
 }
 
 module.exports = serializeError;
-
 },{}],26:[function(require,module,exports){
-"use strict";
-
-var format = require("util").format;
+var format = require('util').format;
 
 function uuid() {
-  return format("%s%s-%s-%s-%s-%s%s%s", s4(), s4(), s4(), s4(), s4(), s4(), s4(), s4());
+  return format('%s%s-%s-%s-%s-%s%s%s', s4(), s4(), s4(), s4(), s4(), s4(), s4(), s4());
 }
 
 function s4() {
-  return Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
+  return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
 
 module.exports = {
   generate: uuid,
-  small: function small() {
+  small: function () {
     return uuid().substring(0, 6);
   }
 };
-
 },{"util":32}],27:[function(require,module,exports){
-"use strict";
-
-var _ = require("underscore");
-var log = require("./logger");
-var StatusConstants = require("../constants/status");
+var _ = require('underscore');
+var log = require('./logger');
+var StatusConstants = require('../constants/status');
 
 when.all = all;
 when.join = join;
@@ -1737,7 +1687,7 @@ function when(handlers) {
   var handler = handlers[this.status.toLowerCase()];
 
   if (!handler) {
-    throw new Error("Could not find a " + this.status + " handler");
+    throw new Error('Could not find a ' + this.status + ' handler');
   }
 
   try {
@@ -1749,19 +1699,19 @@ function when(handlers) {
       case StatusConstants.DONE.toString():
         return handler.call(handlers, this.result);
       default:
-        throw new Error("Unknown fetch result status");
+        throw new Error('Unknown fetch result status');
     }
   } catch (e) {
-    var errorMessage = "An error occured when handling the DONE state of ";
+    var errorMessage = 'An error occured when handling the DONE state of ';
 
     if (this.id) {
-      errorMessage += "the fetch '" + this.id + "'";
+      errorMessage += 'the fetch \'' + this.id + '\'';
     } else {
-      errorMessage += "a fetch";
+      errorMessage += 'a fetch';
     }
 
     if (this.store) {
-      errorMessage += " from the store " + this.store;
+      errorMessage += ' from the store ' + this.store;
     }
 
     log.error(errorMessage, e);
@@ -1770,17 +1720,17 @@ function when(handlers) {
   }
 }
 
-function join() {
+function join(/* fetchResults, handlers */) {
   return all(_.initial(arguments), _.last(arguments));
 }
 
 function all(fetchResults, handlers) {
   if (!fetchResults || !handlers) {
-    throw new Error("No fetch results or handlers specified");
+    throw new Error('No fetch results or handlers specified');
   }
 
   if (!_.isArray(fetchResults) || _.any(fetchResults, notFetchResult)) {
-    throw new Error("Must specify a set of fetch results");
+    throw new Error('Must specify a set of fetch results');
   }
 
   var context = {
@@ -1816,7 +1766,8 @@ function aggregateStatus(fetchResults) {
   for (var i = fetchResults.length - 1; i >= 0; i--) {
     var status = fetchResults[i].status;
 
-    if (status === StatusConstants.FAILED.toString() || status === StatusConstants.PENDING.toString()) {
+    if (status === StatusConstants.FAILED.toString() ||
+        status === StatusConstants.PENDING.toString()) {
       return status;
     }
   }
@@ -1825,8 +1776,6 @@ function aggregateStatus(fetchResults) {
 }
 
 module.exports = when;
-/* fetchResults, handlers */
-
 },{"../constants/status":3,"./logger":16,"underscore":39}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4107,23 +4056,6 @@ module.exports = invariant;
     return
   }
 
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = name.toString();
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
-
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = value.toString();
-    }
-    return value
-  }
-
   function Headers(headers) {
     this.map = {}
 
@@ -4143,8 +4075,7 @@ module.exports = invariant;
   }
 
   Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
+    name = name.toLowerCase()
     var list = this.map[name]
     if (!list) {
       list = []
@@ -4154,24 +4085,24 @@ module.exports = invariant;
   }
 
   Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
+    delete this.map[name.toLowerCase()]
   }
 
   Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
+    var values = this.map[name.toLowerCase()]
     return values ? values[0] : null
   }
 
   Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
+    return this.map[name.toLowerCase()] || []
   }
 
   Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
+    return this.map.hasOwnProperty(name.toLowerCase())
   }
 
   Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
+    this.map[name.toLowerCase()] = [value]
   }
 
   // Instead of iterable for now.
@@ -4221,8 +4152,7 @@ module.exports = invariant;
         return false
       }
     })(),
-    formData: 'FormData' in self,
-    XDomainRequest: 'XDomainRequest' in self
+    formData: 'FormData' in self
   }
 
   function Body() {
@@ -4363,18 +4293,8 @@ module.exports = invariant;
     var self = this
 
     return new Promise(function(resolve, reject) {
-      var legacyCors = false;
-      if (support.XDomainRequest) {
-        var origin = location.protocol + '//' + location.host;
-        legacyCors = (/^\/\//.test(self.url) ? location.protocol + self.url : self.url).substring(0, origin.length) !== origin;
-      }
-      var xhr = legacyCors ? new XDomainRequest() : new XMLHttpRequest()
-
-      if (legacyCors) {
-        xhr.getAllResponseHeaders = function() {
-          return 'Content-Type: '+xhr.contentType;
-        };
-      } else if (self.credentials === 'cors') {
+      var xhr = new XMLHttpRequest()
+      if (self.credentials === 'cors') {
         xhr.withCredentials = true;
       }
 
@@ -4393,11 +4313,6 @@ module.exports = invariant;
 
       xhr.onload = function() {
         var status = (xhr.status === 1223) ? 204 : xhr.status
-
-        // If XDomainRequest there is no status code so just hope for the best...
-        if (legacyCors) {
-          status = 200;
-        }
         if (status < 100 || status > 599) {
           reject(new TypeError('Network request failed'))
           return
@@ -4417,7 +4332,6 @@ module.exports = invariant;
       }
 
       xhr.open(self.method, self.url, true)
-
       if ('responseType' in xhr && support.blob) {
         xhr.responseType = 'blob'
       }
@@ -4443,7 +4357,6 @@ module.exports = invariant;
     this.type = 'default'
     this.url = null
     this.status = options.status
-    this.ok = this.status >= 200 && this.status < 300
     this.statusText = options.statusText
     this.headers = options.headers
     this.url = options.url || ''
@@ -4465,9 +4378,9 @@ module.exports = invariant;
 require('whatwg-fetch');
 
 },{"whatwg-fetch":37}],39:[function(require,module,exports){
-//     Underscore.js 1.7.0
+//     Underscore.js 1.8.1
 //     http://underscorejs.org
-//     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
 
 (function() {
@@ -4488,7 +4401,6 @@ require('whatwg-fetch');
   var
     push             = ArrayProto.push,
     slice            = ArrayProto.slice,
-    concat           = ArrayProto.concat,
     toString         = ObjProto.toString,
     hasOwnProperty   = ObjProto.hasOwnProperty;
 
@@ -4497,7 +4409,11 @@ require('whatwg-fetch');
   var
     nativeIsArray      = Array.isArray,
     nativeKeys         = Object.keys,
-    nativeBind         = FuncProto.bind;
+    nativeBind         = FuncProto.bind,
+    nativeCreate       = Object.create;
+
+  // Naked function reference for surrogate-prototype-swapping.
+  var Ctor = function(){};
 
   // Create a safe reference to the Underscore object for use below.
   var _ = function(obj) {
@@ -4519,12 +4435,12 @@ require('whatwg-fetch');
   }
 
   // Current version.
-  _.VERSION = '1.7.0';
+  _.VERSION = '1.8.1';
 
   // Internal function that returns an efficient (for current engines) version
   // of the passed-in callback, to be repeatedly applied in other Underscore
   // functions.
-  var createCallback = function(func, context, argCount) {
+  var optimizeCb = function(func, context, argCount) {
     if (context === void 0) return func;
     switch (argCount == null ? 3 : argCount) {
       case 1: return function(value) {
@@ -4548,11 +4464,51 @@ require('whatwg-fetch');
   // A mostly-internal function to generate callbacks that can be applied
   // to each element in a collection, returning the desired result — either
   // identity, an arbitrary callback, a property matcher, or a property accessor.
-  _.iteratee = function(value, context, argCount) {
+  var cb = function(value, context, argCount) {
     if (value == null) return _.identity;
-    if (_.isFunction(value)) return createCallback(value, context, argCount);
-    if (_.isObject(value)) return _.matches(value);
+    if (_.isFunction(value)) return optimizeCb(value, context, argCount);
+    if (_.isObject(value)) return _.matcher(value);
     return _.property(value);
+  };
+  _.iteratee = function(value, context) {
+    return cb(value, context, Infinity);
+  };
+
+  // An internal function for creating assigner functions.
+  var createAssigner = function(keysFunc, undefinedOnly) {
+    return function(obj) {
+      var length = arguments.length;
+      if (length < 2 || obj == null) return obj;
+      for (var index = 1; index < length; index++) {
+        var source = arguments[index],
+            keys = keysFunc(source),
+            l = keys.length;
+        for (var i = 0; i < l; i++) {
+          var key = keys[i];
+          if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
+        }
+      }
+      return obj;
+    };
+  };
+
+  // An internal function for creating a new object that inherits from another.
+  var baseCreate = function(prototype) {
+    if (!_.isObject(prototype)) return {};
+    if (nativeCreate) return nativeCreate(prototype);
+    Ctor.prototype = prototype;
+    var result = new Ctor;
+    Ctor.prototype = null;
+    return result;
+  };
+
+  // Helper for collection methods to determine whether a collection
+  // should be iterated as an array or as an object
+  // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
+  var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+  var isArrayLike = function(collection) {
+    var length = collection && collection.length;
+    return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
   };
 
   // Collection Functions
@@ -4562,11 +4518,10 @@ require('whatwg-fetch');
   // Handles raw objects in addition to array-likes. Treats all
   // sparse array-likes as if they were dense.
   _.each = _.forEach = function(obj, iteratee, context) {
-    if (obj == null) return obj;
-    iteratee = createCallback(iteratee, context);
-    var i, length = obj.length;
-    if (length === +length) {
-      for (i = 0; i < length; i++) {
+    iteratee = optimizeCb(iteratee, context);
+    var i, length;
+    if (isArrayLike(obj)) {
+      for (i = 0, length = obj.length; i < length; i++) {
         iteratee(obj[i], i, obj);
       }
     } else {
@@ -4580,77 +4535,66 @@ require('whatwg-fetch');
 
   // Return the results of applying the iteratee to each element.
   _.map = _.collect = function(obj, iteratee, context) {
-    if (obj == null) return [];
-    iteratee = _.iteratee(iteratee, context);
-    var keys = obj.length !== +obj.length && _.keys(obj),
+    iteratee = cb(iteratee, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
         length = (keys || obj).length,
-        results = Array(length),
-        currentKey;
+        results = Array(length);
     for (var index = 0; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
+      var currentKey = keys ? keys[index] : index;
       results[index] = iteratee(obj[currentKey], currentKey, obj);
     }
     return results;
   };
 
-  var reduceError = 'Reduce of empty array with no initial value';
+  // Create a reducing function iterating left or right.
+  function createReduce(dir) {
+    // Optimized iterator function as using arguments.length
+    // in the main function will deoptimize the, see #1991.
+    function iterator(obj, iteratee, memo, keys, index, length) {
+      for (; index >= 0 && index < length; index += dir) {
+        var currentKey = keys ? keys[index] : index;
+        memo = iteratee(memo, obj[currentKey], currentKey, obj);
+      }
+      return memo;
+    }
+
+    return function(obj, iteratee, memo, context) {
+      iteratee = optimizeCb(iteratee, context, 4);
+      var keys = !isArrayLike(obj) && _.keys(obj),
+          length = (keys || obj).length,
+          index = dir > 0 ? 0 : length - 1;
+      // Determine the initial value if none is provided.
+      if (arguments.length < 3) {
+        memo = obj[keys ? keys[index] : index];
+        index += dir;
+      }
+      return iterator(obj, iteratee, memo, keys, index, length);
+    };
+  }
 
   // **Reduce** builds up a single result from a list of values, aka `inject`,
   // or `foldl`.
-  _.reduce = _.foldl = _.inject = function(obj, iteratee, memo, context) {
-    if (obj == null) obj = [];
-    iteratee = createCallback(iteratee, context, 4);
-    var keys = obj.length !== +obj.length && _.keys(obj),
-        length = (keys || obj).length,
-        index = 0, currentKey;
-    if (arguments.length < 3) {
-      if (!length) throw new TypeError(reduceError);
-      memo = obj[keys ? keys[index++] : index++];
-    }
-    for (; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
-      memo = iteratee(memo, obj[currentKey], currentKey, obj);
-    }
-    return memo;
-  };
+  _.reduce = _.foldl = _.inject = createReduce(1);
 
   // The right-associative version of reduce, also known as `foldr`.
-  _.reduceRight = _.foldr = function(obj, iteratee, memo, context) {
-    if (obj == null) obj = [];
-    iteratee = createCallback(iteratee, context, 4);
-    var keys = obj.length !== + obj.length && _.keys(obj),
-        index = (keys || obj).length,
-        currentKey;
-    if (arguments.length < 3) {
-      if (!index) throw new TypeError(reduceError);
-      memo = obj[keys ? keys[--index] : --index];
-    }
-    while (index--) {
-      currentKey = keys ? keys[index] : index;
-      memo = iteratee(memo, obj[currentKey], currentKey, obj);
-    }
-    return memo;
-  };
+  _.reduceRight = _.foldr = createReduce(-1);
 
   // Return the first value which passes a truth test. Aliased as `detect`.
   _.find = _.detect = function(obj, predicate, context) {
-    var result;
-    predicate = _.iteratee(predicate, context);
-    _.some(obj, function(value, index, list) {
-      if (predicate(value, index, list)) {
-        result = value;
-        return true;
-      }
-    });
-    return result;
+    var key;
+    if (isArrayLike(obj)) {
+      key = _.findIndex(obj, predicate, context);
+    } else {
+      key = _.findKey(obj, predicate, context);
+    }
+    if (key !== void 0 && key !== -1) return obj[key];
   };
 
   // Return all the elements that pass a truth test.
   // Aliased as `select`.
   _.filter = _.select = function(obj, predicate, context) {
     var results = [];
-    if (obj == null) return results;
-    predicate = _.iteratee(predicate, context);
+    predicate = cb(predicate, context);
     _.each(obj, function(value, index, list) {
       if (predicate(value, index, list)) results.push(value);
     });
@@ -4659,19 +4603,17 @@ require('whatwg-fetch');
 
   // Return all the elements for which a truth test fails.
   _.reject = function(obj, predicate, context) {
-    return _.filter(obj, _.negate(_.iteratee(predicate)), context);
+    return _.filter(obj, _.negate(cb(predicate)), context);
   };
 
   // Determine whether all of the elements match a truth test.
   // Aliased as `all`.
   _.every = _.all = function(obj, predicate, context) {
-    if (obj == null) return true;
-    predicate = _.iteratee(predicate, context);
-    var keys = obj.length !== +obj.length && _.keys(obj),
-        length = (keys || obj).length,
-        index, currentKey;
-    for (index = 0; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
+    predicate = cb(predicate, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length;
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys ? keys[index] : index;
       if (!predicate(obj[currentKey], currentKey, obj)) return false;
     }
     return true;
@@ -4680,23 +4622,20 @@ require('whatwg-fetch');
   // Determine if at least one element in the object matches a truth test.
   // Aliased as `any`.
   _.some = _.any = function(obj, predicate, context) {
-    if (obj == null) return false;
-    predicate = _.iteratee(predicate, context);
-    var keys = obj.length !== +obj.length && _.keys(obj),
-        length = (keys || obj).length,
-        index, currentKey;
-    for (index = 0; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
+    predicate = cb(predicate, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length;
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys ? keys[index] : index;
       if (predicate(obj[currentKey], currentKey, obj)) return true;
     }
     return false;
   };
 
   // Determine if the array or object contains a given value (using `===`).
-  // Aliased as `include`.
-  _.contains = _.include = function(obj, target) {
-    if (obj == null) return false;
-    if (obj.length !== +obj.length) obj = _.values(obj);
+  // Aliased as `includes` and `include`.
+  _.contains = _.includes = _.include = function(obj, target) {
+    if (!isArrayLike(obj)) obj = _.values(obj);
     return _.indexOf(obj, target) >= 0;
   };
 
@@ -4705,7 +4644,8 @@ require('whatwg-fetch');
     var args = slice.call(arguments, 2);
     var isFunc = _.isFunction(method);
     return _.map(obj, function(value) {
-      return (isFunc ? method : value[method]).apply(value, args);
+      var func = isFunc ? method : value[method];
+      return func == null ? func : func.apply(value, args);
     });
   };
 
@@ -4717,13 +4657,13 @@ require('whatwg-fetch');
   // Convenience version of a common use case of `filter`: selecting only objects
   // containing specific `key:value` pairs.
   _.where = function(obj, attrs) {
-    return _.filter(obj, _.matches(attrs));
+    return _.filter(obj, _.matcher(attrs));
   };
 
   // Convenience version of a common use case of `find`: getting the first object
   // containing specific `key:value` pairs.
   _.findWhere = function(obj, attrs) {
-    return _.find(obj, _.matches(attrs));
+    return _.find(obj, _.matcher(attrs));
   };
 
   // Return the maximum element (or element-based computation).
@@ -4731,7 +4671,7 @@ require('whatwg-fetch');
     var result = -Infinity, lastComputed = -Infinity,
         value, computed;
     if (iteratee == null && obj != null) {
-      obj = obj.length === +obj.length ? obj : _.values(obj);
+      obj = isArrayLike(obj) ? obj : _.values(obj);
       for (var i = 0, length = obj.length; i < length; i++) {
         value = obj[i];
         if (value > result) {
@@ -4739,7 +4679,7 @@ require('whatwg-fetch');
         }
       }
     } else {
-      iteratee = _.iteratee(iteratee, context);
+      iteratee = cb(iteratee, context);
       _.each(obj, function(value, index, list) {
         computed = iteratee(value, index, list);
         if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
@@ -4756,7 +4696,7 @@ require('whatwg-fetch');
     var result = Infinity, lastComputed = Infinity,
         value, computed;
     if (iteratee == null && obj != null) {
-      obj = obj.length === +obj.length ? obj : _.values(obj);
+      obj = isArrayLike(obj) ? obj : _.values(obj);
       for (var i = 0, length = obj.length; i < length; i++) {
         value = obj[i];
         if (value < result) {
@@ -4764,7 +4704,7 @@ require('whatwg-fetch');
         }
       }
     } else {
-      iteratee = _.iteratee(iteratee, context);
+      iteratee = cb(iteratee, context);
       _.each(obj, function(value, index, list) {
         computed = iteratee(value, index, list);
         if (computed < lastComputed || computed === Infinity && result === Infinity) {
@@ -4779,7 +4719,7 @@ require('whatwg-fetch');
   // Shuffle a collection, using the modern version of the
   // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
   _.shuffle = function(obj) {
-    var set = obj && obj.length === +obj.length ? obj : _.values(obj);
+    var set = isArrayLike(obj) ? obj : _.values(obj);
     var length = set.length;
     var shuffled = Array(length);
     for (var index = 0, rand; index < length; index++) {
@@ -4795,7 +4735,7 @@ require('whatwg-fetch');
   // The internal `guard` argument allows it to work with `map`.
   _.sample = function(obj, n, guard) {
     if (n == null || guard) {
-      if (obj.length !== +obj.length) obj = _.values(obj);
+      if (!isArrayLike(obj)) obj = _.values(obj);
       return obj[_.random(obj.length - 1)];
     }
     return _.shuffle(obj).slice(0, Math.max(0, n));
@@ -4803,7 +4743,7 @@ require('whatwg-fetch');
 
   // Sort the object's values by a criterion produced by an iteratee.
   _.sortBy = function(obj, iteratee, context) {
-    iteratee = _.iteratee(iteratee, context);
+    iteratee = cb(iteratee, context);
     return _.pluck(_.map(obj, function(value, index, list) {
       return {
         value: value,
@@ -4825,7 +4765,7 @@ require('whatwg-fetch');
   var group = function(behavior) {
     return function(obj, iteratee, context) {
       var result = {};
-      iteratee = _.iteratee(iteratee, context);
+      iteratee = cb(iteratee, context);
       _.each(obj, function(value, index) {
         var key = iteratee(value, index, obj);
         behavior(result, value, key);
@@ -4853,37 +4793,24 @@ require('whatwg-fetch');
     if (_.has(result, key)) result[key]++; else result[key] = 1;
   });
 
-  // Use a comparator function to figure out the smallest index at which
-  // an object should be inserted so as to maintain order. Uses binary search.
-  _.sortedIndex = function(array, obj, iteratee, context) {
-    iteratee = _.iteratee(iteratee, context, 1);
-    var value = iteratee(obj);
-    var low = 0, high = array.length;
-    while (low < high) {
-      var mid = low + high >>> 1;
-      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
-    }
-    return low;
-  };
-
   // Safely create a real, live array from anything iterable.
   _.toArray = function(obj) {
     if (!obj) return [];
     if (_.isArray(obj)) return slice.call(obj);
-    if (obj.length === +obj.length) return _.map(obj, _.identity);
+    if (isArrayLike(obj)) return _.map(obj, _.identity);
     return _.values(obj);
   };
 
   // Return the number of elements in an object.
   _.size = function(obj) {
     if (obj == null) return 0;
-    return obj.length === +obj.length ? obj.length : _.keys(obj).length;
+    return isArrayLike(obj) ? obj.length : _.keys(obj).length;
   };
 
   // Split a collection into two arrays: one whose elements all satisfy the given
   // predicate, and one whose elements all do not satisfy the predicate.
   _.partition = function(obj, predicate, context) {
-    predicate = _.iteratee(predicate, context);
+    predicate = cb(predicate, context);
     var pass = [], fail = [];
     _.each(obj, function(value, key, obj) {
       (predicate(value, key, obj) ? pass : fail).push(value);
@@ -4900,30 +4827,27 @@ require('whatwg-fetch');
   _.first = _.head = _.take = function(array, n, guard) {
     if (array == null) return void 0;
     if (n == null || guard) return array[0];
-    if (n < 0) return [];
-    return slice.call(array, 0, n);
+    return _.initial(array, array.length - n);
   };
 
   // Returns everything but the last entry of the array. Especially useful on
   // the arguments object. Passing **n** will return all the values in
-  // the array, excluding the last N. The **guard** check allows it to work with
-  // `_.map`.
+  // the array, excluding the last N.
   _.initial = function(array, n, guard) {
     return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
   };
 
   // Get the last element of an array. Passing **n** will return the last N
-  // values in the array. The **guard** check allows it to work with `_.map`.
+  // values in the array.
   _.last = function(array, n, guard) {
     if (array == null) return void 0;
     if (n == null || guard) return array[array.length - 1];
-    return slice.call(array, Math.max(array.length - n, 0));
+    return _.rest(array, Math.max(0, array.length - n));
   };
 
   // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
   // Especially useful on the arguments object. Passing an **n** will return
-  // the rest N values in the array. The **guard**
-  // check allows it to work with `_.map`.
+  // the rest N values in the array.
   _.rest = _.tail = _.drop = function(array, n, guard) {
     return slice.call(array, n == null || guard ? 1 : n);
   };
@@ -4934,18 +4858,20 @@ require('whatwg-fetch');
   };
 
   // Internal implementation of a recursive `flatten` function.
-  var flatten = function(input, shallow, strict, output) {
-    if (shallow && _.every(input, _.isArray)) {
-      return concat.apply(output, input);
-    }
-    for (var i = 0, length = input.length; i < length; i++) {
+  var flatten = function(input, shallow, strict, startIndex) {
+    var output = [], idx = 0;
+    for (var i = startIndex || 0, length = input && input.length; i < length; i++) {
       var value = input[i];
-      if (!_.isArray(value) && !_.isArguments(value)) {
-        if (!strict) output.push(value);
-      } else if (shallow) {
-        push.apply(output, value);
-      } else {
-        flatten(value, shallow, strict, output);
+      if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+        //flatten current level of array or arguments object
+        if (!shallow) value = flatten(value, shallow, strict);
+        var j = 0, len = value.length;
+        output.length += len;
+        while (j < len) {
+          output[idx++] = value[j++];
+        }
+      } else if (!strict) {
+        output[idx++] = value;
       }
     }
     return output;
@@ -4953,7 +4879,7 @@ require('whatwg-fetch');
 
   // Flatten out an array, either recursively (by default), or just one level.
   _.flatten = function(array, shallow) {
-    return flatten(array, shallow, false, []);
+    return flatten(array, shallow, false);
   };
 
   // Return a version of the array that does not contain the specified value(s).
@@ -4971,21 +4897,21 @@ require('whatwg-fetch');
       iteratee = isSorted;
       isSorted = false;
     }
-    if (iteratee != null) iteratee = _.iteratee(iteratee, context);
+    if (iteratee != null) iteratee = cb(iteratee, context);
     var result = [];
     var seen = [];
     for (var i = 0, length = array.length; i < length; i++) {
-      var value = array[i];
+      var value = array[i],
+          computed = iteratee ? iteratee(value, i, array) : value;
       if (isSorted) {
-        if (!i || seen !== value) result.push(value);
-        seen = value;
+        if (!i || seen !== computed) result.push(value);
+        seen = computed;
       } else if (iteratee) {
-        var computed = iteratee(value, i, array);
-        if (_.indexOf(seen, computed) < 0) {
+        if (!_.contains(seen, computed)) {
           seen.push(computed);
           result.push(value);
         }
-      } else if (_.indexOf(result, value) < 0) {
+      } else if (!_.contains(result, value)) {
         result.push(value);
       }
     }
@@ -4995,7 +4921,7 @@ require('whatwg-fetch');
   // Produce an array that contains the union: each distinct element from all of
   // the passed-in arrays.
   _.union = function() {
-    return _.uniq(flatten(arguments, true, true, []));
+    return _.uniq(flatten(arguments, true, true));
   };
 
   // Produce an array that contains every item shared between all the
@@ -5018,7 +4944,7 @@ require('whatwg-fetch');
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
-    var rest = flatten(slice.call(arguments, 1), true, true, []);
+    var rest = flatten(arguments, true, true, 1);
     return _.filter(array, function(value){
       return !_.contains(rest, value);
     });
@@ -5026,23 +4952,28 @@ require('whatwg-fetch');
 
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
-  _.zip = function(array) {
-    if (array == null) return [];
-    var length = _.max(arguments, 'length').length;
-    var results = Array(length);
-    for (var i = 0; i < length; i++) {
-      results[i] = _.pluck(arguments, i);
+  _.zip = function() {
+    return _.unzip(arguments);
+  };
+
+  // Complement of _.zip. Unzip accepts an array of arrays and groups
+  // each array's elements on shared indices
+  _.unzip = function(array) {
+    var length = array && _.max(array, 'length').length || 0;
+    var result = Array(length);
+
+    for (var index = 0; index < length; index++) {
+      result[index] = _.pluck(array, index);
     }
-    return results;
+    return result;
   };
 
   // Converts lists into objects. Pass either a single array of `[key, value]`
   // pairs, or two parallel arrays of the same length -- one of keys, and one of
   // the corresponding values.
   _.object = function(list, values) {
-    if (list == null) return {};
     var result = {};
-    for (var i = 0, length = list.length; i < length; i++) {
+    for (var i = 0, length = list && list.length; i < length; i++) {
       if (values) {
         result[list[i]] = values[i];
       } else {
@@ -5057,28 +4988,61 @@ require('whatwg-fetch');
   // If the array is large and already in sort order, pass `true`
   // for **isSorted** to use binary search.
   _.indexOf = function(array, item, isSorted) {
-    if (array == null) return -1;
-    var i = 0, length = array.length;
-    if (isSorted) {
-      if (typeof isSorted == 'number') {
-        i = isSorted < 0 ? Math.max(0, length + isSorted) : isSorted;
-      } else {
-        i = _.sortedIndex(array, item);
-        return array[i] === item ? i : -1;
-      }
+    var i = 0, length = array && array.length;
+    if (typeof isSorted == 'number') {
+      i = isSorted < 0 ? Math.max(0, length + isSorted) : isSorted;
+    } else if (isSorted && length) {
+      i = _.sortedIndex(array, item);
+      return array[i] === item ? i : -1;
+    }
+    if (item !== item) {
+      return _.findIndex(slice.call(array, i), _.isNaN);
     }
     for (; i < length; i++) if (array[i] === item) return i;
     return -1;
   };
 
   _.lastIndexOf = function(array, item, from) {
-    if (array == null) return -1;
-    var idx = array.length;
+    var idx = array ? array.length : 0;
     if (typeof from == 'number') {
       idx = from < 0 ? idx + from + 1 : Math.min(idx, from + 1);
     }
+    if (item !== item) {
+      return _.findLastIndex(slice.call(array, 0, idx), _.isNaN);
+    }
     while (--idx >= 0) if (array[idx] === item) return idx;
     return -1;
+  };
+
+  // Generator function to create the findIndex and findLastIndex functions
+  function createIndexFinder(dir) {
+    return function(array, predicate, context) {
+      predicate = cb(predicate, context);
+      var length = array != null && array.length;
+      var index = dir > 0 ? 0 : length - 1;
+      for (; index >= 0 && index < length; index += dir) {
+        if (predicate(array[index], index, array)) return index;
+      }
+      return -1;
+    };
+  }
+
+  // Returns the first index on an array-like that passes a predicate test
+  _.findIndex = createIndexFinder(1);
+
+  _.findLastIndex = createIndexFinder(-1);
+
+  // Use a comparator function to figure out the smallest index at which
+  // an object should be inserted so as to maintain order. Uses binary search.
+  _.sortedIndex = function(array, obj, iteratee, context) {
+    iteratee = cb(iteratee, context, 1);
+    var value = iteratee(obj);
+    var low = 0, high = array.length;
+    while (low < high) {
+      var mid = Math.floor((low + high) / 2);
+      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
+    }
+    return low;
   };
 
   // Generate an integer Array containing an arithmetic progression. A port of
@@ -5104,25 +5068,25 @@ require('whatwg-fetch');
   // Function (ahem) Functions
   // ------------------
 
-  // Reusable constructor function for prototype setting.
-  var Ctor = function(){};
+  // Determines whether to execute a function as a constructor
+  // or a normal function with the provided arguments
+  var executeBound = function(sourceFunc, boundFunc, context, callingContext, args) {
+    if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
+    var self = baseCreate(sourceFunc.prototype);
+    var result = sourceFunc.apply(self, args);
+    if (_.isObject(result)) return result;
+    return self;
+  };
 
   // Create a function bound to a given object (assigning `this`, and arguments,
   // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
   // available.
   _.bind = function(func, context) {
-    var args, bound;
     if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
     if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
-    args = slice.call(arguments, 2);
-    bound = function() {
-      if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
-      Ctor.prototype = func.prototype;
-      var self = new Ctor;
-      Ctor.prototype = null;
-      var result = func.apply(self, args.concat(slice.call(arguments)));
-      if (_.isObject(result)) return result;
-      return self;
+    var args = slice.call(arguments, 2);
+    var bound = function() {
+      return executeBound(func, bound, context, this, args.concat(slice.call(arguments)));
     };
     return bound;
   };
@@ -5132,15 +5096,16 @@ require('whatwg-fetch');
   // as a placeholder, allowing any combination of arguments to be pre-filled.
   _.partial = function(func) {
     var boundArgs = slice.call(arguments, 1);
-    return function() {
-      var position = 0;
-      var args = boundArgs.slice();
-      for (var i = 0, length = args.length; i < length; i++) {
-        if (args[i] === _) args[i] = arguments[position++];
+    var bound = function() {
+      var position = 0, length = boundArgs.length;
+      var args = Array(length);
+      for (var i = 0; i < length; i++) {
+        args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i];
       }
       while (position < arguments.length) args.push(arguments[position++]);
-      return func.apply(this, args);
+      return executeBound(func, bound, this, this, args);
     };
+    return bound;
   };
 
   // Bind a number of an object's methods to that object. Remaining arguments
@@ -5160,7 +5125,7 @@ require('whatwg-fetch');
   _.memoize = function(func, hasher) {
     var memoize = function(key) {
       var cache = memoize.cache;
-      var address = hasher ? hasher.apply(this, arguments) : key;
+      var address = '' + (hasher ? hasher.apply(this, arguments) : key);
       if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
       return cache[address];
     };
@@ -5179,9 +5144,7 @@ require('whatwg-fetch');
 
   // Defers a function, scheduling it to run after the current call stack has
   // cleared.
-  _.defer = function(func) {
-    return _.delay.apply(_, [func, 1].concat(slice.call(arguments, 1)));
-  };
+  _.defer = _.partial(_.delay, _, 1);
 
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time. Normally, the throttled function will run
@@ -5206,8 +5169,10 @@ require('whatwg-fetch');
       context = this;
       args = arguments;
       if (remaining <= 0 || remaining > wait) {
-        clearTimeout(timeout);
-        timeout = null;
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
         previous = now;
         result = func.apply(context, args);
         if (!timeout) context = args = null;
@@ -5228,7 +5193,7 @@ require('whatwg-fetch');
     var later = function() {
       var last = _.now() - timestamp;
 
-      if (last < wait && last > 0) {
+      if (last < wait && last >= 0) {
         timeout = setTimeout(later, wait - last);
       } else {
         timeout = null;
@@ -5281,7 +5246,7 @@ require('whatwg-fetch');
     };
   };
 
-  // Returns a function that will only be executed after being called N times.
+  // Returns a function that will only be executed on and after the Nth call.
   _.after = function(times, func) {
     return function() {
       if (--times < 1) {
@@ -5290,15 +5255,14 @@ require('whatwg-fetch');
     };
   };
 
-  // Returns a function that will only be executed before being called N times.
+  // Returns a function that will only be executed up to (but not including) the Nth call.
   _.before = function(times, func) {
     var memo;
     return function() {
       if (--times > 0) {
         memo = func.apply(this, arguments);
-      } else {
-        func = null;
       }
+      if (times <= 1) func = null;
       return memo;
     };
   };
@@ -5310,13 +5274,21 @@ require('whatwg-fetch');
   // Object Functions
   // ----------------
 
-  // Retrieve the names of an object's properties.
+  // Retrieve the names of an object's own properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
   _.keys = function(obj) {
     if (!_.isObject(obj)) return [];
     if (nativeKeys) return nativeKeys(obj);
     var keys = [];
     for (var key in obj) if (_.has(obj, key)) keys.push(key);
+    return keys;
+  };
+
+  // Retrieve all the property names of an object.
+  _.allKeys = function(obj) {
+    if (!_.isObject(obj)) return [];
+    var keys = [];
+    for (var key in obj) keys.push(key);
     return keys;
   };
 
@@ -5329,6 +5301,21 @@ require('whatwg-fetch');
       values[i] = obj[keys[i]];
     }
     return values;
+  };
+
+  // Returns the results of applying the iteratee to each element of the object
+  // In contrast to _.map it returns an object
+  _.mapObject = function(obj, iteratee, context) {
+    iteratee = cb(iteratee, context);
+    var keys =  _.keys(obj),
+          length = keys.length,
+          results = {},
+          currentKey;
+      for (var index = 0; index < length; index++) {
+        currentKey = keys[index];
+        results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
+      }
+      return results;
   };
 
   // Convert an object into a list of `[key, value]` pairs.
@@ -5363,18 +5350,20 @@ require('whatwg-fetch');
   };
 
   // Extend a given object with all the properties in passed-in object(s).
-  _.extend = function(obj) {
-    if (!_.isObject(obj)) return obj;
-    var source, prop;
-    for (var i = 1, length = arguments.length; i < length; i++) {
-      source = arguments[i];
-      for (prop in source) {
-        if (hasOwnProperty.call(source, prop)) {
-            obj[prop] = source[prop];
-        }
-      }
+  _.extend = createAssigner(_.allKeys);
+
+  // Assigns a given object with all the own properties in the passed-in object(s)
+  // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+  _.extendOwn = createAssigner(_.keys);
+
+  // Returns the first key on an object that passes a predicate test
+  _.findKey = function(obj, predicate, context) {
+    predicate = cb(predicate, context);
+    var keys = _.keys(obj), key;
+    for (var i = 0, length = keys.length; i < length; i++) {
+      key = keys[i];
+      if (predicate(obj[key], key, obj)) return key;
     }
-    return obj;
   };
 
   // Return a copy of the object only containing the whitelisted properties.
@@ -5382,13 +5371,15 @@ require('whatwg-fetch');
     var result = {}, key;
     if (obj == null) return result;
     if (_.isFunction(iteratee)) {
-      iteratee = createCallback(iteratee, context);
-      for (key in obj) {
+      iteratee = optimizeCb(iteratee, context);
+      var keys = _.allKeys(obj);
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
         var value = obj[key];
         if (iteratee(value, key, obj)) result[key] = value;
       }
     } else {
-      var keys = concat.apply([], slice.call(arguments, 1));
+      var keys = flatten(arguments, false, false, 1);
       obj = new Object(obj);
       for (var i = 0, length = keys.length; i < length; i++) {
         key = keys[i];
@@ -5403,7 +5394,7 @@ require('whatwg-fetch');
     if (_.isFunction(iteratee)) {
       iteratee = _.negate(iteratee);
     } else {
-      var keys = _.map(concat.apply([], slice.call(arguments, 1)), String);
+      var keys = _.map(flatten(arguments, false, false, 1), String);
       iteratee = function(value, key) {
         return !_.contains(keys, key);
       };
@@ -5412,16 +5403,7 @@ require('whatwg-fetch');
   };
 
   // Fill in a given object with default properties.
-  _.defaults = function(obj) {
-    if (!_.isObject(obj)) return obj;
-    for (var i = 1, length = arguments.length; i < length; i++) {
-      var source = arguments[i];
-      for (var prop in source) {
-        if (obj[prop] === void 0) obj[prop] = source[prop];
-      }
-    }
-    return obj;
-  };
+  _.defaults = createAssigner(_.allKeys, true);
 
   // Create a (shallow-cloned) duplicate of an object.
   _.clone = function(obj) {
@@ -5436,6 +5418,19 @@ require('whatwg-fetch');
     interceptor(obj);
     return obj;
   };
+
+  // Returns whether an object has a given set of `key:value` pairs.
+  _.isMatch = function(object, attrs) {
+    var keys = _.keys(attrs), length = keys.length;
+    if (object == null) return !length;
+    var obj = Object(object);
+    for (var i = 0; i < length; i++) {
+      var key = keys[i];
+      if (attrs[key] !== obj[key] || !(key in obj)) return false;
+    }
+    return true;
+  };
+
 
   // Internal recursive comparison function for `isEqual`.
   var eq = function(a, b, aStack, bStack) {
@@ -5471,74 +5466,76 @@ require('whatwg-fetch');
         // of `NaN` are not equivalent.
         return +a === +b;
     }
-    if (typeof a != 'object' || typeof b != 'object') return false;
+
+    var areArrays = className === '[object Array]';
+    if (!areArrays) {
+      if (typeof a != 'object' || typeof b != 'object') return false;
+
+      // Objects with different constructors are not equivalent, but `Object`s or `Array`s
+      // from different frames are.
+      var aCtor = a.constructor, bCtor = b.constructor;
+      if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+                               _.isFunction(bCtor) && bCtor instanceof bCtor)
+                          && ('constructor' in a && 'constructor' in b)) {
+        return false;
+      }
+    }
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
     // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+    
+    // Initializing stack of traversed objects.
+    // It's done here since we only need them for objects and arrays comparison.
+    aStack = aStack || [];
+    bStack = bStack || [];
     var length = aStack.length;
     while (length--) {
       // Linear search. Performance is inversely proportional to the number of
       // unique nested structures.
       if (aStack[length] === a) return bStack[length] === b;
     }
-    // Objects with different constructors are not equivalent, but `Object`s
-    // from different frames are.
-    var aCtor = a.constructor, bCtor = b.constructor;
-    if (
-      aCtor !== bCtor &&
-      // Handle Object.create(x) cases
-      'constructor' in a && 'constructor' in b &&
-      !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
-        _.isFunction(bCtor) && bCtor instanceof bCtor)
-    ) {
-      return false;
-    }
+
     // Add the first object to the stack of traversed objects.
     aStack.push(a);
     bStack.push(b);
-    var size, result;
+
     // Recursively compare objects and arrays.
-    if (className === '[object Array]') {
+    if (areArrays) {
       // Compare array lengths to determine if a deep comparison is necessary.
-      size = a.length;
-      result = size === b.length;
-      if (result) {
-        // Deep compare the contents, ignoring non-numeric properties.
-        while (size--) {
-          if (!(result = eq(a[size], b[size], aStack, bStack))) break;
-        }
+      length = a.length;
+      if (length !== b.length) return false;
+      // Deep compare the contents, ignoring non-numeric properties.
+      while (length--) {
+        if (!eq(a[length], b[length], aStack, bStack)) return false;
       }
     } else {
       // Deep compare objects.
       var keys = _.keys(a), key;
-      size = keys.length;
+      length = keys.length;
       // Ensure that both objects contain the same number of properties before comparing deep equality.
-      result = _.keys(b).length === size;
-      if (result) {
-        while (size--) {
-          // Deep compare each member
-          key = keys[size];
-          if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
-        }
+      if (_.keys(b).length !== length) return false;
+      while (length--) {
+        // Deep compare each member
+        key = keys[length];
+        if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
       }
     }
     // Remove the first object from the stack of traversed objects.
     aStack.pop();
     bStack.pop();
-    return result;
+    return true;
   };
 
   // Perform a deep comparison to check if two objects are equal.
   _.isEqual = function(a, b) {
-    return eq(a, b, [], []);
+    return eq(a, b);
   };
 
   // Is a given array, string, or object empty?
   // An "empty" object has no enumerable own-properties.
   _.isEmpty = function(obj) {
     if (obj == null) return true;
-    if (_.isArray(obj) || _.isString(obj) || _.isArguments(obj)) return obj.length === 0;
-    for (var key in obj) if (_.has(obj, key)) return false;
-    return true;
+    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
+    return _.keys(obj).length === 0;
   };
 
   // Is a given value a DOM element?
@@ -5558,14 +5555,14 @@ require('whatwg-fetch');
     return type === 'function' || type === 'object' && !!obj;
   };
 
-  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
-  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
+  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
+  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function(name) {
     _['is' + name] = function(obj) {
       return toString.call(obj) === '[object ' + name + ']';
     };
   });
 
-  // Define a fallback version of the method in browsers (ahem, IE), where
+  // Define a fallback version of the method in browsers (ahem, IE < 9), where
   // there isn't any inspectable "Arguments" type.
   if (!_.isArguments(arguments)) {
     _.isArguments = function(obj) {
@@ -5573,8 +5570,9 @@ require('whatwg-fetch');
     };
   }
 
-  // Optimize `isFunction` if appropriate. Work around an IE 11 bug.
-  if (typeof /./ !== 'function') {
+  // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
+  // IE 11 (#1621), and in Safari 8 (#1929).
+  if (typeof /./ != 'function' && typeof Int8Array != 'object') {
     _.isFunction = function(obj) {
       return typeof obj == 'function' || false;
     };
@@ -5626,6 +5624,7 @@ require('whatwg-fetch');
     return value;
   };
 
+  // Predicate-generating functions. Often useful outside of Underscore.
   _.constant = function(value) {
     return function() {
       return value;
@@ -5636,28 +5635,30 @@ require('whatwg-fetch');
 
   _.property = function(key) {
     return function(obj) {
+      return obj == null ? void 0 : obj[key];
+    };
+  };
+
+  // Generates a function for a given object that returns a given property.
+  _.propertyOf = function(obj) {
+    return obj == null ? function(){} : function(key) {
       return obj[key];
     };
   };
 
-  // Returns a predicate for checking whether an object has a given set of `key:value` pairs.
-  _.matches = function(attrs) {
-    var pairs = _.pairs(attrs), length = pairs.length;
+  // Returns a predicate for checking whether an object has a given set of 
+  // `key:value` pairs.
+  _.matcher = _.matches = function(attrs) {
+    attrs = _.extendOwn({}, attrs);
     return function(obj) {
-      if (obj == null) return !length;
-      obj = new Object(obj);
-      for (var i = 0; i < length; i++) {
-        var pair = pairs[i], key = pair[0];
-        if (pair[1] !== obj[key] || !(key in obj)) return false;
-      }
-      return true;
+      return _.isMatch(obj, attrs);
     };
   };
 
   // Run a function **n** times.
   _.times = function(n, iteratee, context) {
     var accum = Array(Math.max(0, n));
-    iteratee = createCallback(iteratee, context, 1);
+    iteratee = optimizeCb(iteratee, context, 1);
     for (var i = 0; i < n; i++) accum[i] = iteratee(i);
     return accum;
   };
@@ -5706,10 +5707,12 @@ require('whatwg-fetch');
 
   // If the value of the named `property` is a function then invoke it with the
   // `object` as context; otherwise, return it.
-  _.result = function(object, property) {
-    if (object == null) return void 0;
-    var value = object[property];
-    return _.isFunction(value) ? object[property]() : value;
+  _.result = function(object, property, fallback) {
+    var value = object == null ? void 0 : object[property];
+    if (value === void 0) {
+      value = fallback;
+    }
+    return _.isFunction(value) ? value.call(object) : value;
   };
 
   // Generate a unique integer id (unique within the entire client session).
@@ -5824,8 +5827,8 @@ require('whatwg-fetch');
   // underscore functions. Wrapped objects may be chained.
 
   // Helper function to continue chaining intermediate results.
-  var result = function(obj) {
-    return this._chain ? _(obj).chain() : obj;
+  var result = function(instance, obj) {
+    return instance._chain ? _(obj).chain() : obj;
   };
 
   // Add your own custom functions to the Underscore object.
@@ -5835,7 +5838,7 @@ require('whatwg-fetch');
       _.prototype[name] = function() {
         var args = [this._wrapped];
         push.apply(args, arguments);
-        return result.call(this, func.apply(_, args));
+        return result(this, func.apply(_, args));
       };
     });
   };
@@ -5850,7 +5853,7 @@ require('whatwg-fetch');
       var obj = this._wrapped;
       method.apply(obj, arguments);
       if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
-      return result.call(this, obj);
+      return result(this, obj);
     };
   });
 
@@ -5858,13 +5861,21 @@ require('whatwg-fetch');
   _.each(['concat', 'join', 'slice'], function(name) {
     var method = ArrayProto[name];
     _.prototype[name] = function() {
-      return result.call(this, method.apply(this._wrapped, arguments));
+      return result(this, method.apply(this._wrapped, arguments));
     };
   });
 
   // Extracts the result from a wrapped and chained object.
   _.prototype.value = function() {
     return this._wrapped;
+  };
+
+  // Provide unwrapping proxy for some methods used in engine operations
+  // such as arithmetic and JSON stringification.
+  _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
+  
+  _.prototype.toString = function() {
+    return '' + this._wrapped;
   };
 
   // AMD registration happens at the end for compatibility with AMD loaders
