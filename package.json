@@ -47,7 +47,6 @@
     "sinon-chai": "^2.5.0",
     "uglify-js": "^2.4.15",
     "jquery": "^2.1.1",
-    "react-router": "^0.11.4",
     "semver": "^4.2.0"
   },
   "author": "James Hollingworth",
@@ -70,6 +69,7 @@
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",
+    "reactify": "^1.0.0",
     "underscore": "^1.7.0"
   }
 }

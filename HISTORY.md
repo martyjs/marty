@@ -1,3 +1,7 @@
+0.8.15 / 2015-03-06
+===================
+- Add reactify as a dependency so you dont have to explicitly add it to parent project
+
 0.8.14 / 2015-03-05
 ===================
 - Remove dependency on Babel
