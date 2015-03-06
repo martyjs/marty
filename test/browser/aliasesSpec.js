@@ -33,7 +33,11 @@ describe('aliases', function () {
 
   describe('marty/constants/status', function () {
     it('should resolve to status constants', function () {
-      expect(Object.keys(require('../../constants/status'))).to.eql(['PENDING', 'FAILED', 'DONE']);
+      var statuses = Object.keys(require('../../constants/status'));
+
+      expect(statuses).to.contain('PENDING');
+      expect(statuses).to.contain('FAILED');
+      expect(statuses).to.contain('DONE');
     });
   });
 });

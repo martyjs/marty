@@ -31,12 +31,30 @@ describe('Constants', function () {
     });
 
     it('should create an object with the given keys', function () {
-      expect(Object.keys(actualResult)).to.eql(input);
+      expect(Object.keys(actualResult)).to.eql(typesWithVariations(['foo', 'bar']));
     });
 
     it('should create a function for each key', function () {
       input.forEach(function (key) {
         expect(actualResult[key]).to.be.instanceof(Function);
+      });
+    });
+
+    it('should add a key_{STARTING} key for each key', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key + '_STARTING']).to.be.instanceof(Function);
+      });
+    });
+
+    it('should add a key_{FAILED} key for each key', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key + '_FAILED']).to.be.instanceof(Function);
+      });
+    });
+
+    it('should add a key_{DONE} key for each key', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key + '_DONE']).to.be.instanceof(Function);
       });
     });
 
@@ -115,8 +133,8 @@ describe('Constants', function () {
 
     it('should return an object of constants', function () {
       expect(Object.keys(actualResult)).to.eql(['foo', 'bim']);
-      expect(Object.keys(actualResult.foo)).to.eql(['bar', 'baz']);
-      expect(Object.keys(actualResult.bim)).to.eql(['bam']);
+      expect(Object.keys(actualResult.foo)).to.eql(typesWithVariations(['bar', 'baz']));
+      expect(Object.keys(actualResult.bim)).to.eql(typesWithVariations(['bam']));
     });
   });
 
@@ -137,8 +155,21 @@ describe('Constants', function () {
 
     it('should return an object of constants', function () {
       expect(Object.keys(actualResult.bim)).to.eql(['bam', 'top']);
-      expect(Object.keys(actualResult.bim.bam)).to.eql(['what']);
-      expect(Object.keys(actualResult.bim.top.flop)).to.eql(['bop', 'hot']);
+      expect(Object.keys(actualResult.bim.bam)).to.eql(typesWithVariations(['what']));
+      expect(Object.keys(actualResult.bim.top.flop)).to.eql(typesWithVariations(['bop', 'hot']));
     });
   });
+
+  function typesWithVariations(types) {
+    var res = [];
+
+    _.each(types, function (type) {
+      res.push(type);
+      res.push(type + '_STARTING');
+      res.push(type + '_DONE');
+      res.push(type + '_FAILED');
+    });
+
+    return res;
+  }
 });

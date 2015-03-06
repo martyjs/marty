@@ -18,14 +18,13 @@ var UsersAPI = Marty.createStateSource({
   baseUrl: 'http://foo.com'
   getAll: function (users) {
     return this.get('/users').then(function (res) {
-      UserActionCreators.receiveAll(res.body);
-    });
+      this.dispatch(UserConstants.RECIEVE_ALL, res.body);
+    }.bind(this));
   },
   createUser: function (user) {
-    this.post({ url: '/users', body: user })
-        .then(function (res) {
-          UserActionCreators.receiveUser(res.body);
-        });
+    this.post({ url: '/users', body: user }).then(function (res) {
+      this.dispatch(UserConstants.RECIEVE_USER, res.body);
+    }.bind(this));
   }
 });
 
@@ -37,18 +36,18 @@ class UsersAPI extends Marty.HttpStateSource {
     this.baseUrl = 'http://foo.com';
   }
   getAll(users) {
-    return this.get('/users')
-               .then((res) => UserActionCreators.receiveAll(res.body));
+    return this
+      .get('/users')
+      .then((res) => this.dispatch(UserConstants.RECIEVE_ALL, res.body));
   }
   createUser user) {
     this.post({ url: '/users', body: user })
-        .then((res) => UserActionCreators.receiveUser(res.body));
+        .then((res) => this.dispatch(UserConstants.RECIEVE_USER, res.body));
   }
 }
 {% endsample %}
 
 If the request is successful then the promise resolves with a response object. If the response content type is ``application/json`` then Marty will attempt to deserialize the body which is accessible at ``res.body``.
-
 
 {% sample %}
 classic
