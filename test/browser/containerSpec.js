@@ -54,7 +54,7 @@ describe('Container', function () {
       actionCreators = Marty.createActionCreators({
         id: 'registerStoreActionCreators',
         addFoo: function (foo) {
-          this.dispatch(foo);
+          this.dispatch('ADD_FOO', foo);
         }
       });
 

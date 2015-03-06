@@ -86,7 +86,7 @@ module.exports = function (config) {
   function local() {
     return _.extend(base(), {
       reporters: ['spec'],
-      browsers: ['ChromeCanary'],
+      browsers: ['Chrome'],
       autoWatch: true,
       singleRun: false,
       colors: true

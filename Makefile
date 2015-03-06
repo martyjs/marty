@@ -13,7 +13,7 @@ test-server:
 test-browser: lint
 	@./build/test-browser.sh
 
-test-watch: lint
+test-watch:
 	@./build/test-watch.sh
 
 bootstrap: bootstrap-js bootstrap-ruby

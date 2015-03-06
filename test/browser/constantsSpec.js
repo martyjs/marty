@@ -5,9 +5,11 @@ var warnings = require('../../lib/warnings');
 var constants = require('../../lib/constants');
 
 describe('Constants', function () {
-  var input, actualResult;
+  var input, actualResult, actionCreatorContext;
 
   beforeEach(function () {
+    actionCreatorContext = { dispatch: sinon.spy() };
+
     warnings.invokeConstant = false;
   });
 
@@ -49,7 +51,9 @@ describe('Constants', function () {
         var actionCreator, creatorFunction;
 
         beforeEach(function () {
-          creatorFunction = sinon.spy();
+          creatorFunction = sinon.spy(function (arg) {
+            this.dispatch(arg);
+          });
           actionCreator = actualResult.foo(creatorFunction);
         });
 
@@ -57,92 +61,42 @@ describe('Constants', function () {
           expect(actionCreator).to.be.instanceof(Function);
         });
 
-        it('should have creators type as a annotation', function () {
-          expect(actionCreator.annotations.type).to.eql('foo');
-        });
-
         describe('when I call the action creator', function () {
           var expectedArg;
           beforeEach(function () {
             expectedArg = 1;
 
-            actionCreator(expectedArg);
+            actionCreator.call(actionCreatorContext, expectedArg);
           });
 
           it('should have called the creator function', function () {
-            expect(creatorFunction).to.have.been.calledWith(expectedArg);
+            expect(actionCreatorContext.dispatch).to.have.been.calledWith('foo', expectedArg);
           });
         });
       });
 
       describe('when I dont pass in a function as the first argument', function () {
-        var actionCreator, actionCreatorContext;
+        var actionCreator;
 
         beforeEach(function () {
           actionCreator = actualResult.foo();
-          actionCreatorContext = { dispatch: sinon.spy() };
         });
 
         it('should create an action creator', function () {
           expect(actionCreator).to.be.instanceof(Function);
         });
 
-        it('should have creators type as a property', function () {
-          expect(actionCreator.annotations.type).to.eql('foo');
-        });
-
         describe('when I call the action creator', function () {
           var expectedArg1, expectedArg2;
           beforeEach(function () {
             expectedArg1 = 1;
-            expectedArg2 = 'foo';
+            expectedArg2 = 'bar';
 
             actionCreator.call(actionCreatorContext, expectedArg1, expectedArg2);
           });
 
           it('should have called the creator function', function () {
-            expect(actionCreatorContext.dispatch).to.have.been.calledWith(expectedArg1, expectedArg2);
-          });
-        });
-      });
-
-      describe('when I pass in an object literal as the first argument', function () {
-        var actionCreator, actionCreatorContext, customProperties;
-
-        beforeEach(function () {
-          customProperties = {
-            foo: 'bar',
-            bar: 'baz'
-          };
-          actionCreatorContext = { dispatch: sinon.spy() };
-          actionCreator = actualResult.foo(customProperties);
-        });
-
-        it('should create an action creator', function () {
-          expect(actionCreator).to.be.instanceof(Function);
-        });
-
-        it('should have creators type as a property', function () {
-          expect(actionCreator.annotations.type).to.eql('foo');
-        });
-
-        it('should include the custom annotations', function () {
-          _.each(customProperties, function (value, key) {
-            expect(actionCreator.annotations[key]).to.eql(value);
-          });
-        });
-
-        describe('when I call the action creator', function () {
-          var expectedArg1, expectedArg2;
-          beforeEach(function () {
-            expectedArg1 = 1;
-            expectedArg2 = 'foo';
-
-            actionCreator.call(actionCreatorContext, expectedArg1, expectedArg2);
-          });
-
-          it('should have called the creator function', function () {
-            expect(actionCreatorContext.dispatch).to.have.been.calledWith(expectedArg1, expectedArg2);
+            expect(actionCreatorContext.dispatch).to.have.been.calledWith('foo', expectedArg1, expectedArg2);
           });
         });
       });

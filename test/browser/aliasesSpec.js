@@ -25,13 +25,6 @@ describe('aliases', function () {
     });
   });
 
-  describe('marty/constants/actions', function () {
-    it('should resolve to action constants', function () {
-      var actions = require('../../constants/actions');
-      expect(Object.keys(actions)).to.eql(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
-    });
-  });
-
   describe('marty/constants/status', function () {
     it('should resolve to status constants', function () {
       expect(Object.keys(require('../../constants/status'))).to.eql(['PENDING', 'FAILED', 'DONE']);
