@@ -4,6 +4,7 @@ var expect = require('chai').expect;
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
 var constants = require('../../lib/constants');
+var autoDispatch = require('../../autoDispatch');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var serializeError = require('../../lib/utils/serializeError');
@@ -22,6 +23,36 @@ describe('ActionCreators', function () {
 
   afterEach(function () {
     logger.restore();
+  });
+
+  describe('autoDispatch(constant)', function () {
+    var TestConstants;
+    beforeEach(function () {
+      TestConstants = constants(['TEST_CONSTANT']);
+
+      actionCreators = Marty.createActionCreators({
+        dispatcher: dispatcher,
+        testConstant: autoDispatch(TestConstants.TEST_CONSTANT)
+      });
+    });
+
+    describe('when I create an action', function () {
+      var expectedArguments;
+
+      beforeEach(function () {
+        expectedArguments = [1, 2, 3];
+        actionCreators.testConstant.apply(actionCreators, expectedArguments);
+        actualAction = dispatcher.getActionWithType('TEST_CONSTANT');
+      });
+
+      it('should dispatch an action with the constant name', function () {
+        expect(actualAction).to.exist;
+      });
+
+      it('should pass through all the arguments', function () {
+        expect(actualAction.arguments).to.eql(expectedArguments);
+      });
+    });
   });
 
   describe('when you create an action creator called \'dispatch\'', function () {
@@ -67,13 +98,8 @@ describe('ActionCreators', function () {
 
   describe('when the action creator is created from a constant', function () {
     describe('when you pass in a function', function () {
-      var TestConstants, expectedProperties;
+      var TestConstants;
       beforeEach(function () {
-        expectedProperties = {
-          foo: 'bar',
-          baz: 'bam'
-        };
-
         TestConstants = constants(['TEST_CONSTANT']);
 
         actionCreators = Marty.createActionCreators({

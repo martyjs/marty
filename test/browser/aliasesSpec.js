@@ -25,6 +25,12 @@ describe('aliases', function () {
     });
   });
 
+  describe('marty/autoDispatch', function () {
+    it('should resolve to autoDispatch', function () {
+      expect(require('../../autoDispatch')).to.equal(require('../../lib/actionCreators/autoDispatch'));
+    });
+  });
+
   describe('marty/constants/status', function () {
     it('should resolve to status constants', function () {
       expect(Object.keys(require('../../constants/status'))).to.eql(['PENDING', 'FAILED', 'DONE']);

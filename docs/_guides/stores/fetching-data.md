@@ -73,11 +73,8 @@ var UserAPI = Marty.createStateSource({
 
 var UserSourceActionCreators = Marty.createActionCreators({
   id: 'UserSourceActionCreators',
-  types: {
-    receiveUser: UserConstants.RECEIVE_USER
-  },
   receiveUser: function (user) {
-    this.dispatch(user);
+    this.dispatch(UserConstants.RECEIVE_USER, user);
   }
 });
 
@@ -126,14 +123,8 @@ class UserAPI extends Marty.HttpStateSource {
 }
 
 class UserSourceActionCreators extends Marty.ActionCreators {
-  constructor(options) {
-    super(options);
-    this.types = {
-      receiveUser: UserConstants.RECEIVE_USER
-    }
-  }
   receiveUser(user) {
-    this.dispatch(user);
+    this.dispatch(UserConstants.RECEIVE_USER, user);
   }
 }
 
