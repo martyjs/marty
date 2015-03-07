@@ -165,7 +165,7 @@ describe('ActionCreators', function () {
     });
   });
 
-  describeStyles('when the action does not return anything', function (styles) {
+  describeStyles('when I dispatch a query', function (styles) {
     beforeEach(function () {
       expectedArg = { foo: 'bar' };
       expectedOtherArg = { baz: 'bim' };

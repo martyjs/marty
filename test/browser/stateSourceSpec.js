@@ -7,27 +7,22 @@ describe('StateSource', function () {
   var stateSource;
 
   describeStyles('creating a state source', function (styles) {
-    var expectedResult, expectedType, dispatcher, expectedArg1, expectedArg2;
+    var expectedResult, expectedType, expectedArg1, expectedArg2;
 
     beforeEach(function () {
       expectedType = 'FOO';
-      dispatcher = new Dispatcher();
       expectedResult = 'foo';
       expectedArg1 = 1;
       expectedArg2 = 'gib';
       stateSource = styles({
         classic: function () {
           return Marty.createStateSource({
-            dispatcher: dispatcher,
             id: 'createStateSource',
             foo: function () {
               return this.bar();
             },
             bar: function () {
               return expectedResult;
-            },
-            bam: function () {
-              this.dispatch(expectedType, expectedArg1, expectedArg2);
             }
           });
         },
@@ -40,38 +35,15 @@ describe('StateSource', function () {
             bar() {
               return expectedResult;
             }
-
-            bam() {
-              this.dispatch(expectedType, expectedArg1, expectedArg2);
-            }
           }
 
-          return new CreateStateSource({
-            dispatcher: dispatcher
-          });
+          return new CreateStateSource();
         }
       });
     });
 
     it('should expose the function', function () {
       expect(stateSource.foo()).to.equal(expectedResult);
-    });
-
-    describe('when you dispatch', function () {
-      var actualAction;
-
-      beforeEach(function () {
-        stateSource.bam();
-        actualAction = dispatcher.getActionWithType(expectedType);
-      });
-
-      it('should dispatch an action with the constant name', function () {
-        expect(actualAction).to.exist;
-      });
-
-      it('should pass through all the arguments', function () {
-        expect(actualAction.arguments).to.eql([expectedArg1, expectedArg2]);
-      });
     });
   });
 
