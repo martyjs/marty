@@ -1,4 +1,4 @@
-var _ = require('lodash-node');
+var _ = require('lodash');
 
 function MockDispatcher() {
   this.dispatch = dispatch;

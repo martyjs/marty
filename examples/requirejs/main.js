@@ -1,6 +1,6 @@
 require.config({
   paths: {
-    marty: '../../dist/marty',
+    marty: '../../dist/browser/marty',
     react: '../../node_modules/react/dist/react'
   }
 });

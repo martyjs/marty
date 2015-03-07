@@ -140,6 +140,9 @@ describe('Component', function () {
         [expectedId]: expectedState.foo
       });
 
+      RootComponent.contextTypes = Marty.Component.contextTypes;
+      ContextComponent.contextTypes = Marty.Component.contextTypes;
+
       Component = TestUtils.renderIntoDocument(
         React.createElement(ContextComponent, {
           context: context,
