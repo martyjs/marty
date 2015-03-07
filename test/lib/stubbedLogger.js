@@ -1,5 +1,5 @@
 var sinon = require('sinon');
-var _ = require('underscore');
+var _ = require('lodash');
 var logger = require('../../logger');
 
 function stubbedLogger() {

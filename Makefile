@@ -28,9 +28,9 @@ release: test
 
 build: lint
 	@mkdir -p dist
-	@$(BIN)/browserify --require ./index.js  --standalone Marty > dist/marty.js
-	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
-	@gzip dist/marty.min.js -c > dist/marty.min.js.gz
+	@$(BIN)/browserify --plugin bundle-collapser/plugin --require ./index.js --standalone Marty > dist/marty.js
+	@cat dist/marty.js | $(BIN)/uglifyjs -m -c "comparisons=false,keep_fargs=true,unsafe=true,unsafe_comps=true,warnings=false" -b "ascii_only=true,beautify=false" -o dist/marty.min.js
+	@gzip --best dist/marty.min.js -c > dist/marty.min.js.gz
 
 docs: bootstrap-ruby
 	@cd docs && bundle exec jekyll serve -w
