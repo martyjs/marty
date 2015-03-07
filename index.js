@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('./lib/utils/mindash');
 var state = require('./lib/state');
 var create = require('./lib/create');
 var Dispatcher = require('./lib/dispatcher');

@@ -66,10 +66,11 @@
   },
   "homepage": "https://martyjs.org",
   "dependencies": {
+    "bundle-collapser": "^1.0.0",
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",
     "reactify": "^1.0.0",
-    "underscore": "^1.7.0"
+    "lodash": "^3.0.0"
   }
 }

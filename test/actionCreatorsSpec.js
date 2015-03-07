@@ -1,5 +1,5 @@
 var sinon = require('sinon');
-var _ = require('underscore');
+var _ = require('lodash');
 var expect = require('chai').expect;
 var Store = require('../lib/store');
 var constants = require('../lib/constants');
@@ -75,7 +75,7 @@ describe('ActionCreators', function () {
       });
 
       it('should pass all properties through', function () {
-        var actualProperties = _.pick(actualAction, Object.keys(expectedProperties));
+        var actualProperties = _.pick(actualAction, _.keys(expectedProperties));
         expect(actualProperties).to.eql(expectedProperties);
       });
     });

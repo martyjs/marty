@@ -1,5 +1,5 @@
 var sinon = require('sinon');
-var _ = require('underscore');
+var _ = require('lodash');
 var Marty = require('../index');
 var expect = require('chai').expect;
 var Promise = require('es6-promise').Promise;
