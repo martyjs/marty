@@ -19,7 +19,8 @@ app.use(function (req, res, next) {
     res.json({
       method: method,
       url: req.url,
-      body: req.body
+      body: req.body,
+      accept: req.headers['accept']
     }).end();
   });
 });
