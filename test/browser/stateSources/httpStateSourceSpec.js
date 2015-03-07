@@ -11,7 +11,7 @@ require('es6-promise').polyfill();
 describeStyles('HttpStateSource', function (styles) {
   this.timeout(10000);
 
-  var API, baseUrl, response, xmlContentType;
+  var API, baseUrl, response, xmlContentType, accept;
   var hook1, hook2, hook3, executionOrder, jsonContentType;
 
   beforeEach(function () {
@@ -237,6 +237,67 @@ describeStyles('HttpStateSource', function (styles) {
     });
   });
 
+  describe('#dataType', function () {
+
+    describe('json', function () {
+      beforeEach(function () {
+        return requestDataType('json');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('application/json');
+      });
+    });
+
+    describe('xml', function () {
+      beforeEach(function () {
+        return requestDataType('xml');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('application/xml, text/xml');
+      });
+    });
+
+    describe('text', function () {
+      beforeEach(function () {
+        return requestDataType('text');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('text/plain');
+      });
+    });
+
+
+    describe('html', function () {
+      beforeEach(function () {
+        return requestDataType('html');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('text/html');
+      });
+    });
+
+    describe('script', function () {
+      beforeEach(function () {
+        return requestDataType('script');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('text/javascript, application/javascript, application/x-javascript');
+      });
+    });
+
+    function requestDataType(dataType) {
+      return makeRequest('get', {
+        url: 'bars/baz',
+        dataType: dataType
+      });
+    }
+  });
+
   describe('#put()', function () {
     describe('when you pass in a url', function () {
       beforeEach(function () {
@@ -448,6 +509,8 @@ describeStyles('HttpStateSource', function (styles) {
 
   function storeResponse(res) {
     response = res.body;
+    accept = response.accept;
+    delete response.accept;
   }
 
   function makeRequest(method) {
