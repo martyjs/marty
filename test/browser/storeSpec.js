@@ -570,7 +570,7 @@ describeStyles('Store', function (styles, currentStyle) {
           testActionCreators = Marty.createActionCreators({
             id: 'test',
             sum: function () {
-              this.dispatch(2);
+              this.dispatch('SUM', 2);
             }
           });
 
@@ -615,7 +615,7 @@ describeStyles('Store', function (styles, currentStyle) {
         es6: function () {
           class TestActionCreators extends Marty.ActionCreators {
             sum() {
-              this.dispatch(2);
+              this.dispatch('SUM', 2);
             }
           }
 
@@ -770,7 +770,7 @@ describeStyles('Store', function (styles, currentStyle) {
             ActionCreators = Marty.createActionCreators({
               id: 'rollbacks',
               add: function (user) {
-                var action = this.dispatch(user);
+                var action = this.dispatch('ADD', user);
 
                 interimState = _.clone(Store.getState());
 
@@ -798,7 +798,7 @@ describeStyles('Store', function (styles, currentStyle) {
           es6: function () {
             class TestActionCreators extends Marty.ActionCreators {
               add(user) {
-                var action = this.dispatch(user);
+                var action = this.dispatch('ADD', user);
 
                 interimState = _.clone(Store.getState());
 

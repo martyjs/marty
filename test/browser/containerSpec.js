@@ -5,11 +5,12 @@ var uuid = require('../../lib/utils/uuid');
 var Dispatcher = require('../../lib/dispatcher');
 
 describe('Container', function () {
-  var container, action, id, context, expectedId;
+  var container, action, query, id, context, expectedId;
   var defaultDispatcher, defaultActionHandler, sandbox, Marty;
 
   beforeEach(function () {
     id = 'foo';
+    query = sinon.spy();
     action = sinon.spy();
     expectedId = uuid.generate();
     sandbox = sinon.sandbox.create();
@@ -54,7 +55,7 @@ describe('Container', function () {
       actionCreators = Marty.createActionCreators({
         id: 'registerStoreActionCreators',
         addFoo: function (foo) {
-          this.dispatch(foo);
+          this.dispatch('ADD_FOO', foo);
         }
       });
 
@@ -277,6 +278,80 @@ describe('Container', function () {
           expect(actualActionCreator).to.be.defined;
           actualActionCreator.foo();
           expect(action).to.be.called;
+        });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
+        });
+      });
+    });
+  });
+
+  describe('queries', function () {
+    describe('registerQueries', function () {
+      var expectedQueries, actualQueries, defaultQueries;
+
+      beforeEach(function () {
+        expectedQueries = {
+          id: id,
+          displayName: 'Foo',
+          foo: query
+        };
+      });
+
+      describe('when I register queries with an Id', function () {
+        beforeEach(function () {
+          defaultQueries = Marty.createQueries(expectedQueries);
+        });
+
+        it('should be able to create an instance of it', function () {
+          actualQueries = container.resolveQueries(expectedQueries.id);
+          expect(actualQueries).to.be.defined;
+          actualQueries.foo();
+          expect(query).to.be.called;
+        });
+
+        it('should return a defaultQueries', function () {
+          context = container.createContext();
+          defaultQueries.foo();
+          defaultQueries.for(context).foo();
+
+          expect(query).to.be.calledTwice;
+        });
+      });
+
+      describe('when queries doesnt have an Id or displayName', function () {
+        beforeEach(function () {
+          delete expectedQueries.id;
+          delete expectedQueries.displayName;
+          warnings.classDoesNotHaveAnId = false;
+          Marty.createQueries(expectedQueries);
+        });
+
+        it('should generate an Id for it', function () {
+          actualQueries = container.resolveQueries(expectedId);
+          expect(actualQueries).to.be.defined;
+          actualQueries.foo();
+          expect(query).to.be.called;
+        });
+
+        afterEach(function () {
+          warnings.classDoesNotHaveAnId = true;
+        });
+      });
+
+      describe('when queries only has a display name', function () {
+        beforeEach(function () {
+          delete expectedQueries.id;
+          warnings.classDoesNotHaveAnId = false;
+          Marty.createQueries(expectedQueries);
+        });
+
+        it('should use the displayName as an Id', function () {
+          actualQueries = container.resolveQueries(expectedQueries.displayName);
+          expect(actualQueries).to.be.defined;
+          actualQueries.foo();
+          expect(query).to.be.called;
         });
 
         afterEach(function () {

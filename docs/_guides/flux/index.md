@@ -22,11 +22,8 @@ var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
   id: 'UserActionCreators',
-  types: {
-    updateUserEmail: UserConstants.UPDATE_USER_EMAIL
-  },
   updateUserEmail: function (userId, email) {
-    this.dispatch(userId, email);
+    this.dispatch(UserConstants.UPDATE_USER_EMAIL, userId, email);
   }
 });
 
@@ -37,14 +34,8 @@ es6
 var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
 
 class UserActionCreators extends Marty.ActionCreators {
-  constructor(options) {
-    super(options);
-    this.types = {
-      updateUserEmail: UserConstants.UPDATE_USER_EMAIL
-    };
-  }
   updateUserEmail(userId, email) {
-    this.dispatch(userId, email);
+    this.dispatch(UserConstants.UPDATE_USER_EMAIL, userId, email);
   }
 }
 

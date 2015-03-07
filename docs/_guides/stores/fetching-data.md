@@ -51,7 +51,7 @@ class UserStore extends Marty.Store {
 
 When you call fetch, Marty will first try calling the ``locally`` function. It the state is present in the store then it's returned and the fetch will finish executing. If the store can't find the state locally it should return ``undefined``. This causes the fetch function to invoke ``remotely``. Once ``remotely`` has finished executing then fetch will then re-execute the ``locally`` function with the expectation that the state is now in the store. If it isn't then the fetch will fail with a "Not found" error. If the ``remotely`` function needs to get the state asynchronously you can return a promise. The fetch function will wait for the promise to be resolved before re-executing ``locally``.
 
-Using the example of getting a user, you would have a UserAPI (Which is an [HTTP State Source](/guides/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should push the user into the store with a [source action creator](/guides/action-creators/source-action-creators.html). You then return this promise chain to ``remotely``.
+Using the example of getting a user, you would have a UserAPI (Which is an [HTTP State Source](/guides/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should dispatch the state. You then return this promise chain to ``remotely``.
 
 {% sample %}
 classic
@@ -65,19 +65,11 @@ var UserAPI = Marty.createStateSource({
   type: 'http',
   id: 'UserAPI',
   getUser: function (userId) {
-    return this.get('http://jsonplaceholder.typicode.com/users/' + userId).then(function (res) {
-      UserSourceActionCreators.receiveUser(res.body);
-    });
-  }
-});
-
-var UserSourceActionCreators = Marty.createActionCreators({
-  id: 'UserSourceActionCreators',
-  types: {
-    receiveUser: UserConstants.RECEIVE_USER
-  },
-  receiveUser: function (user) {
-    this.dispatch(user);
+    return this
+      .get('http://jsonplaceholder.typicode.com/users/' + userId)
+      .then(function (res) {
+        this.dispatch(UserConstants.RECEIVE_USER, res.body);
+      }.bind(this));
   }
 });
 
@@ -119,21 +111,9 @@ var UserConstants = Marty.createConstants([
 
 class UserAPI extends Marty.HttpStateSource {
   getUser(userId) {
-    return this.get('http://jsonplaceholder.typicode.com/users/' + userId).then((res) => {
-      UserSourceActionCreators.receiveUser(res.body);
-    });
-  }
-}
-
-class UserSourceActionCreators extends Marty.ActionCreators {
-  constructor(options) {
-    super(options);
-    this.types = {
-      receiveUser: UserConstants.RECEIVE_USER
-    }
-  }
-  receiveUser(user) {
-    this.dispatch(user);
+    return this
+      .get('http://jsonplaceholder.typicode.com/users/' + userId)
+      .then((res) => this.dispatch(UserConstants.RECEIVE_USER, res.body));
   }
 }
 
