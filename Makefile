@@ -45,7 +45,7 @@ build-server:
 
 build-browser:
 	@mkdir -p dist/browser
-	@$(BIN)/browserify  --transform babelify --plugin bundle-collapser/plugin --require ./index.js --exclude react --standalone Marty > dist/browser/marty.js
+	@$(BIN)/browserify  --transform babelify --plugin bundle-collapser/plugin --require ./marty.js --exclude react --standalone Marty > dist/browser/marty.js
 	@cat dist/browser/marty.js | $(BIN)/uglifyjs -m -c "comparisons=false,keep_fargs=true,unsafe=true,unsafe_comps=true,warnings=false" -b "ascii_only=true,beautify=false" -o dist/browser/marty.min.js
 	@gzip --best dist/browser/marty.min.js -c > dist/browser/marty.min.js.gz
 
