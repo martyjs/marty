@@ -11,12 +11,14 @@ require('es6-promise').polyfill();
 describeStyles('HttpStateSource', function (styles) {
   this.timeout(10000);
 
-  var API, baseUrl, response;
-  var hook1, hook2, hook3, executionOrder;
+  var API, baseUrl, response, xmlContentType;
+  var hook1, hook2, hook3, executionOrder, jsonContentType;
 
   beforeEach(function () {
     baseUrl = '/stub/';
     warnings.classDoesNotHaveAnId = false;
+    xmlContentType = 'application/xml';
+    jsonContentType = 'application/json';
   });
 
   afterEach(function () {
@@ -221,6 +223,7 @@ describeStyles('HttpStateSource', function (styles) {
       beforeEach(function () {
         return makeRequest('get', {
           url: 'bars/baz',
+          contentType: xmlContentType
         });
       });
 
@@ -257,7 +260,8 @@ describeStyles('HttpStateSource', function (styles) {
 
         return makeRequest('put', {
           url: 'bars/baz',
-          body: expectedBody
+          body: expectedBody,
+          contentType: jsonContentType
         });
       });
 
@@ -294,7 +298,8 @@ describeStyles('HttpStateSource', function (styles) {
 
         return makeRequest('post', {
           url: 'bars/baz',
-          body: expectedBody
+          body: expectedBody,
+          contentType: jsonContentType
         });
       });
 

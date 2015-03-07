@@ -47,7 +47,8 @@ var UsersAPI = Marty.createStateSource({
     this.request({
       url: '/users',
       method: 'POST',
-      body: { name: 'foo' }
+      body: { name: 'foo' },
+      contentType: 'application/json'
     });
   }
 });
