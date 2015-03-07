@@ -1,6 +1,6 @@
 var fs = require('fs');
+var _ = require('lodash');
 var yaml = require('js-yaml');
-var _ = require('lodash-node');
 
 module.exports = function (config) {
   process.env.NODE_ENV = 'test';
@@ -86,7 +86,7 @@ module.exports = function (config) {
   function local() {
     return _.extend(base(), {
       reporters: ['spec'],
-      browsers: ['ChromeCanary'],
+      browsers: ['Chrome'],
       autoWatch: true,
       singleRun: false,
       colors: true

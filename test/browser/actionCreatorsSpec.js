@@ -1,5 +1,5 @@
 var sinon = require('sinon');
-var _ = require('underscore');
+var _ = require('lodash');
 var expect = require('chai').expect;
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
@@ -505,7 +505,7 @@ describe('ActionCreators', function () {
   });
 
   describe('#getActionType()', function () {
-    it('should return the function name as upper case with underscores', function () {
+    it('should return the function name as upper case with lodashs', function () {
       expect(actionCreators.getActionType('fooBarBaz')).to.equal('FOO_BAR_BAZ');
     });
   });

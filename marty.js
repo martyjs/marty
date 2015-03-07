@@ -1,9 +1,9 @@
 require('es6-promise').polyfill();
 
-var _ = require('underscore');
 var state = require('./lib/state');
 var create = require('./lib/create');
 var logger = require('./lib/logger');
+var _ = require('./lib/utils/mindash');
 var dispose = require('./lib/dispose');
 var classes = require('./lib/classes');
 var warnings = require('./lib/warnings');

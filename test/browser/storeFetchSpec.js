@@ -1,5 +1,5 @@
 var sinon = require('sinon');
-var _ = require('underscore');
+var _ = require('lodash');
 var Marty = require('../../marty');
 var expect = require('chai').expect;
 var warnings = require('../../lib/warnings');
