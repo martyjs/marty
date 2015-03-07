@@ -13,8 +13,11 @@ Say your view wants to load a user from the ``UserStore``. Internally the store 
 2. **locally** A function which tries to find the required state in the stores state (if its present)
 3. **remotely** A function which tries to get the required state from a state source (if not present)
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserStore = Marty.createStore({
+  id: 'UsersStore',
   getUser: function (userId) {
     return this.fetch({
       id: userId,
@@ -22,39 +25,56 @@ var UserStore = Marty.createStore({
         return this.state[userId];
       },
       remotely: function () {
-        return UserHttpAPI.getUser(userId)
+        return UserAPI.getUser(userId)
       }
     });
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UserStore extends Marty.Store {
+  getUser(userId) {
+    return this.fetch({
+      id: userId,
+      locally: function () {
+        return this.state[userId];
+      },
+      remotely: function () {
+        return UserAPI.getUser(userId)
+      }
+    });
+  }
+}
+
+{% endsample %}
 
 When you call fetch, Marty will first try calling the ``locally`` function. It the state is present in the store then it's returned and the fetch will finish executing. If the store can't find the state locally it should return ``undefined``. This causes the fetch function to invoke ``remotely``. Once ``remotely`` has finished executing then fetch will then re-execute the ``locally`` function with the expectation that the state is now in the store. If it isn't then the fetch will fail with a "Not found" error. If the ``remotely`` function needs to get the state asynchronously you can return a promise. The fetch function will wait for the promise to be resolved before re-executing ``locally``.
 
-Using the example of getting a user, you would have a UserHttpAPI (Which is an [HTTP State Source](/guides/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should push the user into the store with a [source action creator](/guides/action-creators/source-action-creators.html). You then return this promise chain to ``remotely``.
+Using the example of getting a user, you would have a UserAPI (Which is an [HTTP State Source](/guides/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should dispatch the state. You then return this promise chain to ``remotely``.
 
-{% highlight js %}
-var UserHttpAPI = Marty.createStateSource({
-  type: 'http',
-  getUser: function (userId) {
-    return this.get('http://jsonplaceholder.typicode.com/users/' + userId).then(function (res) {
-      UserSourceActionCreators.receiveUser(res.body);
-    });
-  }
-});
-
+{% sample %}
+classic
+=======
 var UserConstants = Marty.createConstants([
   'RECEIVE_USER',
   'USER_NOT_FOUND'
 ]);
 
-var UserSourceActionCreators = Marty.createActionCreators({
-  receiveUser: UserConstants.RECEIVE_USER(function (user) {
-    this.dispatch(user);
-  })
+var UserAPI = Marty.createStateSource({
+  type: 'http',
+  id: 'UserAPI',
+  getUser: function (userId) {
+    return this
+      .get('http://jsonplaceholder.typicode.com/users/' + userId)
+      .then(function (res) {
+        this.dispatch(UserConstants.RECEIVE_USER, res.body);
+      }.bind(this));
+  }
 });
 
 var UserStore = Marty.createStore({
+  id: 'UsersStore',
   handlers: {
     addUser: UserConstants.RECEIVE_USER,
     removeUser: UserConstants.USER_NOT_FOUND
@@ -73,7 +93,7 @@ var UserStore = Marty.createStore({
         return this.state[userId];
       },
       remotely: function () {
-        return UserHttpAPI.getUser(userId)
+        return UserAPI.getUser(userId)
       }
     });
   },
@@ -81,11 +101,57 @@ var UserStore = Marty.createStore({
     // ...
   }
 });
-{% endhighlight %}
+
+es6
+===
+var UserConstants = Marty.createConstants([
+  'RECEIVE_USER',
+  'USER_NOT_FOUND'
+]);
+
+class UserAPI extends Marty.HttpStateSource {
+  getUser(userId) {
+    return this
+      .get('http://jsonplaceholder.typicode.com/users/' + userId)
+      .then((res) => this.dispatch(UserConstants.RECEIVE_USER, res.body));
+  }
+}
+
+class UserStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.state = {};
+    this.handlers = {
+      addUser: UserConstants.RECEIVE_USER,
+      removeUser: UserConstants.USER_NOT_FOUND
+    };
+  }
+  addUser(user) {
+    this.state[user.id] = user;
+    this.hasChanged();
+  }
+  getUser(userId) {
+    return this.fetch({
+      id: userId,
+      locally: function () {
+        return this.state[userId];
+      },
+      remotely: function () {
+        return UserAPI.getUser(userId)
+      }
+    });
+  }
+  removeUser(userId) {
+    // ...
+  }
+}
+{% endsample %}
 
 The result of the fetch function is a [fetch result](/api/stores/#fetch-result) which represents the current state of the fetch. A fetch can either be **PENDING**, **FAILED** or **DONE** (``fetch.status``). If a fetch has failed then the result will have the error (``fetch.error``) and if done it will have the result (``fetch.result``). Your views normally have to deal with each state of a fetch so the fetch result has a ``when()`` function which allows you to render different views for each state
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserStateMixin = Marty.createStateMixin({
   listenTo: UserStore,
   getState: function () {
@@ -111,4 +177,31 @@ var User = React.createClass({
     })
   }
 });
-{% endhighlight %}
+
+es6
+===
+class User extends Marty.Component {
+  constructor(props, context) {
+    super(props, context);
+    this.listenTo = UserStore;
+  }
+  render() {
+    return this.state.user.when({
+      pending: function () {
+        return <div class="user-loading">Loading...</div>;
+      },
+      failed: function (error) {
+        return <div class="user-error">{error.message}</div>;
+      },
+      done: function (user) {
+        return <div className="user">{user.name}</div>;
+      }
+    })
+  }
+  getState() {
+    return {
+      user: UserStore.getUser(this.props.id)
+    };
+  }
+}
+{% endsample %}

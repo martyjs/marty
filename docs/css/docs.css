@@ -1474,7 +1474,17 @@ h1[id] {
 .zero-clipboard {
   position: relative;
   display: none;
+  float: right;
 }
+
+.sample .btn:first-child {
+  border-top-left-radius: 0;
+}
+
+.sample .btn:last-child {
+  border-bottom-right-radius: 0;
+}
+
 .btn-clipboard {
   position: absolute;
   top: 0;

@@ -1,9 +1,9 @@
 var fs = require('fs');
+var _ = require('lodash');
 var yaml = require('js-yaml');
-var _ = require('lodash-node');
 
 module.exports = function (config) {
-  process.env.NODE_ENV = 'test'
+  process.env.NODE_ENV = 'test';
 
   switch (process.env.ENV) {
     case 'CI':
@@ -98,21 +98,21 @@ module.exports = function (config) {
       basePath: '',
       frameworks: ['mocha', 'browserify'],
       browserify: {
-        transform: ['reactify'],
+        transform: ['babelify'],
         debug: true
       },
       files: [
-        'index.js',
+        'marty.js',
         'lib/*.js',
-        'test/**/*.js'
+        'test/browser/**/*.js'
       ],
       exclude: [
-        'test/lib/mockServer/*'
+        'test/browser/lib/mockServer.js'
       ],
       preprocessors: {
         'lib/*': ['browserify'],
-        'index.js': ['browserify'],
-        'test/**/*.js': ['browserify']
+        'marty.js': ['browserify'],
+        'test/browser/**/*.js': ['browserify']
       },
       port: 9876,
       proxies: {

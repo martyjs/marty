@@ -1,1 +1,1 @@
-module.exports = require('./lib/fetch');
+module.exports = require('./lib/store/fetchResult');

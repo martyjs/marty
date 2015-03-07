@@ -4,28 +4,35 @@ title: Action Creators API
 id: api-action-creators
 section: Action Creators
 ---
-<h2 id="createActionCreators">Marty.createActionCreators(props)</h2>
-
-To create some new action creators, you call <code>Marty.createActionCreators</code> passing in an object literal. It returns your action creators as a singleton.
-
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UserActionCreators = Marty.createActionCreators({
-  addUser: UserActions.ADD_USER(function (name, email) {
-    this.dispatch(name, email);
-  })
+  id: 'UserActionCreators',
+  addUser: function (name, email) {
+    this.dispatch(UserActions.ADD_USER, name, email);
+  }
 });
-{% endhighlight %}
 
-<div class="alert alert-warning" role="alert">
-  <strong>Warning!</strong> Please avoid using es6 arrow syntax for your callbacks since they are bound to the current context.
-</div>
+es6
+===
+class UserActionCreators extends Marty.ActionCreators {
+  addUser(name, email) {
+    this.dispatch(UserActions.ADD_USER, name, email);
+  }
+}
+{% endsample %}
+
+<h2 id="id">id</h2>
+
+A unique identifier (*required*). Used for registration within the container.
 
 <h2 id="displayName">displayName</h2>
 
-An (optional) display name for the action creator. Used for richer debugging.
+An (optional) display name for the action creator. Used for richer debugging. We will use the Id if displayName hasn't been set. If you're using ES6 classes, displayName will automatically be the name of the class.
 
-<h2 id="dispatch">dispatch([...])</h2>
+<h2 id="dispatch">dispatch(type, [...])</h2>
 
-Dispatches an action payload. Any [action handlers](/api/stores/index.html#handleAction) will be invoked with the given action handlers.
+Dispatches an action payload with the given type. Any [action handlers](/api/stores/index.html#handleAction) will be invoked with the given action handlers.
 
 Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.

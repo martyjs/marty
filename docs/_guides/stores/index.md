@@ -11,9 +11,11 @@ All of a store's state should live within ``Store#state``. If you want to update
 
 When you create a store it will automatically start listening to the dispatcher. To determine which actions to handle you define the [handlers](/api/stores/#handlers) hash. The keys in handlers are the functions you wish to call when an action comes in and the values are [action predicates](/api/stores/#action-predicates) (Normally the constant of the action's type). If your store does handle the action, then the arguments you passed to [ActionCreator#dispatch](/api/action-creators/index.html#dispatch) are the arguments for the handler.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
-  displayName: 'Users',
+  id: 'UserStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -30,12 +32,37 @@ var listener = UsersStore.addChangeListener(function () {
   console.log('Users store changed');
   listener.dispose();
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.state = {};
+    this.handlers = {
+      addUser: Constants.RECEIVE_USER
+    };
+  }
+  addUser(user) {
+    this.state[user.id] = user;
+    this.hasChanged();
+  }
+}
+
+var listener = UsersStore.addChangeListener(function () {
+  console.log('Users store changed');
+  listener.dispose();
+});
+
+{% endsample %}
 
 Often action creators optimistically dispatch an action before connecting to a state source. So what should you do if that action fails? Action creators will emit actions of  type ``ACTION_FAILED`` and ``{Action Type}_FAILED`` which your store can handle. Alternatively you can return a function from an action handler which will be called if the action fails or if the [action rolled back](/api/stores/index.html#rollback).
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UsersStore',
   addUser: function (user) {
     this.state[user.id] = user;
     this.hasChanged();
@@ -47,4 +74,19 @@ var UsersStore = Marty.createStore({
     }
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  addUser(user) {
+    this.state[user.id] = user;
+    this.hasChanged();
+
+    return function (error) {
+      this.state.errors[user.id] = error;
+      delete this.state[user.id];
+      this.hasChanged();
+    }
+  }
+}
+{% endsample %}

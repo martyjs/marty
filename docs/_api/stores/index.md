@@ -5,29 +5,48 @@ title: Stores API
 section: Stores
 ---
 
-<h2 id="createStore">Marty.createStore(props)</h2>
-
-To create a new store, you call <code>Marty.createStore</code> passing in a set of instance properties. It returns a singleton store which is listening to the dispatcher.
-
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
-  displayName: 'Users',
+  id: 'UsersStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
+  },
+  getInitialState: function () {
+    return [];
   },
   addUser: function (user) {
     this.state.push(user);
     this.hasChanged();
-  },
-  getInitialState: function () {
-    return [];
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.state = [];
+    this.handlers = {
+      addUser: Constants.RECEIVE_USER
+    };
+  }
+  addUser(user) {
+    this.state.push(user);
+    this.hasChanged();
+  }
+}
+
+{% endsample %}
+
+<h2 id="id">id</h2>
+
+A unique identifier (*required*). Used for registration within the container and (de)hydration.
 
 <h2 id="displayName">displayName</h2>
 
-An (optional) display name for the store. Used for richer debugging.
+An (optional) display name for the action creator. Used for richer debugging. We will use the Id if displayName hasn't been set. If you're using ES6 classes, displayName will automatically be the name of the class.
 
 <h2 id="handlers">handlers</h2>
 
@@ -35,8 +54,11 @@ The <code>handlers</code> property is used to define which handlers should be ca
 
 When invoked the handlers arguments are [the arguments passed to the dispatcher](/api/action-creators/index.html#dispatch). The original action is available by calling <code>this.action</code>.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UsersStore'
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -48,33 +70,61 @@ var UsersStore = Marty.createStore({
     ...
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.state = {};
+    this.handlers = {
+      addUser: Constants.RECEIVE_USER
+    };
+  }
+  addUser: function (user) {
+    console.log(this.action) // { type: 'RECEIVE_USER', arguments: [{ name: ...}] }
+    ...
+  }
+}
+{% endsample %}
 
 <h3 id="action-predicates">Action predicates</h3>
 
 An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="http://underscorejs.org/#findWhere">where query</a>. Some examples of action predicates:
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UserStore',
   handlers: {
     foo: UserConstants.ADD_USER,
-    bar: [UserConstants.ADD_USER, 'UPDATE_USER'],
-    baz: { source: 'VIEW' },
-    bam: [{ source: 'VIEW' }, 'USER_DELETED']
+    bar: [UserConstants.ADD_USER, 'UPDATE_USER']
   },
   // called when action.type == 'ADD_USER'
   foo: function () { .. },
 
   // called when action.type == 'ADD_USER' || action.type ==  'UPDATE_USER'
-  bar: function () { .. },
-
-  // called when action.source == 'VIEW'
-  baz: function () { .. },
-
-  // called when action.source == 'VIEW' || action.type ==  'USER_DELETED'
-  bam: function () { .. }
+  bar: function () { .. }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.handlers = {
+      foo: UserConstants.ADD_USER,
+      bar: [UserConstants.ADD_USER, 'UPDATE_USER']
+    };
+  }
+  // called when action.type == 'ADD_USER'
+  foo() { .. },
+
+  // called when action.type == 'ADD_USER' || action.type ==  'UPDATE_USER'
+  bar() { .. }
+}
+{% endsample %}
 
 <h3 id="rollback">Rollback</h3>
 
@@ -82,8 +132,11 @@ There are a number of cases where it would be useful to be able to rollback an a
 
 To provide a rollback to an action handler, simply return a function from the action handler. If an action is rolled back, the function you return will be called.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UserStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -97,33 +150,101 @@ var UsersStore = Marty.createStore({
     return function rollback() {
       this.state.splice(this.state.indexOf(user), 1);
       this.hasChanged();
-    };
+    }
   }
 });
-{% endhighlight %}
 
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.state = {};
+    this.handlers = {
+      addUser: Constants.RECEIVE_USER
+    };
+  },
+  addUser(user) {
+    this.state.push(user);
+    this.hasChanged();
+
+    return function rollback() {
+      this.state.splice(this.state.indexOf(user), 1);
+      this.hasChanged();
+    }
+  }
+}
+{% endsample %}
 
 <h2 id="getInitialState">getInitialState()</h2>
 
-<code>getInitialState</code> (*required*) is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the [state](#state) property.
+<h3>Classic</h3>
+<code>getInitialState</code> (<i>required</i>) is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the [state](#state) property.
+
+<h3>ES6</h3>
+<code>getInitialState</code> is no longer necessary, instead you should set the state in the constructor.
 
 <h2 id="state">state</h2>
 
 The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.
 
-If you want to change the state to a new instance (or if you are using [immutable data collections](/guides/stores/immutable-data-collections.html)) you can set the states value or call <code>this.setState(state)</code>
+If you want to change the state to a new instance (or if you are using [immutable data collections](/guides/stores/immutable-data-collections.html)) you can set the states value.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 addUsers: function (users) {
   this.state = this.state.concat(users);
-
-  // or
-
-  this.setState(this.state.concat(users));
 }
-{% endhighlight %}
+
+es6
+===
+addUsers(users) {
+  this.state = this.state.concat(users);
+}
+{% endsample %}
 
 If the new state does not equal the current state then [hasChanged](#hasChanged) will be called after updating the stores state.
+
+<h2 id="replaceState">replaceState(nextState)</h2>
+
+Replace the nextState with the current state. Same as setting <code>this.state</code>. Triggers [hasChanged](#hasChanged) if the new state is different.
+
+{% sample %}
+classic
+=======
+addUsers: function (users) {
+  this.replaceState(_.extend(users, this.state));
+}
+
+es6
+===
+addUsers(users) {
+  this.replaceState(_.extend(users, this.state));
+}
+{% endsample %}
+
+<h2 id="setState">setState(nextState)</h2>
+
+Merges nextState with the current state. Triggers [hasChanged](#hasChanged).
+
+{% sample %}
+classic
+=======
+addUser: function (user) {
+  var nextState = {};
+  nextState[user.id] = user;
+  this.setState(nextState);
+}
+
+es6
+===
+addUser(user) {
+  this.setState({
+    [user.id]: user
+  });
+}
+{% endsample %}
 
 <h2 id="addChangeListener">addChangeListener(callback, [context])</h2>
 
@@ -146,8 +267,11 @@ listener.dispose();
 
 Calls any [registered callbacks](#addChangeListener).
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UserStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -156,14 +280,33 @@ var UsersStore = Marty.createStore({
     this.hasChanged();
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.state = {};
+    this.handlers = {
+      addUser: Constants.RECEIVE_USER
+    };
+  }
+  addUser(user) {
+    this.state.push(user);
+    this.hasChanged();
+  }
+}
+{% endsample %}
 
 <h2 id="fetch">fetch(options)</h2>
 
 When requesting data from a store we should assume that it might require an async operation. <code>Store#fetch</code> provides a simple syntax that allows you to encapsulate that asynchronicity in a flux way. The <code>fetch</code> function allows you to specify how to get the state locally and remotely and returns an object that represents the current state of that request.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UserStore',
   getUser: function (id) {
     return this.fetch({
       id: api-id,
@@ -188,7 +331,35 @@ UsersStore.getUser(123).when({
     return <div className="user">{user.name}</div>;
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  getUser(id) {
+    return this.fetch({
+      id: id,
+      locally() {
+        return this.state[id];
+      },
+      remotely() {
+        return UserAPI.getUser(id);
+      }
+    });
+  }
+}
+
+UsersStore.getUser(123).when({
+  pending() {
+    return <div className="pending"/>;
+  },
+  failed(error) {
+    return <div className="error">{error.message}</div>;
+  },
+  done(user) {
+    return <div className="user">{user.name}</div>;
+  }
+});
+{% endsample %}
 
 If you need to wait for multiple fetch results to be finished, you can use ``when.all()``. You pass in an array of fetch results and it will execute the appropriate handler (e.g. if any of the handlers failed then it will execute the failed handler).
 
@@ -210,7 +381,6 @@ when.all([foo, bar], {
   }
 });
 {% endhighlight %}
-
 
 <h3>Options</h3>
 
@@ -260,8 +430,11 @@ when.all([foo, bar], {
 
 Often you're only concerned with fetching locally and remotely so you use the second function signature ``fetch(id, locally, remotely)``:
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UserStore',
   getUser: function (id) {
     return this.fetch(id,
       function () {
@@ -273,7 +446,18 @@ var UsersStore = Marty.createStore({
     });
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  getUser(id) {
+    return this.fetch(id,
+      () => return this.state[id],
+      () => return UserAPI.getUser(id)
+    );
+  }
+});
+{% endsample %}
 
 <h3 id="fetch-result">Fetch Result</h3>
 
@@ -429,8 +613,11 @@ when.join(fetch.done("foo"), fetch.done("bar"), {
 
 For when you want to know if you have already tried fetching something. Given a fetch Id it will return true or false depending on whether you have previously tried a fetch for that Id (Irrelevant of whether it was successful or not). Useful if you want to distinguish between an empty collection and needing to fetch state from a remote source.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UsersStores',
   getUsers: function () {
     return this.fetch(
       id: 'users',
@@ -445,7 +632,33 @@ var UsersStore = Marty.createStore({
     })
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  getUsers() {
+    return this.fetch(
+      id: 'users',
+      locally() {
+        if (this.hasAlreadyFetched('users')) {
+          return this.state;
+        }
+      },
+      remotely() {
+        return UsersHttpAPI.getAll()
+      }
+    });
+  }
+}
+{% endsample %}
+
+<h2 id="dehydrate">dehydrate()</h2>
+
+Should return the state of your store in a form that can be serialised to JSON. Used in conjunction with <a href="#rehydrate">rehydrate</a> for synchronising the state of a store on the server with its browser counterpart. If not implemented then Marty will attempt to serialise <code>this.state</code>.
+
+<h2 id="rehydrate">rehydrate(dehydratedState)</h2>
+
+Expects the store to deserialize the dehydrated state and initialise the store. Used in conjunction with <a href="#dehydrate">dehydrate</a> for synchronising the state of a store on the server with its browser counterpart. If not implemented then Marty will call <code>this.replaceState(dehydratedState)</code>.
 
 <h2 id="waitFor">waitFor(*stores)</h2>
 
@@ -453,8 +666,11 @@ If an action handler is dependant on another store having already processed the 
 
 You can also pass an array of dispatch tokens to waitFor.
 
-{% highlight js %}
+{% sample %}
+classic
+=======
 var UsersStore = Marty.createStore({
+  id: 'UsersStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -464,7 +680,23 @@ var UsersStore = Marty.createStore({
     this.hasChanged();
   }
 });
-{% endhighlight %}
+
+es6
+===
+class UsersStore extends Marty.Store {
+  constructor(options) {
+    super(options);
+    this.handlers = {
+      addUser: Constants.RECEIVE_USER
+    };
+  }
+  addUser(user) {
+    this.waitFor(FooStore, BarStore);
+    this.state.push(user);
+    this.hasChanged();
+  }
+}
+{% endsample %}
 
 <h2 id="#dispatchToken">dispatchToken</h2>
 
