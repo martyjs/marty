@@ -5,7 +5,7 @@ describe('Marty#register', function () {
 
   beforeEach(function () {
     expectedId = 'Foo';
-    Marty = require('../../index').createInstance();
+    Marty = require('../../marty').createInstance();
   });
 
   describe('Store', function () {

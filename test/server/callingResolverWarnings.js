@@ -1,13 +1,13 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var expect = require('chai').expect;
 var stubbedLogger = require('../lib/stubbedLogger');
 
-describe('calling resolver warnings', function () {
+describe.skip('calling resolver warnings', function () {
   var Marty, logger;
 
   beforeEach(function () {
     logger = stubbedLogger();
-    Marty = require('../../index').createInstance();
+    Marty = require('../../marty').createInstance();
   });
 
   afterEach(function () {

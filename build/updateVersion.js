@@ -8,7 +8,7 @@ var version = semver.inc(require('../package.json').version, inc);
 console.log(version)
 
 updateDocs();
-updateIndex();
+updateMarty();
 ['../package.json', '../bower.json'].forEach(updateConfig);
 
 function updateDocs() {
@@ -17,10 +17,10 @@ function updateDocs() {
   write('../docs/_config.yml', config);
 }
 
-function updateIndex() {
-  var index = read('../index.js');
-  index = index.replace(/version: '.*'/, util.format("version: '%s'", version));
-  write('../index.js', index);
+function updateMarty() {
+  var marty = read('../marty.js');
+  marty = marty.replace(/version: '.*'/, util.format("version: '%s'", version));
+  write('../marty.js', marty);
 }
 
 function updateConfig(path) {

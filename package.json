@@ -1,8 +1,9 @@
 {
   "name": "marty",
-  "version": "0.0.9-alpha",
+  "version": "0.9.0-alpha",
   "description": "A Javascript library for state management in React applications",
-  "main": "index.js",
+  "main": "dist/node/marty.js",
+  "browser": "marty.js",
   "directories": {
     "doc": "./doc",
     "lib": "./lib"
@@ -18,9 +19,16 @@
     "react",
     "flux"
   ],
+  "dependencies": {
+    "babel": "^4.7.1",
+    "babelify": "^5.0.4",
+    "bundle-collapser": "^1.0.0",
+    "es6-promise": "^2.0.0",
+    "flux": "^2.0.1",
+    "isomorphic-fetch": "1.6.0",
+    "lodash": "^3.0.0"
+  },
   "devDependencies": {
-    "babel": "^4.3.0",
-    "babelify": "^5.0.3",
     "bluebird": "^2.3.11",
     "body-parser": "^1.9.3",
     "browserify": "^5.12.0",
@@ -43,7 +51,6 @@
     "karma-mocha": "^0.1.9",
     "karma-sauce-launcher": "^0.2.10",
     "karma-spec-reporter": "0.0.13",
-    "lodash-node": "^2.4.1",
     "mocha": "^1.21.4",
     "mocha-spec-cov": "0.0.3",
     "react": "^0.13.0",
@@ -53,7 +60,7 @@
     "uglify-js": "^2.4.15"
   },
   "peerDependencies": {
-    "react": ">0.12.0"
+    "react": ">=0.13.0-rc2"
   },
   "author": "James Hollingworth",
   "licenses": [
@@ -70,11 +77,5 @@
       "babelify"
     ]
   },
-  "homepage": "https://martyjs.org",
-  "dependencies": {
-    "es6-promise": "^2.0.0",
-    "flux": "^2.0.1",
-    "isomorphic-fetch": "1.6.0",
-    "underscore": "^1.7.0"
-  }
+  "homepage": "https://martyjs.org"
 }

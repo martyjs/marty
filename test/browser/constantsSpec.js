@@ -1,13 +1,15 @@
 var sinon = require('sinon');
-var _ = require('underscore');
+var _ = require('lodash');
 var expect = require('chai').expect;
-var warnings = require('../../warnings');
+var warnings = require('../../lib/warnings');
 var constants = require('../../lib/constants');
 
 describe('Constants', function () {
-  var input, actualResult;
+  var input, actualResult, actionCreatorContext;
 
   beforeEach(function () {
+    actionCreatorContext = { dispatch: sinon.spy() };
+
     warnings.invokeConstant = false;
   });
 
@@ -29,12 +31,30 @@ describe('Constants', function () {
     });
 
     it('should create an object with the given keys', function () {
-      expect(Object.keys(actualResult)).to.eql(input);
+      expect(Object.keys(actualResult)).to.eql(typesWithVariations(['foo', 'bar']));
     });
 
     it('should create a function for each key', function () {
       input.forEach(function (key) {
         expect(actualResult[key]).to.be.instanceof(Function);
+      });
+    });
+
+    it('should add a key_{STARTING} key for each key', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key + '_STARTING']).to.be.instanceof(Function);
+      });
+    });
+
+    it('should add a key_{FAILED} key for each key', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key + '_FAILED']).to.be.instanceof(Function);
+      });
+    });
+
+    it('should add a key_{DONE} key for each key', function () {
+      input.forEach(function (key) {
+        expect(actualResult[key + '_DONE']).to.be.instanceof(Function);
       });
     });
 
@@ -49,7 +69,9 @@ describe('Constants', function () {
         var actionCreator, creatorFunction;
 
         beforeEach(function () {
-          creatorFunction = sinon.spy();
+          creatorFunction = sinon.spy(function (arg) {
+            this.dispatch(arg);
+          });
           actionCreator = actualResult.foo(creatorFunction);
         });
 
@@ -57,92 +79,42 @@ describe('Constants', function () {
           expect(actionCreator).to.be.instanceof(Function);
         });
 
-        it('should have creators type as a annotation', function () {
-          expect(actionCreator.annotations.type).to.eql('foo');
-        });
-
         describe('when I call the action creator', function () {
           var expectedArg;
           beforeEach(function () {
             expectedArg = 1;
 
-            actionCreator(expectedArg);
+            actionCreator.call(actionCreatorContext, expectedArg);
           });
 
           it('should have called the creator function', function () {
-            expect(creatorFunction).to.have.been.calledWith(expectedArg);
+            expect(actionCreatorContext.dispatch).to.have.been.calledWith('foo', expectedArg);
           });
         });
       });
 
       describe('when I dont pass in a function as the first argument', function () {
-        var actionCreator, actionCreatorContext;
+        var actionCreator;
 
         beforeEach(function () {
           actionCreator = actualResult.foo();
-          actionCreatorContext = { dispatch: sinon.spy() };
         });
 
         it('should create an action creator', function () {
           expect(actionCreator).to.be.instanceof(Function);
         });
 
-        it('should have creators type as a property', function () {
-          expect(actionCreator.annotations.type).to.eql('foo');
-        });
-
         describe('when I call the action creator', function () {
           var expectedArg1, expectedArg2;
           beforeEach(function () {
             expectedArg1 = 1;
-            expectedArg2 = 'foo';
+            expectedArg2 = 'bar';
 
             actionCreator.call(actionCreatorContext, expectedArg1, expectedArg2);
           });
 
           it('should have called the creator function', function () {
-            expect(actionCreatorContext.dispatch).to.have.been.calledWith(expectedArg1, expectedArg2);
-          });
-        });
-      });
-
-      describe('when I pass in an object literal as the first argument', function () {
-        var actionCreator, actionCreatorContext, customProperties;
-
-        beforeEach(function () {
-          customProperties = {
-            foo: 'bar',
-            bar: 'baz'
-          };
-          actionCreatorContext = { dispatch: sinon.spy() };
-          actionCreator = actualResult.foo(customProperties);
-        });
-
-        it('should create an action creator', function () {
-          expect(actionCreator).to.be.instanceof(Function);
-        });
-
-        it('should have creators type as a property', function () {
-          expect(actionCreator.annotations.type).to.eql('foo');
-        });
-
-        it('should include the custom annotations', function () {
-          _.each(customProperties, function (value, key) {
-            expect(actionCreator.annotations[key]).to.eql(value);
-          });
-        });
-
-        describe('when I call the action creator', function () {
-          var expectedArg1, expectedArg2;
-          beforeEach(function () {
-            expectedArg1 = 1;
-            expectedArg2 = 'foo';
-
-            actionCreator.call(actionCreatorContext, expectedArg1, expectedArg2);
-          });
-
-          it('should have called the creator function', function () {
-            expect(actionCreatorContext.dispatch).to.have.been.calledWith(expectedArg1, expectedArg2);
+            expect(actionCreatorContext.dispatch).to.have.been.calledWith('foo', expectedArg1, expectedArg2);
           });
         });
       });
@@ -161,8 +133,8 @@ describe('Constants', function () {
 
     it('should return an object of constants', function () {
       expect(Object.keys(actualResult)).to.eql(['foo', 'bim']);
-      expect(Object.keys(actualResult.foo)).to.eql(['bar', 'baz']);
-      expect(Object.keys(actualResult.bim)).to.eql(['bam']);
+      expect(Object.keys(actualResult.foo)).to.eql(typesWithVariations(['bar', 'baz']));
+      expect(Object.keys(actualResult.bim)).to.eql(typesWithVariations(['bam']));
     });
   });
 
@@ -183,8 +155,21 @@ describe('Constants', function () {
 
     it('should return an object of constants', function () {
       expect(Object.keys(actualResult.bim)).to.eql(['bam', 'top']);
-      expect(Object.keys(actualResult.bim.bam)).to.eql(['what']);
-      expect(Object.keys(actualResult.bim.top.flop)).to.eql(['bop', 'hot']);
+      expect(Object.keys(actualResult.bim.bam)).to.eql(typesWithVariations(['what']));
+      expect(Object.keys(actualResult.bim.top.flop)).to.eql(typesWithVariations(['bop', 'hot']));
     });
   });
+
+  function typesWithVariations(types) {
+    var res = [];
+
+    _.each(types, function (type) {
+      res.push(type);
+      res.push(type + '_STARTING');
+      res.push(type + '_DONE');
+      res.push(type + '_FAILED');
+    });
+
+    return res;
+  }
 });

@@ -9,7 +9,7 @@ section: Constants
 
 As your application grows you might find that it becomes littered with these strings, making it difficult to refactor and understand at a high level what actions are available. Marty provides **Constants** as a solution to this problem.
 
-``Marty.createConstants`` will create an object literal where the key is the action type. The value is also the action type.
+``Marty.createConstants`` will create an object literal where the key is the action type. The value is also the action type. We also create a few extra constants for you so that you can dispatch the various states an action can be in (e.g. starting, done, failed).
 
 {% highlight js %}
 var UserConstants = Marty.createConstants([
@@ -20,8 +20,19 @@ var UserConstants = Marty.createConstants([
 
 // returns
 {
-  ADD_USER: ..,
-  DELETE_USER: ..,
-  UPDATE_USER_EMAIL: ..,
+  ADD_USER: 'ADD_USER',
+  ADD_USER_STARTING: 'ADD_USER_STARTING',
+  ADD_USER_DONE: 'ADD_USER_DONE',
+  ADD_USER_FAILED: 'ADD_USER_FAILED',
+
+  DELETE_USER: 'DELETE_USER',
+  DELETE_USER_STARTING: 'DELETE_USER_STARTING',
+  DELETE_USER_DONE: 'DELETE_USER_DONE',
+  DELETE_USER_FAILED: 'DELETE_USER_FAILED',
+
+  UPDATE_USER_EMAIL: 'UPDATE_USER_EMAIL',
+  UPDATE_USER_STARTING: 'UPDATE_USER_STARTING',
+  UPDATE_USER_DONE: 'UPDATE_USER_DONE',
+  UPDATE_USER_FAILED: 'UPDATE_USER_FAILED',
 }
 {% endhighlight %}

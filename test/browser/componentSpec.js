@@ -1,6 +1,6 @@
 var sinon = require('sinon');
 var React = require('react');
-var Marty = require('../../index');
+var Marty = require('../../marty');
 var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
 var ContextComponent = require('../../lib/contextComponent');
@@ -139,6 +139,9 @@ describe('Component', function () {
       Store.for(context).replaceState({
         [expectedId]: expectedState.foo
       });
+
+      RootComponent.contextTypes = Marty.Component.contextTypes;
+      ContextComponent.contextTypes = Marty.Component.contextTypes;
 
       Component = TestUtils.renderIntoDocument(
         React.createElement(ContextComponent, {

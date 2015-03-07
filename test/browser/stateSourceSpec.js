@@ -1,100 +1,102 @@
-var Marty = require('../../index');
+var Marty = require('../../marty');
 var expect = require('chai').expect;
+var Dispatcher = require('./lib/mockDispatcher');
 var describeStyles = require('./../lib/describeStyles');
 
 describe('StateSource', function () {
   var stateSource;
 
-  describe('#createStateSource()', function () {
-    describeStyles('when you pass in a function', function (styles) {
-      var expectedResult;
+  describeStyles('creating a state source', function (styles) {
+    var expectedResult, expectedType, expectedArg1, expectedArg2;
 
-      beforeEach(function () {
-        expectedResult = 'foo';
-        stateSource = styles({
-          classic: function () {
-            return Marty.createStateSource({
-              id: 'createStateSource',
-              foo: function () {
-                return this.bar();
-              },
-              bar: function () {
-                return expectedResult;
-              }
-            });
-          },
-          es6: function () {
-            class CreateStateSource extends Marty.StateSource {
-              foo() {
-                return this.bar();
-              }
-
-              bar() {
-                return expectedResult;
-              }
+    beforeEach(function () {
+      expectedType = 'FOO';
+      expectedResult = 'foo';
+      expectedArg1 = 1;
+      expectedArg2 = 'gib';
+      stateSource = styles({
+        classic: function () {
+          return Marty.createStateSource({
+            id: 'createStateSource',
+            foo: function () {
+              return this.bar();
+            },
+            bar: function () {
+              return expectedResult;
+            }
+          });
+        },
+        es6: function () {
+          class CreateStateSource extends Marty.StateSource {
+            foo() {
+              return this.bar();
             }
 
-            return new CreateStateSource();
+            bar() {
+              return expectedResult;
+            }
           }
-        });
-      });
 
-      it('should expose the function', function () {
-        expect(stateSource.foo()).to.equal(expectedResult);
+          return new CreateStateSource();
+        }
       });
     });
 
-    describe('#type', function () {
-      describe('jsonStorage', function () {
-        beforeEach(function () {
-          stateSource = Marty.createStateSource({
-            id: 'jsonStorage',
-            type: 'jsonStorage'
-          });
-        });
+    it('should expose the function', function () {
+      expect(stateSource.foo()).to.equal(expectedResult);
+    });
+  });
 
-        it('should mixin the JSONStorageStateSource', function () {
-          expect(stateSource._isJSONStorageStateSource).to.be.true;
+  describe('#type', function () {
+    describe('jsonStorage', function () {
+      beforeEach(function () {
+        stateSource = Marty.createStateSource({
+          id: 'jsonStorage',
+          type: 'jsonStorage'
         });
       });
 
-      describe('localStorage', function () {
-        beforeEach(function () {
-          stateSource = Marty.createStateSource({
-            id: 'localStorage',
-            type: 'localStorage'
-          });
-        });
+      it('should mixin the JSONStorageStateSource', function () {
+        expect(stateSource._isJSONStorageStateSource).to.be.true;
+      });
+    });
 
-        it('should mixin the LocalStorageStateSource', function () {
-          expect(stateSource._isLocalStorageStateSource).to.be.true;
+    describe('localStorage', function () {
+      beforeEach(function () {
+        stateSource = Marty.createStateSource({
+          id: 'localStorage',
+          type: 'localStorage'
         });
       });
 
-      describe('sessionStorage', function () {
-        beforeEach(function () {
-          stateSource = Marty.createStateSource({
-            id: 'sessionStorage',
-            type: 'sessionStorage'
-          });
-        });
+      it('should mixin the LocalStorageStateSource', function () {
+        expect(stateSource._isLocalStorageStateSource).to.be.true;
+      });
+    });
 
-        it('should mixin the SessionStorageStateSource', function () {
-          expect(stateSource._isSessionStorageStateSource).to.be.true;
+    describe('sessionStorage', function () {
+      beforeEach(function () {
+        stateSource = Marty.createStateSource({
+          id: 'sessionStorage',
+          type: 'sessionStorage'
         });
       });
 
-      describe('http', function () {
-        beforeEach(function () {
-          stateSource = Marty.createStateSource({
-            id: 'http',
-            type: 'http'
-          });
-        });
+      it('should mixin the SessionStorageStateSource', function () {
+        expect(stateSource._isSessionStorageStateSource).to.be.true;
+      });
+    });
 
-        it('should mixin the HttpStateSource', function () {
-          expect(stateSource._isHttpStateSource).to.be.true;
+    describe('http', function () {
+      beforeEach(function () {
+        stateSource = Marty.createStateSource({
+          id: 'http',
+          type: 'http'
         });
+      });
+
+      it('should mixin the HttpStateSource', function () {
+        expect(stateSource._isHttpStateSource).to.be.true;
       });
     });
   });

@@ -1,9 +1,9 @@
 var fs = require('fs');
+var _ = require('lodash');
 var yaml = require('js-yaml');
-var _ = require('lodash-node');
 
 module.exports = function (config) {
-  process.env.NODE_ENV = 'test'
+  process.env.NODE_ENV = 'test';
 
   switch (process.env.ENV) {
     case 'CI':
@@ -102,7 +102,7 @@ module.exports = function (config) {
         debug: true
       },
       files: [
-        'index.js',
+        'marty.js',
         'lib/*.js',
         'test/browser/**/*.js'
       ],
@@ -111,7 +111,7 @@ module.exports = function (config) {
       ],
       preprocessors: {
         'lib/*': ['browserify'],
-        'index.js': ['browserify'],
+        'marty.js': ['browserify'],
         'test/browser/**/*.js': ['browserify']
       },
       port: 9876,

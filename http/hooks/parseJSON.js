@@ -1,8 +1,9 @@
-var _ = require('underscore');
 var CONTENT_TYPE = 'Content-Type';
 var JSON_CONTENT_TYPE = 'application/json';
+var _ = require('../../lib/utils/mindash');
 
 module.exports = {
+  id: 'parseJSON',
   after: function (res) {
     if (isJson(res)) {
       return res.json().then(function (body) {

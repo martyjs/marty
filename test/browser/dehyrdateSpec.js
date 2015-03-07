@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var expect = require('chai').expect;
 var describeStyles = require('./../lib/describeStyles');
 
@@ -8,7 +8,7 @@ describeStyles('Marty#dehydrate()', function (styles) {
   beforeEach(function () {
     storeSerializedState = { bar: 'bar' };
     store1ExpectedState = { initial: 'store1' };
-    Marty = require('../../index').createInstance();
+    Marty = require('../../marty').createInstance();
     styles({
       classic: function () {
         Marty.createStore({

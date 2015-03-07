@@ -16,7 +16,9 @@ var UserAPI = Marty.createStateSource({
   baseUrl: 'http://foo.com',
   getUsers: function () {
     return this.get('/users').then(function (res) {
-      SourceActionCreators.receiveUsers(res.body);
+      this.dispatch(UserConstants.RECIEVE_USERS, res.body);
+    }.bind(this)).catch(function (err) {
+      this.dispatch(UserConstants.RECIEVE_USERS_FAILED, err);
     });
   },
   createUser: function (user) {
@@ -34,9 +36,9 @@ class UserAPI extends Marty.HttpStateSource {
     this.baseUrl = 'http://foo.com';
   }
   getUsers() {
-    return this.get('/users').then((res) => {
-      SourceActionCreators.receiveUsers(res.body);
-    });
+    return this.get('/users')
+      .then((res) => this.dispatch(UserConstants.RECIEVE_USERS, res.body))
+      .catch((err) => this.dispatch(UserConstants.RECIEVE_USERS_FAILED, err));
   }
   createUser(user) {
     return this.post('/users', { body: user });
