@@ -1,5 +1,5 @@
+var _ = require('lodash');
 var sinon = require('sinon');
-var _ = require('lodash-node');
 var expect = require('chai').expect;
 var Marty = require('../../../marty');
 var warnings = require('../../../lib/warnings');
