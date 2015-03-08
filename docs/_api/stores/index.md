@@ -265,7 +265,7 @@ listener.dispose();
 
 <h2 id="hasChanged">hasChanged()</h2>
 
-Calls any [registered callbacks](#addChangeListener).
+Calls any [registered callbacks](#addChangeListener). To improve performance listeners will only be notified once for each dispatched action.
 
 {% sample %}
 classic
