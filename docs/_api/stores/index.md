@@ -513,6 +513,19 @@ var component = user.when({
 });
 {% endhighlight %}
 
+<h4 id="fetch-result-toPromise">FetchResult#toPromise()</h4>
+
+Converts a fetch result into a promise. Useful when you want to use a store outside of a React component.
+
+{% highlight js %}
+var getUser = UserStore.getUser().toPromise();
+
+getUser
+  .then((user) => console.log(user))
+  .catch((error) => console.error(error));
+
+{% endhighlight %}
+
 <h2 id="fetch_pending">fetch.pending()</h2>
 
 Returns a pending fetch result
