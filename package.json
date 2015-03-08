@@ -23,6 +23,7 @@
     "babel": "^4.7.1",
     "babelify": "^5.0.4",
     "bundle-collapser": "^1.0.0",
+    "cookies-js": "^1.2.1",
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",

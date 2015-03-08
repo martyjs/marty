@@ -2,6 +2,7 @@ var _ = require('lodash');
 var sinon = require('sinon');
 var expect = require('chai').expect;
 var Marty = require('../../../marty');
+var uuid = require('../../../lib/utils/uuid');
 var warnings = require('../../../lib/warnings');
 var describeStyles = require('../../lib/describeStyles');
 var HttpStateSource = require('../../../lib/stateSource/inbuilt/http');
@@ -11,12 +12,14 @@ require('es6-promise').polyfill();
 describeStyles('HttpStateSource', function (styles) {
   this.timeout(10000);
 
-  var API, baseUrl, response;
-  var hook1, hook2, hook3, executionOrder;
+  var API, baseUrl, response, xmlContentType, accept;
+  var hook1, hook2, hook3, executionOrder, jsonContentType;
 
   beforeEach(function () {
     baseUrl = '/stub/';
     warnings.classDoesNotHaveAnId = false;
+    xmlContentType = 'application/xml';
+    jsonContentType = 'application/json';
   });
 
   afterEach(function () {
@@ -221,6 +224,7 @@ describeStyles('HttpStateSource', function (styles) {
       beforeEach(function () {
         return makeRequest('get', {
           url: 'bars/baz',
+          contentType: xmlContentType
         });
       });
 
@@ -232,6 +236,66 @@ describeStyles('HttpStateSource', function (styles) {
         });
       });
     });
+  });
+
+  describe('#dataType', function () {
+    describe('json', function () {
+      beforeEach(function () {
+        return requestDataType('json');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('application/json');
+      });
+    });
+
+    describe('xml', function () {
+      beforeEach(function () {
+        return requestDataType('xml');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('application/xml, text/xml');
+      });
+    });
+
+    describe('text', function () {
+      beforeEach(function () {
+        return requestDataType('text');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('text/plain');
+      });
+    });
+
+
+    describe('html', function () {
+      beforeEach(function () {
+        return requestDataType('html');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('text/html');
+      });
+    });
+
+    describe('script', function () {
+      beforeEach(function () {
+        return requestDataType('script');
+      });
+
+      it('should convert the data type to accept header', function () {
+        expect(accept).to.eql('text/javascript, application/javascript, application/x-javascript');
+      });
+    });
+
+    function requestDataType(dataType) {
+      return makeRequest('get', {
+        url: '/stub/foos/?id=' + uuid.small(),
+        dataType: dataType
+      });
+    }
   });
 
   describe('#put()', function () {
@@ -257,7 +321,8 @@ describeStyles('HttpStateSource', function (styles) {
 
         return makeRequest('put', {
           url: 'bars/baz',
-          body: expectedBody
+          body: expectedBody,
+          contentType: jsonContentType
         });
       });
 
@@ -294,7 +359,8 @@ describeStyles('HttpStateSource', function (styles) {
 
         return makeRequest('post', {
           url: 'bars/baz',
-          body: expectedBody
+          body: expectedBody,
+          contentType: jsonContentType
         });
       });
 
@@ -443,6 +509,8 @@ describeStyles('HttpStateSource', function (styles) {
 
   function storeResponse(res) {
     response = res.body;
+    accept = response.accept;
+    delete response.accept;
   }
 
   function makeRequest(method) {

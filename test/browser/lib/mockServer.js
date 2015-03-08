@@ -19,7 +19,8 @@ app.use(function (req, res, next) {
     res.json({
       method: method,
       url: req.url,
-      body: req.body
+      body: req.body,
+      accept: req.headers['accept']
     }).end();
   });
 });
@@ -28,6 +29,13 @@ app.get('/iso/*', function () {
   app.get('/hello-world', function (req, res) {
     res.send('<html><body><h1 id="message">hello world</h1></body></html>').end();
   });
+});
+
+app.use(function (req, res, next) {
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  res.header('Expires', '-1');
+  res.header('Pragma', 'no-cache');
+  next();
 });
 
 app.get('*', function (req, res) {

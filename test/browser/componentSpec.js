@@ -141,7 +141,7 @@ describe('Component', function () {
       });
 
       RootComponent.contextTypes = Marty.Component.contextTypes;
-      ContextComponent.contextTypes = Marty.Component.contextTypes;
+      ChildComponent.contextTypes = Marty.Component.contextTypes;
 
       Component = TestUtils.renderIntoDocument(
         React.createElement(ContextComponent, {
