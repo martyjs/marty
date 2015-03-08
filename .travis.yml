@@ -7,3 +7,6 @@ env:
     - ENV="CI"
     - SAUCE_USERNAME="jhollingworth"
     - SAUCE_ACCESS_KEY="4938c9e3-26ce-4661-b09b-785e49f3e892"
+cache:
+  directories:
+    - node_modules
