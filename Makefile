@@ -25,7 +25,7 @@ bootstrap-ruby: docs/Gemfile
 	@which bundle > /dev/null || gem install bundler
 	@cd docs && bundle install
 
-lint: bootstrap-js
+lint:
 	@$(BIN)/jscs --esprima=esprima-fb $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
