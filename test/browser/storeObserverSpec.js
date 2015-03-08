@@ -9,11 +9,14 @@ describe('StoreObserver', function () {
 
     beforeEach(function () {
       logger = stubbedLogger();
+
       expectedError = new Error('Bar');
       expectedComponent = {
         displayName: 'Test',
         getState: function () {
           throw expectedError;
+        },
+        setState: function () {
         }
       };
 

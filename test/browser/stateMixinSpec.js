@@ -76,7 +76,10 @@ describe('StateMixin', function () {
       beforeEach(function () {
         expectedError = new Error();
         store.getState = sinon.stub().throws(expectedError);
-        getObserver(element).onStoreChanged(null, store, element);
+
+        try {
+          getObserver(element).onStoreChanged(null, store, element);
+        } catch (e) {}
       });
 
       it('should add a view to the handler', function () {
