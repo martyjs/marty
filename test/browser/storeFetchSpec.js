@@ -1,5 +1,6 @@
-var sinon = require('sinon');
 var _ = require('lodash');
+var sinon = require('sinon');
+var fetch = require('../../fetch');
 var Marty = require('../../marty');
 var expect = require('chai').expect;
 var warnings = require('../../lib/warnings');
@@ -90,6 +91,81 @@ describe('Store#fetch()', function () {
 
       it('should call the remotely function', function () {
         expect(remotely).to.have.been.calledOnce;
+      });
+    });
+
+    describe('#toPromise', function () {
+      describe('when a fetch is done', function () {
+        var actualPromise, expectedState, localState, getState;
+
+        beforeEach(function () {
+          expectedState = { foo: 'bar' };
+
+          actualPromise = store.fetch({
+            id: 'locally',
+            locally: function () {
+              return localState;
+            },
+            remotely: function () {
+              return new Promise(function (resolve) {
+                localState = expectedState;
+                resolve();
+              });
+            }
+          }).toPromise();
+        });
+
+        it('should resolve the promise', function () {
+          return expect(actualPromise).to.eventually.eql(expectedState);
+        });
+      });
+
+      describe('when a fetch fails', function () {
+        var actualPromise, expectedError;
+
+        beforeEach(function () {
+          expectedError = new Error('foo');
+
+          actualPromise = store.fetch({
+            id: 'locally',
+            locally: function () {},
+            remotely: function () {
+              return new Promise(function (resolve, reject) {
+                reject(expectedError);
+              });
+            }
+          }).toPromise();
+        });
+
+        it('should reject the promise', function () {
+          return expect(actualPromise).to.be.rejectedWith(expectedError);
+        });
+      });
+
+      describe('fetch.done().toPromise()', function () {
+        var result, expectedResult;
+
+        beforeEach(function () {
+          expectedResult = { foo: 'bar' };
+          result = fetch.done(expectedResult).toPromise();
+        });
+
+        it('should resolve the promise', function () {
+          return expect(result).to.eventually.equal(expectedResult);
+        });
+      });
+
+      describe('fetch.failed().toPromise()', function () {
+        var result, expectedError;
+
+        beforeEach(function () {
+          expectedError = new Error('foo');
+          result = fetch.failed(expectedError).toPromise();
+        });
+
+        it('should resolve the promise', function () {
+          return expect(result).to.be.rejectedWith(expectedError);
+        });
       });
     });
 
@@ -301,7 +377,7 @@ describe('Store#fetch()', function () {
     it('should return the in progress fetch', function () {
       actualResult = store.fetch(fetchId, noop, noop);
 
-      expect(actualResult).to.eql(expectedResult);
+      expect(omitPromise(actualResult)).to.eql(omitPromise(expectedResult));
     });
   });
 
@@ -365,7 +441,7 @@ describe('Store#fetch()', function () {
     });
 
     it('should return a fetch not found result', function () {
-      expect(actualResult).to.eql(store.fetch.notFound('bar', store));
+      expect(omitPromise(actualResult)).to.eql(omitPromise(store.fetch.notFound('bar', store)));
     });
 
     it('should not call remotely', function () {
@@ -683,6 +759,10 @@ describe('Store#fetch()', function () {
       expect(actualResult.result).to.equal(expectedResult);
     });
   });
+
+  function omitPromise(result) {
+    return _.omit(result, 'toPromise');
+  }
 
   function noop() {
   }
