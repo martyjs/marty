@@ -10,7 +10,7 @@ test: lint test-server test-browser
 test-server:
 	@./build/test-server.sh
 
-test-browser: lint
+test-browser:
 	@./build/test-browser.sh
 
 test-watch:
