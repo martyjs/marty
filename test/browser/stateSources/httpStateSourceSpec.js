@@ -2,6 +2,7 @@ var _ = require('lodash');
 var sinon = require('sinon');
 var expect = require('chai').expect;
 var Marty = require('../../../marty');
+var uuid = require('../../../lib/utils/uuid');
 var warnings = require('../../../lib/warnings');
 var describeStyles = require('../../lib/describeStyles');
 var HttpStateSource = require('../../../lib/stateSource/inbuilt/http');
@@ -238,7 +239,6 @@ describeStyles('HttpStateSource', function (styles) {
   });
 
   describe('#dataType', function () {
-
     describe('json', function () {
       beforeEach(function () {
         return requestDataType('json');
@@ -292,7 +292,7 @@ describeStyles('HttpStateSource', function (styles) {
 
     function requestDataType(dataType) {
       return makeRequest('get', {
-        url: 'bars/baz',
+        url: '/stub/foos/?id=' + uuid.small(),
         dataType: dataType
       });
     }
