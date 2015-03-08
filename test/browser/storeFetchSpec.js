@@ -173,6 +173,92 @@ describe('Store#fetch()', function () {
     });
 
     describe('#dependsOn', function () {
+      var Store1, Store2, changeListener, fooQueryResult, barQueryResult, store2ChangeListener;
+
+      beforeEach(function () {
+        store2ChangeListener = sinon.spy();
+
+        Store1 = Marty.createStore({
+          id: 'Store1',
+          foo: function () {
+            return this.fetch({
+              id: 'foo',
+              locally: function () {
+                return fooQueryResult;
+              },
+              remotely: function () {
+                return new Promise(function (resolve) {
+                  setTimeout(function () {
+                    fooQueryResult = { foo: 'bar' };
+                    resolve();
+                  }, 1);
+                });
+              }
+            })
+          },
+          bar: function () {
+            return this.fetch({
+              id: 'bar',
+              locally: function () {
+                return barQueryResult;
+              },
+              remotely: function () {
+                return new Promise(function (resolve) {
+                  setTimeout(function () {
+                    barQueryResult = { bar: 'bar' };
+                    resolve();
+                  }, 1);
+                });
+              }
+            })
+          },
+        });
+
+        Store2 = Marty.createStore({
+          id: 'Store2',
+          singleDependency: function () {
+            return this.fetch({
+              id: 'singleDependency',
+              dependsOn: Store1.foo(),
+              locally: function () {
+                return { bar: 'baz' };
+              }
+            })
+          },
+          multipleDependencies: function () {
+            return this.fetch({
+              id: 'multipleDependencies',
+              dependsOn: [Store1.foo(), Store1.bar()],
+              locally: function () {
+                return { bar: 'baz' };
+              }
+            })
+          }
+        });
+
+        Store2.addChangeListener(store2ChangeListener);
+      });
+
+      describe('when there is one pending dependency', function () {
+        beforeEach(function () {
+          return Store2.singleDependency().toPromise();
+        });
+
+        it('should trigger the store to update', function () {
+          expect(store2ChangeListener).to.be.calledOnce;
+        });
+      });
+
+      describe('when there are two pending dependency', function () {
+        beforeEach(function () {
+          return Store2.multipleDependencies().toPromise();
+        });
+
+        it('should trigger the store to update', function () {
+          expect(store2ChangeListener).to.be.calledOnce;
+        });
+      });
+
       describe('when you pass it a fetch result', function () {
         describe('when the fetch result is pending', function () {
           beforeEach(function () {
