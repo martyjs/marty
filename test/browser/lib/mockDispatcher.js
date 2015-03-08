@@ -4,6 +4,7 @@ var ActionPayload = require('../../../lib/actionPayload');
 function MockDispatcher() {
   this.id = 'MockDispatcher';
 
+  this.register = _.noop;
   this.dispatch = dispatch;
   this.dispatchedActions = [];
   this.dispatchAction = dispatch;

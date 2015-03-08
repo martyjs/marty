@@ -5,9 +5,10 @@ var Marty = require('../../marty');
 var expect = require('chai').expect;
 var warnings = require('../../lib/warnings');
 var Promise = require('es6-promise').Promise;
+var MockDispatcher = require('./lib/mockDispatcher');
 
 describe('Store#fetch()', function () {
-  var listener, store, changeListener, endFetch, remoteFetch, fetchId;
+  var listener, store, changeListener, endFetch, remoteFetch, fetchId, dispatcher;
   var expectedResult, actualResult, actualContext, expectedError, actualError;
 
   beforeEach(function () {
@@ -16,10 +17,12 @@ describe('Store#fetch()', function () {
 
     fetchId = 'foo';
     listener = sinon.spy();
+    dispatcher = new MockDispatcher();
     store = Marty.createStore({
       id: 'storeFetch',
       displayName: 'Test',
-      getInitialState: _.noop
+      getInitialState: _.noop,
+      dispatcher: dispatcher
     });
     changeListener = store.addChangeListener(listener);
   });
@@ -491,8 +494,8 @@ describe('Store#fetch()', function () {
     });
 
     describe('when the remote fetch returns a promise', function () {
-      describe('when the promise fails', function () {
-        var remoteFetch;
+      describe('when the promise rejects', function () {
+        var remoteFetch, fetchFailedAction;
 
         beforeEach(function (done) {
           expectedError = new Error();
@@ -505,7 +508,11 @@ describe('Store#fetch()', function () {
 
           store.addChangeListener(function () {
             actualResult = store.fetch('foo', noop, noop);
-            done();
+
+            setTimeout(function () {
+              fetchFailedAction = dispatcher.getActionWithType('FETCH_FAILED');
+              done();
+            }, 1);
           });
         });
 
@@ -519,6 +526,18 @@ describe('Store#fetch()', function () {
 
         it('should have the error', function () {
           expect(actualResult.error).to.equal(expectedError);
+        });
+
+        it('should dispatch a FETCH_FAILED action', function () {
+          expect(fetchFailedAction).to.exist;
+        });
+
+        it('should include fetch, store and error in the FETCH_FAILED action', function () {
+          expect(fetchFailedAction.arguments).to.eql([
+            expectedError,
+            'foo',
+            store
+          ]);
         });
 
         describe('when I try to call the fetch again', function () {
@@ -538,7 +557,7 @@ describe('Store#fetch()', function () {
         });
       });
 
-      describe('when the promise completes done', function () {
+      describe('when the promise resolves', function () {
         describe('when the local fetch then returns a value', function () {
           var localResult;
 
