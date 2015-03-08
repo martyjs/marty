@@ -1,6 +1,5 @@
 var _ = require('lodash');
 var sinon = require('sinon');
-var Marty = require('../../marty');
 var expect = require('chai').expect;
 var Dispatcher = require('../../lib/dispatcher');
 var stubbedLogger = require('../lib/stubbedLogger');
@@ -12,9 +11,11 @@ var ActionPredicateUndefinedError = require('../../errors/actionPredicateUndefin
 describeStyles('Store', function (styles, currentStyle) {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
   var actualAction, actualChangeListenerFunctionContext, expectedChangeListenerFunctionContext;
-  var expectedError, logger;
+  var expectedError, logger, Marty;
 
   beforeEach(function () {
+    Marty = require('../../marty').createInstance();
+
     logger = stubbedLogger();
     dispatcher = {
       register: sinon.stub().returns(dispatchToken),
@@ -159,6 +160,34 @@ describeStyles('Store', function (styles, currentStyle) {
       });
     });
   }
+
+  describe('when the store updates multiple times during a dispatch', function () {
+    beforeEach(function () {
+      var dispatcher = Marty.Dispatcher.getDefault();
+
+      var FooStore = Marty.createStore({
+        handlers: {
+          foo: 'FOO'
+        },
+        foo: function () {
+          this.hasChanged();
+          this.hasChanged();
+          this.hasChanged();
+        }
+      });
+
+      changeListener = sinon.spy();
+      FooStore.addChangeListener(changeListener);
+      dispatcher.dispatchAction({
+        type: 'FOO',
+        arguments: []
+      });
+    });
+
+    it('should only notify components once at the end of the dispatch', function () {
+      expect(changeListener).to.be.calledOnce;
+    });
+  });
 
   describe('#state', function () {
     var newState;
