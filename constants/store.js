@@ -1,3 +1,1 @@
-var constants = require('./index');
-
-module.exports = constants(['FETCH_FAILED']);
+module.exports = require('../lib/constants/store');

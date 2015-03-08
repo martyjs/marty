@@ -1,8 +1,1 @@
-function UnkownStoreError(store) {
-  this.name = 'Unknown store';
-  this.message = 'Unknown store ' + store;
-}
-
-UnkownStoreError.prototype = Error.prototype;
-
-module.exports = UnkownStoreError;
+module.exports = require('../lib/errors/unknownStore');
