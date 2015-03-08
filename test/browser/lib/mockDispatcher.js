@@ -1,8 +1,12 @@
 var _ = require('lodash');
+var ActionPayload = require('../../../lib/actionPayload');
 
 function MockDispatcher() {
+  this.id = 'MockDispatcher';
+
   this.dispatch = dispatch;
   this.dispatchedActions = [];
+  this.dispatchAction = dispatch;
   this.getActionWithType = getActionWithType;
 
   function getActionWithType(actionType) {
@@ -12,7 +16,7 @@ function MockDispatcher() {
   }
 
   function dispatch(action) {
-    this.dispatchedActions.push(action);
+    this.dispatchedActions.push(new ActionPayload(action));
   }
 }
 
