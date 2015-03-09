@@ -40,4 +40,4 @@ collections:
   devtools:
     title: Developer Tools
     output: true
-current_version: 0.8.12
+current_version: 0.9.0-beta
