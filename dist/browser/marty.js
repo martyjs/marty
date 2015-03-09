@@ -7115,7 +7115,7 @@ function baseAssign(object, source, customizer) {
         value = object[key],
         result = customizer(value, source[key], key, object, source);
 
-    if ((result === result ? result !== value : value === value) ||
+    if ((result === result ? (result !== value) : (value === value)) ||
         (typeof value == 'undefined' && !(key in object))) {
       object[key] = result;
     }
@@ -8059,7 +8059,7 @@ function baseSlice(array, start, end) {
   if (end < 0) {
     end += length;
   }
-  length = start > end ? 0 : (end - start) >>> 0;
+  length = start > end ? 0 : ((end - start) >>> 0);
   start >>>= 0;
 
   var result = Array(length);
@@ -8602,8 +8602,10 @@ function equalObjects(object, other, equalFunc, customizer, isWhere, stackA, sta
         othCtor = other.constructor;
 
     // Non `Object` object instances with different constructors are not equal.
-    if (objCtor != othCtor && ('constructor' in object && 'constructor' in other) &&
-        !(typeof objCtor == 'function' && objCtor instanceof objCtor && typeof othCtor == 'function' && othCtor instanceof othCtor)) {
+    if (objCtor != othCtor &&
+        ('constructor' in object && 'constructor' in other) &&
+        !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
+          typeof othCtor == 'function' && othCtor instanceof othCtor)) {
       return false;
     }
   }
@@ -8841,7 +8843,7 @@ function isIterateeCall(value, index, object) {
   }
   if (prereq) {
     var other = object[index];
-    return value === value ? value === other : other !== other;
+    return value === value ? (value === other) : (other !== other);
   }
   return false;
 }
@@ -9610,7 +9612,7 @@ var keys = !nativeKeys ? shimKeys : function(object) {
         length = object.length;
   }
   if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
-     (typeof object != 'function' && (length && isLength(length)))) {
+      (typeof object != 'function' && (length && isLength(length)))) {
     return shimKeys(object);
   }
   return isObject(object) ? nativeKeys(object) : [];
@@ -10054,7 +10056,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.0-beta",
+    version: "0.9.0-rc1",
     warnings: warnings,
     Dispatcher: Dispatcher,
     Diagnostics: Diagnostics,
