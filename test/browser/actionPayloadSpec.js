@@ -46,10 +46,11 @@ describe('ActionPayload', function () {
     it('should return the action as an object literal', function () {
       expect(action.toJSON()).to.eql({
         id: id,
+        stores: [],
+        components: [],
+        arguments: args,
         type: actionType,
-        handlers: [],
-        timestamp: timestamp,
-        arguments: args
+        timestamp: timestamp
       });
     });
   });
@@ -76,23 +77,25 @@ describe('ActionPayload', function () {
     });
   });
 
-  describe('#addViewHandler()', function () {
+  describe('#addComponentHandler()', function () {
     beforeEach(function () {
       name = 'foo',
-      lastState = {};
-      view = {
-        state: nextState
-      };
-      action.addStoreHandler(store, 'bar');
-      viewHandler = action.addViewHandler(name, view, lastState);
+      viewHandler = action.addComponentHandler({
+        state: nextState,
+        displayName: name
+      });
     });
 
     it('should add the handler to the current store handler', function () {
-      expect(action.handlers[0].views[0]).to.exist;
+      expect(action.components[0]).to.exist;
     });
 
-    it('should store the name of the view', function () {
-      expect(action.handlers[0].views[0].name).to.equal(name);
+    it('should store the name of the component', function () {
+      expect(action.components[0].displayName).to.equal(name);
+    });
+
+    it('should store the state of the component', function () {
+      expect(action.components[0].state).to.equal(nextState);
     });
   });
 
@@ -108,11 +111,11 @@ describe('ActionPayload', function () {
     });
 
     it('should store the name of the store', function () {
-      expect(action.handlers[0].store).to.equal(store.displayName);
+      expect(action.stores[0].store).to.equal(store.displayName);
     });
 
     it('should store the name of the action handler', function () {
-      expect(action.handlers[0].name).to.equal(handlerName);
+      expect(action.stores[0].handler).to.equal(handlerName);
     });
   });
 });
