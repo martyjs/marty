@@ -709,22 +709,6 @@ describeStyles('Store', function (styles, currentStyle) {
   describe('#handleAction()', function () {
     var data = {}, expectedAction;
 
-    describe('when an error occurs', function () {
-      beforeEach(function () {
-        expectedAction = new ActionPayload({ type: 'ERROR' });
-        try {
-          store.handleAction(expectedAction);
-        } catch (e) { }
-      });
-
-      it('should log the error and any additional metadata', function () {
-        var expectedMessage = 'An error occured while trying to handle an ' +
-        '\'ERROR\' action in the action handler `error` within the store TestStore';
-
-        expect(logger.error).to.be.calledWith(expectedMessage, expectedError, expectedAction);
-      });
-    });
-
     describe('when the store does not handle action type', function () {
       beforeEach(function () {
         handleAction('foo');

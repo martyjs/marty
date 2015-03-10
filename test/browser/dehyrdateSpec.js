@@ -15,7 +15,7 @@ describeStyles('Marty#dehydrate()', function (styles) {
         Marty.createStore({
           id: 'Store1',
           getInitialState: _.noop,
-          hydrate: function () {
+          dehydrate: function () {
             return store1ExpectedState;
           },
           testFetch: function () {
@@ -31,7 +31,7 @@ describeStyles('Marty#dehydrate()', function (styles) {
         Marty.createStore({
           id: 'Store2',
           getInitialState: _.noop,
-          hydrate: function () {
+          dehydrate: function () {
             return storeSerializedState;
           }
         });
@@ -51,7 +51,7 @@ describeStyles('Marty#dehydrate()', function (styles) {
       },
       es6: function () {
         class Store1 extends Marty.Store {
-          hydrate() {
+          dehydrate() {
             return store1ExpectedState;
           }
           testFetch () {
@@ -65,7 +65,7 @@ describeStyles('Marty#dehydrate()', function (styles) {
         }
 
         class Store2 extends Marty.Store {
-          hydrate() {
+          dehydrate() {
             return storeSerializedState;
           }
         }

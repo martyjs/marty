@@ -47,12 +47,7 @@ describe('ActionPayload', function () {
       expect(action.toJSON()).to.eql({
         id: id,
         type: actionType,
-        source: source,
-        creator: creator,
-        internal: internal,
         handlers: [],
-        error: null,
-        status: 'PENDING',
         timestamp: timestamp,
         arguments: args
       });
@@ -99,30 +94,6 @@ describe('ActionPayload', function () {
     it('should store the name of the view', function () {
       expect(action.handlers[0].views[0].name).to.equal(name);
     });
-
-    describe('#dispose()', function () {
-      beforeEach(function () {
-        viewHandler.dispose();
-      });
-
-      it('should store the after state of the view', function () {
-        expect(action.handlers[0].views[0].state).to.equal(nextState);
-      });
-    });
-
-    describe('#failed()', function () {
-      var expectedError;
-
-      beforeEach(function () {
-        expectedError = new Error();
-
-        viewHandler.failed(expectedError);
-      });
-
-      it('should store the thrown error', function () {
-        expect(action.handlers[0].views[0].error).to.equal(expectedError);
-      });
-    });
   });
 
   describe('#addStoreHandler()', function () {
@@ -142,30 +113,6 @@ describe('ActionPayload', function () {
 
     it('should store the name of the action handler', function () {
       expect(action.handlers[0].name).to.equal(handlerName);
-    });
-
-
-    describe('#dispose()', function () {
-      beforeEach(function () {
-        nextState = { after: true };
-        storeState = nextState;
-        storeHandler.dispose();
-      });
-
-      it('should store the after state of the view', function () {
-        expect(action.handlers[0].state).to.eql(nextState);
-      });
-    });
-
-    describe('#failed()', function () {
-      beforeEach(function () {
-        expectedError = new Error();
-        storeHandler.failed(expectedError);
-      });
-
-      it('should store the thrown error', function () {
-        expect(action.handlers[0].error).to.equal(expectedError);
-      });
     });
   });
 });
