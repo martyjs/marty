@@ -61,7 +61,7 @@
     "uglify-js": "^2.4.15"
   },
   "peerDependencies": {
-    "react": ">=0.13.0-rc1"
+    "react": "^0.13.0"
   },
   "author": "James Hollingworth",
   "licenses": [
