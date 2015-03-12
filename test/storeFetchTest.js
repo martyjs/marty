@@ -283,6 +283,12 @@ describe('Store#fetch()', function () {
     });
   });
 
+  describe('when you pass valid, but falsy id', function () {
+    it('should not throw an error', function () {
+      expect(function () { store.fetch({id: 0}); }).not.to.throw(Error);
+    });
+  });
+
   describe('when a fetch with the given id is in progress', function () {
     beforeEach(function () {
       expectedResult = store.fetch(fetchId, noop, function () {
