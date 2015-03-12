@@ -78,11 +78,15 @@ describe('ActionPayload', function () {
   });
 
   describe('#addComponentHandler()', function () {
+    var expectedStoreId;
     beforeEach(function () {
-      name = 'foo',
+      name = 'foo';
+      expectedStoreId = 'FooStore';
       viewHandler = action.addComponentHandler({
         state: nextState,
         displayName: name
+      }, {
+        id: expectedStoreId
       });
     });
 
@@ -96,6 +100,10 @@ describe('ActionPayload', function () {
 
     it('should store the state of the component', function () {
       expect(action.components[0].state).to.equal(nextState);
+    });
+
+    it('should store the store which caused the render', function () {
+      expect(action.components[0].store).to.equal(expectedStoreId);
     });
   });
 
