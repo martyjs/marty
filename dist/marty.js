@@ -12,16 +12,20 @@ var Marty = _.extend({
 }, state, create);
 
 module.exports = Marty;
+
 },{"./lib/create":12,"./lib/diagnostics":13,"./lib/dispatcher":14,"./lib/state":18,"underscore":39}],1:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['ACTION_STARTING', 'ACTION_DONE', 'ACTION_FAILED']);
+
 },{"./index":2}],2:[function(require,module,exports){
 module.exports = require('../lib/constants');
+
 },{"../lib/constants":11}],3:[function(require,module,exports){
 var constants = require('./index');
 
 module.exports = constants(['PENDING', 'FAILED', 'DONE']);
+
 },{"./index":2}],4:[function(require,module,exports){
 function ActionHandlerNotFoundError(actionHandler, store) {
   this.name = 'Action handler not found';
@@ -35,6 +39,7 @@ function ActionHandlerNotFoundError(actionHandler, store) {
 ActionHandlerNotFoundError.prototype = Error.prototype;
 
 module.exports = ActionHandlerNotFoundError;
+
 
 },{}],5:[function(require,module,exports){
 function ActionPredicateUndefinedError(actionHandler, store) {
@@ -50,6 +55,7 @@ ActionPredicateUndefinedError.prototype = Error.prototype;
 
 module.exports = ActionPredicateUndefinedError;
 
+
 },{}],6:[function(require,module,exports){
 function CompoundError(errors) {
   this.errors = errors;
@@ -59,6 +65,7 @@ function CompoundError(errors) {
 CompoundError.prototype = Error.prototype;
 
 module.exports = CompoundError;
+
 },{}],7:[function(require,module,exports){
 function NotFoundError(message) {
   this.name = 'Not found';
@@ -69,6 +76,7 @@ function NotFoundError(message) {
 NotFoundError.prototype = Error.prototype;
 
 module.exports = NotFoundError;
+
 },{}],8:[function(require,module,exports){
 function UnkownStoreError(store) {
   this.name = 'Unknown store';
@@ -78,6 +86,7 @@ function UnkownStoreError(store) {
 UnkownStoreError.prototype = Error.prototype;
 
 module.exports = UnkownStoreError;
+
 },{}],9:[function(require,module,exports){
 var _ = require('underscore');
 var log = require('./logger');
@@ -273,6 +282,7 @@ function ActionCreators(options) {
 
 module.exports = ActionCreators;
 
+
 },{"../constants/actions":1,"./actionPayload":10,"./dispatcher":14,"./logger":16,"./utils/serializeError":25,"./utils/uuid":26,"underscore":39}],10:[function(require,module,exports){
 var _ = require('underscore');
 var uuid = require('./utils/uuid');
@@ -434,6 +444,7 @@ function ActionPayload(options) {
 }
 
 module.exports = ActionPayload;
+
 },{"../constants/status":3,"./diagnostics":13,"./utils/uuid":26,"underscore":39}],11:[function(require,module,exports){
 var _ = require('underscore');
 
@@ -501,6 +512,7 @@ function constants(obj) {
 }
 
 module.exports = constants;
+
 },{"underscore":39}],12:[function(require,module,exports){
 var _ = require('underscore');
 var Store = require('./store');
@@ -586,6 +598,7 @@ function defaults(marty, options) {
 
   return options;
 }
+
 },{"./actionCreators":9,"./constants":11,"./dispatcher":14,"./mixins/stateMixin":17,"./stateSource":19,"./store":24,"events":28,"underscore":39}],13:[function(require,module,exports){
 var diagnostics = {
   log: log,
@@ -609,6 +622,7 @@ function warn() {
   }
 }
 
+
 },{}],14:[function(require,module,exports){
 var uuid = require('./utils/uuid');
 var Dispatcher = require('flux').Dispatcher;
@@ -621,6 +635,7 @@ Dispatcher.getCurrent = function () {
 };
 
 module.exports = Dispatcher;
+
 },{"./utils/uuid":26,"flux":34}],15:[function(require,module,exports){
 var when = require('./when');
 var NotFoundError = require('../errors/notFound');
@@ -672,6 +687,7 @@ function fetchResult(result, store) {
 
   return result;
 }
+
 },{"../errors/notFound":7,"./when":27}],16:[function(require,module,exports){
 var _ = require('underscore');
 
@@ -684,6 +700,7 @@ if (console) {
     error: _.noop
   };
 }
+
 },{"underscore":39}],17:[function(require,module,exports){
 var _ = require('underscore');
 var log = require('../logger');
@@ -878,6 +895,7 @@ function StateMixin(options) {
 }
 
 module.exports = StateMixin;
+
 },{"../diagnostics":13,"../logger":16,"../utils/uuid":26,"underscore":39}],18:[function(require,module,exports){
 var _ = require('underscore');
 var UnknownStoreError = require('../errors/unknownStore');
@@ -933,6 +951,7 @@ function serializeState() {
 
   return state;
 }
+
 },{"../errors/unknownStore":8,"underscore":39}],19:[function(require,module,exports){
 var _ = require('underscore');
 var HttpStateSource = require('./stateSources/http');
@@ -967,6 +986,7 @@ function StateSource(options) {
 }
 
 module.exports = StateSource;
+
 },{"./stateSources/http":20,"./stateSources/jsonStorage":21,"./stateSources/localStorage":22,"./stateSources/sessionStorage":23,"underscore":39}],20:[function(require,module,exports){
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
@@ -1072,6 +1092,7 @@ function requestOptions(method, baseUrl, options) {
 
 module.exports = HttpStateSource;
 
+
 },{"es6-promise":33,"isomorphic-fetch":38,"underscore":39}],21:[function(require,module,exports){
 function JSONStorageStateSource(options) {
   options = options || {};
@@ -1122,6 +1143,7 @@ function JSONStorageStateSource(options) {
 }
 
 module.exports = JSONStorageStateSource;
+
 },{}],22:[function(require,module,exports){
 function LocalStorageStateSource(options) {
   options = options || {};
@@ -1150,6 +1172,7 @@ function LocalStorageStateSource(options) {
 }
 
 module.exports = LocalStorageStateSource;
+
 },{}],23:[function(require,module,exports){
 function SessionStorageStateSource(options) {
 
@@ -1178,6 +1201,7 @@ function SessionStorageStateSource(options) {
 }
 
 module.exports = SessionStorageStateSource;
+
 },{}],24:[function(require,module,exports){
 var CHANGE_EVENT = 'changed';
 var _ = require('underscore');
@@ -1639,6 +1663,7 @@ function Store(options) {
 
 module.exports = Store;
 
+
 },{"../constants/status":3,"../errors/actionHandlerNotFound":4,"../errors/actionPredicateUndefined":5,"../errors/compound":6,"../errors/notFound":7,"./diagnostics":13,"./dispatcher":14,"./fetch":15,"./logger":16,"./utils/uuid":26,"events":28,"underscore":39}],25:[function(require,module,exports){
 function serializeError(error) {
   if (!error) {
@@ -1656,6 +1681,7 @@ function serializeError(error) {
 }
 
 module.exports = serializeError;
+
 },{}],26:[function(require,module,exports){
 var format = require('util').format;
 
@@ -1673,6 +1699,7 @@ module.exports = {
     return uuid().substring(0, 6);
   }
 };
+
 },{"util":32}],27:[function(require,module,exports){
 var _ = require('underscore');
 var log = require('./logger');
@@ -1776,6 +1803,7 @@ function aggregateStatus(fetchResults) {
 }
 
 module.exports = when;
+
 },{"../constants/status":3,"./logger":16,"underscore":39}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
