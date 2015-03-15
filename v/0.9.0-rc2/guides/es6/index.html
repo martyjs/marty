@@ -901,7 +901,55 @@
       <h1 class="page-title">ES6</h1>
     
     <div class="content">
-      
+      <p>Marty provides support for defining everything using ES6 classes. For all inbuilt types you will find their base class available on <code>Marty</code> object (e.g. <code>Marty.HttpStateSource</code>, <code>Marty.ActionCreators</code>, <code>Marty.Store</code>).</p>
+
+<h2>Registration</h2>
+
+<p>All types must be registered within Marty&#39;s container. When defining your types with the ES5 syntax we will automatically register do this for you.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">FooStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+    <span class="p">...</span>
+<span class="p">});</span></code></pre></div>
+
+<p>Unfortunately there&#39;s no way to do this automatically when defining a class so you must manually call <code>Marty.register</code> passing in the class and (optionally) its Id.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">FooStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+    <span class="nx">getFoo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">FooStore</span><span class="p">);</span></code></pre></div>
+
+<h2>Default instance</h2>
+
+<p>In most cases it&#39;s much easier for us to have a single instance of each type. This saves us having to manually manage the lifecycle of each object. This is why Marty will return an instance of type registered type from <code>Marty.register</code> known as the <strong>default instance</strong>.</p>
+
+<p>In almost all cases the default instance is what you want to be using so if you&#39;re using a module loader (e.g. browserify, webpack, requirejs) we recommend you export the default instance from the file.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">//stores/fooStore.js</span>
+<span class="kr">class</span> <span class="nx">FooStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+    <span class="nx">getFoo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">FooStore</span><span class="p">);</span>
+
+<span class="c1">//views/foo.js</span>
+<span class="kd">var</span> <span class="nx">FooStore</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../stores/fooStore'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">FooStore</span><span class="p">.</span><span class="nx">getFoo</span><span class="p">();</span></code></pre></div>
+
+<p>There are occasions when you might want to access the underlying type. In those cases we tend to create a folder for the type, that contains 2 files:</p>
+
+<ol>
+<li>type.js - containing the class</li>
+<li>index.js - containing <code>module.exports = Marty.register(&#39;./type&#39;)</code></li>
+</ol>
+
+<p>This allows you call <code>require(&#39;./stores/fooStore&#39;)</code> when you want the default instance and <code>require(&#39;./stores/fooStore/type&#39;)</code> when you want the type.</p>
+
     </div>
   </div>
 </div>
