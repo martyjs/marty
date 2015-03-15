@@ -7,9 +7,9 @@ section: Action Creators
 
 Action Creators are where any changes to your applications state start. Actions are functions that are responsible for coordinating changes to local and remote state.
 
-All actions have a type of string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher](/guides/dispatcher/index.html)) and use [action's type to determine whether to do something with it](/api/stores/index.html#handlers). Action types help us build loosely coupled applications that can grow without increasing complexity.
+All actions have a type of string which gives a terse description of what the action does (e.g. "UPDATE\_USER_EMAIL"). Stores listen for new actions (using the [dispatcher]({% url /guides/dispatcher/index.html %})) and use [action's type to determine whether to do something with it]({% url /api/stores/index.html#handlers %}). Action types help us build loosely coupled applications that can grow without increasing complexity.
 
-To create an action, you should pass its type followed by any arguments to the [``dispatch``](/api/actionCreators/index.html#dispatch) function.
+To create an action, you should pass its type followed by any arguments to the [``dispatch``]({% url /api/actionCreators/index.html#dispatch %}) function.
 
 {% sample %}
 classic

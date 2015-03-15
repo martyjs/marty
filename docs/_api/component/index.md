@@ -23,7 +23,7 @@ class User extends Marty.Component {
 
 <h3 id="listenTo">listenTo</h3>
 
-Must be either a [store](/api/stores/index.html) or an array of [stores](/api/stores/index.html). Just before the [initial render](http://facebook.github.io/react/docs/component-specs.html#mounting-componentwillmount), it will register a change listener with the specified store(s).
+Must be either a [store]({% url /api/stores/index.html %}) or an array of [stores]({% url /api/stores/index.html %}). Just before the [initial render](http://facebook.github.io/react/docs/component-specs.html#mounting-componentwillmount), it will register a change listener with the specified store(s).
 
 When the element is about to be [unmounted from the DOM](http://facebook.github.io/react/docs/component-specs.html#unmounting-componentwillunmount) it will dispose of an change listeners.
 

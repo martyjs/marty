@@ -56,7 +56,7 @@ Resolves the instance of the object for the objects Marty context. The context c
 
 The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an [action predicate](#action-predicates).
 
-When invoked the handlers arguments are [the arguments passed to the dispatcher](/api/action-creators/index.html#dispatch). The original action is available by calling <code>this.action</code>.
+When invoked the handlers arguments are [the arguments passed to the dispatcher]({% url /api/action-creators/index.html#dispatch %}). The original action is available by calling <code>this.action</code>.
 
 {% sample %}
 classic
@@ -192,7 +192,7 @@ class UsersStore extends Marty.Store {
 
 The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.
 
-If you want to change the state to a new instance (or if you are using [immutable data collections](/guides/stores/immutable-data-collections.html)) you can set the states value.
+If you want to change the state to a new instance (or if you are using [immutable data collections]({% url /guides/stores/immutable-data-collections.html %})) you can set the states value.
 
 {% sample %}
 classic

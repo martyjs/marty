@@ -49,7 +49,7 @@ An (optional) display name for the action creator. Used for richer debugging. We
 
 <h2 id="dispatch">dispatch(type, [...])</h2>
 
-Dispatches an action payload with the given type. Any [action handlers](/api/stores/index.html#handleAction) will be invoked with the given action handlers.
+Dispatches an action payload with the given type. Any [action handlers]({% url /api/stores/index.html#handleAction %}) will be invoked with the given action handlers.
 
 <h2 id="for">for(obj)</h2>
 
