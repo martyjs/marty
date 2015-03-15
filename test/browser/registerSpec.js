@@ -39,7 +39,7 @@ describe('Marty#register', function () {
         };
 
         ExpectedStore = createStore(Marty, expectedInitialState);
-        ActualStore = Marty.register(expectedId, ExpectedStore);
+        ActualStore = Marty.register(ExpectedStore, expectedId);
       });
 
       it('should return an instance of the store', function () {
@@ -92,7 +92,7 @@ describe('Marty#register', function () {
     describe('when you pass in an id', function () {
       beforeEach(function () {
         ExpectedActionCreators = createActionCreators(Marty);
-        ActualActionCreators = Marty.register(expectedId, ExpectedActionCreators);
+        ActualActionCreators = Marty.register(ExpectedActionCreators, expectedId);
       });
 
       it('should return an instance of the store', function () {
@@ -140,7 +140,7 @@ describe('Marty#register', function () {
     describe('when you pass in an id', function () {
       beforeEach(function () {
         ExpectedStateSource = createStateSource(Marty);
-        ActualStateSource = Marty.register(expectedId, ExpectedStateSource);
+        ActualStateSource = Marty.register(ExpectedStateSource, expectedId);
       });
 
       it('should return an instance of the store', function () {

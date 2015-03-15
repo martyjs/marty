@@ -20,12 +20,16 @@ function createInstance() {
     dispose: dispose,
     version: '0.9.0-rc2',
     warnings: warnings,
-    Dispatcher: Dispatcher,
-    Diagnostics: Diagnostics,
+    dispatcher: Dispatcher,
+    diagnostics: Diagnostics,
     container: new Container(),
     __events: new EventEmitter(),
     renderToString: renderToString,
-    createInstance: createInstance
+    createInstance: createInstance,
+
+    // Legacy
+    Dispatcher: Dispatcher,
+    Diagnostics: Diagnostics
   }, state, create, classes, environment);
 }
 

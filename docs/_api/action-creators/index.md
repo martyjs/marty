@@ -34,5 +34,3 @@ An (optional) display name for the action creator. Used for richer debugging. We
 <h2 id="dispatch">dispatch(type, [...])</h2>
 
 Dispatches an action payload with the given type. Any [action handlers](/api/stores/index.html#handleAction) will be invoked with the given action handlers.
-
-Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
