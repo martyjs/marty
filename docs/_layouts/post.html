@@ -3,13 +3,14 @@ layout: default
 sectionid: blog
 ---
 
+{% capture version %}{% version %}{% endcapture %}
 
 <div class="container bs-docs-container">
   <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
     <ul class="sections-nav nav" role="navigation">
       {% for post in site.posts %}
         <li class="nav-section">
-          <a {% if page.url == post.url %} class="active"{% endif %} href="{{ post.url }}">{{ post.title }}</a>
+          <a {% if page.url == post.url %} class="active"{% endif %} href="{{version}}{{post.url}}">{{ post.title }}</a>
         </li>
       {% endfor %}
     </ul>

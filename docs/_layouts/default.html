@@ -68,7 +68,7 @@
           <li{% if page.sectionid == "blog" %} class="active"{% endif %}>
             {% assign latest_blog = site.posts | first %}
 
-            <a href="{{latest_blog.url}}">Blog</a>
+            <a href="{{version}}{{latest_blog.url}}">Blog</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
