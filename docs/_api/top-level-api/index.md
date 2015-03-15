@@ -77,11 +77,11 @@ Given some dehyrdated state, it will call [Store#rehydrate](/api/stores/index.ht
 
 <h3 id="createContext">Marty.createContext(options)</h3>
 
-Creates a [context](/api/context/index.html) for all types currently registered within the [Marty.container](#container).
+Creates a [context](/api/context/index.html) which contains a dispatcher and instances of all types currently registered within [Marty.container](#container).
 
 <h3 id="renderToString">Marty.renderToString(options)</h3>
 
-[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occured. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**).
+[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occured. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**). It uses React contexts to pass the Marty context to child components (context key is ``marty``).
 
 {% highlight js %}
 var options = {
@@ -90,6 +90,17 @@ var options = {
   props: { bar: 'bar' },
   timeout: 1000
 };
+
+var Foo = React.createClass({
+  contextTypes {
+    marty: React.PropTypes.object
+  },
+  render: function () {
+    var store = this.context.marty.getStore('foo');
+
+    return <div />
+  }
+});
 
 Marty.renderToString(options).then(function (res) {
   console.log('Rendered html', res.html);
