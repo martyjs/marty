@@ -7,7 +7,7 @@
   <title>{{ page.title }} | marty.js</title>
   <meta name="viewport" content="width=device-width">
 
-  <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
+  <link rel="shortcut icon" href="{% url /favicon.ico?v=1 %}" type="image/x-icon">
 
   <link rel="stylesheet" type="text/css" href="{% url /css/bootstrap.min.css %}">
   <link rel="stylesheet" type="text/css" href="{% url /css/font-awesome.min.css %}">
@@ -27,7 +27,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a href="/" class="navbar-brand">marty.js</a>
+        <a href="{% url / %}" class="navbar-brand">marty.js</a>
       </div>
       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">

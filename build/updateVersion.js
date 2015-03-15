@@ -9,6 +9,7 @@ console.log(version)
 
 updateDocs();
 updateMarty();
+updateVersion();
 ['../package.json', '../bower.json'].forEach(updateConfig);
 
 function updateDocs() {
@@ -27,6 +28,10 @@ function updateConfig(path) {
   var config = JSON.parse(read(path));
   config.version = version;
   write(path, JSON.stringify(config, null, 2));
+}
+
+function updateVersion() {
+  write('../VERSION', version);
 }
 
 function write(path, data) {

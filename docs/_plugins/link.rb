@@ -27,9 +27,9 @@ module Jekyll
       end
 
       if ENV['VERSION'] == 'true'
-        "/v/#{@version}#{@text}"
+        "/v/#{@version}#{@text.strip}".strip
       else
-        @text
+        @text.strip
       end
     end
   end

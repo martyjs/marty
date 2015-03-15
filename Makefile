@@ -53,4 +53,4 @@ docs:
 	@cd docs && bundle exec jekyll serve -w
 
 release-docs: bootstrap-ruby
-	@cd docs && bundle exec rake release
+	@sh ./build/release-docs.sh
