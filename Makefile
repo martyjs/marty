@@ -32,7 +32,7 @@ build: lint
 	@cat dist/marty.js | $(BIN)/uglifyjs > dist/marty.min.js
 	@gzip dist/marty.min.js -c > dist/marty.min.js.gz
 
-docs: bootstrap-ruby
+docs:
 	@cd docs && bundle exec jekyll serve -w
 
 release-docs: bootstrap-ruby
