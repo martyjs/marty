@@ -47,7 +47,7 @@ In the above scenario, ``UserConstants.UPDATE_USER_EMAIL`` creates an action cre
 If an action is making a change to your local state then it can pass its type data along to something called a dispatcher. The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
 
 {% highlight js %}
-var Dispatcher = require('marty/dispatcher').getDefault();
+var Dispatcher = require('marty').dispatcher.getDefault();
 
 Dispatcher.register(function (action) {
   console.log('action with type', action.type, 'has been dispatched') ;

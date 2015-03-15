@@ -160,9 +160,9 @@ Hooks are object literals which have 3 optional keys: ``before``, ``after`` and 
 Registers the hook in the pipeline
 
 {% highlight js %}
-var HttpStateSource = require('marty/stateSources/http');
+var Marty = require('marty');
 
-HttpStateSource.addHook({
+Marty.HttpStateSource.addHook({
   priority: 1,
   before: function (req) {
     req.headers['Foo'] = 'bar';
@@ -178,9 +178,9 @@ HttpStateSource.addHook({
 Removes the hook from the pipline.
 
 {% highlight js %}
+var Marty = require('marty');
 var ParseJSON = require('marty/http/hooks/parseJSON');
-var HttpStateSource = require('marty/stateSources/http');
 
-HttpStateSource.removeHook(ParseJSON);
+Marty.HttpStateSource.removeHook(ParseJSON);
 {% endhighlight %}
 

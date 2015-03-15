@@ -14,7 +14,7 @@ To create an action, you should pass its type followed by any arguments to the [
 {% sample %}
 classic
 =======
-var Dispatcher = require('marty/dispatcher');
+var Dispatcher = require('marty').dispatcher.getDefault();
 var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
@@ -32,7 +32,7 @@ Dispatcher.register(function (action) {
 });
 es6
 ===
-var Dispatcher = require('marty/dispatcher');
+var Dispatcher = require('marty').dispatcher.getDefault();
 var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
 
 class UserActionCreators extends Marty.ActionCreators {
