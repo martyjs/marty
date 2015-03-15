@@ -97,9 +97,6 @@ Marty.renderToString(options).then(function (res) {
 });
 {% endhighlight %}
 
-
-
-
 <h2 id="environment">Environment</h2>
 <h3 id="isServer">Marty.isServer</h3>
 
