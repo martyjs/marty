@@ -1,9 +1,11 @@
 var util = require('util');
 var sinon = require('sinon');
+var React = require('react');
 var when = require('../../when');
 var fetch = require('../../fetch');
 var expect = require('chai').expect;
 var stubbedLogger = require('../lib/stubbedLogger');
+var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('when', function () {
   var handlers, logger, expectedResult1, expectedResult2, expectedError;
@@ -53,6 +55,39 @@ describe('when', function () {
       );
 
       expect(logger.error).to.be.calledWith(expectedMessage, expectedError);
+    });
+  });
+
+  describe('when I pass in a function context as the second argument', function () {
+    var Component, fetchResult, expectedResult;
+
+    beforeEach(function () {
+      fetchResult = fetch.done();
+      expectedResult = { foo: 'bar' };
+      Component = TestUtils.renderIntoDocument(
+        React.createElement(React.createClass({
+          render: function () {
+            return React.createElement('div');
+          },
+          foo: function () {
+            return fetchResult.when({
+              done: function () {
+                return this.baz();
+              }
+            }, this);
+          },
+          bar: function () {
+            this.baz();
+          },
+          baz: function () {
+            return expectedResult;
+          }
+        }))
+      );
+    });
+
+    it('should inherit from the context', function () {
+      expect(Component.foo()).to.eql(expectedResult);
     });
   });
 
@@ -176,6 +211,27 @@ describe('when', function () {
         expect(handlers.failed).to.have.been.calledWith(expectedError);
       });
     });
+
+    describe('when you pass in a context', function () {
+      var expectedResult, actualResult;
+
+      beforeEach(function () {
+        expectedResult = { foo: 'bar' };
+        actualResult = when.join(fetch.done(), fetch.done(), {
+          done: function () {
+            return this.whatever();
+          }
+        }, {
+          whatever: function () {
+            return expectedResult;
+          }
+        })
+      });
+
+      it('should inherit from the context', function () {
+        expect(actualResult).to.equal(expectedResult);
+      });
+    })
 
     describe('when one of the fetch results is pending', function () {
       beforeEach(function () {

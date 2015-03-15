@@ -1,12 +1,14 @@
-var sinon = require('sinon');
 var _ = require('lodash');
+var sinon = require('sinon');
+var fetch = require('../../fetch');
 var Marty = require('../../marty');
 var expect = require('chai').expect;
 var warnings = require('../../lib/warnings');
 var Promise = require('es6-promise').Promise;
+var MockDispatcher = require('./lib/mockDispatcher');
 
 describe('Store#fetch()', function () {
-  var listener, store, changeListener, endFetch, remoteFetch, fetchId;
+  var listener, store, changeListener, endFetch, remoteFetch, fetchId, dispatcher;
   var expectedResult, actualResult, actualContext, expectedError, actualError;
 
   beforeEach(function () {
@@ -15,10 +17,12 @@ describe('Store#fetch()', function () {
 
     fetchId = 'foo';
     listener = sinon.spy();
+    dispatcher = new MockDispatcher();
     store = Marty.createStore({
       id: 'storeFetch',
       displayName: 'Test',
-      getInitialState: _.noop
+      getInitialState: _.noop,
+      dispatcher: dispatcher
     });
     changeListener = store.addChangeListener(listener);
   });
@@ -93,7 +97,168 @@ describe('Store#fetch()', function () {
       });
     });
 
+    describe('#toPromise', function () {
+      describe('when a fetch is done', function () {
+        var actualPromise, expectedState, localState, getState;
+
+        beforeEach(function () {
+          expectedState = { foo: 'bar' };
+
+          actualPromise = store.fetch({
+            id: 'locally',
+            locally: function () {
+              return localState;
+            },
+            remotely: function () {
+              return new Promise(function (resolve) {
+                localState = expectedState;
+                resolve();
+              });
+            }
+          }).toPromise();
+        });
+
+        it('should resolve the promise', function () {
+          return expect(actualPromise).to.eventually.eql(expectedState);
+        });
+      });
+
+      describe('when a fetch fails', function () {
+        var actualPromise, expectedError;
+
+        beforeEach(function () {
+          expectedError = new Error('foo');
+
+          actualPromise = store.fetch({
+            id: 'locally',
+            locally: function () {},
+            remotely: function () {
+              return new Promise(function (resolve, reject) {
+                reject(expectedError);
+              });
+            }
+          }).toPromise();
+        });
+
+        it('should reject the promise', function () {
+          return expect(actualPromise).to.be.rejectedWith(expectedError);
+        });
+      });
+
+      describe('fetch.done().toPromise()', function () {
+        var result, expectedResult;
+
+        beforeEach(function () {
+          expectedResult = { foo: 'bar' };
+          result = fetch.done(expectedResult).toPromise();
+        });
+
+        it('should resolve the promise', function () {
+          return expect(result).to.eventually.equal(expectedResult);
+        });
+      });
+
+      describe('fetch.failed().toPromise()', function () {
+        var result, expectedError;
+
+        beforeEach(function () {
+          expectedError = new Error('foo');
+          result = fetch.failed(expectedError).toPromise();
+        });
+
+        it('should resolve the promise', function () {
+          return expect(result).to.be.rejectedWith(expectedError);
+        });
+      });
+    });
+
     describe('#dependsOn', function () {
+      var Store1, Store2, changeListener, fooQueryResult, barQueryResult, store2ChangeListener;
+
+      beforeEach(function () {
+        store2ChangeListener = sinon.spy();
+
+        Store1 = Marty.createStore({
+          id: 'Store1',
+          foo: function () {
+            return this.fetch({
+              id: 'foo',
+              locally: function () {
+                return fooQueryResult;
+              },
+              remotely: function () {
+                return new Promise(function (resolve) {
+                  setTimeout(function () {
+                    fooQueryResult = { foo: 'bar' };
+                    resolve();
+                  }, 1);
+                });
+              }
+            })
+          },
+          bar: function () {
+            return this.fetch({
+              id: 'bar',
+              locally: function () {
+                return barQueryResult;
+              },
+              remotely: function () {
+                return new Promise(function (resolve) {
+                  setTimeout(function () {
+                    barQueryResult = { bar: 'bar' };
+                    resolve();
+                  }, 1);
+                });
+              }
+            })
+          },
+        });
+
+        Store2 = Marty.createStore({
+          id: 'Store2',
+          singleDependency: function () {
+            return this.fetch({
+              id: 'singleDependency',
+              dependsOn: Store1.foo(),
+              locally: function () {
+                return { bar: 'baz' };
+              }
+            })
+          },
+          multipleDependencies: function () {
+            return this.fetch({
+              id: 'multipleDependencies',
+              dependsOn: [Store1.foo(), Store1.bar()],
+              locally: function () {
+                return { bar: 'baz' };
+              }
+            })
+          }
+        });
+
+        Store2.addChangeListener(store2ChangeListener);
+      });
+
+      describe('when there is one pending dependency', function () {
+        beforeEach(function () {
+          return Store2.singleDependency().toPromise();
+        });
+
+        it('should trigger the store to update', function () {
+          expect(store2ChangeListener).to.be.calledOnce;
+        });
+      });
+
+      describe('when there are two pending dependency', function () {
+        beforeEach(function () {
+          return Store2.multipleDependencies().toPromise();
+        });
+
+        it('should trigger the store to update', function () {
+          expect(store2ChangeListener).to.be.calledOnce;
+        });
+      });
+
       describe('when you pass it a fetch result', function () {
         describe('when the fetch result is pending', function () {
           beforeEach(function () {
@@ -291,6 +456,12 @@ describe('Store#fetch()', function () {
     });
   });
 
+  describe('when you pass valid, but falsy id', function () {
+    it('should not throw an error', function () {
+      expect(function () { store.fetch({id: 0}); }).not.to.throw(Error);
+    });
+  });
+
   describe('when a fetch with the given id is in progress', function () {
     beforeEach(function () {
       expectedResult = store.fetch(fetchId, noop, function () {
@@ -301,7 +472,7 @@ describe('Store#fetch()', function () {
     it('should return the in progress fetch', function () {
       actualResult = store.fetch(fetchId, noop, noop);
 
-      expect(actualResult).to.eql(expectedResult);
+      expect(omitPromise(actualResult)).to.eql(omitPromise(expectedResult));
     });
   });
 
@@ -365,7 +536,7 @@ describe('Store#fetch()', function () {
     });
 
     it('should return a fetch not found result', function () {
-      expect(actualResult).to.eql(store.fetch.notFound('bar', store));
+      expect(omitPromise(actualResult)).to.eql(omitPromise(store.fetch.notFound('bar', store)));
     });
 
     it('should not call remotely', function () {
@@ -415,8 +586,8 @@ describe('Store#fetch()', function () {
     });
 
     describe('when the remote fetch returns a promise', function () {
-      describe('when the promise fails', function () {
-        var remoteFetch;
+      describe('when the promise rejects', function () {
+        var remoteFetch, fetchFailedAction;
 
         beforeEach(function (done) {
           expectedError = new Error();
@@ -429,7 +600,11 @@ describe('Store#fetch()', function () {
 
           store.addChangeListener(function () {
             actualResult = store.fetch('foo', noop, noop);
-            done();
+
+            setTimeout(function () {
+              fetchFailedAction = dispatcher.getActionWithType('FETCH_FAILED');
+              done();
+            }, 1);
           });
         });
 
@@ -443,6 +618,18 @@ describe('Store#fetch()', function () {
 
         it('should have the error', function () {
           expect(actualResult.error).to.equal(expectedError);
+        });
+
+        it('should dispatch a FETCH_FAILED action', function () {
+          expect(fetchFailedAction).to.exist;
+        });
+
+        it('should include fetch, store and error in the FETCH_FAILED action', function () {
+          expect(fetchFailedAction.arguments).to.eql([
+            expectedError,
+            'foo',
+            store
+          ]);
         });
 
         describe('when I try to call the fetch again', function () {
@@ -462,7 +649,7 @@ describe('Store#fetch()', function () {
         });
       });
 
-      describe('when the promise completes done', function () {
+      describe('when the promise resolves', function () {
         describe('when the local fetch then returns a value', function () {
           var localResult;
 
@@ -683,6 +870,10 @@ describe('Store#fetch()', function () {
       expect(actualResult.result).to.equal(expectedResult);
     });
   });
+
+  function omitPromise(result) {
+    return _.omit(result, 'toPromise');
+  }
 
   function noop() {
   }

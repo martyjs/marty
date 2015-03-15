@@ -131,7 +131,7 @@ describeStyles('Marty#renderToString', function (styles) {
     }, options)).then(loadDOM);
   }
 
-  function loadDOM(html) {
-    $ = cheerio.load(html);
+  function loadDOM(result) {
+    $ = cheerio.load(result.html);
   }
 });

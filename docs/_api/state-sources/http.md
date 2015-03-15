@@ -47,7 +47,8 @@ var UsersAPI = Marty.createStateSource({
     this.request({
       url: '/users',
       method: 'POST',
-      body: { name: 'foo' }
+      body: { name: 'foo' },
+      contentType: 'application/json'
     });
   }
 });
@@ -106,6 +107,12 @@ class UsersAPI extends Marty.HttpStateSource {
      <td>string</td>
      <td>application/json</td>
      <td>Content type of request</td>
+   </tr>
+   <tr>
+     <td>dataType</td>
+     <td>string</td>
+     <td>json</td>
+     <td>The type of data that you're expecting back from the server. <code>xml</code>, <code>json</code>, <code>script</code>, or <code>html</code></td>
    </tr>
   </tbody>
 </table>

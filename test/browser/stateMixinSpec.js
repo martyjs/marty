@@ -70,40 +70,6 @@ describe('StateMixin', function () {
       element.displayName = mixin.displayName;
     });
 
-    describe('when the handler fails', function () {
-      var expectedError;
-
-      beforeEach(function () {
-        expectedError = new Error();
-        store.getState = sinon.stub().throws(expectedError);
-        getObserver(element).onStoreChanged(null, store, element);
-      });
-
-      it('should add a view to the handler', function () {
-        expect(action.handlers[0].views[0]).to.eql({
-          name: 'bar',
-          id: expectedId,
-          error: expectedError,
-          state: expectedState
-        });
-      });
-    });
-
-    describe('when the handler is successful', function () {
-      beforeEach(function () {
-        getObserver(element).onStoreChanged(null, store, element);
-      });
-
-      it('should add a view to the handler', function () {
-        expect(action.handlers[0].views[0]).to.eql({
-          name: 'bar',
-          error: null,
-          id: expectedId,
-          state: expectedState
-        });
-      });
-    });
-
     afterEach(function () {
       console.log = log;
     });

@@ -1,6 +1,8 @@
-var _ = require('./utils/mindash');
-var log = require('./logger');
-var warnings = require('./warnings');
+"use strict";
+
+var log = require("../logger");
+var _ = require("../utils/mindash");
+var warnings = require("../warnings");
 
 function constants(obj) {
   return toConstant(obj);
@@ -31,12 +33,7 @@ function constants(obj) {
     var constants = {};
 
     _.each(array, function (actionType) {
-      var types = [
-        actionType,
-        actionType + '_STARTING',
-        actionType + '_DONE',
-        actionType + '_FAILED'
-      ];
+      var types = [actionType, actionType + "_STARTING", actionType + "_DONE", actionType + "_FAILED"];
 
       _.each(types, function (type) {
         constants[type] = createActionCreator(type);
@@ -47,13 +44,9 @@ function constants(obj) {
   }
 
   function createActionCreator(actionType) {
-    var constantActionCreator = function (actionCreator) {
+    var constantActionCreator = function constantActionCreator(actionCreator) {
       if (warnings.invokeConstant) {
-        log.warn(
-          'Warning: Invoking constants has been depreciated. ' +
-          'Please migrate to new style of creating action creators ' +
-          'http://martyjs.org/guides/action-creators/migrating-from-v8.html'
-        );
+        log.warn("Warning: Invoking constants has been depreciated. " + "Please migrate to new style of creating action creators " + "http://martyjs.org/guides/action-creators/migrating-from-v8.html");
       }
 
       if (!_.isFunction(actionCreator)) {
@@ -67,7 +60,7 @@ function constants(obj) {
 
         function actionContext(creators) {
           return _.extend({}, creators, {
-            dispatch: function () {
+            dispatch: function dispatch() {
               var args = _.toArray(arguments);
 
               args.unshift(actionType);

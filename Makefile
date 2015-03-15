@@ -10,7 +10,7 @@ test: lint test-server test-browser
 test-server:
 	@./build/test-server.sh
 
-test-browser: lint
+test-browser:
 	@./build/test-browser.sh
 
 test-watch:
@@ -25,7 +25,7 @@ bootstrap-ruby: docs/Gemfile
 	@which bundle > /dev/null || gem install bundler
 	@cd docs && bundle install
 
-lint: bootstrap-js
+lint:
 	@$(BIN)/jscs --esprima=esprima-fb $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 

@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.9.0-alpha",
+  "version": "0.9.0-rc2",
   "description": "A Javascript library for state management in React applications",
   "main": "dist/node/marty.js",
   "browser": "marty.js",
@@ -22,17 +22,18 @@
   "dependencies": {
     "babel": "^4.7.1",
     "babelify": "^5.0.4",
-    "bundle-collapser": "^1.0.0",
+    "cookies-js": "^1.2.1",
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",
-    "lodash": "^3.0.0"
+    "lodash": "^3.5.0"
   },
   "devDependencies": {
     "bluebird": "^2.3.11",
     "body-parser": "^1.9.3",
-    "browserify": "^5.12.0",
+    "browserify": "^9.0.0",
     "browserify-shim": "^3.7.0",
+    "bundle-collapser": "^1.0.0",
     "chai": "^1.9.1",
     "chai-as-promised": "^4.1.1",
     "cheerio": "^0.18.0",
@@ -60,7 +61,7 @@
     "uglify-js": "^2.4.15"
   },
   "peerDependencies": {
-    "react": ">=0.13.0-rc2"
+    "react": "^0.13.0"
   },
   "author": "James Hollingworth",
   "licenses": [

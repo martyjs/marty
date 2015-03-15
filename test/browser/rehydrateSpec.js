@@ -1,5 +1,6 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
+var Instances = require('../../lib/instances');
 var UnknownStoreError = require('../../errors/unknownStore');
 
 describe('Marty#rehydrate()', function () {
@@ -50,16 +51,32 @@ describe('Marty#rehydrate()', function () {
     });
 
     describe('when you pass in state for a known store', function () {
-      var store1State, store2State;
+      var store1State, store2State, expectedFetchId;
 
       beforeEach(function () {
+        expectedFetchId = 'foo';
         store1State = { foo: 'bar' };
         store2State = { bar: 'baz' };
 
         BrowserMarty.rehydrate({
-          test1: store1State,
-          test2: store2State
+          test1: {
+            state: store1State,
+            fetchHistory: {
+              [expectedFetchId]: true
+            }
+          },
+          test2: {
+            state: store2State,
+            fetchHistory: {
+              [expectedFetchId]: true
+            }
+          }
         });
+      });
+
+      it('should set the stores fetchHistory', function () {
+        expect(Store1.hasAlreadyFetched(expectedFetchId)).to.be.true;
+        expect(Store2.hasAlreadyFetched(expectedFetchId)).to.be.true;
       });
 
       it('should set the state of the store', function () {

@@ -1,3 +1,1 @@
-var constants = require('./index');
-
-module.exports = constants(['PENDING', 'FAILED', 'DONE']);
+module.exports = require('../lib/constants/status');

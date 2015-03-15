@@ -10,6 +10,7 @@ var warnings = require('./lib/warnings');
 var Container = require('./lib/container');
 var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
+var environment = require('./lib/environment');
 var EventEmitter = require('events').EventEmitter;
 var renderToString = require('./lib/renderToString');
 
@@ -17,7 +18,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: '0.8.12',
+    version: '0.9.0-rc2',
     warnings: warnings,
     Dispatcher: Dispatcher,
     Diagnostics: Diagnostics,
@@ -25,7 +26,7 @@ function createInstance() {
     __events: new EventEmitter(),
     renderToString: renderToString,
     createInstance: createInstance
-  }, state, create, classes);
+  }, state, create, classes, environment);
 }
 
 module.exports = createInstance();

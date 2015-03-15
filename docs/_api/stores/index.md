@@ -265,7 +265,7 @@ listener.dispose();
 
 <h2 id="hasChanged">hasChanged()</h2>
 
-Calls any [registered callbacks](#addChangeListener).
+Calls any [registered callbacks](#addChangeListener). To improve performance listeners will only be notified once for each dispatched action.
 
 {% sample %}
 classic
@@ -300,7 +300,7 @@ class UsersStore extends Marty.Store {
 
 <h2 id="fetch">fetch(options)</h2>
 
-When requesting data from a store we should assume that it might require an async operation. <code>Store#fetch</code> provides a simple syntax that allows you to encapsulate that asynchronicity in a flux way. The <code>fetch</code> function allows you to specify how to get the state locally and remotely and returns an object that represents the current state of that request.
+When requesting data from a store we should assume that it might require an async operation. <code>Store#fetch</code> provides a simple syntax that allows you to encapsulate that asynchronicity in a flux way. The <code>fetch</code> function allows you to specify how to get the state locally and remotely and returns a <a href="#fetch-result">fetch result</a> which represents the current state of the fetch.
 
 {% sample %}
 classic
@@ -461,7 +461,11 @@ class UsersStore extends Marty.Store {
 
 <h3 id="fetch-result">Fetch Result</h3>
 
-Fetch returns a result object that repesents the current state of the fetch. It has a status which can be either **PENDING**, **DONE** OR **FAILED**. You can get the status by accessing ``fetch.status`` or with the helpers ``fetch.pending``, ``fetch.failed`` or ``fetch.done``.
+Fetch returns a result object that represents the current state of the fetch. It has a status which can be either **PENDING**, **DONE** OR **FAILED**. You can get the status by accessing ``fetch.status`` or with the helpers ``fetch.pending``, ``fetch.failed`` or ``fetch.done``.
+
+<div class="alert alert-info" id="fetch-not-promise">
+A fetch result is <b>not a promise</b>. It is an object literal that represents the fetch at the point the fetch was invoked. If the state of the fetch changes you will have to re-invoke <code>fetch</code> to get the updated state (e.g. After a store changes).
+</div>
 
 {% highlight js %}
 var user = UserStore.getUser(id);
@@ -497,7 +501,10 @@ UserStore.addChangeListener(function () {
 });
 {% endhighlight %}
 
-The result offers the helper function ``when(statusHandlers)`` for handling each of the status
+
+<h4 id="when">when(handlers, [context])</h4>
+
+<code>when</code> is a helper function that makes it easier to map the various states a fetch result can be in. You can pass in an optional context as the second argument which the handlers inherit from (allowing you to call other handlers or anything on the passed in context).
 
 {% highlight js %}
 var component = user.when({
@@ -510,7 +517,65 @@ var component = user.when({
   done: function (user) {
     return <div className="user">{user.name}</div>;
   }
-});
+}, this);
+{% endhighlight %}
+
+
+<h4 id="when.all">when.all([fetchResult*], handlers, [context])</h4>
+
+<code>when.all</code> will wait for all fetch results to be done before invoked the <code>done</code> status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
+
+{% highlight js %}
+var when = require('marty/when');
+var fetch = require('marty/fetch');
+
+when.all([fetch.done("foo"), fetch.done("bar")], {
+  pending: function () {
+    console.log("pending");
+  },
+  done: function (results) {
+    console.log("all done", results); // foo, bar
+  },
+  failed: function (error) {
+    console.log("failed", error); // first error
+  }
+})
+
+{% endhighlight %}
+
+<h4 id="when.join">when.join(fetchResult*, handlers, [context])</h4>
+
+<code>when.join</code> will wait for all fetch results to be done before invoked the <code>done</code> status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
+
+{% highlight js %}
+var when = require('marty/when');
+var fetch = require('marty/fetch');
+
+when.join(fetch.done("foo"), fetch.done("bar"), {
+  pending: function () {
+    console.log("pending");
+  },
+  done: function (results) {
+    console.log("all done", results); // foo, bar
+  },
+  failed: function (error) {
+    console.log("failed", error); // first error
+  }
+})
+
+{% endhighlight %}
+
+<h4 id="fetch-result-toPromise">toPromise()</h4>
+
+Converts a fetch result into a promise. Useful when you want to use a store outside of a React component.
+
+{% highlight js %}
+var getUser = UserStore.getUser().toPromise();
+
+getUser
+  .then((user) => console.log(user))
+  .catch((error) => console.error(error));
+
 {% endhighlight %}
 
 <h2 id="fetch_pending">fetch.pending()</h2>
@@ -565,49 +630,6 @@ var fetch = require('marty/fetch').notFound();
 console.log(fetch.failed, fetch.error) // FAILED, { status: 404 }
 {% endhighlight %}
 
-<h2 id="when.all">when.all([fetchResult*], handlers)</h2>
-
-``when.all`` will wait for all fetch results to be done before invoked the ``done`` status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
-
-{% highlight js %}
-var when = require('marty/when');
-var fetch = require('marty/fetch');
-
-when.all([fetch.done("foo"), fetch.done("bar")], {
-  pending: function () {
-    console.log("pending");
-  },
-  done: function (results) {
-    console.log("all done", results); // foo, bar
-  },
-  failed: function (error) {
-    console.log("failed", error); // first error
-  }
-})
-
-{% endhighlight %}
-
-<h2 id="when.join">when.join(fetchResult*, handlers)</h2>
-
-``when.join`` will wait for all fetch results to be done before invoked the ``done`` status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
-
-{% highlight js %}
-var when = require('marty/when');
-var fetch = require('marty/fetch');
-
-when.join(fetch.done("foo"), fetch.done("bar"), {
-  pending: function () {
-    console.log("pending");
-  },
-  done: function (results) {
-    console.log("all done", results); // foo, bar
-  },
-  failed: function (error) {
-    console.log("failed", error); // first error
-  }
-})
-
-{% endhighlight %}
 
 <h2 id="hasAlreadyFetched">hasAlreadyFetched(fetchId)</h2>
 
