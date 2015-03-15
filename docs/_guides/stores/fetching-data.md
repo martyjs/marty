@@ -65,19 +65,26 @@ var UserAPI = Marty.createStateSource({
   type: 'http',
   id: 'UserAPI',
   getUser: function (userId) {
-    return this
-      .get('http://jsonplaceholder.typicode.com/users/' + userId)
-      .then(function (res) {
-        this.dispatch(UserConstants.RECEIVE_USER, res.body);
-      }.bind(this));
+    return this.get('http://jsonplaceholder.typicode.com/users/' + userId);
+  }
+});
+
+var UserQueries = Marty.createQueries({
+  getUser: function (userId) {
+    this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
+
+    UserAPI.getUser(userId).then(function (res) {
+      this.dispatch(UserConstants.RECEIVE_USER, userId, res.body);
+    }.bind(this)).catch(function (err) {
+      this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err);
+    }.bind(this));
   }
 });
 
 var UserStore = Marty.createStore({
   id: 'UsersStore',
   handlers: {
-    addUser: UserConstants.RECEIVE_USER,
-    removeUser: UserConstants.USER_NOT_FOUND
+    addUser: UserConstants.RECEIVE_USER
   },
   getInitialState: function() {
     return {};
@@ -93,12 +100,9 @@ var UserStore = Marty.createStore({
         return this.state[userId];
       },
       remotely: function () {
-        return UserAPI.getUser(userId)
+        return UserQueries.getUser(userId)
       }
     });
-  },
-  removeUser: function (userId) {
-    // ...
   }
 });
 
@@ -111,9 +115,17 @@ var UserConstants = Marty.createConstants([
 
 class UserAPI extends Marty.HttpStateSource {
   getUser(userId) {
-    return this
-      .get('http://jsonplaceholder.typicode.com/users/' + userId)
-      .then((res) => this.dispatch(UserConstants.RECEIVE_USER, res.body));
+    return this.get('http://jsonplaceholder.typicode.com/users/' + userId);
+  }
+}
+
+class UserQueries extends Marty.Queries {
+  getUser(userId) {
+    this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
+
+    UserAPI.getUser(userId)
+      .then(res => this.dispatch(UserConstants.RECEIVE_USER, userId, res.body))
+      .catch(err => this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err));
   }
 }
 
@@ -122,8 +134,7 @@ class UserStore extends Marty.Store {
     super(options);
     this.state = {};
     this.handlers = {
-      addUser: UserConstants.RECEIVE_USER,
-      removeUser: UserConstants.USER_NOT_FOUND
+      addUser: UserConstants.RECEIVE_USER
     };
   }
   addUser(user) {
@@ -137,12 +148,9 @@ class UserStore extends Marty.Store {
         return this.state[userId];
       },
       remotely: function () {
-        return UserAPI.getUser(userId)
+        return UserQueries.getUser(userId)
       }
     });
-  }
-  removeUser(userId) {
-    // ...
   }
 }
 {% endsample %}
