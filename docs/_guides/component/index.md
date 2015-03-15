@@ -6,7 +6,7 @@ section: Component
 ---
 
 <div class="alert alert-info">
-If you are using ES5, we recommend you use <a href="/guides/state-mixin/index.html"><code>State mixins</code></a>
+If you are using ES5, we recommend you use <a href="{% url /guides/state-mixin/index.html %}"><code>State mixins</code></a>
 </div>
 
 

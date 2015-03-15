@@ -22,7 +22,7 @@ sectionid: page
         <li {% if page.section == section_name %} class="nav-section active"{% else %} class="nav-section" {% endif %}>
           {% capture section_url %}/{{page.collection}}/{{section_slug}}/index.html{% endcapture %}
 
-          <a {% if page.url == section_url %} class="active"{% endif %} href="{{section_url}}">
+          <a {% if page.url == section_url %} class="active"{% endif %} href="{% url {{section_url}} %}">
               {{section_name}}
           </a>
           {% if section_items.size > 1 %}
