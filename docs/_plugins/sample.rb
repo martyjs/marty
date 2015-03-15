@@ -34,7 +34,7 @@ module Jekyll
         styles.each do |style, lines|
           output += "\t<button type=\"button\" data-style=\"#{style}\" class=\"btn btn-default #{style}\">#{style}</button>"
         end
-          
+
         output += "\t</div>"
 
         styles.each do |style, lines|
