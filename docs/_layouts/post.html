@@ -1,0 +1,27 @@
+---
+layout: default
+sectionid: blog
+---
+
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      {% for post in site.posts %}
+        <li class="nav-section">
+          <a {% if page.url == post.url %} class="active"{% endif %} href="{{ post.url }}">{{ post.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    <h1 class="page-title">
+      {{page.title}}
+
+      <span class="meta">by <a href="{{page.author_url}}">{{ page.author }}</a> on {{ page.date | date: "%B %e, %Y" }}</span>
+    </h1>
+    <div class="content">
+      {{content}}
+    </div>
+  </div>
+</div>

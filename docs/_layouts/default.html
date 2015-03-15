@@ -65,6 +65,11 @@
           <li{% if page.collection == "devtools" %} class="active"{% endif %}>
             <a href="{% url /devtools %}">Developer Tools</a>
           </li>
+          <li{% if page.sectionid == "blog" %} class="active"{% endif %}>
+            {% assign latest_blog = site.posts | first %}
+
+            <a href="{{latest_blog.url}}">Blog</a>
+          </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>

@@ -34,6 +34,10 @@ body {
   font-weight: normal;
 }
 
+.page-title .meta {
+  font-size: 14px;
+}
+
 /* Outline button for use within the docs */
 .btn-outline {
   color: #2a2a2a;
