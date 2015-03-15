@@ -5,7 +5,6 @@ module Jekyll
 
     VARIABLE_SYNTAX = /(?<variable>[^{]*\{\{\s*(?<name>[\w\-\.]+)\s*(\|.*)?\}\}[^\s}]*)(?<params>.*)/
 
-
     def initialize(tag_name, text, tokens)
       super
       matched = text.strip.match(VARIABLE_SYNTAX)
@@ -22,8 +21,8 @@ module Jekyll
     def render(context)
 
       if @text.match(VARIABLE_SYNTAX)
-        partial = Liquid::Template.parse(@text)
-        @text = partial.render!(context)
+        var = @text.gsub(/{{/, '').gsub(/}}/, '')
+        @text = context[var] || ''
       end
 
       if ENV['VERSION'] == 'true'

@@ -18,6 +18,7 @@
 </head>
 <body>
 
+  {% capture version %}{% version %}{% endcapture %}
   <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
     <div class="container">
       <div class="navbar-header">
@@ -39,7 +40,7 @@
                 <li {% if page.section == section_name and page.collection == "guides" %} class="active"{% endif %}>
                   {% capture section_url %}/guides/{{section_name | slugify}}/index.html{% endcapture %}
 
-                  <a {% if page.url == section_url %} class="active"{% endif %} href="{% url {{section_url}} %}">
+                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{version}}{{section_url}}">
                     {{section_name}}
                   </a>
                 </li>
@@ -54,7 +55,7 @@
                 <li {% if page.section == section_name and page.collection == "api" %} class="active"{% endif %}>
                   {% capture section_url %}/api/{{section_name | slugify}}/index.html{% endcapture %}
 
-                  <a {% if page.url == section_url %} class="active"{% endif %} href="{% url {{section_url}} %}">
+                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{version}}{{section_url}}">
                     {{section_name}}
                   </a>
                 </li>

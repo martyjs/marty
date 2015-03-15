@@ -3,6 +3,8 @@ layout: default
 sectionid: page
 ---
 
+{% capture version %}{% version %}{% endcapture %}
+
 <div class="container bs-docs-container">
   <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
     <ul class="sections-nav nav" role="navigation">
@@ -22,7 +24,7 @@ sectionid: page
         <li {% if page.section == section_name %} class="nav-section active"{% else %} class="nav-section" {% endif %}>
           {% capture section_url %}/{{page.collection}}/{{section_slug}}/index.html{% endcapture %}
 
-          <a {% if page.url == section_url %} class="active"{% endif %} href="{% url {{section_url}} %}">
+          <a {% if page.url == section_url %} class="active"{% endif %} href="{{version}}{{section_url}}">
               {{section_name}}
           </a>
           {% if section_items.size > 1 %}
@@ -32,7 +34,7 @@ sectionid: page
               {% else %}
                 <li>
                   <a {% if page.url == section_page.url %} class="active"{% endif %}
-                      href="{{section_page.url}}">{{section_page.title}}</a>
+                      href="{{version}}{{section_page.url}}">{{section_page.title}}</a>
                 </li>
               {% endif %}
             {% endfor %}
