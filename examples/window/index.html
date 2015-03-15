@@ -11,14 +11,12 @@
 
 <script type="text/javascript">
   var Store = Marty.createStore({
+    id: 'Store',
     getInitialState: function () {
-      return [{
-        id: 1,
-        displayName: 'Foo'
-      }, {
-        id: 2,
-        displayName: 'Bar'
-      }]
+      return {
+        1: { displayName: 'Foo' },
+        2: { displayName: 'Bar' }
+      };
     }
   });
 

@@ -2,19 +2,22 @@ require.config({
   paths: {
     marty: '../../dist/browser/marty',
     react: '../../node_modules/react/dist/react'
+  },
+  shim: {
+    marty: {
+      deps: ['react']
+    }
   }
 });
 
 require(['react', 'marty'], function (React, Marty) {
   var Store = Marty.createStore({
+    id: 'Store',
     getInitialState: function () {
-      return [{
-        id: 1,
-        displayName: 'Foo'
-      }, {
-        id: 2,
-        displayName: 'Bar'
-      }]
+      return {
+        1: { displayName: 'Foo' },
+        2: { displayName: 'Bar' }
+      };
     }
   });
 
