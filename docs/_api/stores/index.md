@@ -48,6 +48,10 @@ A unique identifier (*required*). Used for registration within the container and
 
 An (optional) display name for the action creator. Used for richer debugging. We will use the Id if displayName hasn't been set. If you're using ES6 classes, displayName will automatically be the name of the class.
 
+<h2 id="for">for(obj)</h2>
+
+Resolves the instance of the object for the objects Marty context. The context can either be the object itself or available at ``obj.context`` or ``obj.context.marty``.
+
 <h2 id="handlers">handlers</h2>
 
 The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an [action predicate](#action-predicates).

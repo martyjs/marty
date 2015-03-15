@@ -35,3 +35,7 @@ The type of the state source (e.g. 'http').
 <h2 id="mixins">mixins</h2>
 
 An (optional) array of mixins that can be passed in through the createStateSource method.
+
+<h2 id="for">for(obj)</h2>
+
+Resolves the instance of the object for the objects Marty context. The context can either be the object itself or available at ``obj.context`` or ``obj.context.marty``.
