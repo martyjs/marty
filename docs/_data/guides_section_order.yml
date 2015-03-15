@@ -2,6 +2,7 @@
 - Flux
 - Stores
 - Action Creators
+- Queries
 - Component
 - State Mixin
 - State Sources
