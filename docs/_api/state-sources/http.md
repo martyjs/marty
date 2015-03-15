@@ -151,10 +151,6 @@ Same as <code>request(_.extend(options, { method: 'DELETE'})</code>
 
 <h2 id="hooks">Hooks</h2>
 
-Hooks allows you to make changes to requests before they are sent and as well as when responses are received. This can be useful when you want to do things like automatically converting all JSON responses to immutable objects.
-
-Hooks are object literals which have 3 optional keys: ``before``, ``after`` and ``priority``. If ``before`` is present then it will be called with the request as its argument. If ``after`` is present then it will be called after the response is recieved with the response as its argument. Setting a priority allows you to alter in what order the hook is executed (The smaller the number, the earlier it will be executed).
-
 <h3 id="addHook">addHook</h3>
 
 Registers the hook in the pipeline
