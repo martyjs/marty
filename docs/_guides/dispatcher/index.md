@@ -10,22 +10,11 @@ The dispatcher is the central hub in which all application data flows throw. Whe
 Marty uses [facebook's dispatcher](https://github.com/facebook/flux/).
 
 {% highlight js %}
-var Dispatcher = require('marty/dispatcher').getDefault();
+var Dispatcher = require('marty').dispatcher.getDefault();
 
 var dispatchToken = Dispatcher.register(function (action) {
   console.log(action);
 });
 
-Dispatcher.dispatch({ type: 'CREATE_FOO' });
-{% endhighlight %}
-
-Normally [action creators](/guides/action-creators/index.html) are responsible for calling the dispatcher. However if you feel the need to dispatch an action elsewhere, Marty expects the dispatch payload to be an instance of [``ActionPayload``](https://github.com/jhollingworth/marty/blob/master/lib/actionPayload.js).
-
-{% highlight js %}
-var Dispatcher = require('marty/dispatcher');
-var ActionPayload = require('marty/actionPayload');
-
-Dispatcher.dispatch(new ActionPayload({
-  type: 'CREATE_FOO'
-}));
+Dispatcher.dispatchAction({ type: 'CREATE_FOO' });
 {% endhighlight %}
