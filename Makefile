@@ -54,3 +54,6 @@ docs:
 
 release-docs: bootstrap-ruby
 	@sh ./build/release-docs.sh
+
+prerelease-docs:
+	@sh ./build/prerelease-docs.sh

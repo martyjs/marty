@@ -11,7 +11,8 @@ jekyll build -d ../../marty-gh-pages
 echo martyjs.org > ../../CNAME
 
 # Copy the old versions back again
-cp -r ../tmp/doc-versions ../../marty-gh-pages/v/
+cp -r ../tmp/doc-versions/* ../../marty-gh-pages/v/
+rm -rf ../tmp/doc-versions
 
 VERSION=true jekyll build -d ../../marty-gh-pages/v/$version
 
