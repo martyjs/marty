@@ -7,8 +7,6 @@ section: Isomorphism
 
 When we talk about isomorphism we are referring to a JS applications ability to run either in the browser or on the server (using node.js or io.js on the server). There are number of benefits to this, most prominently speed. The server responds with the full HTML so the users does not have to wait for the JS and data to load before seeing something. However there are a number of challenges you face with building isomorphic applications which Marty helps you solve.
 
-
-
 <h2 id="fetching-state">Fetching state</h2>
 
 Thanks to [React.renderToString](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) rendering individual React components on the server is trivial. However components on their own are useless without some state. So how do we know what state we need? How do we determine its OK to render?
@@ -35,7 +33,7 @@ var UserStore = Marty.createStore({
             remotely() {
                 return UserQueries.getUser(id);
             }
-        })
+        });
     }
 });
 
@@ -44,7 +42,7 @@ var UserState = Marty.createStateMixin({
     getState() {
         return {
             user: UserStore.getUser(this.props.id)
-        }
+        };
     }
 });
 
@@ -84,7 +82,6 @@ Unfortunately you cannot make the same HTTP requests on the server as you do in 
 
 Unfortunately we can't replicate all browser state on the server so [Local Storage state source]({% url /api/state-sources/local-storage.html %}), [Session Storage state source]({% url /api/state-sources/session-storage.html %}) and [JSON Storage state source]({% url /api/state-sources/json-storage.html %}) will return undefined values.
 
-
 <h2 id="concurrency">Concurrency</h2>
 
 In Marty, there is only one instance of each store, action creator, query, state source and dispatcher. This is a problem where you might have multiple requests which are all trying to use the same store. So how do we deal with concurrency?
@@ -92,6 +89,50 @@ In Marty, there is only one instance of each store, action creator, query, state
 The obvious solution is to give each request their own set of instances to play with. Marty introduces [contexts]({%url /api/context/index.html %}) to solve this problem. A context is an object that has its own dispatcher as well as its own instances of stores, action creators, queries and state sources. They are created by [``Marty.createContext()``]({% url /api/top-level-api/index.html#createContext %}) which will create new instances of all types currently registered in the [``container``]({% url /api/container/index.html %}).
 
 While contexts partially solve the problem, they introduce a new problem: How do I reference a specific instance belonging to the current context?
+
+The result of you [registering]({% url /api/top-level-api/index.html#register %}) a store, action creator, query or state sources is instance of that type. We call this the **default instance**. Contexts have a [resolve](http://martyjs.org/v/0.9.0-rc2/api/context/index.html#resolve) function which accepts a default instance and will return the context's instance with the same type. So now we have a mechanism for resolving the current instance we need a way of accessing the current context.
+
+When you call ``Marty.renderString`` you need to pass in a context. When we render the component we pass this context to all components using [React contexts](https://www.tildedave.com/2014/11/15/introduction-to-contexts-in-react-js.html) so you can get the current context in all components by calling ``this.context.marty``. So to get the correct instance of a store from a component you would need to do
+
+{% highlight js %}
+var User = React.createClass({
+    render() {
+        var user = this.context.marty.resolve(UserStore).getUser(123);
+        ...
+    }
+});
+{% endhighlight %}
+
+This tends to get a little verbose so all stores, action creators, queries and state sources have a ``for`` function which will do this for you
+
+{% highlight js %}
+var User = React.createClass({
+    render() {
+        var user = UserStore.for(this).getUser(123);
+        ...
+    }
+});
+{% endhighlight %}
+
+For stores, action creators, queries and state sources the context is available at ``this.context`` however ``for`` still works in the same way
+
+{% highlight js %}
+var UserStore = Marty.createStore({
+    getUser(id) {
+        return this.fetch({
+            id: id,
+            locally() {
+                return this.state[id];
+            },
+            remotely() {
+                return UserQueries.for(this).getUser(id);
+            }
+        });
+    }
+});
+{% endhighlight %}
+
+What this means is if you want you're code to run on the server you will need to remember to add ``.for(this)``. We will warn you if you do this accidentally so its worth watching you're logs.
 
 <h2 id="inconsistent-apis">Inconsistent APIs</h2>
 
