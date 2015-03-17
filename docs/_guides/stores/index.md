@@ -5,7 +5,7 @@ id: stores
 section: Stores
 ---
 
-The store is where your state should live. It is also the only place that your state should **change**. Actions come in from the dispatcher and the store  decides whether to handle them or not. If the store does choose to handle an action and subsequently changes its state then it will notify any listeners that it has changed. Your views can then listen to those changes (via the [State Mixin](/guides/state-mixin)) and then re-render themselves.
+The store is where your state should live. It is also the only place that your state should **change**. Actions come in from the dispatcher and the store  decides whether to handle them or not. If the store does choose to handle an action and subsequently changes its state then it will notify any listeners that it has changed. Your views can then listen to those changes (via the [State Mixin]({% url /guides/state-mixin %})) and then re-render themselves.
 
 All of a store's state should live within ``Store#state``. If you want to update the state you should use ``Store#setState`` which will update ``this.state`` and then notify any listeners that the store has changed. Or if you prefer you can update ``this.state`` and then manually call ``this.hasChanged()``
 

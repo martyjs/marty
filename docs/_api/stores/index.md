@@ -111,7 +111,7 @@ var UsersStore = Marty.createStore({
 
 The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.
 
-If you want to change the state to a new instance (or if you are using [immutable data collections](/guides/stores/immutable-data-collections.html)) you can set the states value or call <code>this.setState(state)</code>
+If you want to change the state to a new instance (or if you are using [immutable data collections]({% url /guides/stores/immutable-data-collections.html %})) you can set the states value or call <code>this.setState(state)</code>
 
 {% highlight js %}
 addUsers: function (users) {
