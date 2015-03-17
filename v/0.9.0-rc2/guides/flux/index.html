@@ -1115,7 +1115,7 @@ If you have a view that's interested in a domain, it can ask the store to notify
 <p>Whenever you want to change a value within your application, your data must follow this flow of <a href="/v/0.9.0-rc2/guides/action-creators/index.html">Action creator</a> <strong>-&gt;</strong> <a href="/v/0.9.0-rc2/guides/dispatcher/index.html">Dispatcher</a> <strong>-&gt;</strong> <a href="/v/0.9.0-rc2/guides/stores/index.html">Store</a> <strong>-&gt;</strong> <a href="/v/0.9.0-rc2/guides/state-mixin/index.html">State mixin</a> <strong>-&gt;</strong> View. This is known as a <strong>unidirectional data flow</strong>.</p>
 
 <p><center>
-  <img src="/img/data-flow.png" alt="Data flow"/>
+  <img src="/v/0.9.0-rc2/img/data-flow.png" alt="Data flow"/>
 </center></p>
 
 <p>While this seems superfluous at first, it turns out to have some great benefits. First and foremost, it&#39;s really easy to debug. There&#39;s only one place your application state can change so you don&#39;t have to dig into all the views to work out where a value was changed (it&#39;s even easier if you&#39;re using <a href="/v/0.9.0-rc2/guides/stores/immutable-data-collections.html">immutable data collections</a>). Thanks to action types being strings you have a loosely coupled <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a> architecture which is easy to grow without increasing the complexity of the code base.</p>

@@ -906,7 +906,95 @@
       <h1 class="page-title">Isomorphism</h1>
     
     <div class="content">
-      
+      <p>When we talk about isomorphism we are referring to a JS applications ability to run either in the browser or on the server (using node.js or io.js on the server). There are number of benefits to this, most prominently speed. The server responds with the full HTML so the users does not have to wait for the JS and data to load before seeing something. However there are a number of challenges you face with building isomorphic applications which Marty helps you solve.</p>
+
+<h2 id="fetching-state">Fetching state</h2>
+
+<p>Thanks to <a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">React.renderToString</a> rendering individual React components on the server is trivial. However components on their own are useless without some state. So how do we know what state we need? How do we determine its OK to render?</p>
+
+<p>A naive approach would be for you to put all the required state into the stores before rendering the component. This isn&#39;t a scalable solution and tends to be error prone. We&#39;ve found a better approach is to have the components tell us what state it needs using the same APIs they would in the browser and we will handle satisfying those requests on server.</p>
+
+<p><a href="/v/0.9.0-rc2/api/top-level-api/#renderToString">Marty.renderToString</a> behaves similarly to React.renderToString however has the added benefit of knowing about state. While rendering it will see what <a href="/v/0.9.0-rc2/api/stores/index.html#fetch">fetches it makes</a>. It will then wait until all of those fetches are complete (or have failed) and then it will re-render the component. <code>Marty.renderToString()</code> returns a promise which will be resolved with the HTML once the component has been re-rendered.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+    <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">addUser</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+    <span class="p">},</span>
+    <span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">user</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+    <span class="p">},</span>
+    <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span>
+            <span class="na">id</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
+            <span class="nx">locally</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+            <span class="p">},</span>
+            <span class="nx">remotely</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nx">UserQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">})</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">UserState</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+    <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
+    <span class="nx">getState</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+    <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">UserState</span><span class="p">],</span>
+    <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">when</span><span class="p">({</span>
+            <span class="nx">pending</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="o">&lt;</span><span class="nx">Loading</span> <span class="o">/&gt;</span><span class="p">;</span>
+            <span class="p">},</span>
+            <span class="nx">failed</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="o">&lt;</span><span class="nb">Error</span> <span class="nx">error</span><span class="o">=</span><span class="p">{</span><span class="nx">error</span><span class="p">}</span> <span class="sr">/&gt;</span><span class="err">;
+</span>            <span class="p">},</span>
+            <span class="nx">done</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>            <span class="p">}</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">({</span>
+    <span class="na">component</span><span class="p">:</span> <span class="nx">User</span><span class="p">,</span>
+    <span class="na">props</span><span class="p">:</span> <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">123</span> <span class="p">},</span>
+    <span class="na">context</span><span class="p">:</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContext</span><span class="p">()</span>
+<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">render</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">render</span><span class="p">.</span><span class="nx">html</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span></code></pre></div>
+
+<p>To help you debug server side rendering we will also return you some diagnostic information about what fetches occurred, how long they took and what state was returned. For example, in the <a href="https://github.com/jhollingworth/marty-chat-example/blob/v0.9/app/server/index.js#L32-L49">chat example we render all this information to the console</a>.</p>
+
+<h2 id="implicit-state">Implicit state</h2>
+
+<p>Unfortunately you cannot make the same HTTP requests on the server as you do in the browser. The major problem being there is a lot of implicit state in the browser we often forget about. For example when you make a request to <code>/bar</code>, your browser will automatically fully qualify the URL for you (e.g. http://foo.com/bar) and add in cookies and other HTTP headers. If you were to make the same request on the server it would fail so we need a way of replicating this state on the server.</p>
+
+<p><a href="/v/0.9.0-rc2/guides/isomorphism/marty-express.html">marty-express</a> helps here by filling in as of this information as it can. When you make a request to the <a href="/v/0.9.0-rc2/api/state-sources/http.html">HTTP state source</a> on the server, <a href="/v/0.9.0-rc2/guides/isomorphism/marty-express.html">marty-express</a> will fully qualify the URL for you (if it isn&#39;t already) and also inject in HTTP headers that were in the original request. This way you can share the same fetching code across all the browser and server.</p>
+
+<p>Unfortunately we can&#39;t replicate all browser state on the server so <a href="/v/0.9.0-rc2/api/state-sources/local-storage.html">Local Storage state source</a>, <a href="/v/0.9.0-rc2/api/state-sources/session-storage.html">Session Storage state source</a> and <a href="/v/0.9.0-rc2/api/state-sources/json-storage.html">JSON Storage state source</a> will return undefined values.</p>
+
+<h2 id="concurrency">Concurrency</h2>
+
+<p>In Marty, there is only one instance of each store, action creator, query, state source and dispatcher. This is a problem where you might have multiple requests which are all trying to use the same store. So how do we deal with concurrency?</p>
+
+<p>The obvious solution is to give each request their own set of instances to play with. Marty introduces <a href="/v/0.9.0-rc2/api/context/index.html">contexts</a> to solve this problem. A context is an object that has its own dispatcher as well as its own instances of stores, action creators, queries and state sources. They are created by <a href="/v/0.9.0-rc2/api/top-level-api/index.html#createContext"><code>Marty.createContext()</code></a> which will create new instances of all types currently registered in the <a href="/v/0.9.0-rc2/api/container/index.html"><code>container</code></a>.</p>
+
+<p>While contexts partially solve the problem, they introduce a new problem: How do I reference a specific instance belonging to the current context?</p>
+
+<h2 id="inconsistent-apis">Inconsistent APIs</h2>
+
+<p>Another big problem is the irregularities of the server and browser APIs. For example if you want to modify a cookie in the browser you would do <code>document.cookie = &quot;foo=bar&quot;</code> whereas on the server (using express.js) you would do <code>res.cookie(&#39;foo&#39;, &#39;bar&#39;)</code>. We need a way to abstract away these differences so our code can run anywhere.</p>
+
+<p>State sources were originally introduced to help solve this type of problem so all we needed to introduce a couple more that help building isomorphic applications. Two new ones we&#39;ve introduced are the <a href="/v/0.9.0-rc2/api/state-sources/cookie.html">cookie state source</a> for reading and modifying cookies on the browser and server and the <a href="/v/0.9.0-rc2/api/state-sources/location.html">location state source</a> for getting and changing your location.</p>
+
     </div>
   </div>
 </div>
