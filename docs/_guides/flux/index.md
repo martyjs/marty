@@ -243,7 +243,7 @@ class User extends Marty.Component {
 Whenever you want to change a value within your application, your data must follow this flow of [Action creator]({% url /guides/action-creators/index.html %}) **->** [Dispatcher]({% url /guides/dispatcher/index.html %}) **->** [Store]({% url /guides/stores/index.html %}) **->** [State mixin]({% url /guides/state-mixin/index.html %}) **->** View. This is known as a **unidirectional data flow**.
 
 <center>
-  <img src="/img/data-flow.png" alt="Data flow"/>
+  <img src="{% url /img/data-flow.png %}" alt="Data flow"/>
 </center>
 
 While this seems superfluous at first, it turns out to have some great benefits. First and foremost, it's really easy to debug. There's only one place your application state can change so you don't have to dig into all the views to work out where a value was changed (it's even easier if you're using [immutable data collections]({% url /guides/stores/immutable-data-collections.html %})). Thanks to action types being strings you have a loosely coupled [Law of Demeter](http://en.wikipedia.org/wiki/Law_of_Demeter) architecture which is easy to grow without increasing the complexity of the code base.

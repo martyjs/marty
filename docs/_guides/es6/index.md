@@ -26,7 +26,7 @@ class FooStore extends Marty.Store {
     }
 }
 
-var store = Marty.register(FooStore);
+var store = Marty.register(FooStore, 'foo');
 {% endhighlight %}
 
 ##Default instance
