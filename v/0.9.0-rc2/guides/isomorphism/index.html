@@ -933,7 +933,7 @@
             <span class="nx">remotely</span><span class="p">()</span> <span class="p">{</span>
                 <span class="k">return</span> <span class="nx">UserQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
             <span class="p">}</span>
-        <span class="p">})</span>
+        <span class="p">});</span>
     <span class="p">}</span>
 <span class="p">});</span>
 
@@ -942,7 +942,7 @@
     <span class="nx">getState</span><span class="p">()</span> <span class="p">{</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
-        <span class="p">}</span>
+        <span class="p">};</span>
     <span class="p">}</span>
 <span class="p">});</span>
 
@@ -988,6 +988,44 @@
 <p>The obvious solution is to give each request their own set of instances to play with. Marty introduces <a href="/v/0.9.0-rc2/api/context/index.html">contexts</a> to solve this problem. A context is an object that has its own dispatcher as well as its own instances of stores, action creators, queries and state sources. They are created by <a href="/v/0.9.0-rc2/api/top-level-api/index.html#createContext"><code>Marty.createContext()</code></a> which will create new instances of all types currently registered in the <a href="/v/0.9.0-rc2/api/container/index.html"><code>container</code></a>.</p>
 
 <p>While contexts partially solve the problem, they introduce a new problem: How do I reference a specific instance belonging to the current context?</p>
+
+<p>The result of you <a href="/v/0.9.0-rc2/api/top-level-api/index.html#register">registering</a> a store, action creator, query or state sources is instance of that type. We call this the <strong>default instance</strong>. Contexts have a <a href="http://martyjs.org/v/0.9.0-rc2/api/context/index.html#resolve">resolve</a> function which accepts a default instance and will return the context&#39;s instance with the same type. So now we have a mechanism for resolving the current instance we need a way of accessing the current context.</p>
+
+<p>When you call <code>Marty.renderString</code> you need to pass in a context. When we render the component we pass this context to all components using <a href="https://www.tildedave.com/2014/11/15/introduction-to-contexts-in-react-js.html">React contexts</a> so you can get the current context in all components by calling <code>this.context.marty</code>. So to get the correct instance of a store from a component you would need to do</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+    <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">marty</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">UserStore</span><span class="p">).</span><span class="nx">getUser</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>This tends to get a little verbose so all stores, action creators, queries and state sources have a <code>for</code> function which will do this for you</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+    <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">getUser</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>For stores, action creators, queries and state sources the context is available at <code>this.context</code> however <code>for</code> still works in the same way</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+    <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span>
+            <span class="na">id</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
+            <span class="nx">locally</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+            <span class="p">},</span>
+            <span class="nx">remotely</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nx">UserQueries</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>What this means is if you want you&#39;re code to run on the server you will need to remember to add <code>.for(this)</code>. We will warn you if you do this accidentally so its worth watching you&#39;re logs.</p>
 
 <h2 id="inconsistent-apis">Inconsistent APIs</h2>
 
