@@ -33,7 +33,7 @@ An (optional) display name for the store. Used for richer debugging.
 
 The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an [action predicate](#action-predicates).
 
-When invoked the handlers arguments are [the arguments passed to the dispatcher](/api/action-creators/index.html#dispatch). The original action is available by calling <code>this.action</code>.
+When invoked the handlers arguments are [the arguments passed to the dispatcher]({% url /api/action-creators/index.html#dispatch %}). The original action is available by calling <code>this.action</code>.
 
 {% highlight js %}
 var UsersStore = Marty.createStore({

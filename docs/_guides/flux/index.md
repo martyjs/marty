@@ -63,7 +63,7 @@ var UserStore = Marty.createStore({
 });
 {% endhighlight %}
 
-When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its [``handlers`` hash](/api/stores/index.html#handlers) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in ``this.state``).
+When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its [``handlers`` hash]({% url /api/stores/index.html#handlers %}) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in ``this.state``).
 
 The next (and final) step is to notify views about the new data. Like the dispatcher, you can register to be notified of any changes to a store.
 
