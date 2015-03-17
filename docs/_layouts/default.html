@@ -9,12 +9,12 @@
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
 
-  <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
-  <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
-  <link rel="stylesheet" type="text/css" href="/css/docs.css">
+  <link rel="stylesheet" type="text/css" href="{% url /css/bootstrap.min.css %}">
+  <link rel="stylesheet" type="text/css" href="{% url /css/font-awesome.min.css %}">
+  <link rel="stylesheet" type="text/css" href="{% url /css/codemirror.css %}">
+  <link rel="stylesheet" type="text/css" href="{% url /css/docs.css %}">
 
-  <script type="text/javascript" src="/js/codemirror.js"></script>
+  <script type="text/javascript" src="{% url /js/codemirror.js %}"></script>
 </head>
 <body>
 
@@ -28,12 +28,12 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a href="/" class="navbar-brand">marty.js</a>
+        <a href="{% url / %}" class="navbar-brand">marty.js</a>
       </div>
       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
           <li{% if page.collection == "guides" %} class="active"{% endif %}>
-            <a href="/guides/getting-started">Guides</a>
+            <a href="{% url /guides/getting-started %}">Guides</a>
             <ul class="nav sub-nav visible-xs-block">
               {% assign sections = site.guides | group_by:"section" %}
               {% for section_name in site.data.guides_section_order %}
@@ -48,7 +48,7 @@
             </ul>
           </li>
           <li{% if page.collection == "api" %} class="active"{% endif %}>
-            <a href="/api/stores">API</a>
+            <a href="{% url /api/stores %}">API</a>
             <ul class="nav sub-nav visible-xs-block">
               {% assign sections = site.api | group_by:"section" %}
               {% for section_name in site.data.api_section_order %}
@@ -63,7 +63,7 @@
             </ul>
           </li>
           <li{% if page.collection == "devtools" %} class="active"{% endif %}>
-            <a href="/devtools">Developer Tools</a>
+            <a href="{% url /devtools %}">Developer Tools</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -103,7 +103,7 @@
 
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/headings.js"></script>
+  <script type="text/javascript" src="{% url /js/headings.js %}"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ id: home
       A JavaScript library for state management in React applications
     </p>
     <p class="lead">
-      <a href="/guides/getting-started" class="btn btn-outline-inverse btn-lg">Get started now</a>
+      <a href="{% url /guides/getting-started %}" class="btn btn-outline-inverse btn-lg">Get started now</a>
     </p>
   </div>
 </div>
@@ -25,7 +25,7 @@ id: home
     <div class="col-sm-4">
       <h3>State management</h3>
       <p>
-        Marty provides solutions for <a href="/guides/state-sources/index.html">getting state into your application</a>, <a href="/guides/stores/index.html">storing it in memory</a> and then <a href="/guides/state-mixin/index.html">binding it to your React components</a>.
+        Marty provides solutions for <a href="{% url /guides/state-sources/index.html %}">getting state into your application</a>, <a href="{% url /guides/stores/index.html %}">storing it in memory</a> and then <a href="{% url /guides/state-mixin/index.html %}">binding it to your React components</a>.
       </p>
     </div>
     <div class="col-sm-4">
