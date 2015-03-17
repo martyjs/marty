@@ -8,7 +8,7 @@ section: State Mixin
 
 <h3 id="listenTo">listenTo</h3>
 
-Expects either a [store](/api/stores/index.html) or an array of [stores](/api/stores/index.html). Just before the [initial render](http://facebook.github.io/react/docs/component-specs.html#mounting-componentwillmount), it will register a change listener with the specified store(s).
+Expects either a [store]({% url /api/stores/index.html %}) or an array of [stores]({% url /api/stores/index.html %}). Just before the [initial render](http://facebook.github.io/react/docs/component-specs.html#mounting-componentwillmount), it will register a change listener with the specified store(s).
 
 When the element is about to be [unmounted from the DOM](http://facebook.github.io/react/docs/component-specs.html#unmounting-componentwillunmount) it will dispose of an change listeners.
 
@@ -38,7 +38,7 @@ var UserState = Marty.createStateMixin({
 
 <h3 id="stores">Stores</h3>
 
-If the value of a key is a [store](/api/stores/index.html), then the mixin will automatically listen to the store and merge the stores state with result of <code>getState</code>
+If the value of a key is a [store]({% url /api/stores/index.html %}), then the mixin will automatically listen to the store and merge the stores state with result of <code>getState</code>
 
 {% highlight js %}
 var UserState = Marty.createStateMixin({

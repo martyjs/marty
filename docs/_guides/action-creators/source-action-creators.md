@@ -5,7 +5,7 @@ id: server-action-creators
 section: Action Creators
 ---
 
-Often your action creator will call a [state source](/guides/state-source/index.html) which then calls another action creator with the response. This becomes a problem if you are using a module loader (e.g. CommonJS, AMD) since it creates a cyclic dependency.
+Often your action creator will call a [state source]({% url /guides/state-source/index.html %}) which then calls another action creator with the response. This becomes a problem if you are using a module loader (e.g. CommonJS, AMD) since it creates a cyclic dependency.
 
 The way to get around this is to have a seperate action creator that is responsible for handling responses from sources. In Marty we call them **Source Action Creator**.
 

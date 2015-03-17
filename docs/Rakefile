@@ -15,3 +15,10 @@ task :release => [:update_version] do
   system "jekyll build -d ../../marty-gh-pages"
   File.open('../../marty-gh-pages/CNAME', 'w+') { |f| f.write('martyjs.org') }
 end
+
+task :release_version => [:update_version] do
+  site_config = YAML.load_file('_config.yml')
+
+  system "jekyll build -d ../../marty-gh-pages/v/#{site_config['current_version']}"
+  File.open('../../marty-gh-pages/CNAME', 'w+') { |f| f.write('martyjs.org') }
+end
