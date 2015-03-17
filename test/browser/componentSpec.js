@@ -2,6 +2,7 @@ var sinon = require('sinon');
 var React = require('react');
 var Marty = require('../../marty');
 var expect = require('chai').expect;
+var warnings = require('../../lib/warnings');
 var TestUtils = require('react/addons').addons.TestUtils;
 var ContextComponent = require('../../lib/contextComponent');
 
@@ -9,9 +10,14 @@ describe('Component', function () {
   var Store, Component, getState, expectedId;
 
   beforeEach(function () {
+    warnings.cannotFindContext = false;
     expectedId = 123;
     getState = sinon.spy();
     Store = Marty.register(FooStore);
+  });
+
+  afterEach(function () {
+    warnings.cannotFindContext = true;
   });
 
   describe('when you listen to stores', function () {
