@@ -57,30 +57,14 @@ var StoreObserver = (function () {
 })();
 
 function tryGetState(component, store) {
-  var handler;
-  var displayName = component.displayName;
+  var state = component.getState();
+  var displayName = component.displayName || component.constructor.displayName;
 
   if (store && store.action) {
-    handler = store.action.addViewHandler(displayName, component);
+    store.action.addComponentHandler({ displayName: displayName }, store);
   }
 
-  try {
-    return component.getState();
-  } catch (e) {
-    var errorMessage = "An error occured while trying to get the latest state in the view " + component.displayName;
-
-    log.error(errorMessage, e, component);
-
-    if (handler) {
-      handler.failed(e);
-    }
-
-    throw e;
-  } finally {
-    if (handler) {
-      handler.dispose();
-    }
-  }
+  return state;
 }
 
 module.exports = StoreObserver;

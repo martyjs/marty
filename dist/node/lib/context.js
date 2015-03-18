@@ -14,12 +14,11 @@ var FetchDiagnostics = require("./fetchDiagnostics");
 var DEFAULT_TIMEOUT = 1000;
 
 var Context = (function () {
-  function Context(container, req) {
+  function Context(container) {
     var _this = this;
 
     _classCallCheck(this, Context);
 
-    this.req = req;
     this.instances = {};
     this.id = uuid.type("Context");
     this.dispatcher = new Dispatcher();

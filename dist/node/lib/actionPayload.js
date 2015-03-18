@@ -2,16 +2,14 @@
 
 var _ = require("./utils/mindash");
 var uuid = require("./utils/uuid");
-var Diagnostics = require("./diagnostics");
-var StatusConstants = require("./constants/status");
 
 function ActionPayload(options) {
   options || (options = {});
 
+  var stores = [];
+  var components = [];
   var rollbackHandlers = [];
   var actionHandledCallbacks = {};
-  var status = StatusConstants.PENDING;
-  var handlers = options.handlers || [];
 
   _.extend(this, options);
 
@@ -19,45 +17,25 @@ function ActionPayload(options) {
   this.type = actionType(options.type);
   this.arguments = _.toArray(options.arguments);
 
-  this.error = null;
   this.toJSON = toJSON;
   this.handled = handled;
   this.toString = toString;
   this.rollback = rollback;
-  this.internal = !!options.internal;
-  this.addViewHandler = addViewHandler;
   this.addStoreHandler = addStoreHandler;
   this.onActionHandled = onActionHandled;
   this.addRollbackHandler = addRollbackHandler;
+  this.addComponentHandler = addComponentHandler;
   this.timestamp = options.timestamp || new Date();
 
-  Object.defineProperty(this, "handlers", {
+  Object.defineProperty(this, "stores", {
     get: function get() {
-      return handlers;
+      return stores;
     }
   });
 
-  Object.defineProperty(this, "status", {
+  Object.defineProperty(this, "components", {
     get: function get() {
-      return status;
-    }
-  });
-
-  Object.defineProperty(this, "pending", {
-    get: function get() {
-      return status === StatusConstants.PENDING;
-    }
-  });
-
-  Object.defineProperty(this, "failed", {
-    get: function get() {
-      return status === StatusConstants.FAILED;
-    }
-  });
-
-  Object.defineProperty(this, "done", {
-    get: function get() {
-      return status === StatusConstants.DONE;
+      return components;
     }
   });
 
@@ -74,9 +52,7 @@ function ActionPayload(options) {
   }
 
   function toJSON() {
-    var json = _.pick(this, "id", "type", "error", "source", "creator", "internal", "handlers", "arguments", "timestamp");
-
-    json.status = this.status.toString();
+    var json = _.pick(this, "id", "type", "stores", "arguments", "timestamp", "components");
 
     return json;
   }
@@ -99,56 +75,19 @@ function ActionPayload(options) {
     actionHandledCallbacks[id] = cb;
   }
 
-  function addViewHandler(name, view) {
-    var storeHandler = handlers[handlers.length - 1];
-
-    var viewHandler = {
-      name: name,
-      error: null,
-      id: uuid.small() };
-
-    storeHandler.views.push(viewHandler);
-
-    return {
-      dispose: function dispose() {
-        if (Diagnostics.devtoolsEnabled) {
-          var state = view.state;
-          if (state) {
-            viewHandler.state = JSON.parse(JSON.stringify(state));
-          }
-        }
-      },
-      failed: function failed(err) {
-        viewHandler.error = err;
-      }
-    };
+  function addComponentHandler(component, store) {
+    components.push(_.extend({
+      id: uuid.small(),
+      store: store.id || store.displayName
+    }, component));
   }
 
   function addStoreHandler(store, handlerName) {
-    var handler = {
-      views: [],
-      error: null,
-      type: "Store",
+    stores.push({
       id: uuid.small(),
-      name: handlerName,
-      store: store.displayName };
-
-    handlers.push(handler);
-
-    return {
-      dispose: function dispose() {
-        if (Diagnostics.devtoolsEnabled) {
-          var state = (store.serialize || store.getState)();
-
-          if (state) {
-            handler.state = JSON.parse(JSON.stringify(state));
-          }
-        }
-      },
-      failed: function failed(err) {
-        handler.error = err;
-      }
-    };
+      handler: handlerName,
+      store: store.id || store.displayName
+    });
   }
 
   function addRollbackHandler(rollbackHandler, context) {

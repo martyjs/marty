@@ -35,7 +35,7 @@ function fetch(id, local, remote) {
     remotely: _.noop
   });
 
-  if (!options || !options.id) {
+  if (!options || _.isUndefined(options.id)) {
     throw new Error("must specify an id");
   }
 
