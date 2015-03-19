@@ -25,7 +25,7 @@ var LocationStateSource = (function (_StateSource) {
   _createClass(LocationStateSource, {
     getLocation: {
       value: function getLocation(location) {
-        return locationFactory(location);
+        return locationFactory(this.context, location);
       }
     }
   }, {
@@ -39,7 +39,7 @@ var LocationStateSource = (function (_StateSource) {
   return LocationStateSource;
 })(StateSource);
 
-function defaultLocationFactory(location) {
+function defaultLocationFactory(context, location) {
   var l = location || window.location;
 
   return {
