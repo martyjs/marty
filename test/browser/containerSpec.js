@@ -4,8 +4,8 @@ var warnings = require('../../lib/warnings');
 var uuid = require('../../lib/utils/uuid');
 var Dispatcher = require('../../lib/dispatcher');
 
-describe('Container', function () {
-  var container, action, query, id, context, expectedId;
+describe('Registry', function () {
+  var registry, action, query, id, context, expectedId;
   var defaultDispatcher, defaultActionHandler, sandbox, Marty;
 
   beforeEach(function () {
@@ -22,7 +22,7 @@ describe('Container', function () {
     sandbox.stub(uuid, 'generate').returns(expectedId);
     sandbox.stub(Dispatcher, 'getDefault').returns(defaultDispatcher);
 
-    container = Marty.container;
+    registry = Marty.registry;
   });
 
   afterEach(function () {
@@ -85,14 +85,14 @@ describe('Container', function () {
         });
 
         it('should be able to create an instance of it', function () {
-          actualStore = container.resolveStore(expectedStore.id);
+          actualStore = registry.resolveStore(expectedStore.id);
           expect(actualStore).to.be.defined;
           actionCreators.addFoo(expectedFoo);
           expect(actualStore.getFoo(expectedFoo.id)).to.equal(expectedFoo);
         });
 
         it('should return a resolvable instance', function () {
-          context = container.createContext();
+          context = registry.createContext();
 
           actionCreators.for(context).addFoo(expectedFoo);
           expect(defaultStore.for(context).getFoo(expectedFoo.id)).to.equal(expectedFoo);
@@ -109,7 +109,7 @@ describe('Container', function () {
         });
 
         it('should generate an Id for it', function () {
-          actualStore = container.resolveStore(expectedId);
+          actualStore = registry.resolveStore(expectedId);
           expect(actualStore).to.be.defined;
           expect(actualStore.getFoo).to.be.defined;
         });
@@ -127,7 +127,7 @@ describe('Container', function () {
         });
 
         it('should use the displayName as an Id', function () {
-          actualStore = container.resolveStore(expectedStore.displayName);
+          actualStore = registry.resolveStore(expectedStore.displayName);
           expect(actualStore).to.be.defined;
           expect(actualStore.getFoo).to.be.defined;
         });
@@ -160,14 +160,14 @@ describe('Container', function () {
         });
 
         it('should be able to create an instance of it', function () {
-          actualStateSource = container.resolveStateSource(expectedStateSource.id);
+          actualStateSource = registry.resolveStateSource(expectedStateSource.id);
           expect(actualStateSource).to.be.defined;
           actualStateSource.getFoo();
           expect(stateCall).to.be.calledOnce;
         });
 
         it('should return a resolvable instance', function () {
-          context = container.createContext();
+          context = registry.createContext();
 
           defaultStateSource.for(context).getFoo();
           expect(stateCall).to.be.calledOnce;
@@ -183,7 +183,7 @@ describe('Container', function () {
         });
 
         it('should generate an Id for it', function () {
-          actualStateSource = container.resolveStateSource(expectedId);
+          actualStateSource = registry.resolveStateSource(expectedId);
           expect(actualStateSource).to.be.defined;
           expect(actualStateSource.getFoo).to.be.defined;
         });
@@ -201,7 +201,7 @@ describe('Container', function () {
         });
 
         it('should use the displayName as an Id', function () {
-          actualStateSource = container.resolveStateSource(expectedStateSource.displayName);
+          actualStateSource = registry.resolveStateSource(expectedStateSource.displayName);
           expect(actualStateSource).to.be.defined;
           expect(actualStateSource.getFoo).to.be.defined;
         });
@@ -231,14 +231,14 @@ describe('Container', function () {
         });
 
         it('should be able to create an instance of it', function () {
-          actualActionCreator = container.resolveActionCreators(expectedActionCreator.id);
+          actualActionCreator = registry.resolveActionCreators(expectedActionCreator.id);
           expect(actualActionCreator).to.be.defined;
           actualActionCreator.foo();
           expect(action).to.be.called;
         });
 
         it('should return a defaultActionCreator', function () {
-          context = container.createContext();
+          context = registry.createContext();
           defaultActionCreator.foo();
           defaultActionCreator.for(context).foo();
 
@@ -255,7 +255,7 @@ describe('Container', function () {
         });
 
         it('should generate an Id for it', function () {
-          actualActionCreator = container.resolveActionCreators(expectedId);
+          actualActionCreator = registry.resolveActionCreators(expectedId);
           expect(actualActionCreator).to.be.defined;
           actualActionCreator.foo();
           expect(action).to.be.called;
@@ -274,7 +274,7 @@ describe('Container', function () {
         });
 
         it('should use the displayName as an Id', function () {
-          actualActionCreator = container.resolveActionCreators(expectedActionCreator.displayName);
+          actualActionCreator = registry.resolveActionCreators(expectedActionCreator.displayName);
           expect(actualActionCreator).to.be.defined;
           actualActionCreator.foo();
           expect(action).to.be.called;
@@ -305,14 +305,14 @@ describe('Container', function () {
         });
 
         it('should be able to create an instance of it', function () {
-          actualQueries = container.resolveQueries(expectedQueries.id);
+          actualQueries = registry.resolveQueries(expectedQueries.id);
           expect(actualQueries).to.be.defined;
           actualQueries.foo();
           expect(query).to.be.called;
         });
 
         it('should return a defaultQueries', function () {
-          context = container.createContext();
+          context = registry.createContext();
           defaultQueries.foo();
           defaultQueries.for(context).foo();
 
@@ -329,7 +329,7 @@ describe('Container', function () {
         });
 
         it('should generate an Id for it', function () {
-          actualQueries = container.resolveQueries(expectedId);
+          actualQueries = registry.resolveQueries(expectedId);
           expect(actualQueries).to.be.defined;
           actualQueries.foo();
           expect(query).to.be.called;
@@ -348,7 +348,7 @@ describe('Container', function () {
         });
 
         it('should use the displayName as an Id', function () {
-          actualQueries = container.resolveQueries(expectedQueries.displayName);
+          actualQueries = registry.resolveQueries(expectedQueries.displayName);
           expect(actualQueries).to.be.defined;
           actualQueries.foo();
           expect(query).to.be.called;
