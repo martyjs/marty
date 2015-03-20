@@ -11,6 +11,21 @@ describe('Marty#register', function () {
   describe('Store', function () {
     var ExpectedStore, ActualStore, expectedInitialState;
 
+    describe('when you pass options', function () {
+      it('should take them', function () {
+        class ExpectedStore extends Marty.Store {
+          constructor(options) {
+            super(options);
+            this.state = {};
+            this.options = options;
+          }
+        };
+        let expectedOptions = {some: 'options'}
+        ActualStore = Marty.register(ExpectedStore, expectedOptions)
+        expect(ActualStore.options).to.eql(expectedOptions)
+      });
+    });
+
     describe('when you dont pass in an id', function () {
       beforeEach(function () {
         expectedInitialState = {
