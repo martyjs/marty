@@ -152,6 +152,9 @@ var Store = (function () {
 
             emitter.emit.call(emitter, StoreEvents.CHANGE_EVENT, _this.state, _this, eventArgs);
           }
+
+          // Clear the action once the component has seen it
+          _this.action = null;
         };
 
         if (this.action) {

@@ -8,49 +8,58 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var cookieFactory = defaultCookieFactory;
+var _ = require("../../utils/mindash");
 var StateSource = require("../stateSource");
+var locationFactory = defaultLocationFactory;
 
-var CookieStateSource = (function (_StateSource) {
-  function CookieStateSource(options) {
-    _classCallCheck(this, CookieStateSource);
+var LocationStateSource = (function (_StateSource) {
+  function LocationStateSource(options) {
+    _classCallCheck(this, LocationStateSource);
 
-    _get(Object.getPrototypeOf(CookieStateSource.prototype), "constructor", this).call(this, options);
-    this._isCookieStateSource = true;
-    this._cookies = cookieFactory(this.context);
+    _get(Object.getPrototypeOf(LocationStateSource.prototype), "constructor", this).call(this, options);
+    this._isLocationStateSource = true;
   }
 
-  _inherits(CookieStateSource, _StateSource);
+  _inherits(LocationStateSource, _StateSource);
 
-  _createClass(CookieStateSource, {
-    get: {
-      value: function get(key) {
-        return this._cookies.get(key);
-      }
-    },
-    set: {
-      value: function set(key, value, options) {
-        return this._cookies.set(key, value, options);
-      }
-    },
-    expire: {
-      value: function expire(key) {
-        return this._cookies.expire(key);
+  _createClass(LocationStateSource, {
+    getLocation: {
+      value: function getLocation(location) {
+        return locationFactory(this.context, location);
       }
     }
   }, {
-    setCookieFactory: {
-      value: function setCookieFactory(value) {
-        cookieFactory = value;
+    setLocationFactory: {
+      value: function setLocationFactory(value) {
+        locationFactory = value;
       }
     }
   });
 
-  return CookieStateSource;
+  return LocationStateSource;
 })(StateSource);
 
-function defaultCookieFactory() {
-  return require("cookies-js");
+function defaultLocationFactory(context, location) {
+  var l = location || window.location;
+
+  return {
+    url: l.url,
+    path: l.pathname,
+    hostname: l.hostname,
+    query: query(l.search),
+    protocol: l.protocol.replace(":", "")
+  };
+
+  function query(search) {
+    var result = {};
+
+    _.each(search.substr(1).split("&"), function (part) {
+      var item = part.split("=");
+      result[item[0]] = decodeURIComponent(item[1]);
+    });
+
+    return result;
+  }
 }
 
-module.exports = CookieStateSource;
+module.exports = LocationStateSource;

@@ -33,8 +33,8 @@ var Container = (function () {
       }
     },
     createContext: {
-      value: function createContext(req) {
-        return new Context(this, req);
+      value: function createContext() {
+        return new Context(this);
       }
     },
     get: {
@@ -61,6 +61,8 @@ var Container = (function () {
       value: function register(clazz) {
         var defaultInstance = new clazz({});
         var type = classType(defaultInstance);
+
+        defaultInstance.__isDefaultInstance = true;
 
         if (!this.types[type]) {
           this.types[type] = {};
