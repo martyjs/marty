@@ -50,7 +50,7 @@ UserAPI.getUsers();
 
 Marty comes with a number of state sources out of the box:
 
-* [HTTP](/guides/state-sources/http.html)
-* [JSON storage](/guides/state-sources/json-storage.html)
-* [Local storage](/guides/state-sources/local-storage.html)
-* [Session storage](/guides/state-sources/session-storage.html)
+* [HTTP](/api/state-sources/http.html)
+* [JSON storage](/api/state-sources/json-storage.html)
+* [Local storage](/api/state-sources/local-storage.html)
+* [Session storage](/api/state-sources/session-storage.html)

@@ -5,6 +5,8 @@ id: cookie-source-json
 section: State Sources
 ---
 
+Provides a simple way of accessing your cookies.
+
 {% sample %}
 classic
 =======
