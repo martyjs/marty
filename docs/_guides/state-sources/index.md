@@ -54,3 +54,5 @@ Marty comes with a number of state sources out of the box:
 * [JSON storage](/api/state-sources/json-storage.html)
 * [Local storage](/api/state-sources/local-storage.html)
 * [Session storage](/api/state-sources/session-storage.html)
+* [Location](/api/state-sources/location.html)
+* [Cookie](/api/state-sources/cookie.html)
