@@ -2,7 +2,7 @@ var React = require('react');
 var _ = require('lodash');
 
 module.exports = function (Marty) {
-  var MessageStore, MessageAPI;
+  var MessageStore, MessageAPI, Message;
 
   class _MessageStore extends Marty.Store {
     constructor(options) {
@@ -47,42 +47,41 @@ module.exports = function (Marty) {
     }
   }
 
-  class Message extends Marty.Component {
-    constructor(props, context) {
-      super(props, context);
-      this.listenTo = MessageStore;
-    }
+  class _Message extends React.Component {
     render() {
-      var message = this.state.message.when({
-        pending: function () {
-          return {
-            text: 'pending'
-          };
-        },
-        failed: function (error) {
-          return {
-            text: 'error: ' + error
-          };
-        },
-        done: function (message) {
-          return message;
-        }
-      });
+      var message = this.props.message;
 
       return React.createElement('div', { id: 'message' },
         React.createElement('div', { className: 'text' }, message.text),
         React.createElement('div', { className: 'context' }, message.context)
       );
     }
-    getState() {
-      return {
-        message: MessageStore.for(this).getMessage(this.props.id)
-      };
-    }
   }
 
   MessageAPI = Marty.register(_MessageAPI);
   MessageStore = Marty.register(_MessageStore);
+  Message = Marty.createContainer(_Message, {
+    listenTo: MessageStore,
+    fetch: {
+      message() {
+        return MessageStore.for(this).getMessage(this.props.id)
+      }
+    },
+    pending() {
+      return this.done({
+        message: {
+          text: 'pending'
+        }
+      })
+    },
+    failed(errors) {
+      return this.done({
+        message: {
+          text: 'error: ' + errors.message
+        }
+      });
+    }
+  });
 
   return {
     Message: Message,

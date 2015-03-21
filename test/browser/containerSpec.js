@@ -3,12 +3,20 @@ var sinon = require('sinon');
 var fetch = require('../../fetch');
 var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
+var ContextComponent = require('../../lib/components/context');
 
 describe('Container', function () {
-  var Marty, InnerComponent, ContainerComponent, element, expectedProps, initialProps, updateProps, Store, handler;
+  var Marty, InnerComponent, ContainerComponent, expectedProps, element, context;
+  var initialProps, updateProps, Store, handler, handlerContext, fetchContext;
+
   beforeEach(function () {
+    context = {
+      foo: 'bar'
+    };
+
     updateProps = sinon.spy();
     handler = sinon.spy(function () {
+      handlerContext = this;
       return <div></div>;
     });
 
@@ -84,6 +92,7 @@ describe('Container', function () {
       element = render(wrap(InnerComponent, {
         fetch: {
           foo() {
+            fetchContext = this;
             return 'bar';
           }
         }
@@ -92,6 +101,10 @@ describe('Container', function () {
 
     it('should pass that value to the inner component via props', function () {
       expect(initialProps).to.eql({ foo: 'bar' });
+    });
+
+    it('should make the marty context available in the current context', function () {
+      expect(fetchContext.context).to.equal(context);
     });
   });
 
@@ -166,7 +179,11 @@ describe('Container', function () {
         }
       };
 
-      expect(handler).to.be.calledWith(expectedResults, element);
+      expect(handler).to.be.calledWith(expectedResults);
+    });
+
+    it('should make the marty context available in the current context', function () {
+      expect(handlerContext.context).to.equal(context);
     });
   });
 
@@ -186,7 +203,11 @@ describe('Container', function () {
     });
 
     it('should call the handler with the fetches and component', function () {
-      expect(handler).to.be.calledWith(element);
+      expect(handler).to.be.calledOnce;
+    });
+
+    it('should make the marty context available in the current context', function () {
+      expect(handlerContext.context).to.equal(context);
     });
   });
 
@@ -222,7 +243,11 @@ describe('Container', function () {
         bar: barError
       };
 
-      expect(handler).to.be.calledWith(expectedErrors, element);
+      expect(handler).to.be.calledWith(expectedErrors);
+    });
+
+    it('should make the marty context available in the current context', function () {
+      expect(handlerContext.context).to.equal(context);
     });
   });
 
@@ -266,11 +291,46 @@ describe('Container', function () {
     });
   });
 
+  describe('when calling a fetch handler', function () {
+    var expectedResult, failed;
+
+    beforeEach(function () {
+      failed = sinon.spy();
+      expectedResult = { id: 123 };
+      element = render(wrap(InnerComponent, {
+        fetch: {
+          foo() {
+            return fetch.pending();
+          }
+        },
+        result: expectedResult,
+        pending() {
+          return this.failed();
+        },
+        failed() {
+          failed(this.result);
+          return this.done();
+        }
+      }));
+    });
+
+    it('should allow me to call anything else in the config', function () {
+      expect(failed).to.be.calledWith(expectedResult);
+    });
+  })
+
   function wrap(InnerComponent, containerOptions) {
     return Marty.createContainer(InnerComponent, containerOptions);
   }
 
   function render(Component, props) {
-    return TestUtils.renderIntoDocument(React.createElement(Component, props));
+    var subject = {
+      type: Component,
+      props: props
+    };
+
+    return TestUtils.renderIntoDocument(
+      <ContextComponent context={context} subject={subject} />
+    );
   }
 });
