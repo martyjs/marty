@@ -1,14 +1,32 @@
 var React = require('react');
 var sinon = require('sinon');
+var fetch = require('../../fetch');
 var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('Container', function () {
-  var Marty, InnerComponent, ContainerComponent, element, expectedProps, initialProps, updateProps;
+  var Marty, InnerComponent, ContainerComponent, element, expectedProps, initialProps, updateProps, Store, handler;
   beforeEach(function () {
     updateProps = sinon.spy();
+    handler = sinon.spy(function () {
+      return <div></div>;
+    });
 
     Marty = require('../../marty').createInstance();
+
+    Store = Marty.createStore({
+      id: 'ContainerStore',
+      getInitialState() {
+        return {}
+      },
+      addFoo(foo) {
+        this.state[foo.id] = foo;
+        this.hasChanged();
+      },
+      getFoo(id) {
+        return this.state[id];
+      }
+    });
 
     InnerComponent = React.createClass({
       render() {
@@ -65,7 +83,7 @@ describe('Container', function () {
     beforeEach(function () {
       element = render(wrap(InnerComponent, {
         fetch: {
-          foo: function () {
+          foo() {
             return 'bar';
           }
         }
@@ -81,10 +99,10 @@ describe('Container', function () {
     beforeEach(function () {
       element = render(wrap(InnerComponent, {
         fetch: {
-          foo: function () {
+          foo() {
             return 'bar';
           },
-          bar: function () {
+          bar() {
             return { baz: 'bam' };
           }
         }
@@ -101,17 +119,151 @@ describe('Container', function () {
     });
   });
 
-  describe('when I fetch a value that is done', function () {
-    it('should pass that value through to the child');
+  describe('when all of the fetchs are done and a done handler is not implemented', function () {
+    beforeEach(function () {
+      element = render(wrap(InnerComponent, {
+        fetch: {
+          foo() {
+            return fetch.done('bar');
+          },
+          bar() {
+            return fetch.done({ baz: 'bam' });
+          }
+        }
+      }))
+    });
+
+    it('should pass that value through to the child', function () {
+      expect(initialProps).to.eql({
+        foo: 'bar',
+        bar: {
+          baz: 'bam'
+        }
+      });
+    });
   });
 
-  describe('when I fetch a pending value and there is a pending handler', function () {
-    it('should render the result of the pending handler');
+  describe('when all of the fetchs are done and a done handler is implemented', function () {
+    beforeEach(function () {
+      element = render(wrap(InnerComponent, {
+        fetch: {
+          foo() {
+            return fetch.done('bar');
+          },
+          bar() {
+            return fetch.done({ baz: 'bam' });
+          }
+        },
+        done: handler
+      }))
+    });
+
+    it('should call the handler with the results and component', function () {
+      var expectedResults = {
+        foo: 'bar',
+        bar: {
+          baz: 'bam'
+        }
+      };
+
+      expect(handler).to.be.calledWith(expectedResults, element);
+    });
   });
 
-  describe('when I fetch a failed value and there is a failed handler', function () {
-    it('should render the result of the failed handler');
-    it('should pass in the error');
+  describe('when a fetch is pending and there is a pending handler', function () {
+    beforeEach(function () {
+      element = render(wrap(InnerComponent, {
+        fetch: {
+          foo() {
+            return fetch.done('bar');
+          },
+          bar() {
+            return fetch.pending();
+          }
+        },
+        pending: handler
+      }))
+    });
+
+    it('should call the handler with the fetches and component', function () {
+      expect(handler).to.be.calledWith(element);
+    });
+  });
+
+  describe('when a fetch failed and there is a failed handler', function () {
+    var fooError, barError;
+
+    beforeEach(function () {
+      fooError = new Error('foo');
+      barError = new Error('bar');
+
+      element = render(wrap(InnerComponent, {
+        fetch: {
+          foo() {
+            return fetch.failed(fooError);
+          },
+          bar() {
+            return fetch.failed(barError);
+          },
+          baz() {
+            return fetch.done({});
+          },
+          bam() {
+            return fetch.pending();
+          }
+        },
+        failed: handler
+      }));
+    });
+
+    it('should call the handler with the errors and component', function () {
+      var expectedErrors = {
+        foo: fooError,
+        bar: barError
+      };
+
+      expect(handler).to.be.calledWith(expectedErrors, element);
+    });
+  });
+
+  describe('when a fetch failed and there is no failed handler', function () {
+    it('should throw an error', function () {
+      expect(noFailedHandler).to.throw(Error);
+
+      function noFailedHandler() {
+        render(wrap(InnerComponent, {
+          fetch: {
+            foo() {
+              return fetch.failed(fooError);
+            }
+          }
+        }));
+      }
+    });
+  });
+
+  describe('when I listen to a store', function () {
+    var expectedResult;
+
+    beforeEach(function () {
+      element = render(wrap(InnerComponent, {
+        listenTo: Store,
+        fetch: {
+          foo() {
+            return Store.getFoo(123);
+          }
+        }
+      }));
+
+      expectedResult = { id: 123 };
+      Store.addFoo(expectedResult);
+    });
+
+    it('should update the inner components props when the store changes', function () {
+      expect(updateProps).to.be.calledWith({
+        foo: expectedResult
+      });
+    });
   });
 
   function wrap(InnerComponent, containerOptions) {
