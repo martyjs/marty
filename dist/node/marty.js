@@ -9,9 +9,10 @@ var _ = require("./lib/utils/mindash");
 var dispose = require("./lib/dispose");
 var classes = require("./lib/classes");
 var warnings = require("./lib/warnings");
-var Container = require("./lib/container");
+var Registry = require("./lib/registry");
 var Dispatcher = require("./lib/dispatcher");
 var Diagnostics = require("./lib/diagnostics");
+var environment = require("./lib/environment");
 var EventEmitter = require("events").EventEmitter;
 var renderToString = require("./lib/renderToString");
 
@@ -19,15 +20,15 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.0-rc1",
+    version: "0.9.0-rc2",
     warnings: warnings,
     Dispatcher: Dispatcher,
+    registry: new Registry(),
     Diagnostics: Diagnostics,
-    container: new Container(),
     __events: new EventEmitter(),
     renderToString: renderToString,
     createInstance: createInstance
-  }, state, create, classes);
+  }, state, create, classes, environment);
 }
 
 module.exports = createInstance();

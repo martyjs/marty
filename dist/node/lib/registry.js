@@ -18,15 +18,15 @@ var humanStrings = require("./utils/humanStrings");
 
 var FUNCTIONS_TO_NOT_WRAP = ["fetch"];
 
-var Container = (function () {
-  function Container() {
-    _classCallCheck(this, Container);
+var Registry = (function () {
+  function Registry() {
+    _classCallCheck(this, Registry);
 
     this.types = {};
     this.defaults = {};
   }
 
-  _createClass(Container, {
+  _createClass(Registry, {
     dispose: {
       value: function dispose() {
         this.types = {};
@@ -61,6 +61,8 @@ var Container = (function () {
       value: function register(clazz) {
         var defaultInstance = new clazz({});
         var type = classType(defaultInstance);
+
+        defaultInstance.__isDefaultInstance = true;
 
         if (!this.types[type]) {
           this.types[type] = {};
@@ -107,7 +109,7 @@ var Container = (function () {
     }
   });
 
-  return Container;
+  return Registry;
 })();
 
 addTypeHelpers("Store");
@@ -115,7 +117,7 @@ addTypeHelpers("Queries");
 addTypeHelpers("StateSource");
 addTypeHelpers("ActionCreators");
 
-module.exports = Container;
+module.exports = Registry;
 
 function classType(obj) {
   if (obj instanceof Store) {
@@ -159,7 +161,7 @@ function wrapResolverFunctions(functionName) {
 }
 
 function addTypeHelpers(type) {
-  var proto = Container.prototype;
+  var proto = Registry.prototype;
   var pluralType = type;
 
   if (pluralType[pluralType.length - 1] !== "s") {

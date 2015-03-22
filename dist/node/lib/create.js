@@ -1,10 +1,9 @@
 "use strict";
 
 var _ = require("./utils/mindash");
-var warnings = require("./warnings");
 var constants = require("./constants");
 var StateMixin = require("./stateMixin");
-var STORE_CHANGED_EVENT = "store-changed";
+var createContainer = require("./createContainer");
 var createStoreClass = require("./store/createStoreClass");
 var createQueriesClass = require("./queries/createQueriesClass");
 var createStateSourceClass = require("./stateSource/createStateSourceClass");
@@ -16,12 +15,11 @@ module.exports = {
   createStore: createStore,
   createQueries: createQueries,
   createContext: createContext,
+  createContainer: createContainer,
   createConstants: createConstants,
   createStateMixin: createStateMixin,
   createStateSource: createStateSource,
-  createActionCreators: createActionCreators,
-  addStoreChangeListener: addStoreChangeListener
-};
+  createActionCreators: createActionCreators };
 
 function register(id, clazz) {
   if (!_.isString(id)) {
@@ -39,43 +37,11 @@ function register(id, clazz) {
     clazz.displayName = clazz.id;
   }
 
-  var defaultInstance = this.container.register(clazz);
-
-  // TODO: Find a nicer way of listening to objects being registered
-  if (defaultInstance.constructor.type === "Store") {
-    warnings.without("callingResolverOnServer", function () {
-      defaultInstance.addChangeListener(_.bind(onStoreChanged, this));
-    }, this);
-  }
-
-  return defaultInstance;
-}
-
-function addStoreChangeListener(callback, context) {
-  var events = this.__events;
-
-  if (context) {
-    callback = _.bind(callback, context);
-  }
-
-  events.on(STORE_CHANGED_EVENT, callback);
-
-  return {
-    dispose: _.bind(function () {
-      events.removeListener(STORE_CHANGED_EVENT, callback);
-    }, this)
-  };
+  return this.registry.register(clazz);
 }
 
 function createContext(req) {
-  return this.container.createContext(req);
-}
-
-function createStore(properties) {
-  var StoreClass = createStoreClass(properties);
-  var defaultInstance = this.register(StoreClass);
-
-  return defaultInstance;
+  return this.registry.createContext(req);
 }
 
 function getClassName(clazz) {
@@ -86,20 +52,19 @@ function getClassName(clazz) {
   return className === DEFAULT_CLASS_NAME ? null : className;
 }
 
-function onStoreChanged() {
-  var events = this.__events;
-  var args = _.toArray(arguments);
-
-  args.unshift(STORE_CHANGED_EVENT);
-  events.emit.apply(events, args);
-}
-
 function createConstants(obj) {
   return constants(obj);
 }
 
 function createStateMixin(options) {
   return new StateMixin(options);
+}
+
+function createStore(properties) {
+  var StoreClass = createStoreClass(properties);
+  var defaultInstance = this.register(StoreClass);
+
+  return defaultInstance;
 }
 
 function createActionCreators(properties) {

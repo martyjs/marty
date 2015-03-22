@@ -8,14 +8,18 @@ var log = require("./logger");
 var _ = require("./utils/mindash");
 
 var StoreObserver = (function () {
-  function StoreObserver(component, stores) {
+  function StoreObserver(options) {
     var _this = this;
 
     _classCallCheck(this, StoreObserver);
 
-    this.component = component;
-    this.listeners = _.map(stores, function (store) {
-      return _this.listenToStore(store, component);
+    options = options || {};
+
+    this.component = options.component;
+    this.onStoreChanged = options.onStoreChanged || _.noop;
+
+    this.listeners = _.map(options.stores, function (store) {
+      return _this.listenToStore(store);
     });
   }
 
@@ -26,61 +30,32 @@ var StoreObserver = (function () {
       }
     },
     listenToStore: {
-      value: function listenToStore(store, component) {
+      value: function listenToStore(store) {
         var _this = this;
 
+        var component = this.component;
         var storeDisplayName = store.displayName || store.id;
 
-        log.trace("The " + component.displayName + " component  (" + component.__id + ") is listening to the " + storeDisplayName + " store");
+        log.trace("The " + component.displayName + " component  (" + component.id + ") is listening to the " + storeDisplayName + " store");
 
         return store["for"](component).addChangeListener(function (state, store) {
-          _this.onStoreChanged(state, store, component);
+          var storeDisplayName = store.displayName || store.id;
+
+          log.trace("" + storeDisplayName + " store has changed. " + ("The " + _this.component.displayName + " component (" + _this.component.id + ") is updating"));
+
+          if (store && store.action) {
+            store.action.addComponentHandler({
+              displayName: _this.component.displayName
+            }, store);
+          }
+
+          _this.onStoreChanged(store);
         });
-      }
-    },
-    onStoreChanged: {
-      value: function onStoreChanged(state, store, component) {
-        var storeDisplayName = store.displayName || store.id;
-
-        log.trace("" + storeDisplayName + " store has changed. The " + component.displayName + " component (" + component.__id + ") is updating");
-
-        if (component._lifeCycleState === "UNMOUNTED") {
-          log.warn("Warning: Trying to set the state of " + component.displayName + " component (" + component.__id + ") which is unmounted");
-        } else {
-          component.setState(tryGetState(component, store));
-        }
       }
     }
   });
 
   return StoreObserver;
 })();
-
-function tryGetState(component, store) {
-  var handler;
-  var displayName = component.displayName;
-
-  if (store && store.action) {
-    handler = store.action.addViewHandler(displayName, component);
-  }
-
-  try {
-    return component.getState();
-  } catch (e) {
-    var errorMessage = "An error occured while trying to get the latest state in the view " + component.displayName;
-
-    log.error(errorMessage, e, component);
-
-    if (handler) {
-      handler.failed(e);
-    }
-
-    throw e;
-  } finally {
-    if (handler) {
-      handler.dispose();
-    }
-  }
-}
 
 module.exports = StoreObserver;

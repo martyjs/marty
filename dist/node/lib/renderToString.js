@@ -2,7 +2,7 @@
 
 var React = require("react");
 var Context = require("./context");
-var ContextComponent = require("./contextComponent");
+var ContextComponent = require("./components/context");
 
 function renderToString(options) {
   options = options || {};
