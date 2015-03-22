@@ -1,6 +1,6 @@
 ---
 layout: home
-title: Home
+title: marty.js
 id: home
 ---
 <div class="bs-docs-masthead" id="content" role="main">

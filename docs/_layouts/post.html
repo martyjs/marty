@@ -20,6 +20,18 @@ sectionid: blog
       {{page.title}}
 
       <span class="meta">by <a href="{{page.author_url}}">{{ page.author }}</a> on {{ page.date | date: "%B %e, %Y" }}</span>
+
+      <div class="page-share">
+        <!-- AddToAny BEGIN -->
+        <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+        <a class="a2a_dd" href="https://www.addtoany.com/share_save"></a>
+        <a class="a2a_button_facebook"></a>
+        <a class="a2a_button_twitter"></a>
+        <a class="a2a_button_google_plus"></a>
+        </div>
+        <script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+        <!-- AddToAny END -->
+      </div>
     </h1>
     <div class="content">
       {{content}}
@@ -29,7 +41,7 @@ sectionid: blog
     <script type="text/javascript">
         /* * * CONFIGURATION VARIABLES * * */
         var disqus_shortname = 'martyjs';
-        
+
         /* * * DON'T EDIT BELOW THIS LINE * * */
         (function() {
           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -44,7 +56,7 @@ sectionid: blog
 <script type="text/javascript">
   /* * * CONFIGURATION VARIABLES * * */
   var disqus_shortname = 'martyjs';
-  
+
   /* * * DON'T EDIT BELOW THIS LINE * * */
   (function () {
       var s = document.createElement('script'); s.async = true;

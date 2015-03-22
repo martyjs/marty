@@ -1,6 +1,5 @@
 "use strict";
 
-var _ = require("./utils/mindash");
 var constants = require("./constants");
 var StateMixin = require("./stateMixin");
 var createContainer = require("./createContainer");
@@ -21,12 +20,7 @@ module.exports = {
   createStateSource: createStateSource,
   createActionCreators: createActionCreators };
 
-function register(id, clazz) {
-  if (!_.isString(id)) {
-    clazz = id;
-    id = null;
-  }
-
+function register(clazz, id) {
   var className = getClassName(clazz);
 
   if (!clazz.id) {

@@ -194,7 +194,7 @@ function getHooks(func) {
   return _.sortBy(_.filter(hooks, has(func)), priority);
 
   function priority(hook) {
-    return hook.priority;
+    return hook.priority || 1;
   }
 
   function has(func) {

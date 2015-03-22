@@ -36,19 +36,35 @@ function getFetchResult(config) {
 function invokeFetches(config) {
   var fetches = {};
 
-  _.each(config.fetch, function (getResult, key) {
-    if (!_.isFunction(getResult)) {
-      log.warn("The fetch " + key + " was not a function and so ignoring");
-    } else {
-      var result = getResult.call(config);
+  if (_.isFunction(config.fetch)) {
+    var result = config.fetch.call(config);
 
+    if (result._isFetchResult) {
+      throw new Error("Cannot return a single fetch result. You must return an object " + "literal where the keys map to props and the values can be fetch results");
+    }
+
+    _.each(result, function (result, key) {
       if (!result || !result._isFetchResult) {
         result = fetch.done(result);
       }
 
       fetches[key] = result;
-    }
-  });
+    });
+  } else {
+    _.each(config.fetch, function (getResult, key) {
+      if (!_.isFunction(getResult)) {
+        log.warn("The fetch " + key + " was not a function and so ignoring");
+      } else {
+        var result = getResult.call(config);
+
+        if (!result || !result._isFetchResult) {
+          result = fetch.done(result);
+        }
+
+        fetches[key] = result;
+      }
+    });
+  }
 
   return fetches;
 }
