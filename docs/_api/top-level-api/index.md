@@ -9,7 +9,7 @@ section: Top-Level API
 
 <h3 id="register">Marty.register(class, [id])</h3>
 
-Register a Marty class into the [container](#container). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it. Optionally takes a store Id as the second argument. Defaults to the store name.
+Register a Marty class into the [registry](#registry). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it. Optionally takes a store Id as the second argument. Defaults to the store name.
 
 {% highlight js %}
 class UserStore extends Marty.Store {
@@ -21,19 +21,19 @@ module.exports = Marty.register(UserStore, 'users');
 
 <h3 id="createStore">Marty.createStore(options)</h3>
 
-Register a [store]({% url /api/stores/index.html %}) defined with the ES5 syntact into the [container](#container). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
+Register a [store]({% url /api/stores/index.html %}) defined with the ES5 syntact into the [registry](#registry). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
 
 <h3 id="createQueries">Marty.createQueries(options)</h3>
 
-Register [queries]({% url /api/queries/index.html %}) defined with the ES5 syntact into the [container](#container). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
+Register [queries]({% url /api/queries/index.html %}) defined with the ES5 syntact into the [registry](#registry). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
 
 <h3 id="createStateSource">Marty.createStateSource(options)</h3>
 
-Register a [state source]({% url /api/state-source/index.html %}) defined with the ES5 syntact into the [container](#container). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
+Register a [state source]({% url /api/state-source/index.html %}) defined with the ES5 syntact into the [registry](#registry). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
 
 <h3 id="createActionCreators">Marty.createActionCreators(options)</h3>
 
-Register [action creators]({% url /api/action-creators/index.html %}) defined with the ES5 syntact into the [container](#container). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
+Register [action creators]({% url /api/action-creators/index.html %}) defined with the ES5 syntact into the [registry](#registry). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
 
 <h3 id="createStateMixin">Marty.createStateMixin(options)</h3>
 
@@ -43,9 +43,9 @@ Creates a [state mixin]({% url /guides/state-mixin/index.html %}) and returns it
 
 Creates [constants]({% url /guides/constants/index.html %}) and returns them.
 
-<h3 id="container">container</h3>
+<h3 id="registry">Marty.registry</h3>
 
-Returns the instance of [Container]({% url /api/container/index.html %}) Marty is using.
+Returns the current instance of the [registry]({% url /api/registry/index.html %}).
 
 <h2 id="state">State</h2>
 <h3 id="replaceState">Marty.replaceState(stores, [context])</h3>
@@ -77,7 +77,7 @@ Given some dehyrdated state, it will call [Store#rehydrate]({% url /api/stores/i
 
 <h3 id="createContext">Marty.createContext(options)</h3>
 
-Creates a [context]({% url /api/context/index.html %}) which contains a dispatcher and instances of all types currently registered within [Marty.container](#container).
+Creates a [context]({% url /api/context/index.html %}) which contains a dispatcher and instances of all types currently registered within [Marty.registry](#registry).
 
 <h3 id="renderToString">Marty.renderToString(options)</h3>
 

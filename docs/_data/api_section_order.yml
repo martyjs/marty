@@ -6,6 +6,6 @@
 - State Mixin
 - State Sources
 - Context
-- Container
+- Registry
 - Dispatcher
 - Constants

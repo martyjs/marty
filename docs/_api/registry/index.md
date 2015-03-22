@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Container API
-id: api-container
-section: Container
+title: Registry API
+id: api-registry
+section: Registry
 ---
 
 Responsible for knowing about all types within Marty and instantiating new instances of them.

@@ -5,7 +5,7 @@ id: api-context
 section: Context
 ---
 
-An object that contains instances of all types within ``Marty.container`` at the point that ``Marty.createContext()`` was called. Needed for isomorphic applications.
+An object that contains instances of all types within ``Marty.registry`` at the point that ``Marty.createContext()`` was called. Needed for isomorphic applications.
 
 <h2 id="fetch">fetch(callback, options)</h2>
 

@@ -42,7 +42,7 @@ class UsersStore extends Marty.Store {
 
 <h2 id="id">id</h2>
 
-A unique identifier (*required*). Used for registration within the container and (de)hydration.
+A unique identifier (*required*). Needed for and (de)hydration and by the [registry]({% url /api/registry/index.html %}) to uniquely identify the type.
 
 <h2 id="displayName">displayName</h2>
 
