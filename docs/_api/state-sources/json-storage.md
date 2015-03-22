@@ -5,6 +5,8 @@ id: state-source-json
 section: State Sources
 ---
 
+Provides a simple way of storing JSON objects in local or session storage.
+
 {% sample %}
 classic
 =======

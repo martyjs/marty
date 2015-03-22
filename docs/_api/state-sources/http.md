@@ -5,6 +5,8 @@ id: state-source-http
 section: State Sources
 ---
 
+Provides a simple way of making HTTP requests.
+
 {% sample %}
 classic
 =======

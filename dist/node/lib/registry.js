@@ -33,8 +33,8 @@ var Registry = (function () {
       }
     },
     createContext: {
-      value: function createContext(req) {
-        return new Context(this, req);
+      value: function createContext() {
+        return new Context(this);
       }
     },
     get: {

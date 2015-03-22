@@ -5,6 +5,8 @@ id: state-source-local
 section: State Sources
 ---
 
+Provides a simple way of storing state in local storage.
+
 {% sample %}
 classic
 =======

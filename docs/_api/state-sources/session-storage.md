@@ -5,6 +5,8 @@ id: state-source-session
 section: State Sources
 ---
 
+Provides a simple way of storing state in session storage.
+
 {% sample %}
 classic
 =======

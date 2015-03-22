@@ -40,8 +40,8 @@ function register(id, clazz) {
   return this.registry.register(clazz);
 }
 
-function createContext(req) {
-  return this.registry.createContext(req);
+function createContext() {
+  return this.container.createContext();
 }
 
 function getClassName(clazz) {
