@@ -15,7 +15,7 @@ module.exports = {
 };
 
 function getDefaultStores(context) {
-  return context.container.getAllDefaultStores();
+  return context.registry.getAllDefaultStores();
 }
 
 function clearState() {

@@ -3,7 +3,6 @@
 module.exports = {
   Store: require("./store"),
   Queries: require("./queries"),
-  Component: require("./component"),
   StateSource: require("./stateSource"),
   ActionCreators: require("./actionCreators"),
   HttpStateSource: require("./stateSource/inbuilt/http"),

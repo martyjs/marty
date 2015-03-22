@@ -1,10 +1,10 @@
 "use strict";
 
 var React = require("react");
-var _ = require("./utils/mindash");
+var _ = require("../utils/mindash");
 
-var ContextComponent = React.createClass({
-  displayName: "ContextComponent",
+var Context = React.createClass({
+  displayName: "Context",
 
   childContextTypes: {
     marty: React.PropTypes.object.isRequired
@@ -22,4 +22,4 @@ var ContextComponent = React.createClass({
   }
 });
 
-module.exports = ContextComponent;
+module.exports = Context;

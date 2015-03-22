@@ -9,12 +9,13 @@ var uuid = require("./utils/uuid");
 var Instances = require("./instances");
 var timeout = require("./utils/timeout");
 var Dispatcher = require("./dispatcher");
+var deferred = require("./utils/deferred");
 var FetchDiagnostics = require("./fetchDiagnostics");
 
 var DEFAULT_TIMEOUT = 1000;
 
 var Context = (function () {
-  function Context(container) {
+  function Context(registry) {
     var _this = this;
 
     _classCallCheck(this, Context);
@@ -25,7 +26,7 @@ var Context = (function () {
 
     Instances.add(this);
 
-    _.each((container || {}).types, function (classes, type) {
+    _.each((registry || {}).types, function (classes, type) {
       var options = {
         context: _this,
         dispatcher: _this.dispatcher
@@ -34,7 +35,7 @@ var Context = (function () {
       _this.instances[type] = {};
 
       _.each(classes, function (clazz) {
-        _this.instances[type][clazz.id] = container.resolve(type, clazz.id, options);
+        _this.instances[type][clazz.id] = registry.resolve(type, clazz.id, options);
       });
     });
   }
@@ -159,13 +160,4 @@ module.exports = Context;
 
 function getInstance(context) {
   return Instances.get(context);
-}
-
-function deferred() {
-  var result = {};
-  result.promise = new Promise(function (resolve, reject) {
-    result.resolve = resolve;
-    result.reject = reject;
-  });
-  return result;
 }
