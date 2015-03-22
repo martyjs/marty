@@ -187,23 +187,13 @@ As your application grows you start to find that there is a lot of boilerplate c
 {% sample %}
 classic
 =======
-var UserStateMixin = Marty.createStateMixin({
-  listenTo: UserStore,
-  getState: function () {
-    return {
-      user: UserStore.getUser(this.props.userId)
-    };
-  }
-});
-
 var User = React.createClass({
-  mixins: [UserStateMixin],
   render: function () {
     return (
       <div className="user">
         <input type="text"
                onChange={this.updateEmail}
-               value={this.state.user.email}></input>
+               value={this.props.user.email}></input>
       </div>
     );
   },
@@ -212,32 +202,41 @@ var User = React.createClass({
     UserActionCreators.updateUserEmail(this.props.userId, email);
   }
 });
+
+module.exports = Marty.createContainer(User, {
+  listenTo: UserStore,
+  fetch: {
+    user() {
+      return UserStore.getUser(this.props.userId)
+    }
+  }
+});
 es6
 ===
-class User extends Marty.Component {
-  constructor(props, context) {
-    super(props, context);
-    this.listenTo = UserStore;
-  }
+class User extends React.Component {
   render() {
     return (
       <div className="user">
         <input type="text"
                onChange={this.updateEmail}
-               value={this.state.user.email}></input>
+               value={this.props.user.email}></input>
       </div>
     );
-  }
-  getState() {
-    return {
-      user: UserStore.getUser(this.props.userId)
-    };
   }
   updateEmail(e) {
     var email = e.target.value;
     UserActionCreators.updateUserEmail(this.props.userId, email);
   }
 }
+
+module.exports = Marty.createContainer(User, {
+  listenTo: UserStore,
+  fetch: {
+    user() {
+      return UserStore.getUser(this.props.userId)
+    }
+  }
+});
 {% endsample %}
 
 Whenever you want to change a value within your application, your data must follow this flow of [Action creator]({% url /guides/action-creators/index.html %}) **->** [Dispatcher]({% url /guides/dispatcher/index.html %}) **->** [Store]({% url /guides/stores/index.html %}) **->** [State mixin]({% url /guides/state-mixin/index.html %}) **->** View. This is known as a **unidirectional data flow**.

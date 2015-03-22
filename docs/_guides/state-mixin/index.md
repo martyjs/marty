@@ -6,7 +6,7 @@ section: State Mixin
 ---
 
 <div class="alert alert-info">
-If you are using ES6 classes we recommend you use <a href="{% url /guides/component/index.html %}"><code>Marty.Component</code></a>
+The State Mixin will be depreciated, we recommend you use <a href="{% url /guides/containers/index.html %}"><code>containers</code></a> instead.
 </div>
 
 We found that there was a lot of boilerplate code in React components to start listening to [stores]({% url /guides/stores/index.html %}) and get their states. The State mixin helps to reduce the amount of code you have to write.

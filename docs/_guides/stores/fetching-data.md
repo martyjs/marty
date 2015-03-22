@@ -160,56 +160,35 @@ The result of the fetch function is a [fetch result]({% url /api/stores/#fetch-r
 {% sample %}
 classic
 =======
-var UserStateMixin = Marty.createStateMixin({
-  listenTo: UserStore,
-  getState: function () {
-    return {
-      user: UserStore.getUser(this.props.id)
-    };
+var User = React.createClass({
+  render: function () {
+    return <div className="user">{this.props.user.name}</div>;
   }
 });
 
-var User = React.createClass({
-  mixins: [UserStateMixin],
-  render: function () {
-    return this.state.user.when({
-      pending: function () {
-        return <div class="user-loading">Loading...</div>;
-      },
-      failed: function (error) {
-        return <div class="user-error">{error.message}</div>;
-      },
-      done: function (user) {
-        return <div className="user">{user.name}</div>;
-      }
-    })
+module.exports = Marty.createContainer(User, {
+  listenTo: UserStore,
+  fetch: {
+    user() {
+      return UserStore.getUser(this.props.userId)
+    }
   }
 });
 
 es6
 ===
-class User extends Marty.Component {
-  constructor(props, context) {
-    super(props, context);
-    this.listenTo = UserStore;
-  }
+class User extends React.Component {
   render() {
-    return this.state.user.when({
-      pending: function () {
-        return <div class="user-loading">Loading...</div>;
-      },
-      failed: function (error) {
-        return <div class="user-error">{error.message}</div>;
-      },
-      done: function (user) {
-        return <div className="user">{user.name}</div>;
-      }
-    })
-  }
-  getState() {
-    return {
-      user: UserStore.getUser(this.props.id)
-    };
+    return <div className="user">{this.props.user.name}</div>;
   }
 }
+
+module.exports = Marty.createContainer(User, {
+  listenTo: UserStore,
+  fetch: {
+    user() {
+      return UserStore.getUser(this.props.userId)
+    }
+  }
+});
 {% endsample %}

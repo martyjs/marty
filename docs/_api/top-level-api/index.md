@@ -43,6 +43,10 @@ Creates a [state mixin]({% url /guides/state-mixin/index.html %}) and returns it
 
 Creates [constants]({% url /guides/constants/index.html %}) and returns them.
 
+<h3 id="createContainer">Marty.createContainer(InnerComponent, options)</h3>
+
+Wraps the component with a [container component]({% url /guides/containers/index.html %}) that is responsible for fetching state from stores and passing it to the inner component.
+
 <h3 id="registry">Marty.registry</h3>
 
 Returns the current instance of the [registry]({% url /api/registry/index.html %}).

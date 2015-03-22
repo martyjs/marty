@@ -16,6 +16,7 @@ A naive approach would be for you to put all the required state into the stores 
 [Marty.renderToString]({% url /api/top-level-api/#renderToString %}) behaves similarly to React.renderToString however has the added benefit of knowing about state. While rendering it will see what [fetches it makes]({% url /api/stores/index.html#fetch %}). It will then wait until all of those fetches are complete (or have failed) and then it will re-render the component. ``Marty.renderToString()`` returns a promise which will be resolved with the HTML once the component has been re-rendered.
 
 {% highlight js %}
+// stores/userStore.js
 var UserStore = Marty.createStore({
     handlers: {
         addUser: UserConstants.RECEIVE_USER
@@ -37,32 +38,26 @@ var UserStore = Marty.createStore({
     }
 });
 
-var UserState = Marty.createStateMixin({
-    listenTo: UserStore,
-    getState() {
-        return {
-            user: UserStore.getUser(this.props.id)
-        };
-    }
-});
-
+// components/user.js
 var User = React.createClass({
-    mixins: [UserState],
     render() {
-        return this.state.user.when({
-            pending() {
-                return <Loading />;
-            },
-            failed(error) {
-                return <Error error={error} />;
-            },
-            done(user) {
-                return <div>{user.name}</div>
-            }
-        });
+        return <div>{this.props.user.name}</div>;
     }
 });
 
+module.exports = Marty.createContainer(User, {
+    listenTo: UserStore,
+    fetch: {
+        user() {
+            return UserStore.getUser(this.props.id)
+        }
+    },
+    failed(errors) {
+        return <Errors errors={errors} />;
+    }
+})
+
+// renderToString.js
 Marty.renderToString({
     component: User,
     props: { id: 123 },

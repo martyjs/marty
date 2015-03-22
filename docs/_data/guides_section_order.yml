@@ -3,7 +3,7 @@
 - Stores
 - Action Creators
 - Queries
-- Component
+- Containers
 - State Mixin
 - State Sources
 - Isomorphism
