@@ -1,8 +1,8 @@
 ---
 layout: page
-title: Fetching data
-id: stores-fetch
-section: Stores
+title: Fetching state
+id: fetch
+section: Fetching state
 ---
 
 From the views perspective, the store holds all the state it needs. In most cases it's unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we've found they make your views complicated and difficult to reason about. It also goes against Flux's unidirectional data flow. Marty introduces the [fetch API]({% url /api/stores/#fetch %}) which is an alternative solution to the problem.
