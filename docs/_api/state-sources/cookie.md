@@ -5,7 +5,7 @@ id: cookie-source-json
 section: State Sources
 ---
 
-Provides a simple way of accessing your cookies.
+Provides a simple way of accessing your cookies. Useful when creating [isomorphic applications]({% url /guides/isomorphism/index.html %}).
 
 {% sample %}
 classic
