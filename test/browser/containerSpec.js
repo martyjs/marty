@@ -62,7 +62,6 @@ describe('Container', function () {
   });
 
   describe('when I pass in a simple component', function () {
-
     beforeEach(function () {
       ContainerComponent = Marty.createContainer(InnerComponent);
     });
@@ -73,6 +72,28 @@ describe('Container', function () {
 
     it('should make the original component accessible at InnerComponent', function () {
       expect(ContainerComponent.InnerComponent).to.equal(InnerComponent);
+    });
+  });
+
+  describe('when fetch is a function', function () {
+     beforeEach(function () {
+      element = render(wrap(InnerComponent, {
+        fetch() {
+          return {
+            foo: 'bar',
+            bar: fetch.done({ baz: 'bam' })
+          };
+        }
+      }));
+    });
+
+    it('should pass each of them to the inner component via props', function () {
+      expect(initialProps).to.eql({
+        foo: 'bar',
+        bar: {
+          baz: 'bam'
+        }
+      });
     });
   });
 
