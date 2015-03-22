@@ -6,6 +6,7 @@ var warnings = {
   without: without,
   invokeConstant: true,
   reservedFunction: true,
+  cannotFindContext: true,
   classDoesNotHaveAnId: true,
   stateIsNullOrUndefined: true,
   callingResolverOnServer: true,

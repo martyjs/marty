@@ -7,7 +7,7 @@ var _ = require('./lib/utils/mindash');
 var dispose = require('./lib/dispose');
 var classes = require('./lib/classes');
 var warnings = require('./lib/warnings');
-var Container = require('./lib/container');
+var Registry = require('./lib/registry');
 var Dispatcher = require('./lib/dispatcher');
 var Diagnostics = require('./lib/diagnostics');
 var environment = require('./lib/environment');
@@ -18,11 +18,11 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: '0.9.0-rc2',
+    version: '0.9.0-rc3',
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
-    container: new Container(),
+    registry: new Registry(),
     __events: new EventEmitter(),
     renderToString: renderToString,
     createInstance: createInstance,

@@ -7,7 +7,7 @@ ES6_SRC = $(shell find ./lib ./marty.js -type f -name '*.js')
 
 test: lint test-server test-browser
 
-test-server:
+test-server: build-server
 	@./build/test-server.sh
 
 test-browser:

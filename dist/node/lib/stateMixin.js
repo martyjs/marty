@@ -26,9 +26,20 @@ function StateMixin(options) {
       marty: React.PropTypes.object
     },
     componentDidMount: function componentDidMount() {
+      var component = {
+        id: this.__id,
+        displayName: this.displayName || this.constructor.displayName };
+
       Instances.add(this, {
-        observer: new StoreObserver(this, config.stores)
+        observer: new StoreObserver({
+          component: component,
+          stores: config.stores,
+          onStoreChanged: this.onStoreChanged
+        })
       });
+    },
+    onStoreChanged: function onStoreChanged() {
+      this.setState(this.getState());
     },
     componentWillUnmount: function componentWillUnmount() {
       var instance = Instances.get(this);

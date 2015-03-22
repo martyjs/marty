@@ -28,7 +28,7 @@ describe('Marty#register', function () {
       });
 
       it('should default to the class name', function () {
-        expect(Marty.container.getDefault('Store', 'ExpectedStore')).to.equal(ActualStore);
+        expect(Marty.registry.getDefault('Store', 'ExpectedStore')).to.equal(ActualStore);
       });
     });
 
@@ -49,7 +49,7 @@ describe('Marty#register', function () {
       });
 
       it('should default to the class name', function () {
-        expect(Marty.container.getDefault('Store', expectedId)).to.equal(ActualStore);
+        expect(Marty.registry.getDefault('Store', expectedId)).to.equal(ActualStore);
       });
     });
 
@@ -85,7 +85,7 @@ describe('Marty#register', function () {
       });
 
       it('should default to the class name', function () {
-        expect(Marty.container.getDefault('ActionCreators', 'ExpectedActionCreators')).to.equal(ActualActionCreators);
+        expect(Marty.registry.getDefault('ActionCreators', 'ExpectedActionCreators')).to.equal(ActualActionCreators);
       });
     });
 
@@ -101,7 +101,7 @@ describe('Marty#register', function () {
       });
 
       it('should default to the class name', function () {
-        expect(Marty.container.getDefault('ActionCreators', expectedId)).to.equal(ActualActionCreators);
+        expect(Marty.registry.getDefault('ActionCreators', expectedId)).to.equal(ActualActionCreators);
       });
     });
 
@@ -133,7 +133,7 @@ describe('Marty#register', function () {
       });
 
       it('should default to the class name', function () {
-        expect(Marty.container.getDefault('StateSource', 'ExpectedStateSource')).to.equal(ActualStateSource);
+        expect(Marty.registry.getDefault('StateSource', 'ExpectedStateSource')).to.equal(ActualStateSource);
       });
     });
 
@@ -149,7 +149,7 @@ describe('Marty#register', function () {
       });
 
       it('should default to the class name', function () {
-        expect(Marty.container.getDefault('StateSource', expectedId)).to.equal(ActualStateSource);
+        expect(Marty.registry.getDefault('StateSource', expectedId)).to.equal(ActualStateSource);
       });
     });
 

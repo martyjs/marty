@@ -15,7 +15,7 @@ module.exports = {
 };
 
 function getDefaultStores(context) {
-  return context.container.getAllDefaultStores();
+  return context.registry.getAllDefaultStores();
 }
 
 function clearState() {
@@ -90,7 +90,7 @@ function dehydrate(context) {
 
       dehydratedStores[id] = {
         fetchHistory: instance.fetchHistory,
-        state: (store.hydrate || store.getState).call(store)
+        state: (store.dehydrate || store.getState).call(store)
       };
     }
   });

@@ -51,7 +51,7 @@ class UserStore extends Marty.Store {
 
 When you call fetch, Marty will first try calling the ``locally`` function. It the state is present in the store then it's returned and the fetch will finish executing. If the store can't find the state locally it should return ``undefined``. This causes the fetch function to invoke ``remotely``. Once ``remotely`` has finished executing then fetch will then re-execute the ``locally`` function with the expectation that the state is now in the store. If it isn't then the fetch will fail with a "Not found" error. If the ``remotely`` function needs to get the state asynchronously you can return a promise. The fetch function will wait for the promise to be resolved before re-executing ``locally``.
 
-Using the example of getting a user, you would have a UserAPI (Which is an [HTTP State Source]({% url /guides/state-sources/http.html %})), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should dispatch the state. You then return this promise chain to ``remotely``.
+Using the example of getting a user, you would have a UserAPI (Which is an [HTTP State Source]({% url /api/state-sources/http.html %})), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should dispatch the state. You then return this promise chain to ``remotely``.
 
 {% sample %}
 classic
