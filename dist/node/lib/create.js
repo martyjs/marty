@@ -41,7 +41,7 @@ function register(id, clazz) {
 }
 
 function createContext() {
-  return this.container.createContext();
+  return this.registry.createContext();
 }
 
 function getClassName(clazz) {

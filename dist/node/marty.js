@@ -20,7 +20,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.0-rc2",
+    version: "0.9.0-rc3",
     warnings: warnings,
     Dispatcher: Dispatcher,
     registry: new Registry(),
