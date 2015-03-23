@@ -886,21 +886,26 @@ describeStyles('Store', function (styles, currentStyle) {
 
   describe('#clear()', function () {
     describe('when you do not pass in a clear function', function () {
+      var initialState;
+
       beforeEach(function () {
+        initialState = {
+          foo: 'foo'
+        };
+
         store = styles({
           classic: function () {
             return Marty.createStore({
               id: 'clear',
               getInitialState: function () {
-                return {};
+                return initialState;
               }
             });
           },
           es6: function () {
             class ClearStore extends Marty.Store {
-              constructor() {
-                super();
-                this.state = {};
+              getInitialState() {
+                return initialState;
               }
             }
 
@@ -916,7 +921,7 @@ describeStyles('Store', function (styles, currentStyle) {
       });
 
       it('should replace the state with the original state', function () {
-        expect(store.state).to.eql({});
+        expect(store.state).to.eql(initialState);
       });
 
       it('should clear the fetchHistory', function () {
