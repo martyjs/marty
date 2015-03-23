@@ -9,7 +9,7 @@ section: Isomorphism
 
 marty-express will take your react-router routes and automatically serve them as if they were in the browser meaning you have a single place to define your routes. If a user requests one of these routes, it will use [``Marty.renderToString``]({% url /api/top-level-api/index.html#renderToString %}) to render the component on the server and then pass the result to the view for rendering.
 
-If you make any requests through the HTTP state source then requests are automatically fully qualified and any HTTP headers in the original request are automatically added. It will [LocationStateSource](/api/state-sources/location.html) and the [CookieStateSource](/api/state-sources/cookie.html) so that they use the express.js ``req`` and ``res``.
+If you make any requests through the HTTP state source then requests are automatically fully qualified and any HTTP headers in the original request are automatically added. It also modifies [LocationStateSource](/api/state-sources/location.html) and the [CookieStateSource](/api/state-sources/cookie.html) so that they use the ``req`` and ``res`` from the HTTP request.
 
 {% highlight js %}
 var Marty = require('marty');
