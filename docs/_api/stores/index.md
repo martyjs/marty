@@ -42,17 +42,21 @@ class UsersStore extends Marty.Store {
 
 <h2 id="id">id</h2>
 
-A unique identifier (*required*). Used for registration within the container and (de)hydration.
+A unique identifier (*required*). Needed for and (de)hydration and by the [registry]({% url /api/registry/index.html %}) to uniquely identify the type.
 
 <h2 id="displayName">displayName</h2>
 
 An (optional) display name for the action creator. Used for richer debugging. We will use the Id if displayName hasn't been set. If you're using ES6 classes, displayName will automatically be the name of the class.
 
+<h2 id="for">for(obj)</h2>
+
+Resolves the instance of the object for the objects Marty context. The context can either be the object itself or available at ``obj.context`` or ``obj.context.marty``.
+
 <h2 id="handlers">handlers</h2>
 
 The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an [action predicate](#action-predicates).
 
-When invoked the handlers arguments are [the arguments passed to the dispatcher](/api/action-creators/index.html#dispatch). The original action is available by calling <code>this.action</code>.
+When invoked the handlers arguments are [the arguments passed to the dispatcher]({% url /api/action-creators/index.html#dispatch %}). The original action is available by calling <code>this.action</code>.
 
 {% sample %}
 classic
@@ -188,7 +192,7 @@ class UsersStore extends Marty.Store {
 
 The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.
 
-If you want to change the state to a new instance (or if you are using [immutable data collections](/guides/stores/immutable-data-collections.html)) you can set the states value.
+If you want to change the state to a new instance (or if you are using [immutable data collections]({% url /guides/stores/immutable-data-collections.html %})) you can set the states value.
 
 {% sample %}
 classic

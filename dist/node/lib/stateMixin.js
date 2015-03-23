@@ -1,6 +1,6 @@
 "use strict";
 
-var React = require("react");
+var React = require("./react");
 var _ = require("./utils/mindash");
 var uuid = require("./utils/uuid");
 var Instances = require("./instances");

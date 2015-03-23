@@ -5,7 +5,7 @@ id: location-state-source
 section: State Sources
 ---
 
-Provides a simple way of accessing your current location.
+Provides a simple way of accessing your current location. Useful when creating [isomorphic applications]({% url /guides/isomorphism/index.html %}).
 
 {% sample %}
 classic

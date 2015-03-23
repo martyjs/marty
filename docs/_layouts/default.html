@@ -4,20 +4,21 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>{{ page.title }} | marty.js</title>
+  <title>{{ page.title }}</title>
   <meta name="viewport" content="width=device-width">
 
-  <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
+  <link rel="shortcut icon" href="{% url /favicon.ico?v=1 %}" type="image/x-icon">
 
-  <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
-  <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
-  <link rel="stylesheet" type="text/css" href="/css/docs.css">
+  <link rel="stylesheet" type="text/css" href="{% url /css/bootstrap.min.css %}">
+  <link rel="stylesheet" type="text/css" href="{% url /css/font-awesome.min.css %}">
+  <link rel="stylesheet" type="text/css" href="{% url /css/codemirror.css %}">
+  <link rel="stylesheet" type="text/css" href="{% url /css/docs.css %}">
 
-  <script type="text/javascript" src="/js/codemirror.js"></script>
+  <script type="text/javascript" src="{% url /js/codemirror.js %}"></script>
 </head>
 <body>
 
+  {% capture version %}{% version %}{% endcapture %}
   <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
     <div class="container">
       <div class="navbar-header">
@@ -27,19 +28,19 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a href="/" class="navbar-brand">marty.js</a>
+        <a href="{% url / %}" class="navbar-brand">marty.js</a>
       </div>
       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
           <li{% if page.collection == "guides" %} class="active"{% endif %}>
-            <a href="/guides/getting-started">Guides</a>
+            <a href="{% url /guides/getting-started %}">Guides</a>
             <ul class="nav sub-nav visible-xs-block">
               {% assign sections = site.guides | group_by:"section" %}
               {% for section_name in site.data.guides_section_order %}
                 <li {% if page.section == section_name and page.collection == "guides" %} class="active"{% endif %}>
                   {% capture section_url %}/guides/{{section_name | slugify}}/index.html{% endcapture %}
 
-                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{section_url}}">
+                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{version}}{{section_url}}">
                     {{section_name}}
                   </a>
                 </li>
@@ -47,14 +48,14 @@
             </ul>
           </li>
           <li{% if page.collection == "api" %} class="active"{% endif %}>
-            <a href="/api/stores">API</a>
+            <a href="{% url /api/top-level-api %}">API</a>
             <ul class="nav sub-nav visible-xs-block">
               {% assign sections = site.api | group_by:"section" %}
               {% for section_name in site.data.api_section_order %}
                 <li {% if page.section == section_name and page.collection == "api" %} class="active"{% endif %}>
                   {% capture section_url %}/api/{{section_name | slugify}}/index.html{% endcapture %}
 
-                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{section_url}}">
+                  <a {% if page.url == section_url %} class="active"{% endif %} href="{{version}}{{section_url}}">
                     {{section_name}}
                   </a>
                 </li>
@@ -62,7 +63,12 @@
             </ul>
           </li>
           <li{% if page.collection == "devtools" %} class="active"{% endif %}>
-            <a href="/devtools">Developer Tools</a>
+            <a href="{% url /devtools %}">Developer Tools</a>
+          </li>
+          <li{% if page.sectionid == "blog" %} class="active"{% endif %}>
+            {% assign latest_blog = site.posts | first %}
+
+            <a href="{{version}}{{latest_blog.url}}">Blog</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -102,8 +108,8 @@
 
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/style.js"></script>
-  <script type="text/javascript" src="/js/headings.js"></script>
+  <script type="text/javascript" src="{% url /js/style.js %}"></script>
+  <script type="text/javascript" src="{% url /js/headings.js %}"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>
 </html>

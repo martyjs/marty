@@ -1,9 +1,16 @@
 - Getting Started
 - Flux
 - Stores
+- Fetching state
 - Action Creators
+- Queries
+- Containers
 - State Mixin
 - State Sources
+- Isomorphism
+- ES6
+- Developer Tools
 - Constants
 - Dispatcher
+- Upgrading
 - Further reading

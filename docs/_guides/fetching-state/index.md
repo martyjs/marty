@@ -1,11 +1,11 @@
 ---
 layout: page
-title: Fetching data
-id: stores-fetch
-section: Stores
+title: Fetching state
+id: fetch
+section: Fetching state
 ---
 
-From the views perspective, the store holds all the state it needs. In most cases it's unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we've found they make your views complicated and difficult to reason about. It also goes against Flux's unidirectional data flow. Marty introduces the [fetch API](/api/stores/#fetch) which is an alternative solution to the problem.
+From the views perspective, the store holds all the state it needs. In most cases it's unfeasible for you to hold all your applications data locally and so we need to fetch data from a remote source. Traditionally you might solve this problem by using callbacks or a promise however we've found they make your views complicated and difficult to reason about. It also goes against Flux's unidirectional data flow. Marty introduces the [fetch API]({% url /api/stores/#fetch %}) which is an alternative solution to the problem.
 
 Say your view wants to load a user from the ``UserStore``. Internally the store would call ``fetch`` which allows it to define how to get the user locally or, if not present, get it from a state source. ``fetch`` requires 3 things:
 
@@ -51,7 +51,7 @@ class UserStore extends Marty.Store {
 
 When you call fetch, Marty will first try calling the ``locally`` function. It the state is present in the store then it's returned and the fetch will finish executing. If the store can't find the state locally it should return ``undefined``. This causes the fetch function to invoke ``remotely``. Once ``remotely`` has finished executing then fetch will then re-execute the ``locally`` function with the expectation that the state is now in the store. If it isn't then the fetch will fail with a "Not found" error. If the ``remotely`` function needs to get the state asynchronously you can return a promise. The fetch function will wait for the promise to be resolved before re-executing ``locally``.
 
-Using the example of getting a user, you would have a UserAPI (Which is an [HTTP State Source](/api/state-sources/http.html)), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should dispatch the state. You then return this promise chain to ``remotely``.
+Using the example of getting a user, you would have a UserAPI (Which is an [HTTP State Source]({% url /api/state-sources/http.html %})), internally it would make the HTTP request which would be represented as a promise. Once the request completes, you should dispatch the state. You then return this promise chain to ``remotely``.
 
 {% sample %}
 classic
@@ -65,19 +65,26 @@ var UserAPI = Marty.createStateSource({
   type: 'http',
   id: 'UserAPI',
   getUser: function (userId) {
-    return this
-      .get('http://jsonplaceholder.typicode.com/users/' + userId)
-      .then(function (res) {
-        this.dispatch(UserConstants.RECEIVE_USER, res.body);
-      }.bind(this));
+    return this.get('http://jsonplaceholder.typicode.com/users/' + userId);
+  }
+});
+
+var UserQueries = Marty.createQueries({
+  getUser: function (userId) {
+    this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
+
+    UserAPI.getUser(userId).then(function (res) {
+      this.dispatch(UserConstants.RECEIVE_USER, userId, res.body);
+    }.bind(this)).catch(function (err) {
+      this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err);
+    }.bind(this));
   }
 });
 
 var UserStore = Marty.createStore({
   id: 'UsersStore',
   handlers: {
-    addUser: UserConstants.RECEIVE_USER,
-    removeUser: UserConstants.USER_NOT_FOUND
+    addUser: UserConstants.RECEIVE_USER
   },
   getInitialState: function() {
     return {};
@@ -93,12 +100,9 @@ var UserStore = Marty.createStore({
         return this.state[userId];
       },
       remotely: function () {
-        return UserAPI.getUser(userId)
+        return UserQueries.getUser(userId)
       }
     });
-  },
-  removeUser: function (userId) {
-    // ...
   }
 });
 
@@ -111,9 +115,17 @@ var UserConstants = Marty.createConstants([
 
 class UserAPI extends Marty.HttpStateSource {
   getUser(userId) {
-    return this
-      .get('http://jsonplaceholder.typicode.com/users/' + userId)
-      .then((res) => this.dispatch(UserConstants.RECEIVE_USER, res.body));
+    return this.get('http://jsonplaceholder.typicode.com/users/' + userId);
+  }
+}
+
+class UserQueries extends Marty.Queries {
+  getUser(userId) {
+    this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
+
+    UserAPI.getUser(userId)
+      .then(res => this.dispatch(UserConstants.RECEIVE_USER, userId, res.body))
+      .catch(err => this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err));
   }
 }
 
@@ -122,8 +134,7 @@ class UserStore extends Marty.Store {
     super(options);
     this.state = {};
     this.handlers = {
-      addUser: UserConstants.RECEIVE_USER,
-      removeUser: UserConstants.USER_NOT_FOUND
+      addUser: UserConstants.RECEIVE_USER
     };
   }
   addUser(user) {
@@ -137,71 +148,47 @@ class UserStore extends Marty.Store {
         return this.state[userId];
       },
       remotely: function () {
-        return UserAPI.getUser(userId)
+        return UserQueries.getUser(userId)
       }
     });
-  }
-  removeUser(userId) {
-    // ...
   }
 }
 {% endsample %}
 
-The result of the fetch function is a [fetch result](/api/stores/#fetch-result) which represents the current state of the fetch. A fetch can either be **PENDING**, **FAILED** or **DONE** (``fetch.status``). If a fetch has failed then the result will have the error (``fetch.error``) and if done it will have the result (``fetch.result``). Your views normally have to deal with each state of a fetch so the fetch result has a ``when()`` function which allows you to render different views for each state
+The result of the fetch function is a [fetch result]({% url /api/stores/#fetch-result %}) which represents the current state of the fetch. A fetch can either be **PENDING**, **FAILED** or **DONE** (``fetch.status``). If a fetch has failed then the result will have the error (``fetch.error``) and if done it will have the result (``fetch.result``). Your views normally have to deal with each state of a fetch so the fetch result has a ``when()`` function which allows you to render different views for each state
 
 {% sample %}
 classic
 =======
-var UserStateMixin = Marty.createStateMixin({
-  listenTo: UserStore,
-  getState: function () {
-    return {
-      user: UserStore.getUser(this.props.id)
-    };
+var User = React.createClass({
+  render: function () {
+    return <div className="user">{this.props.user.name}</div>;
   }
 });
 
-var User = React.createClass({
-  mixins: [UserStateMixin],
-  render: function () {
-    return this.state.user.when({
-      pending: function () {
-        return <div class="user-loading">Loading...</div>;
-      },
-      failed: function (error) {
-        return <div class="user-error">{error.message}</div>;
-      },
-      done: function (user) {
-        return <div className="user">{user.name}</div>;
-      }
-    })
+module.exports = Marty.createContainer(User, {
+  listenTo: UserStore,
+  fetch: {
+    user() {
+      return UserStore.getUser(this.props.userId)
+    }
   }
 });
 
 es6
 ===
-class User extends Marty.Component {
-  constructor(props, context) {
-    super(props, context);
-    this.listenTo = UserStore;
-  }
+class User extends React.Component {
   render() {
-    return this.state.user.when({
-      pending: function () {
-        return <div class="user-loading">Loading...</div>;
-      },
-      failed: function (error) {
-        return <div class="user-error">{error.message}</div>;
-      },
-      done: function (user) {
-        return <div className="user">{user.name}</div>;
-      }
-    })
-  }
-  getState() {
-    return {
-      user: UserStore.getUser(this.props.id)
-    };
+    return <div className="user">{this.props.user.name}</div>;
   }
 }
+
+module.exports = Marty.createContainer(User, {
+  listenTo: UserStore,
+  fetch: {
+    user() {
+      return UserStore.getUser(this.props.userId)
+    }
+  }
+});
 {% endsample %}

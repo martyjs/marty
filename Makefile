@@ -49,8 +49,11 @@ build-browser:
 	@cat dist/browser/marty.js | $(BIN)/uglifyjs -m -c "comparisons=false,keep_fargs=true,unsafe=true,unsafe_comps=true,warnings=false" -b "ascii_only=true,beautify=false" -o dist/browser/marty.min.js
 	@gzip --best dist/browser/marty.min.js -c > dist/browser/marty.min.js.gz
 
-docs: bootstrap-ruby
+docs:
 	@cd docs && bundle exec jekyll serve -w
 
 release-docs: bootstrap-ruby
-	@cd docs && bundle exec rake release
+	@sh ./build/release-docs.sh
+
+prerelease-docs:
+	@sh ./build/prerelease-docs.sh

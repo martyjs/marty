@@ -25,7 +25,7 @@ class UserActionCreators extends Marty.ActionCreators {
 
 <h2 id="id">id</h2>
 
-A unique identifier (*required*). Used for registration within the container.
+A unique identifier (*required*). Needed by the [registry]({% url /api/registry/index.html %}) to uniquely identify the type.
 
 <h2 id="displayName">displayName</h2>
 
@@ -33,6 +33,8 @@ An (optional) display name for the action creator. Used for richer debugging. We
 
 <h2 id="dispatch">dispatch(type, [...])</h2>
 
-Dispatches an action payload with the given type. Any [action handlers](/api/stores/index.html#handleAction) will be invoked with the given action handlers.
+Dispatches an action payload with the given type. Any [action handlers]({% url /api/stores/index.html#handleAction %}) will be invoked with the given action handlers.
 
-Returns <code>Action</code>. You can rollback an action by calling <code>action.rollback()</code>.
+<h2 id="for">for(obj)</h2>
+
+Resolves the instance of the object for the objects Marty context. The context can either be the object itself or available at ``obj.context`` or ``obj.context.marty``.

@@ -20,7 +20,7 @@ var UserActionCreators = Marty.createActionCreators({
 
 There were 3 reasons:
 1. Automatic error handling made debugging really difficult ([#127](https://github.com/jhollingworth/marty/issues/127)).
-2. Automatically dispatched actions were confusing and not that helpeful ([#157](https://github.com/jhollingworth/marty/issues/157), [#152](https://github.com/jhollingworth/marty/issues/152)).
+2. Automatically dispatched actions were confusing and not that helpful ([#157](https://github.com/jhollingworth/marty/issues/157), [#152](https://github.com/jhollingworth/marty/issues/152)).
 3. It didn't play nicely with ES6 classes
 
 We decided this code wasn't adding any value so we should move towards a simpler more explicit approach.
@@ -29,7 +29,7 @@ In v0.9 you will see warnings in your code to move to the new style and we will 
 
 ##How do I migrate my code to the new style?
 
-All you need to do is move the constant to being the first argument of the dispatch function. If you utilising auto dispatch constants then you will need to use ``marty/autoDispatch``.
+All you need to do is move the constant to being the first argument of the dispatch function. If you utilizing auto dispatch constants then you will need to use ``marty/autoDispatch``.
 
 {% highlight js %}
 var autoDispatch = require('marty/autoDispatch');

@@ -1,6 +1,11 @@
+- Top-Level API
 - Stores
 - Action Creators
-- Component
+- Queries
+- Containers
 - State Mixin
 - State Sources
+- Context
+- Registry
+- Dispatcher
 - Constants

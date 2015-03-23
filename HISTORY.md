@@ -1,8 +1,41 @@
-unreleased
-==================
+0.9.0 / 2015-03-25
+===================
 
-- Replaced `reactify` for `babelify` as Babel now supports JSX transforms too and will help
-with an ES6 transition.
+**New features**
+
+- Isomorphism (#13)
+- CookieStateSource
+- LocationStateSource
+- ES6 Classes (#89)
+- Add dataType option to http state source (#161)
+- Lodash v3 instead of underscore (#136)
+- Simplify action creators (#163, #93)
+- replaceState and setState (#126)
+- HttpStateSource hooks (#118)
+- FetchResult#toPromise (#131)
+- Clear fetch history in Store#clear (#149)
+- Batch store change events (#112)
+- Allow you to specify when function context (#76)
+- Marty.createContainer (#204)
+
+**Bugs**
+
+- dependsOn doesn't update when dependent store updates (#113)
+- Don't auto set content-type if using FormData (#140)
+- Fetch API compatibility (#133)
+
+
+0.8.15 / 2015-03-06
+===================
+- Add reactify as a dependency so you dont have to explicitly add it to parent project
+
+0.8.14 / 2015-03-05
+===================
+- Remove dependency on Babel
+
+0.8.13 / 2015-03-03
+===================
+- Hotfix for fetch incomaptibility in Chrome Canary [#133](https://github.com/jhollingworth/marty/issues/133)
 
 0.8.12 / 2015-02-14
 ===================

@@ -3,6 +3,8 @@ name: Marty
 description: A React.js/Flux Framework
 url: http://martyjs.org
 baseurl: /
+permalink: "/blog/:year/:month/:day/:title.html"
+paginate_path: "/blog/page:num/"
 relative_permalinks: true
 paginate: 5
 timezone: America/Los_Angeles
@@ -40,4 +42,4 @@ collections:
   devtools:
     title: Developer Tools
     output: true
-current_version: 0.9.0-rc3
+current_version: 0.9.0

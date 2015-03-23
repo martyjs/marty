@@ -1,6 +1,6 @@
 ---
 layout: home
-title: Home
+title: marty.js
 id: home
 ---
 <div class="bs-docs-masthead" id="content" role="main">
@@ -10,7 +10,7 @@ id: home
       A JavaScript library for state management in React applications
     </p>
     <p class="lead">
-      <a href="/guides/getting-started" class="btn btn-outline-inverse btn-lg">Get started now</a>
+      <a href="{% url /guides/getting-started %}" class="btn btn-outline-inverse btn-lg">Get started now</a>
     </p>
   </div>
 </div>
@@ -23,15 +23,15 @@ id: home
       </p>
     </div>
     <div class="col-sm-4">
-      <h3>State management</h3>
+      <h3>Isomorphic</h3>
       <p>
-        Marty provides solutions for <a href="/guides/state-sources/index.html">getting state into your application</a>, <a href="/guides/stores/index.html">storing it in memory</a> and then <a href="/guides/state-mixin/index.html">binding it to your React components</a>.
+        Marty makes it easy to build JavaScript applications that run as happily on the server as they do in the browser. Read our <a href="{% url /guides/isomorphism/index.html %}">guide on isomorphism</a> to learn more.
       </p>
     </div>
     <div class="col-sm-4">
-      <h3>Debugging</h3>
+      <h3>Developer Tools</h3>
       <p>
-        Marty has a <a href="/devtools/">Chrome Developer Tool</a> to help you visualise the current state of your application and how it changes over time.
+        Marty has a <a href="{% url /devtools/ %}">Chrome Developer Tool</a> to help you visualize the current state of your application and how it changes over time.
       </p>
     </div>
   </div>

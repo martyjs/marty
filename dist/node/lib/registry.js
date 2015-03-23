@@ -38,8 +38,8 @@ var Registry = (function () {
       }
     },
     get: {
-      value: function get(type, clazz) {
-        return (this.types[type] || {})[clazz];
+      value: function get(type, id) {
+        return (this.types[type] || {})[id];
       }
     },
     getAll: {

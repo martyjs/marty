@@ -28,10 +28,25 @@ body {
   margin: 20px 0;
 }
 
+
+.page-title {
+  position: relative;
+}
+
+.page-share {
+  position: absolute;
+  right: 0;
+  top: 2px;
+}
+
 /* Keep code small in tables on account of limited space */
 .table code {
   font-size: 13px;
   font-weight: normal;
+}
+
+.page-title .meta {
+  font-size: 14px;
 }
 
 /* Outline button for use within the docs */

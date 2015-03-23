@@ -1,6 +1,6 @@
 "use strict";
 
-var React = require("react");
+var React = require("./react");
 var Context = require("./context");
 var ContextComponent = require("./components/context");
 
