@@ -67,11 +67,15 @@ describe('Container', function () {
     });
 
     it('should return a renderable component', function () {
-      wrap(ContainerComponent);
+      render(ContainerComponent);
     });
 
     it('should make the original component accessible at InnerComponent', function () {
       expect(ContainerComponent.InnerComponent).to.equal(InnerComponent);
+    });
+
+    it('should set the display name', function () {
+      expect(render(ContainerComponent).refs.subject.constructor.displayName).to.eql('InnerComponentContainer');
     });
   });
 
