@@ -23,15 +23,15 @@ id: home
       </p>
     </div>
     <div class="col-sm-4">
-      <h3>Isomorphic</h3>
+      <h3>Declarative data fetching</h3>
       <p>
-        Marty makes it easy to build JavaScript applications that run as happily on the server as they do in the browser. Read our <a href="{% url /guides/isomorphism/index.html %}">guide on isomorphism</a> to learn more.
+        Marty has a unique <a href="{% url /guides/fetching-state/index.html %}">fetch API</a> that allows you to declaratively define your components state requirements. It also helps you define what to do when waiting for that state or when an error occurs.
       </p>
     </div>
     <div class="col-sm-4">
-      <h3>Developer Tools</h3>
+      <h3>Isomorphic</h3>
       <p>
-        Marty has a <a href="{% url /devtools/ %}">Chrome Developer Tool</a> to help you visualize the current state of your application and how it changes over time.
+        Marty makes it easy to build JavaScript applications that run as happily on the server as they do in the browser. Read our <a href="{% url /guides/isomorphism/index.html %}">guide on isomorphism</a> to learn more.
       </p>
     </div>
   </div>
