@@ -5,7 +5,7 @@ id: container
 section: Containers
 ---
 
-Containers are components that wrap a component and manages its state. They manage subscriptions to stores and allow you to control what happens when fetching state. They are Marty's solution to state mixins being depreciated.
+We found that there was a lot of boilerplate code in React components for listening to [stores]({% url /guides/stores/index.html %}) and getting state from them. Containers provide a simpler way for your components to interact with stores. They do this by wrapping your component in another component (Called a **container component**) which is responsible for fetching state from the stores which it then passes to the inner component via props.
 
 {% sample %}
 classic
@@ -59,13 +59,11 @@ module.exports = Marty.createContainer(User, {
 });
 {% endsample %}
 
-To create a container, pass your component (called the inner component) to [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) with an object hash that contains the container configuration. The result will be a component which you can render.
+To create a container, pass your component to [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) with an object hash that contains the container configuration. [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) will return a new component which can knows how to fetch state from stores as well as rendering it. 
 
-The most important configuration option is ``fetch``. ``fetch`` is an object where the values are functions which are invoked and the result is passed to the inner component as a prop. The prop key is determined by the key. The container component will do this when first created and any time any stores you specify in ``listenTo`` change.
+The most important configuration option is [``fetch``]({% url /api/containers/index.html#fetch %}). [``fetch``]({% url /api/containers/index.html#fetch %}) is an object where the values are functions which are invoked and the result is passed to the inner component as a prop. The prop key is determined by the key. The container component will do this when first created and any time any stores you specify in [``listenTo``]({% url /api/containers/index.html#listenTo %}) changes.
 
-If any of the values are [fetch results]({% url /api/stores.html#fetch-result %}) then Marty will wait for the fetches to complete before rendering the inner component. While there are pending fetch results then the result of ``pending`` handler will be rendered. If you'd still like to render the inner component you can call ``this.done`` passing in default values.
-
-If any of the fetches have failed then ``failed`` handler is called. It will pass in an object hash containing the errors that have failed.
+If you're using the [fetch API]({% url /api/stores/index.html#fetch %}) then containers provide an easy way of dealing with the different states a fetch can be in. If any of your fetches are pending then the container will render whatever you return from the [``pending`` handler]({% url /api/containers/index.html#pending %}). The same will happen if any of the fetches have failed however the container will pass in an object containing all the errors to the [``failed`` handler]({% url /api/containers/index.html#failed %}).
 
 ##Further reading
 
