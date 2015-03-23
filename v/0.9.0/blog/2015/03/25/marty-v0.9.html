@@ -317,7 +317,15 @@
 
 <h2 id="isomorphisim">Isomorphisim</h2>
 
-<p>Building isomorphic applications (Being able to run your JS application on the server or in the browser) has been one of the major reasons people have started using React. The problem was all of the current solutions we tried had lots of unanswered questions. How do I get state into my stores in a scalable way? How can I write my data fetching code so it runs on the server and in the browser? How do I integrate with libraries like <a href="https://github.com/rackt/react-router">react-router</a> and <a href="expressjs.com">express.js</a>? We&#39;ve been thinking about these questions and think we have some good answers. You can read our <a href="/v/0.9.0/guides/isomorphism/index.html">guide on isomorphism</a> to learn more.</p>
+<p>Being able to run your JS application on the server and in the browser has been one of the major reasons people have started using React. We&#39;ve found its still very challenging to build isomorphic applications and so we&#39;ve built a set of APIs that make it easier.</p>
+
+<p><a href="/v/0.9.0/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> is a smarter version of <a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">React.renderToString</a> which will wait until your components have all their state before rendering. It can also tell you about what state has been fetched:</p>
+
+<p><img src="/v/0.9.0/img/renderToString-diagnostics.png" width="100%" alt="Marty Developer Tools"/></p>
+
+<p>We&#39;ve also created <a href="/v/0.9.0/guides/isomorphism/marty-express.html">marty-express</a>, a middleware for <a href="expressjs.com">express.js</a> which allows you to have a single code base that can run on the client or the server. It consumes <a href="https://github.com/rackt/react-router">react-router</a> routes so you don&#39;t have to have to duplicate your routes on the client and the server. It will also modify your <a href="/v/0.9.0/guides/state-sources/index.html">state sources</a> so that they can be used on the server.</p>
+
+<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/v/0.9.0/guides/isomorphism/index.html">guide</a> on how to get started.</p>
 
 <h2 id="es6-classes">ES6 Classes</h2>
 
@@ -352,7 +360,7 @@
 
 <h2 id="containers">Containers</h2>
 
-<p>Mixins are so 2014, it&#39;s all about function composition now. We&#39;ve introduce <a href="/v/0.9.0/api/top-level-api/index.htm#createContainer"><code>Marty.createContainer</code></a> as a replacement for the <a href="/v/0.9.0/guides/state-mixin/index.htm#createContainer">state mixin</a> which also works with components defined using the classic ES5 style and ES6 classes.</p>
+<p>When defining components using ES6 classes you can no longer use mixins which means you won&#39;t be able to use the <a href="/v/0.9.0/guides/state-mixin/index.html">state mixin</a>. A new pattern emerging is <a href="https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750">to wrap your components in &quot;container&quot; components which do the work of mixins</a>. We&#39;re a big fan of this pattern and so we&#39;ve introduced <a href="/v/0.9.0/api/top-level-api/index.html#createContainer"><code>Marty.createContainer</code></a> which wraps your component with a component that does the same job as the <a href="/v/0.9.0/guides/state-mixin/index.html">state mixin</a>. You can checkout our <a href="/v/0.9.0/guides/containers/index.html">containers guide</a> to learn more about them.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">User</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
@@ -412,7 +420,7 @@ There was a lot of confusion about how to dispatch actions when fetching state. 
 <span class="p">}</span></code></pre></div>
 </div>
 
-<h2 id="defining-action-types">Defining action types</h2>
+<h2 id="action-creators">Action creators</h2>
 
 <p>Our approach to defining <a href="http://martyjs.org/v/0.8.15/guides/action-creators/index.html">action creators</a> was the source of many bugs and lots of confusion. We&#39;ve got a new, simplified our approach which should resolve all of these issues.</p>
 
@@ -444,7 +452,7 @@ There was a lot of confusion about how to dispatch actions when fetching state. 
 
 <h2 id="lodash">lodash</h2>
 
-<p>Thanks to <a href="https://github.com/jdalton">@jdalton</a> we&#39;ve moved from underscore.js to lodash (This is an internal change so wont effect you if you&#39;re using underscore in your application). This has resulted in a <strong>6KB drop</strong> in our gzipped file size. Unfortunately Marty has also grown by 6KB so Marty v0.9 is the same size as Marty v0.8.</p>
+<p>Thanks to <a href="https://github.com/jdalton">@jdalton</a> we&#39;ve moved from underscore.js to lodash (This is an internal change so wont effect you if you&#39;re using underscore in your application). This has resulted in a <strong>6KB drop</strong> in our gzipped file size. Unfortunately Marty has also grown by 6KB so Marty v0.9 is the same size as Marty v0.8 :(</p>
 
 <h2 id="changelog">Changelog</h2>
 
