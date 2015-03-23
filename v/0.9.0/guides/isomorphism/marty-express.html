@@ -1123,7 +1123,7 @@
 
 <p>marty-express will take your react-router routes and automatically serve them as if they were in the browser meaning you have a single place to define your routes. If a user requests one of these routes, it will use <a href="/v/0.9.0/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> to render the component on the server and then pass the result to the view for rendering.</p>
 
-<p>If you make any requests through the HTTP state source then requests are automatically fully qualified and any HTTP headers in the original request are automatically added. It will <a href="/api/state-sources/location.html">LocationStateSource</a> and the <a href="/api/state-sources/cookie.html">CookieStateSource</a> so that they use the express.js <code>req</code> and <code>res</code>.</p>
+<p>If you make any requests through the HTTP state source then requests are automatically fully qualified and any HTTP headers in the original request are automatically added. It also modifies <a href="/api/state-sources/location.html">LocationStateSource</a> and the <a href="/api/state-sources/cookie.html">CookieStateSource</a> so that they use the <code>req</code> and <code>res</code> from the HTTP request.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Marty</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">Router</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'react-router'</span><span class="p">);</span>

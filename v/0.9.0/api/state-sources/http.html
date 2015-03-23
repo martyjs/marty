@@ -887,6 +887,22 @@
 
 <h2 id="hooks">Hooks</h2>
 
+<p>Hooks allows you to make changes to requests before they are sent and as well as when responses are received. This can be useful when you want to do things like automatically converting all JSON responses to immutable objects.</p>
+
+<p>Hooks are object literals which have 3 optional keys: <code>before</code>, <code>after</code> and <code>priority</code>. If <code>before</code> is present then it will be called with the request as its argument. If <code>after</code> is present then it will be called after the response is received with the response as its argument. Setting a priority allows you to alter in what order the hook is executed (The smaller the number, the earlier it will be executed).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Marty</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
+
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">HttpStateSource</span><span class="p">.</span><span class="nx">addHook</span><span class="p">({</span>
+  <span class="na">priority</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nx">before</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">'Foo'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'bar'</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="nx">after</span><span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
 <h3 id="addHook">addHook</h3>
 
 <p>Registers the hook in the pipeline</p>
