@@ -1,4 +1,4 @@
-0.9.0 / 2015-03-25
+0.9.0 / 2015-03-24
 ===================
 
 **New features**
@@ -17,6 +17,7 @@
 - Batch store change events (#112)
 - Allow you to specify when function context (#76)
 - Marty.createContainer (#204)
+- Set request credentials to 'same-origin' (#209)
 
 **Bugs**
 
