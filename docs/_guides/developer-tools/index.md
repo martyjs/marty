@@ -12,7 +12,7 @@ section: Dev tools
 * What components re-rendered as a result of the action (and how many)
 * Which stores caused a component to re-render
 
-<img src="{% url /img/devtools-data-flow.png %}" width="100%" alt="Marty Developer Tools"/>
+<a href="{% url /img/devtools-data-flow.png %}"><img src="{% url /img/devtools-data-flow.png %}" width="100%" alt="Marty Developer Tools"/></a>
 
 For Marty Developer Tools to work, you add Marty to the window object (<code>window.Marty = require('marty')</code>). Once you've done that, open your app in Chrome and open Chrome Developer Tools. You should see a new 'Marty' tab which gives you a view into what your application is doing.
 
