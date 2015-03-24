@@ -76,6 +76,10 @@ var HttpStateSource = (function (_StateSource) {
     addHook: {
       value: function addHook(hook) {
         if (hook) {
+          if (_.isUndefined(hook.priority)) {
+            hook.priority = Object.keys(hooks).length;
+          }
+
           hooks[hook.id] = hook;
         }
       }
@@ -99,6 +103,7 @@ var HttpStateSource = (function (_StateSource) {
 
 HttpStateSource.addHook(require("./hooks/parseJSON"));
 HttpStateSource.addHook(require("./hooks/stringifyJSON"));
+HttpStateSource.addHook(require("./hooks/includeCredentials"));
 
 module.exports = HttpStateSource;
 
@@ -194,7 +199,7 @@ function getHooks(func) {
   return _.sortBy(_.filter(hooks, has(func)), priority);
 
   function priority(hook) {
-    return hook.priority || 1;
+    return hook.priority;
   }
 
   function has(func) {

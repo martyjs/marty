@@ -119,6 +119,11 @@ var Store = (function () {
         instance.fetchHistory = {};
         instance.failedFetches = {};
         instance.fetchInProgress = {};
+
+        if (!newState && _.isFunction(this.getInitialState)) {
+          newState = this.getInitialState();
+        }
+
         this.state = newState || {};
       }
     },

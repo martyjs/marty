@@ -97,6 +97,7 @@ function createContainer(InnerComponent, config) {
   });
 
   Container.InnerComponent = InnerComponent;
+  Container.displayName = InnerComponent.displayName + "Container";
 
   return Container;
 }
