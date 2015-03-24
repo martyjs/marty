@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title> | marty.js</title>
+  <title></title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -18,6 +18,7 @@
 </head>
 <body>
 
+  
   <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
     <div class="container">
       <div class="navbar-header">
@@ -63,8 +64,32 @@
                 <li >
                   
 
+                  <a  href="/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/guides/action-creators/index.html">
                     Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/containers/index.html">
+                    Containers
                   </a>
                 </li>
               
@@ -87,6 +112,30 @@
                 <li >
                   
 
+                  <a  href="/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/es6/index.html">
+                    ES6
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/guides/constants/index.html">
                     Constants
                   </a>
@@ -103,6 +152,14 @@
                 <li >
                   
 
+                  <a  href="/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/guides/further-reading/index.html">
                     Further reading
                   </a>
@@ -111,9 +168,17 @@
             </ul>
           </li>
           <li>
-            <a href="/api/stores">API</a>
+            <a href="/api/top-level-api">API</a>
             <ul class="nav sub-nav visible-xs-block">
               
+              
+                <li >
+                  
+
+                  <a  href="/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
               
                 <li >
                   
@@ -128,6 +193,22 @@
 
                   <a  href="/api/action-creators/index.html">
                     Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/containers/index.html">
+                    Containers
                   </a>
                 </li>
               
@@ -150,6 +231,30 @@
                 <li >
                   
 
+                  <a  href="/api/context/index.html">
+                    Context
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/registry/index.html">
+                    Registry
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/api/constants/index.html">
                     Constants
                   </a>
@@ -157,8 +262,16 @@
               
             </ul>
           </li>
+          <li>
+            <a href="/support">Support</a>
+          </li>
           <li class="active">
             <a href="/devtools">Developer Tools</a>
+          </li>
+          <li>
+            
+
+            <a href="/blog/2015/03/24/marty-v0.9.html">Blog</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -173,14 +286,22 @@
     </div>
   </header>
   <div class="container devtools">
-  <h1>Marty Developer Tools (Beta)</h1>
-  <a href="https://chrome.google.com/webstore/detail/marty-developer-tools/fifcikknnbggajppebgolpkaambnkpae?hl=en">Marty Developer Tools</a> is an extension to Chrome's developer tools. It shows you the current state of your stores and how actions flow through the stores to the views.
+  <h1>Marty Developer Tools</h1>
+  <p>
+  <a href="https://chrome.google.com/webstore/detail/marty-developer-tools/fifcikknnbggajppebgolpkaambnkpae">Marty Developer Tools</a> is an extension to Chrome's developer tools. It shows you the current state of your stores, actions that have flowed through the application as well as allowing you to revert to an earlier state. For each action we will show:
+</p>
+  <ul>
+<li>Which stores handled the action</li>
+<li>What arguments were passed to the stores action handler</li>
+<li>What components re-rendered as a result of the action (and how many)</li>
+<li>Which stores caused a component to re-render</li>
+  </ul>
 
   <p style="text-align:center; margin-top: 20px">
     <a class="btn btn-default" href="https://chrome.google.com/webstore/detail/marty-developer-tools/fifcikknnbggajppebgolpkaambnkpae?hl=en">Download from Chrome Web Store</a>
   </p>
 
-  <img src="/img/devtools-data-flow.png" alt="Marty Developer Tools"/>
+<a href="/img/devtools-data-flow.png"><img src="/img/devtools-data-flow.png" width="100%" alt="Marty Developer Tools"/></a>
 
   For Marty Developer Tools to work, you add Marty to the window object (<code>window.Marty = require('marty')</code>). Once you've done that, open your app in Chrome and open Chrome Developer Tools. You should see a new 'Marty' tab which gives you a view into what your application is doing.
 
@@ -190,7 +311,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.10</li>
+        <li>v0.9.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
@@ -211,6 +332,7 @@
 
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/style.js"></script>
   <script type="text/javascript" src="/js/headings.js"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>

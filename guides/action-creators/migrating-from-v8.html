@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Dispatcher</title>
+  <title>Migrating from Marty v0.8</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -69,7 +69,7 @@
                   </a>
                 </li>
               
-                <li >
+                <li  class="active">
                   
 
                   <a  href="/guides/action-creators/index.html">
@@ -141,10 +141,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/guides/dispatcher/index.html">
+                  <a  href="/guides/dispatcher/index.html">
                     Dispatcher
                   </a>
                 </li>
@@ -535,7 +535,7 @@
           
         
 
-        <li  class="nav-section" >
+        <li  class="nav-section active">
           
 
           <a  href="/guides/action-creators/index.html">
@@ -563,7 +563,7 @@
             
               
                 <li>
-                  <a 
+                  <a  class="active"
                       href="/guides/action-creators/migrating-from-v8.html">Migrating from Marty v0.8</a>
                 </li>
               
@@ -998,10 +998,10 @@
           
         
 
-        <li  class="nav-section active">
+        <li  class="nav-section" >
           
 
-          <a  class="active" href="/guides/dispatcher/index.html">
+          <a  href="/guides/dispatcher/index.html">
               Dispatcher
           </a>
           
@@ -1119,20 +1119,41 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Dispatcher</h1>
+      <h1 class="page-title">Migrating from Marty v0.8</h1>
     
     <div class="content">
-      <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creator</a> creates an action and you call <code>this.dispatch()</code>, the action will be passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
+      <p>In Marty v0.8 and below we had a different way of defining an action creators type which has now been depreciated:</p>
 
-<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>.</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}),</span>
+  <span class="na">deleteEmail</span><span class="p">:</span> <span class="nx">UserConstants</span><span class="p">.</span><span class="nx">DELETE_EMAIL</span><span class="p">()</span>
+<span class="p">});</span></code></pre></div>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">getDefault</span><span class="p">();</span>
+<h2>Why was it depreciated?</h2>
 
-<span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
-<span class="p">});</span>
+<p>There were 3 reasons:
+1. Automatic error handling made debugging really difficult (<a href="https://github.com/jhollingworth/marty/issues/127">#127</a>).
+2. Automatically dispatched actions were confusing and not that helpful (<a href="https://github.com/jhollingworth/marty/issues/157">#157</a>, <a href="https://github.com/jhollingworth/marty/issues/152">#152</a>).
+3. It didn&#39;t play nicely with ES6 classes</p>
 
-<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatchAction</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_FOO'</span> <span class="p">});</span></code></pre></div>
+<p>We decided this code wasn&#39;t adding any value so we should move towards a simpler more explicit approach.</p>
+
+<p>In v0.9 you will see warnings in your code to move to the new style and we will remove the code entirely in v0.10.</p>
+
+<h2>How do I migrate my code to the new style?</h2>
+
+<p>All you need to do is move the constant to being the first argument of the dispatch function. If you utilizing auto dispatch constants then you will need to use <code>marty/autoDispatch</code>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">autoDispatch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/autoDispatch'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+  <span class="p">}),</span>
+  <span class="na">deleteEmail</span><span class="p">:</span> <span class="nx">autoDispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">DELETE_EMAIL</span><span class="p">)</span>
+<span class="p">});</span></code></pre></div>
 
     </div>
   </div>

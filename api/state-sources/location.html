@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Session Storage State Source | marty.js</title>
+  <title>Location State Source</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -18,6 +18,7 @@
 </head>
 <body>
 
+  
   <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
     <div class="container">
       <div class="navbar-header">
@@ -31,7 +32,7 @@
       </div>
       <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
         <ul class="nav navbar-nav">
-          <li class="active">
+          <li>
             <a href="/guides/getting-started">Guides</a>
             <ul class="nav sub-nav visible-xs-block">
               
@@ -63,8 +64,32 @@
                 <li >
                   
 
+                  <a  href="/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/guides/action-creators/index.html">
                     Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/containers/index.html">
+                    Containers
                   </a>
                 </li>
               
@@ -76,11 +101,35 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
                   <a  href="/guides/state-sources/index.html">
                     State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/es6/index.html">
+                    ES6
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/guides/developer-tools/index.html">
+                    Developer Tools
                   </a>
                 </li>
               
@@ -103,6 +152,14 @@
                 <li >
                   
 
+                  <a  href="/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/guides/further-reading/index.html">
                     Further reading
                   </a>
@@ -110,10 +167,18 @@
               
             </ul>
           </li>
-          <li>
-            <a href="/api/stores">API</a>
+          <li class="active">
+            <a href="/api/top-level-api">API</a>
             <ul class="nav sub-nav visible-xs-block">
               
+              
+                <li >
+                  
+
+                  <a  href="/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
               
                 <li >
                   
@@ -134,16 +199,56 @@
                 <li >
                   
 
-                  <a  href="/api/state-mixin/index.html">
-                    State Mixin
+                  <a  href="/api/queries/index.html">
+                    Queries
                   </a>
                 </li>
               
                 <li >
                   
 
+                  <a  href="/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li  class="active">
+                  
+
                   <a  href="/api/state-sources/index.html">
                     State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/context/index.html">
+                    Context
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/registry/index.html">
+                    Registry
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/api/dispatcher/index.html">
+                    Dispatcher
                   </a>
                 </li>
               
@@ -158,7 +263,15 @@
             </ul>
           </li>
           <li>
+            <a href="/support">Support</a>
+          </li>
+          <li>
             <a href="/devtools">Developer Tools</a>
+          </li>
+          <li>
+            
+
+            <a href="/blog/2015/03/24/marty-v0.9.html">Blog</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -172,7 +285,9 @@
       </nav>
     </div>
   </header>
-  <div class="container bs-docs-container">
+  
+
+<div class="container bs-docs-container">
   <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
     <ul class="sections-nav nav" role="navigation">
       
@@ -194,27 +309,8 @@
           
         
           
-            
-          
         
           
-        
-          
-        
-          
-        
-
-        <li  class="nav-section" >
-          
-
-          <a  href="/guides/getting-started/index.html">
-              Getting Started
-          </a>
-          
-        </li>
-      
-        
-
         
           
         
@@ -226,22 +322,12 @@
             
           
         
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
 
         <li  class="nav-section" >
           
 
-          <a  href="/guides/flux/index.html">
-              Flux
+          <a  href="/api/top-level-api/index.html">
+              Top-Level API
           </a>
           
         </li>
@@ -266,38 +352,21 @@
           
         
           
+        
+          
             
+          
+        
           
         
 
         <li  class="nav-section" >
           
 
-          <a  href="/guides/stores/index.html">
+          <a  href="/api/stores/index.html">
               Stores
           </a>
           
-            <ul class="nav">
-            
-              
-                <li>
-                  <a 
-                      href="/guides/stores/fetching-data.html">Fetching data</a>
-                </li>
-              
-            
-              
-                <li>
-                  <a 
-                      href="/guides/stores/immutable-data-collections.html">Immutable data collections</a>
-                </li>
-              
-            
-              
-              
-            
-            </ul>
-          
         </li>
       
         
@@ -323,34 +392,54 @@
         
           
         
+          
+        
+          
+        
 
         <li  class="nav-section" >
           
 
-          <a  href="/guides/action-creators/index.html">
+          <a  href="/api/action-creators/index.html">
               Action Creators
           </a>
           
-            <ul class="nav">
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
             
-              
-                <li>
-                  <a 
-                      href="/guides/action-creators/actions-vs-action-creators.html">Actions vs. Action Creators</a>
-                </li>
-              
-            
-              
-              
-            
-              
-                <li>
-                  <a 
-                      href="/guides/action-creators/source-action-creators.html">Source Action Creators</a>
-                </li>
-              
-            
-            </ul>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/queries/index.html">
+              Queries
+          </a>
           
         </li>
       
@@ -370,7 +459,9 @@
           
         
           
-            
+        
+          
+        
           
         
           
@@ -381,7 +472,44 @@
         <li  class="nav-section" >
           
 
-          <a  href="/guides/state-mixin/index.html">
+          <a  href="/api/containers/index.html">
+              Containers
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/state-mixin/index.html">
               State Mixin
           </a>
           
@@ -405,7 +533,11 @@
           
         
           
+        
+          
             
+          
+        
           
         
           
@@ -414,7 +546,7 @@
         <li  class="nav-section active">
           
 
-          <a  href="/guides/state-sources/index.html">
+          <a  href="/api/state-sources/index.html">
               State Sources
           </a>
           
@@ -423,7 +555,14 @@
               
                 <li>
                   <a 
-                      href="/guides/state-sources/http.html">HTTP State Source</a>
+                      href="/api/state-sources/cookie.html">Cookie State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/api/state-sources/http.html">HTTP State Source</a>
                 </li>
               
             
@@ -433,21 +572,28 @@
               
                 <li>
                   <a 
-                      href="/guides/state-sources/json-storage.html">JSON Storage State Source</a>
+                      href="/api/state-sources/json-storage.html">JSON Storage State Source</a>
                 </li>
               
             
               
                 <li>
                   <a 
-                      href="/guides/state-sources/local-storage.html">Local Storage State Source</a>
+                      href="/api/state-sources/local-storage.html">Local Storage State Source</a>
                 </li>
               
             
               
                 <li>
                   <a  class="active"
-                      href="/guides/state-sources/session-storage.html">Session Storage State Source</a>
+                      href="/api/state-sources/location.html">Location State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/api/state-sources/session-storage.html">Session Storage State Source</a>
                 </li>
               
             
@@ -461,6 +607,10 @@
           
         
           
+        
+          
+        
+          
             
           
         
@@ -482,8 +632,8 @@
         <li  class="nav-section" >
           
 
-          <a  href="/guides/constants/index.html">
-              Constants
+          <a  href="/api/context/index.html">
+              Context
           </a>
           
         </li>
@@ -496,6 +646,47 @@
           
         
           
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/registry/index.html">
+              Registry
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
             
           
         
@@ -515,7 +706,7 @@
         <li  class="nav-section" >
           
 
-          <a  href="/guides/dispatcher/index.html">
+          <a  href="/api/dispatcher/index.html">
               Dispatcher
           </a>
           
@@ -527,13 +718,17 @@
           
         
           
-        
-          
-        
-          
-        
-          
             
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
           
         
           
@@ -548,8 +743,8 @@
         <li  class="nav-section" >
           
 
-          <a  href="/guides/further-reading/index.html">
-              Further reading
+          <a  href="/api/constants/index.html">
+              Constants
           </a>
           
         </li>
@@ -558,22 +753,37 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Session Storage State Source</h1>
+      <h1 class="page-title">Location State Source</h1>
     
     <div class="content">
-      <p>The Session Storage State Source allows you to persist data to <a href="https://developer.mozilla.org/en/docs/Web/Guide/API/DOM/Storage#sessionStorage">sessionStorage</a>.</p>
+      <p>Provides a simple way of accessing your current location. Useful when creating <a href="/guides/isomorphism/index.html">isomorphic applications</a>.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">FooStorage</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateSource</span><span class="p">({</span>
-  <span class="na">type</span><span class="p">:</span> <span class="s1">'sessionStorage'</span><span class="p">,</span>
-  <span class="na">saveFoo</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="nx">foo</span><span class="p">);</span>
-  <span class="p">},</span>
-  <span class="nx">getFoo</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
-  <span class="p">}</span>
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">Location</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateSource</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'Location'</span><span class="p">,</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'location'</span>
 <span class="p">});</span>
 
-<span class="nx">FooStorage</span><span class="p">.</span><span class="nx">saveFoo</span><span class="p">(</span><span class="s1">'Foo'</span><span class="p">);</span></code></pre></div>
+<span class="kd">var</span> <span class="nx">location</span> <span class="o">=</span> <span class="nx">Location</span><span class="p">.</span><span class="nx">getLocation</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">location</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">location</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">Location</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">LocationStateSource</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">location</span> <span class="o">=</span> <span class="nx">Location</span><span class="p">.</span><span class="nx">getLocation</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">location</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="nx">location</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span></code></pre></div>
+</div>
+
+<h2 id="get">getLocation()</h2>
+
+<p>Returns information about the current location:</p>
+
+<ul>
+<li><strong>url</strong> e.g. http://foo.com/bar?baz=bam</li>
+<li><strong>path</strong> e.g. /bar</li>
+<li><strong>hostname</strong> e.g. foo.com</li>
+<li><strong>query</strong> e.g. <code>{ baz: &#39;bam&#39; }</code></li>
+<li><strong>protocol</strong> e.g. http</li>
+</ul>
 
     </div>
   </div>
@@ -583,7 +793,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.8.10</li>
+        <li>v0.9.0</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
@@ -604,6 +814,7 @@
 
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/style.js"></script>
   <script type="text/javascript" src="/js/headings.js"></script>
   <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </body>

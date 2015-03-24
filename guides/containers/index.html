@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Dispatcher</title>
+  <title>Containers</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -85,10 +85,10 @@
                   </a>
                 </li>
               
-                <li >
+                <li  class="active">
                   
 
-                  <a  href="/guides/containers/index.html">
+                  <a  class="active" href="/guides/containers/index.html">
                     Containers
                   </a>
                 </li>
@@ -141,10 +141,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/guides/dispatcher/index.html">
+                  <a  href="/guides/dispatcher/index.html">
                     Dispatcher
                   </a>
                 </li>
@@ -657,10 +657,10 @@
           
         
 
-        <li  class="nav-section" >
+        <li  class="nav-section active">
           
 
-          <a  href="/guides/containers/index.html">
+          <a  class="active" href="/guides/containers/index.html">
               Containers
           </a>
           
@@ -998,10 +998,10 @@
           
         
 
-        <li  class="nav-section active">
+        <li  class="nav-section" >
           
 
-          <a  class="active" href="/guides/dispatcher/index.html">
+          <a  href="/guides/dispatcher/index.html">
               Dispatcher
           </a>
           
@@ -1119,20 +1119,68 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Dispatcher</h1>
+      <h1 class="page-title">Containers</h1>
     
     <div class="content">
-      <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creator</a> creates an action and you call <code>this.dispatch()</code>, the action will be passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
+      <p>We found that there was a lot of boilerplate code in React components for listening to <a href="/guides/stores/index.html">stores</a> and getting state from them. Containers provide a simpler way for your components to interact with stores. They do this by wrapping your component in another component (Called a <strong>container component</strong>) which is responsible for fetching state from the stores which it then passes to the inner component via props.</p>
 
-<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>.</p>
-
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">getDefault</span><span class="p">();</span>
-
-<span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"User"</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
 <span class="p">});</span>
 
-<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatchAction</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_FOO'</span> <span class="p">});</span></code></pre></div>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">User</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
+  <span class="na">fetch</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nx">user</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">UserStore</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="p">(</span><span class="nx">errors</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"User User-failedToLoad"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">errors</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">pending</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">done</span><span class="p">({</span>
+      <span class="na">user</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">User</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"User"</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">User</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
+  <span class="na">fetch</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nx">user</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">UserStore</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="p">(</span><span class="nx">errors</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"User User-failedToLoad"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">errors</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">pending</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">done</span><span class="p">({</span>
+      <span class="na">user</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+</div>
+
+<p>To create a container, pass your component to <a href="/api/top-level-api/index.html#createContainer"><code>Marty.createContainer</code></a> with an object hash that contains the container configuration. <a href="/api/top-level-api/index.html#createContainer"><code>Marty.createContainer</code></a> will return a new component which can knows how to fetch state from stores as well as rendering it. </p>
+
+<p>The most important configuration option is <a href="/api/containers/index.html#fetch"><code>fetch</code></a>. <a href="/api/containers/index.html#fetch"><code>fetch</code></a> is an object where the values are functions which are invoked and the result is passed to the inner component as a prop. The prop key is determined by the key. The container component will do this when first created and any time any stores you specify in <a href="/api/containers/index.html#listenTo"><code>listenTo</code></a> changes.</p>
+
+<p>If you&#39;re using the <a href="/api/stores/index.html#fetch">fetch API</a> then containers provide an easy way of dealing with the different states a fetch can be in. If any of your fetches are pending then the container will render whatever you return from the <a href="/api/containers/index.html#pending"><code>pending</code> handler</a>. The same will happen if any of the fetches have failed however the container will pass in an object containing all the errors to the <a href="/api/containers/index.html#failed"><code>failed</code> handler</a>.</p>
+
+<h2>Further reading</h2>
+
+<ul>
+<li><a href="https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750">Mixins Are Dead. Long Live Composition</a></li>
+<li><a href="http://facebook.github.io/react/blog/2015/03/19/building-the-facebook-news-feed-with-relay.html">Building The Facebook News Feed With Relay</a></li>
+</ul>
 
     </div>
   </div>

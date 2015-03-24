@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Dispatcher</title>
+  <title>marty-express</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -109,7 +109,7 @@
                   </a>
                 </li>
               
-                <li >
+                <li  class="active">
                   
 
                   <a  href="/guides/isomorphism/index.html">
@@ -141,10 +141,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/guides/dispatcher/index.html">
+                  <a  href="/guides/dispatcher/index.html">
                     Dispatcher
                   </a>
                 </li>
@@ -798,7 +798,7 @@
           
         
 
-        <li  class="nav-section" >
+        <li  class="nav-section active">
           
 
           <a  href="/guides/isomorphism/index.html">
@@ -812,7 +812,7 @@
             
               
                 <li>
-                  <a 
+                  <a  class="active"
                       href="/guides/isomorphism/marty-express.html">marty-express</a>
                 </li>
               
@@ -998,10 +998,10 @@
           
         
 
-        <li  class="nav-section active">
+        <li  class="nav-section" >
           
 
-          <a  class="active" href="/guides/dispatcher/index.html">
+          <a  href="/guides/dispatcher/index.html">
               Dispatcher
           </a>
           
@@ -1119,20 +1119,32 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Dispatcher</h1>
+      <h1 class="page-title">marty-express</h1>
     
     <div class="content">
-      <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creator</a> creates an action and you call <code>this.dispatch()</code>, the action will be passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
+      <p><a href="http://github.com/jhollingworth/marty-express">marty-express</a> is an <a href="http://expressjs.com/">express.js</a> middleware which makes it easier to build isomorphic applications using express and <a href="https://github.com/rackt/react-router">react-router</a>.</p>
 
-<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>.</p>
+<p>marty-express will take your react-router routes and automatically serve them as if they were in the browser meaning you have a single place to define your routes. If a user requests one of these routes, it will use <a href="/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> to render the component on the server and then pass the result to the view for rendering.</p>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">getDefault</span><span class="p">();</span>
+<p>If you make any requests through the HTTP state source then requests are automatically fully qualified and any HTTP headers in the original request are automatically added. It also modifies <a href="/api/state-sources/location.html">LocationStateSource</a> and the <a href="/api/state-sources/cookie.html">CookieStateSource</a> so that they use the <code>req</code> and <code>res</code> from the HTTP request.</p>
 
-<span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
-<span class="p">});</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Marty</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">Router</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'react-router'</span><span class="p">);</span>
 
-<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatchAction</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_FOO'</span> <span class="p">});</span></code></pre></div>
+<span class="kd">var</span> <span class="nx">routes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">&lt;</span><span class="nx">Route</span> <span class="nx">name</span><span class="o">=</span><span class="s1">'foo'</span> <span class="nx">path</span><span class="o">=</span><span class="s1">'/foo/:id'</span> <span class="nx">handler</span><span class="o">=</span><span class="p">{</span><span class="nx">Foo</span><span class="p">}</span> <span class="sr">/&gt;</span><span class="err">,
+</span>    <span class="o">&lt;</span><span class="nx">Route</span> <span class="nx">name</span><span class="o">=</span><span class="s1">'var'</span> <span class="nx">path</span><span class="o">=</span><span class="s1">'/bar/:id'</span> <span class="nx">handler</span><span class="o">=</span><span class="p">{</span><span class="nx">Bar</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span><span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">require</span><span class="p">(</span><span class="s1">'marty-express'</span><span class="p">)({</span>
+  <span class="na">routes</span><span class="p">:</span> <span class="nx">routes</span><span class="p">,</span>
+  <span class="na">marty</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">),</span>
+  <span class="na">rendered</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">diagnostics</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Page rendered'</span><span class="p">,</span> <span class="nx">diagnostics</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}));</span></code></pre></div>
 
     </div>
   </div>

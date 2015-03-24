@@ -28,10 +28,34 @@ body {
   margin: 20px 0;
 }
 
+
+.page-title {
+  position: relative;
+}
+
+.page-share {
+  position: absolute;
+  right: 0;
+  top: 2px;
+  font-size: 11px;
+  font-style: 'Helvetica Neue', Arial, sans-serif;
+}
+
 /* Keep code small in tables on account of limited space */
 .table code {
   font-size: 13px;
   font-weight: normal;
+}
+
+.page-title .meta {
+  font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .page-title .meta {
+    display: block;
+    margin-top: 10px;
+  }
 }
 
 /* Outline button for use within the docs */
@@ -1474,7 +1498,17 @@ h1[id] {
 .zero-clipboard {
   position: relative;
   display: none;
+  float: right;
 }
+
+.sample .btn:first-child {
+  border-top-left-radius: 0;
+}
+
+.sample .btn:last-child {
+  border-bottom-right-radius: 0;
+}
+
 .btn-clipboard {
   position: absolute;
   top: 0;

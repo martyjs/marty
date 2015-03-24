@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Dispatcher</title>
+  <title>Developer Tools</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -128,7 +128,7 @@
                 <li >
                   
 
-                  <a  href="/guides/developer-tools/index.html">
+                  <a  class="active" href="/guides/developer-tools/index.html">
                     Developer Tools
                   </a>
                 </li>
@@ -141,10 +141,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/guides/dispatcher/index.html">
+                  <a  href="/guides/dispatcher/index.html">
                     Dispatcher
                   </a>
                 </li>
@@ -907,7 +907,7 @@
         <li  class="nav-section" >
           
 
-          <a  href="/guides/developer-tools/index.html">
+          <a  class="active" href="/guides/developer-tools/index.html">
               Developer Tools
           </a>
           
@@ -998,10 +998,10 @@
           
         
 
-        <li  class="nav-section active">
+        <li  class="nav-section" >
           
 
-          <a  class="active" href="/guides/dispatcher/index.html">
+          <a  href="/guides/dispatcher/index.html">
               Dispatcher
           </a>
           
@@ -1119,20 +1119,35 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Dispatcher</h1>
+      <h1 class="page-title">Developer Tools</h1>
     
     <div class="content">
-      <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creator</a> creates an action and you call <code>this.dispatch()</code>, the action will be passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
+      <p><a href="https://chrome.google.com/webstore/detail/marty-developer-tools/fifcikknnbggajppebgolpkaambnkpae">Marty Developer Tools</a> is an extension to Chrome&#39;s developer tools. It shows you the current state of your stores, actions that have flowed through the application as well as allowing you to revert to an earlier state. For each action we will show:</p>
 
-<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>.</p>
+<ul>
+<li>Which stores handled the action</li>
+<li>What arguments were passed to the stores action handler</li>
+<li>What components re-rendered as a result of the action (and how many)</li>
+<li>Which stores caused a component to re-render</li>
+</ul>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">getDefault</span><span class="p">();</span>
+<p><a href="/img/devtools-data-flow.png"><img src="/img/devtools-data-flow.png" width="100%" alt="Marty Developer Tools"/></a></p>
 
-<span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
-<span class="p">});</span>
+<p>For Marty Developer Tools to work, you add Marty to the window object (<code>window.Marty = require(&#39;marty&#39;)</code>). Once you&#39;ve done that, open your app in Chrome and open Chrome Developer Tools. You should see a new &#39;Marty&#39; tab which gives you a view into what your application is doing.</p>
 
-<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatchAction</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_FOO'</span> <span class="p">});</span></code></pre></div>
+<h2>Serializers</h2>
+
+<p>Marty Developer Tools uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage"><code>window.postMessage</code></a> to communicate with Marty. This means you need to serialize any state to simple objects otherwise the developer tools won&#39;t be able to receive it. We try our best (e.g. We automatically serialize <a href="http://facebook.github.io/immutable-js/">immutable.js</a>) collections for you however there will be times when you want more control. For these cases you can register a new serializer</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nb">window</span><span class="p">.</span><span class="nx">MartyDevTools</span><span class="p">.</span><span class="nx">registerSerializer</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'foo'</span><span class="p">,</span>
+  <span class="nx">canSerialize</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span> <span class="k">instanceof</span> <span class="nx">Foo</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="nx">serialize</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">serialize</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
 
     </div>
   </div>

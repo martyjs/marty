@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Dispatcher</title>
+  <title>ES6</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -117,10 +117,10 @@
                   </a>
                 </li>
               
-                <li >
+                <li  class="active">
                   
 
-                  <a  href="/guides/es6/index.html">
+                  <a  class="active" href="/guides/es6/index.html">
                     ES6
                   </a>
                 </li>
@@ -141,10 +141,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/guides/dispatcher/index.html">
+                  <a  href="/guides/dispatcher/index.html">
                     Dispatcher
                   </a>
                 </li>
@@ -859,10 +859,10 @@
           
         
 
-        <li  class="nav-section" >
+        <li  class="nav-section active">
           
 
-          <a  href="/guides/es6/index.html">
+          <a  class="active" href="/guides/es6/index.html">
               ES6
           </a>
           
@@ -998,10 +998,10 @@
           
         
 
-        <li  class="nav-section active">
+        <li  class="nav-section" >
           
 
-          <a  class="active" href="/guides/dispatcher/index.html">
+          <a  href="/guides/dispatcher/index.html">
               Dispatcher
           </a>
           
@@ -1119,20 +1119,57 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Dispatcher</h1>
+      <h1 class="page-title">ES6</h1>
     
     <div class="content">
-      <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creator</a> creates an action and you call <code>this.dispatch()</code>, the action will be passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
+      <p>Marty provides support for defining everything using ES6 classes. For all inbuilt types you will find their base class available on <code>Marty</code> object (e.g. <code>Marty.HttpStateSource</code>, <code>Marty.ActionCreators</code>, <code>Marty.Store</code>).</p>
 
-<p>Marty uses <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>.</p>
+<h2>Registration</h2>
 
-<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">getDefault</span><span class="p">();</span>
+<p>All types must be registered within Marty&#39;s container. When defining your types with the ES5 syntax we will automatically register do this for you.</p>
 
-<span class="kd">var</span> <span class="nx">dispatchToken</span> <span class="o">=</span> <span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
-<span class="p">});</span>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">FooStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+    <span class="p">...</span>
+<span class="p">});</span></code></pre></div>
 
-<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">dispatchAction</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'CREATE_FOO'</span> <span class="p">});</span></code></pre></div>
+<p>Unfortunately there&#39;s no way to do this automatically when defining a class so you must manually call <code>Marty.register</code> passing in the class and (optionally) its Id.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">FooStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+    <span class="nx">getFoo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">FooStore</span><span class="p">,</span> <span class="s1">'foo'</span><span class="p">);</span></code></pre></div>
+
+<h2>Default instance</h2>
+
+<p>In most cases it&#39;s much easier for us to have a single instance of each type. This saves us having to manually manage the lifecycle of each object. This is why Marty will return an instance of type registered type from <code>Marty.register</code> known as the <strong>default instance</strong>.</p>
+
+<p>In almost all cases the default instance is what you want to be using so if you&#39;re using a module loader (e.g. browserify, webpack, requirejs) we recommend you export the default instance from the file.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">//stores/fooStore.js</span>
+<span class="kr">class</span> <span class="nx">FooStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+    <span class="nx">getFoo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">FooStore</span><span class="p">);</span>
+
+<span class="c1">//views/foo.js</span>
+<span class="kd">var</span> <span class="nx">FooStore</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../stores/fooStore'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">FooStore</span><span class="p">.</span><span class="nx">getFoo</span><span class="p">();</span></code></pre></div>
+
+<p>There are occasions when you might want to access the underlying type. In those cases we tend to create a folder for the type, that contains 2 files:</p>
+
+<ol>
+<li>type.js - containing the class</li>
+<li>index.js - containing <code>module.exports = Marty.register(&#39;./type&#39;)</code></li>
+</ol>
+
+<p>This allows you call <code>require(&#39;./stores/fooStore&#39;)</code> when you want the default instance and <code>require(&#39;./stores/fooStore/type&#39;)</code> when you want the type.</p>
 
     </div>
   </div>

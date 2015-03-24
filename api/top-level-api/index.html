@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Action Creators API</title>
+  <title>Top-Level API</title>
   <meta name="viewport" content="width=device-width">
 
   <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon">
@@ -172,10 +172,10 @@
             <ul class="nav sub-nav visible-xs-block">
               
               
-                <li >
+                <li  class="active">
                   
 
-                  <a  href="/api/top-level-api/index.html">
+                  <a  class="active" href="/api/top-level-api/index.html">
                     Top-Level API
                   </a>
                 </li>
@@ -188,10 +188,10 @@
                   </a>
                 </li>
               
-                <li  class="active">
+                <li >
                   
 
-                  <a  class="active" href="/api/action-creators/index.html">
+                  <a  href="/api/action-creators/index.html">
                     Action Creators
                   </a>
                 </li>
@@ -323,10 +323,10 @@
           
         
 
-        <li  class="nav-section" >
+        <li  class="nav-section active">
           
 
-          <a  href="/api/top-level-api/index.html">
+          <a  class="active" href="/api/top-level-api/index.html">
               Top-Level API
           </a>
           
@@ -397,10 +397,10 @@
           
         
 
-        <li  class="nav-section active">
+        <li  class="nav-section" >
           
 
-          <a  class="active" href="/api/action-creators/index.html">
+          <a  href="/api/action-creators/index.html">
               Action Creators
           </a>
           
@@ -753,36 +753,153 @@
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
     
-      <h1 class="page-title">Action Creators API</h1>
+      <h1 class="page-title">Top-Level API</h1>
     
     <div class="content">
-      <div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
-  <span class="na">id</span><span class="p">:</span> <span class="s1">'UserActionCreators'</span><span class="p">,</span>
-  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+      <h2 id="registration">Registration</h2>
+
+<h3 id="register">Marty.register(class, [id])</h3>
+
+<p>Register a Marty class into the <a href="#registry">registry</a>. Instantiates an instance with the <a href="/api/dispatcher/index.html#default">dispatcher</a> and returns it. Optionally takes a store Id as the second argument. Defaults to the store name.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">UserStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserStore</span><span class="p">,</span> <span class="s1">'users'</span><span class="p">);</span></code></pre></div>
+
+<h3 id="createStore">Marty.createStore(options)</h3>
+
+<p>Register a <a href="/api/stores/index.html">store</a> defined with the ES5 syntact into the <a href="#registry">registry</a>. Instantiates an instance with the <a href="/api/dispatcher/index.html#default">dispatcher</a> and returns it.</p>
+
+<h3 id="createQueries">Marty.createQueries(options)</h3>
+
+<p>Register <a href="/api/queries/index.html">queries</a> defined with the ES5 syntact into the <a href="#registry">registry</a>. Instantiates an instance with the <a href="/api/dispatcher/index.html#default">dispatcher</a> and returns it.</p>
+
+<h3 id="createStateSource">Marty.createStateSource(options)</h3>
+
+<p>Register a <a href="/api/state-source/index.html">state source</a> defined with the ES5 syntact into the <a href="#registry">registry</a>. Instantiates an instance with the <a href="/api/dispatcher/index.html#default">dispatcher</a> and returns it.</p>
+
+<h3 id="createActionCreators">Marty.createActionCreators(options)</h3>
+
+<p>Register <a href="/api/action-creators/index.html">action creators</a> defined with the ES5 syntact into the <a href="#registry">registry</a>. Instantiates an instance with the <a href="/api/dispatcher/index.html#default">dispatcher</a> and returns it.</p>
+
+<h3 id="createStateMixin">Marty.createStateMixin(options)</h3>
+
+<p>Creates a <a href="/guides/state-mixin/index.html">state mixin</a> and returns it.</p>
+
+<h3 id="createConstants">Marty.createConstants(options)</h3>
+
+<p>Creates <a href="/guides/constants/index.html">constants</a> and returns them.</p>
+
+<h3 id="createContainer">Marty.createContainer(InnerComponent, options)</h3>
+
+<p>Wraps the component with a <a href="/guides/containers/index.html">container component</a> that is responsible for fetching state from stores and passing it to the inner component.</p>
+
+<h3 id="registry">Marty.registry</h3>
+
+<p>Returns the current instance of the <a href="/api/registry/index.html">registry</a>.</p>
+
+<h2 id="state">State</h2>
+
+<h3 id="replaceState">Marty.replaceState(stores, [context])</h3>
+
+<p>Replaces (<a href="/api/stores/index.html#replaceState">Store#replaceState</a>) the state of all stores with the values passed in. If a <a href="#createContext">context</a> is passed in then we will replace the context&#39;s stores state. The key within the <code>stores</code> object literal must be the Id of the store.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Marty</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">({</span>
+  <span class="na">UserStore</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">state</span><span class="p">:</span> <span class="p">{</span>
+      <span class="p">[</span><span class="mi">123</span><span class="p">]:</span> <span class="p">{</span> <span class="nl">id</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Foo'</span> <span class="p">}</span>
+    <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UserActionCreators</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">ActionCreators</span> <span class="p">{</span>
-  <span class="nx">addUser</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">ADD_USER</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span> <span class="c1">// { id: 123, name: 'Foo' }</span></code></pre></div>
+
+<h3 id="clearState">Marty.clearState([context])</h3>
+
+<p>Calls <a href="/api/stores/index.html#clear">Store#clear</a> on all registered stores. If a <a href="#createContext">context</a> is passed in then we will call  <a href="/api/stores/index.html#clear">Store#clear</a>) on all stores within the context.</p>
+
+<h3 id="dehydrate">Marty.dehydrate([context])</h3>
+
+<p>Calls <a href="/api/stores/index.html#dehydrate">Store#dehydrate</a> if present or <a href="/api/stores/index.html#getState">Store#getState</a> on all registered stores. Returning all states as a serializable object literal where they key is the Id of the store. If a <a href="#createContext">context</a> is passed in then we will dehyrdate all stores within the context.</p>
+
+<h3 id="rehydrate">Marty.rehydrate([states], [context])</h3>
+
+<p>Given some dehyrdated state, it will call <a href="/api/stores/index.html#rehydrate">Store#rehydrate</a> if present or <a href="/api/stores/index.html#replaceState">Store#replaceState</a> on all registered stores passing in the dehyrdated state. The key of the states must match the Id of the store. If you don&#39;t pass in states then it will look at the <code>window.__marty.state</code>. If a <a href="#createContext">context</a> is passed in then we will rehyrdate all stores within the context.</p>
+
+<h3 id="createContext">Marty.createContext(options)</h3>
+
+<p>Creates a <a href="/api/context/index.html">context</a> which contains a dispatcher and instances of all types currently registered within <a href="#registry">Marty.registry</a>.</p>
+
+<h3 id="renderToString">Marty.renderToString(options)</h3>
+
+<p><a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">Renders</a> the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occured. <code>timeout</code> allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default <strong>1000ms</strong>). It uses React contexts to pass the Marty context to child components (context key is <code>marty</code>).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">type</span><span class="p">:</span> <span class="nx">Foo</span><span class="p">,</span>
+  <span class="na">context</span><span class="p">:</span> <span class="nx">context</span><span class="p">,</span>
+  <span class="na">props</span><span class="p">:</span> <span class="p">{</span> <span class="na">bar</span><span class="p">:</span> <span class="s1">'bar'</span> <span class="p">},</span>
+  <span class="na">timeout</span><span class="p">:</span> <span class="mi">1000</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">Foo</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">contextTypes</span> <span class="p">{</span>
+    <span class="nl">marty</span><span class="p">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">PropTypes</span><span class="p">.</span><span class="nx">object</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="err">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">marty</span><span class="p">.</span><span class="nx">getStore</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="o">/&gt;</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-</div>
+<span class="p">});</span>
 
-<h2 id="id">id</h2>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">(</span><span class="nx">options</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">html</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Diagnostics'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
+<span class="p">});</span></code></pre></div>
 
-<p>A unique identifier (<em>required</em>). Needed by the <a href="/api/registry/index.html">registry</a> to uniquely identify the type.</p>
+<h2 id="environment">Environment</h2>
 
-<h2 id="displayName">displayName</h2>
+<h3 id="isServer">Marty.isServer</h3>
 
-<p>An (optional) display name for the action creator. Used for richer debugging. We will use the Id if displayName hasn&#39;t been set. If you&#39;re using ES6 classes, displayName will automatically be the name of the class.</p>
+<p>True if the current process is being executed within node.js or io.js.</p>
 
-<h2 id="dispatch">dispatch(type, [...])</h2>
+<h3 id="isBrowser">Marty.isBrowser</h3>
 
-<p>Dispatches an action payload with the given type. Any <a href="/api/stores/index.html#handleAction">action handlers</a> will be invoked with the given action handlers.</p>
+<p>True if the current process is being executed within a browser.</p>
 
-<h2 id="for">for(obj)</h2>
+<h2 id="general">General</h2>
 
-<p>Resolves the instance of the object for the objects Marty context. The context can either be the object itself or available at <code>obj.context</code> or <code>obj.context.marty</code>.</p>
+<h3 id="dispatcher">Marty.dispatcher</h3>
+
+<p>Returns the current instance of the <a href="/api/dispatcher/index.html">dispatcher</a>.</p>
+
+<h3 id="warnings">Marty.warnings</h3>
+
+<p>Configurable list of warnings that Marty emits. Setting the key to false will stop the warning from happening. We will warn you when a feature is being depreciated so disabling warnings can make upgrading difficult in the future.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Marty</span><span class="p">.</span><span class="nx">warnings</span><span class="p">.</span><span class="nx">invokeConstant</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span></code></pre></div>
+
+<h4 id="withoutWarning">Marty.warnings.without(warningsToDisable*, callback, [context])</h4>
+
+<p>Disables a warning for the duration of the callback.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">Marty</span><span class="p">.</span><span class="nx">warnings</span><span class="p">.</span><span class="nx">without</span><span class="p">([</span><span class="s1">'reservedFunction'</span><span class="p">,</span> <span class="s1">'superNotCalledWithOptions'</span><span class="p">],</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// do something evil</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="createInstance">Marty.createInstance()</h3>
+
+<p>Creates a new instance of Marty. Useful for testing.</p>
+
+<h3 id="dispose">Marty.dispose()</h3>
+
+<p>Disposes of all state and event listeners for all known instances.</p>
+
+<h3 id="version">Marty.version</h3>
+
+<p>The current version of Marty.</p>
 
     </div>
   </div>
