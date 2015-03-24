@@ -4,6 +4,8 @@
 
 ## Quick start
 
+[![Join the chat at https://gitter.im/jhollingworth/marty](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jhollingworth/marty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ```
 make build        # rebuild source
 make test         # lint & run tests
