@@ -37,6 +37,8 @@ body {
   position: absolute;
   right: 0;
   top: 2px;
+  font-size: 11px;
+  font-style: 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Keep code small in tables on account of limited space */
@@ -47,6 +49,13 @@ body {
 
 .page-title .meta {
   font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .page-title .meta {
+    display: block;
+    margin-top: 10px;
+  }
 }
 
 /* Outline button for use within the docs */

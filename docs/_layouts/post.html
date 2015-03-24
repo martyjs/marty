@@ -19,18 +19,22 @@ sectionid: blog
     <h1 class="page-title">
       {{page.title}}
 
-      <span class="meta">by <a href="{{page.author_url}}">{{ page.author }}</a> on {{ page.date | date: "%B %e, %Y" }}</span>
+
+      <span class="meta">by <a href="{{page.author_url}}">{{ page.author }}</a> <span class="hidden-xs">on {{ page.date | date: "%B %e, %Y" }}</span></span>
 
       <div class="page-share">
-        <!-- AddToAny BEGIN -->
-        <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
-        <a class="a2a_dd" href="https://www.addtoany.com/share_save"></a>
-        <a class="a2a_button_facebook"></a>
-        <a class="a2a_button_twitter"></a>
-        <a class="a2a_button_google_plus"></a>
+        <div class="hidden-xs" style="margin-top:3px">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-text="marty.js 0.9 - Isomorphism, ES6 classes and much more" data-size="large" data-count="none" data-hashtags="martyjs">Tweet</a>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          <a class="github-button" href="https://github.com/jhollingworth/marty" data-style="mega" data-count-href="/jhollingworth/marty/stargazers" data-count-api="/repos/jhollingworth/marty#stargazers_count">Star</a>
         </div>
-        <script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
-        <!-- AddToAny END -->
+        <div class="visible-xs-block" style="margin-top:40px">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-text="marty.js 0.9 - Isomorphism, ES6 classes and much more" data-count="none" data-hashtags="martyjs">Tweet</a>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+          <!-- Place this tag where you want the button to render. -->
+          <a class="github-button" href="https://github.com/jhollingworth/marty" data-count-href="/jhollingworth/marty/stargazers" data-count-api="/repos/jhollingworth/marty#stargazers_count">Star</a>
+        </div>
       </div>
     </h1>
     <div class="content">
@@ -52,6 +56,8 @@ sectionid: blog
     <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
   </div>
 </div>
+<!-- Place this tag right after the last button or just before your close body tag. -->
+<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
 
 <script type="text/javascript">
   /* * * CONFIGURATION VARIABLES * * */
