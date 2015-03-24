@@ -4,8 +4,8 @@ then
   exit 1;
 fi
 
-# echo "updating version"
-# version="$(node build/updateVersion.js)"
+echo "updating version"
+version="$(node build/updateVersion.js)"
 
 echo "building v$version"
 make build
