@@ -1,9 +1,9 @@
-var fs = require('fs');
-var util = require('util');
-var semver = require('semver');
-var join = require('path').join;
-var inc = process.env.inc || 'patch';
-var version = semver.inc(require('../package.json').version, inc);
+let fs = require('fs');
+let util = require('util');
+let semver = require('semver');
+let join = require('path').join;
+let inc = process.env.inc || 'patch';
+let version = semver.inc(require('../package.json').version, inc);
 
 console.log(version)
 
@@ -13,19 +13,19 @@ updateVersion();
 ['../package.json', '../bower.json'].forEach(updateConfig);
 
 function updateDocs() {
-  var config = read('../docs/_config.yml');
+  let config = read('../docs/_config.yml');
   config = config.replace(/current_version: .*/, util.format("current_version: %s", version));
   write('../docs/_config.yml', config);
 }
 
 function updateMarty() {
-  var marty = read('../marty.js');
+  let marty = read('../marty.js');
   marty = marty.replace(/version: '.*'/, util.format("version: '%s'", version));
   write('../marty.js', marty);
 }
 
 function updateConfig(path) {
-  var config = JSON.parse(read(path));
+  let config = JSON.parse(read(path));
   config.version = version;
   write(path, JSON.stringify(config, null, 2));
 }
