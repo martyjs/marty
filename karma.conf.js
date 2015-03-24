@@ -1,6 +1,6 @@
-var fs = require('fs');
-var _ = require('lodash');
-var yaml = require('js-yaml');
+let fs = require('fs');
+let _ = require('lodash');
+let yaml = require('js-yaml');
 
 module.exports = function (config) {
   process.env.NODE_ENV = 'test';
@@ -31,7 +31,7 @@ module.exports = function (config) {
   }
 
   function saucelabs() {
-    var customLaunchers = {
+    let customLaunchers = {
       sl_chrome: {
         base: 'SauceLabs',
         browserName: 'chrome',
@@ -126,11 +126,11 @@ module.exports = function (config) {
     return _.pick(travisGlobalVariables(), 'SAUCE_USERNAME', 'SAUCE_ACCESS_KEY');
 
     function travisGlobalVariables() {
-      var config = {};
-      var travis = yaml.safeLoad(fs.readFileSync('./.travis.yml', 'utf-8'));
+      let config = {};
+      let travis = yaml.safeLoad(fs.readFileSync('./.travis.yml', 'utf-8'));
 
-      travis.env.global.forEach(function (variable) {
-        var parts = /(.*)="(.*)"/.exec(variable);
+      travis.env.global.forEach(function (letiable) {
+        let parts = /(.*)="(.*)"/.exec(letiable);
 
         config[parts[1]] = parts[2];
       });
