@@ -336,11 +336,11 @@
 
 <p>We&#39;ve also created <a href="/guides/isomorphism/marty-express.html">marty-express</a>, a middleware for <a href="expressjs.com">express.js</a> which consumes <a href="https://github.com/rackt/react-router">react-router</a> routes so you don&#39;t have to have to duplicate your routing on the client and the server. It also modifies the <a href="/api/state-sources/http.html">HTTP state source</a> so HTTP requests made on the server will behave the same as they would in the browser.</p>
 
-<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/guides/isomorphism/index.html">guide on how to get started</a>.</p>
+<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/guides/isomorphism/index.html">guide on how to get started</a>. Our <a href="https://github.com/jhollingworth/marty-chat-example">example chat app</a> has also been updated to be isomorphic.</p>
 
 <h2 id="es6-classes">ES6 Classes</h2>
 
-<p>To complement React ability to define components using ES6 classes we now support defining all types using classes as well. You can read our guide on <a href="/guides/es6/index.html">ES6</a> to find out how to make the switch.</p>
+<p>To complement React ability to define components using ES6 classes we now support defining all types using classes as well. You can read our guide on <a href="/guides/es6/index.html">ES6</a> to find out how to make the switch. We have also created a new version of the <a href="https://github.com/jhollingworth/marty-chat-example-es6">example chat app which uses ES6 classes</a>.</p>
 
 <div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">id</span><span class="p">:</span> <span class="s1">'UsersStore'</span><span class="p">,</span>
