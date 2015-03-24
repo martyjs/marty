@@ -62,6 +62,9 @@
               {% endfor %}
             </ul>
           </li>
+          <li{% if page.collection == "support" %} class="active"{% endif %}>
+            <a href="{% url /support %}">Support</a>
+          </li>
           <li{% if page.collection == "devtools" %} class="active"{% endif %}>
             <a href="{% url /devtools %}">Developer Tools</a>
           </li>

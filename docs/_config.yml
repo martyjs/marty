@@ -39,6 +39,9 @@ collections:
   api:
     title: API
     output: true
+  support:
+    title: Support
+    output: true
   devtools:
     title: Developer Tools
     output: true
