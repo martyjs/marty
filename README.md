@@ -42,10 +42,6 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 (From [atom](https://atom.io/docs/latest/contributing#git-commit-messages))
 
-##Browser Support
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/jhollingworth.svg)](https://saucelabs.com/u/jhollingworth)
-
 ## Maintainers
 
 * [James Hollingworth](http://github.com/jhollingworth)
