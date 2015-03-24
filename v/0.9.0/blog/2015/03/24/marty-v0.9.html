@@ -319,15 +319,17 @@
 
 <h2 id="isomorphisim">Isomorphisim</h2>
 
-<p>Being able to run your JS application on the server and in the browser has been one of the major reasons people have started using React. We&#39;ve found it is still very challenging to build isomorphic applications and so we&#39;ve built a set of APIs that make it easier.</p>
+<p>Being able to run your JS application on the server and in the browser has been one of the major reasons people have started using React. We&#39;ve found it&#39;s still challenging to build isomorphic applications and so we&#39;ve built a set of APIs that make it easier.</p>
 
-<p><a href="/v/0.9.0/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> is a smarter version of <a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring"><code>React.renderToString</code></a> which knows what state each component needs, fetches it for you and only then renders the component. It also gives you lots of diagnostic information to understand what Marty is doing on the server:</p>
+<p><a href="/v/0.9.0/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> is a smarter version of <a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring"><code>React.renderToString</code></a> which knows what state each component needs, fetches it for you and then renders the component. It also gives you lots of diagnostic information to understand what Marty is doing on the server:</p>
 
 <p><a href="/v/0.9.0/img/renderToString-diagnostics.png"><img src="/v/0.9.0/img/renderToString-diagnostics.png" width="100%" alt="Marty Developer Tools"/></a></p>
 
-<p>We&#39;ve also created <a href="/v/0.9.0/guides/isomorphism/marty-express.html">marty-express</a>, a middleware for <a href="expressjs.com">express.js</a> which consumes <a href="https://github.com/rackt/react-router">react-router</a> routes so you don&#39;t have to have to duplicate your routes on the client and the server. It will also modify the <a href="/v/0.9.0/api/state-sources/http.html">HTTP state source</a> so that you can make the same HTTP requests on the server.</p>
+<p>For synchronizing state between the server and browser we have <a href="/v/0.9.0/api/top-level-api/#dehydrate"><code>Marty.dehydrate()</code></a> and <a href="/v/0.9.0/api/top-level-api/#rehydrate"><code>Marty.rehydrate()</code></a>. <a href="/v/0.9.0/api/top-level-api/#dehydrate"><code>Marty.dehydrate()</code></a> serializes the contents of your stores to a string which is sent down with the rendered HTML. When your application first loads in the browser you just need to call <a href="/v/0.9.0/api/top-level-api/#rehydrate"><code>Marty.rehydrate()</code></a> to have your stores return back to their state when on the server.</p>
 
-<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/v/0.9.0/guides/isomorphism/index.html">guide</a> on how to get started.</p>
+<p>We&#39;ve also created <a href="/v/0.9.0/guides/isomorphism/marty-express.html">marty-express</a>, a middleware for <a href="expressjs.com">express.js</a> which consumes <a href="https://github.com/rackt/react-router">react-router</a> routes so you don&#39;t have to have to duplicate your routing on the client and the server. It also modifies the <a href="/v/0.9.0/api/state-sources/http.html">HTTP state source</a> so HTTP requests made on the server will behave the same as they would in the browser.</p>
+
+<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/v/0.9.0/guides/isomorphism/index.html">guide on how to get started</a>.</p>
 
 <h2 id="es6-classes">ES6 Classes</h2>
 
@@ -362,7 +364,7 @@
 
 <h2 id="containers">Containers</h2>
 
-<p>When defining components using ES6 classes you can no longer use mixins which means you won&#39;t be able to use the <a href="/v/0.9.0/guides/state-mixin/index.html">state mixin</a>. A new pattern emerging is <a href="https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750">to wrap your components in &quot;container&quot; components which do the work of mixins</a>. We&#39;re a big fan of this pattern and so we&#39;ve introduced <a href="/v/0.9.0/api/top-level-api/index.html#createContainer"><code>Marty.createContainer</code></a> which wraps your component with a component that does the same job as the <a href="/v/0.9.0/guides/state-mixin/index.html">state mixin</a>. You can checkout our <a href="/v/0.9.0/guides/containers/index.html">containers guide</a> to learn more about them.</p>
+<p>When defining components using ES6 classes you can no longer use mixins which means you won&#39;t be able to use the <a href="/v/0.9.0/guides/state-mixin/index.html">state mixin</a>. A new pattern emerging to solve this problem is <a href="https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750">to wrap your components in &quot;container&quot; components</a>. We&#39;re a big fan of this pattern and so we&#39;ve introduced <a href="/v/0.9.0/api/top-level-api/index.html#createContainer"><code>Marty.createContainer</code></a> which creates a container component that does the same job as the <a href="/v/0.9.0/guides/state-mixin/index.html">state mixin</a>. You can checkout our <a href="/v/0.9.0/guides/containers/index.html">containers guide</a> to learn more about them.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">User</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
@@ -391,7 +393,7 @@
 <h2 id="queries">Queries</h2>
 
 <p>
-There was a lot of confusion about how to dispatch actions when fetching state. We're introducing <a href="/v/0.9.0/guides/queries/index.html">Queries</a> which are responsible for coordinating getting new state from outside of the application. You can read <a href="/v/0.9.0/guides/queries/index.html">our guide</a> to learn why they've been introduced.
+<a href="/v/0.9.0/guides/queries/index.html">Queries</a> are a new type we're introducing that is responsible for coordinating getting new state from outside of the application. They should help reduce some confusion about how to dispatch actions when fetching state. You can read <a href="/v/0.9.0/guides/queries/index.html">our guide</a> to learn why they've been introduced.
 </p>
 
 <div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UserQueries</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createQueries</span><span class="p">({</span>
@@ -424,7 +426,7 @@ There was a lot of confusion about how to dispatch actions when fetching state. 
 
 <h2 id="action-creators">Action creators</h2>
 
-<p>Our approach to defining <a href="http://martyjs.org/v/0.8.15/guides/action-creators/index.html">action creators</a> was the source of many bugs and lots of confusion. We&#39;ve got a new, simplified approach which should resolve all of these issues.</p>
+<p>Our approach to defining <a href="http://martyjs.org/v/0.8.15/guides/action-creators/index.html">action creators</a> was the source of lots of confusion and many bugs. We&#39;ve got a new, simplified approach which should resolve these issues.</p>
 
 <div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_EMAIL"</span><span class="p">]);</span>
 
