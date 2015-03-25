@@ -445,7 +445,7 @@ var UsersStore = Marty.createStore({
         return this.state[id];
       },
       function () {
-        return UserAPI.getUser(id);
+        return UserQueries.getUser(id);
       }
     });
   }
@@ -457,7 +457,7 @@ class UsersStore extends Marty.Store {
   getUser(id) {
     return this.fetch(id,
       () => return this.state[id],
-      () => return UserAPI.getUser(id)
+      () => return UserQueries.getUser(id)
     );
   }
 });
