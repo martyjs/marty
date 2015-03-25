@@ -704,7 +704,7 @@ var _extends = Object.assign || function (target) {
   }return target;
 };
 
-var React = require("react");
+var React = require(32);
 var log = require(28);
 var _ = require(64);
 var uuid = require(67);
@@ -828,7 +828,7 @@ function getStoresToListenTo(config, component) {
   });
 }
 
-},{"14":14,"28":28,"59":59,"64":64,"67":67,"undefined":undefined}],14:[function(require,module,exports){
+},{"14":14,"28":28,"32":32,"59":59,"64":64,"67":67}],14:[function(require,module,exports){
 "use strict";
 
 var log = require(28);
@@ -10143,7 +10143,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.0",
+    version: "0.9.1",
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
