@@ -44,5 +44,5 @@ class UserQueries extends Marty.Queries {
 
 ##Why have Queries at all?
 
-One practical reason for queries is that you get a circular dependency if you're store tries to call an action creator from inside itself. Splitting reads form writes was an easy way of resolving this situation. You could just as easily use action creators but we've found having separate types for them makes the code base easier to navigate and understand.
+One practical reason for queries is that you get a circular dependency if your store tries to call an action creator from inside itself. Splitting reads from writes was an easy way of resolving this situation. You could just as easily use action creators, but we've found having separate types for them makes the codebase easier to navigate and understand.
 
