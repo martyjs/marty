@@ -1129,7 +1129,7 @@ Often you're only concerned with fetching locally and remotely so you use the se
         <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
       <span class="p">},</span>
       <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">UserQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">});</span>
   <span class="p">}</span>
@@ -1137,7 +1137,7 @@ Often you're only concerned with fetching locally and remotely so you use the se
   <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span>
       <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">],</span>
-      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">return</span> <span class="nx">UserQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
