@@ -1,3 +1,8 @@
+0.9.1 / 2015-03-25
+===================
+
+- Fix issue where Marty would not work with window object (#219, #216)
+
 0.9.0 / 2015-03-24
 ===================
 
