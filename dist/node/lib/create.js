@@ -7,7 +7,7 @@ var createStoreClass = require("./store/createStoreClass");
 var createQueriesClass = require("./queries/createQueriesClass");
 var createStateSourceClass = require("./stateSource/createStateSourceClass");
 var createActionCreatorsClass = require("./actionCreators/createActionCreatorsClass");
-var DEFAULT_CLASS_NAME = "Class";
+var getClassName = require("./utils/getClassName");
 
 module.exports = {
   register: register,
@@ -36,14 +36,6 @@ function register(clazz, id) {
 
 function createContext() {
   return this.registry.createContext();
-}
-
-function getClassName(clazz) {
-  var funcNameRegex = /function (.{1,})\(/;
-  var results = funcNameRegex.exec(clazz.toString());
-  var className = results && results.length > 1 ? results[1] : "";
-
-  return className === DEFAULT_CLASS_NAME ? null : className;
 }
 
 function createConstants(obj) {
