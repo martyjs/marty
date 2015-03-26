@@ -67,6 +67,7 @@ If you're using the [fetch API]({% url /api/stores/index.html#fetch %}) then con
 
 ##Further reading
 
+* [Separating components and containers in different files]({% url /guides/containers/separating-components-and-containers-in-different-files.html %}).
 * [Mixins Are Dead. Long Live Composition](https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750)
 * [Building The Facebook News Feed With Relay](http://facebook.github.io/react/blog/2015/03/19/building-the-facebook-news-feed-with-relay.html)
 
