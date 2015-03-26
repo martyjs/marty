@@ -74,8 +74,19 @@ describe('Container', function () {
       expect(ContainerComponent.InnerComponent).to.equal(InnerComponent);
     });
 
-    it('should set the display name', function () {
+    it('should set the display name on classical React components', function () {
       expect(render(ContainerComponent).refs.subject.constructor.displayName).to.eql('InnerComponentContainer');
+    });
+
+    it('should set the display name on ES6 React components', function () {
+      class ES6InnerComponent extends React.Component {
+        render() {
+          return React.createElement('div');
+        }
+      }
+
+      let ContainerES6Component = Marty.createContainer(ES6InnerComponent);
+      expect(render(ContainerES6Component).refs.subject.constructor.displayName).to.eql('ES6InnerComponentContainer');
     });
   });
 
