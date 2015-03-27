@@ -23,13 +23,12 @@ let Component = require('./component');
 module.exports = Marty.createContainer(Component, {
   // ...
 });
-{% endsample $}
+{% endsample %}
 
-if your `Container` is doing more than the defaults, i.e., you're using some `JSX` on `done`, you 
-will need to include `React` on that file too. It's clear if you're not using `JSX` as your code
+if your `Container` is doing more than the defaults, i.e., you're using some `JSX` on `done`, you will need to include `React` on that file too. It's clear if you're not using `JSX` as your code
 will read something like:
 
-{% sample %}
+{% highlight js %}
 // container.js
 module.exports = Marty.createContainer(Component, {
   // ...
@@ -41,13 +40,13 @@ module.exports = Marty.createContainer(Component, {
   }
   // ...
 });
-{% endsample %}
+{% endhighlight %}
 
 `React` is clearly a dependency there.
 
 However, if you're using `JSX`, it might not be that clear as no `React` variable is visible.
 
-{% sample %}
+{% highlight js %}
 // container.js
 module.exports = Marty.createContainer(Component, {
   // ...
@@ -56,7 +55,7 @@ module.exports = Marty.createContainer(Component, {
   }
   // ...
 });
-{% endsample %}
+{% endhighlight %}
 
 This isn't directly tied to `Marty` or `React` itself, it's just something that may happen if you're
 not aware that eventually your JSX transformer will introduce that `React` variable there and your
