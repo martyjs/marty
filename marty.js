@@ -18,7 +18,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: '0.9.1',
+    version: '0.9.2',
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
