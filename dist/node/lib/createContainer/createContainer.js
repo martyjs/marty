@@ -8,6 +8,7 @@ var _ = require("../utils/mindash");
 var uuid = require("../utils/uuid");
 var StoreObserver = require("../storeObserver");
 var getFetchResult = require("./getFetchResult");
+var getClassName = require("../utils/getClassName");
 
 function createContainer(InnerComponent, config) {
   config = config || {};
@@ -18,6 +19,7 @@ function createContainer(InnerComponent, config) {
 
   var observer;
   var id = uuid.type("Component");
+  var innerComponentDisplayName = InnerComponent.displayName || getClassName(InnerComponent);
 
   var Container = React.createClass({
     displayName: "Container",
@@ -28,7 +30,7 @@ function createContainer(InnerComponent, config) {
     componentDidMount: function componentDidMount() {
       var component = {
         id: id,
-        displayName: InnerComponent.displayName
+        displayName: innerComponentDisplayName
       };
 
       observer = new StoreObserver({
@@ -45,14 +47,15 @@ function createContainer(InnerComponent, config) {
         observer.dispose();
       }
     },
+    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+      config.props = nextProps;
+    },
     getInitialState: function getInitialState() {
-      var _this = this;
-
       config = _.defaults(config, {
         // Have a default implementation of done so it can be
         // called from other handlers
-        done: function (results) {
-          return React.createElement(InnerComponent, _extends({}, _this.props, results));
+        done: function done(results) {
+          return React.createElement(InnerComponent, _extends({}, this.props, results));
         }
       });
 
@@ -97,7 +100,7 @@ function createContainer(InnerComponent, config) {
   });
 
   Container.InnerComponent = InnerComponent;
-  Container.displayName = InnerComponent.displayName + "Container";
+  Container.displayName = innerComponentDisplayName + "Container";
 
   return Container;
 }
