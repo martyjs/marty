@@ -90,7 +90,7 @@ You cannot make the same HTTP requests on the server as you do in the browser. T
 
 There are many other inconsistencies between APIs on the server and in the browser. For example if you want to modify a cookie in the browser you would do ``document.cookie = "foo=bar"`` whereas on the server (using express.js) you would do ``res.cookie('foo', 'bar')``. Routing is another example which you need to define with two incompatible APIs.
 
-[marty-express]({% url /guides/isomorphism/marty-express.html %}) is an [express.js](expressjs.com) middleware which aims to resolve these differences allowing you to have a single code base. It will do a number of things for your you:
+[marty-express]({% url /guides/isomorphism/marty-express.html %}) is an [express.js](http://expressjs.com) middleware which aims to resolve these differences allowing you to have a single code base. It will do a number of things for your you:
 
 * Consumes [react-router](https://github.com/rackt/react-router) routes and automatically renders them on the server. It will also manage ``Marty.renderToString`` for you.
 * Modifies any requests made through [HTTP state source]({% url /api/state-sources/http.html %}), fully qualifying relative URLs and injecting headers from the original request.
