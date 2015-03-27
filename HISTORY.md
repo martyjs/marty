@@ -1,3 +1,8 @@
+0.9.2 / 2015-03-27
+===================
+
+- Correctly listening to `componentWillReceiveProps` and passing props (#229)
+
 0.9.1 / 2015-03-25
 ===================
 
