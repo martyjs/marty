@@ -30,6 +30,10 @@ describe('Marty#register', function () {
       it('should default to the class name', function () {
         expect(Marty.registry.getDefault('Store', 'ExpectedStore')).to.equal(ActualStore);
       });
+
+      it('should default to the class name on the default instance', function () {
+        expect(Marty.registry.getDefault('Store', 'ExpectedStore').id).to.equal(ActualStore);
+      });
     });
 
     describe('when you pass in an id', function () {
@@ -48,8 +52,12 @@ describe('Marty#register', function () {
         expect(ActualStore.getFoo(123)).to.eql(expectedInitialState[123]);
       });
 
-      it('should default to the class name', function () {
-        expect(Marty.registry.getDefault('Store', expectedId)).to.equal(ActualStore);
+      it('should use the specified id', function () {
+        expect(Marty.registry.getDefault('Store', expectedId)).to.equal(expectedId);
+      });
+
+      it('should use the specified id on the default instance', function () {
+        expect(Marty.registry.getDefault('Store', expectedId).id).to.equal(expectedId);
       });
     });
 
