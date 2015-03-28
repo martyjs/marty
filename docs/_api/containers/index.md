@@ -53,7 +53,7 @@ If any of the values within the object hash are [fetch results]({% url /api/stor
 
 <h3 id="done">done(props)</h3>
 
-Creates the inner components, passing through the result of the [fetch](#fetch) via props. Override if you want more control about how the inner component is created.
+Creates the inner components, passing through the result of the [fetch](#fetch) via props. Override if you want more control about how the inner component is created. You should ensure the component should have the ref ``innerComponent``.
 
 <h3 id="pending">pending()</h3>
 
@@ -76,3 +76,6 @@ module.exports = Marty.createContainer(User, {
 });
 {% endhighlight %}
 
+<h3 id="getInnerComponent">getInnerComponent()</h3>
+
+Returns the inner component.
