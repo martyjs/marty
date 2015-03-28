@@ -751,7 +751,10 @@ function createContainer(InnerComponent, config) {
       };
     },
     done: function done(results) {
-      return React.createElement(InnerComponent, _extends({}, this.props, results));
+      return React.createElement(InnerComponent, _extends({ ref: "innerComponent" }, this.props, results));
+    },
+    getInnerComponent: function getInnerComponent() {
+      return this.refs.innerComponent;
     },
     render: function render() {
       var container = this;
@@ -10145,7 +10148,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.3",
+    version: "0.9.4",
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
