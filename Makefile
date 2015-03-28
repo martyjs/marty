@@ -29,7 +29,7 @@ lint:
 	@$(BIN)/jscs --esprima=esprima-fb $(SRC);
 	@$(BIN)/jsxhint $(SRC);
 
-release: test
+release:
 	@inc=$(inc) sh ./build/release.sh
 
 watch:
