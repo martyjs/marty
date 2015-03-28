@@ -57,7 +57,10 @@ function createContainer(InnerComponent, config) {
       };
     },
     done: function done(results) {
-      return React.createElement(InnerComponent, _extends({}, this.props, results));
+      return React.createElement(InnerComponent, _extends({ ref: "innerComponent" }, this.props, results));
+    },
+    getInnerComponent: function getInnerComponent() {
+      return this.refs.innerComponent;
     },
     render: function render() {
       var container = this;

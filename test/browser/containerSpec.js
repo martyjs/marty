@@ -112,6 +112,25 @@ describe('Container', function () {
     });
   });
 
+  describe('#getInnerComponent()', function () {
+    beforeEach(function () {
+      ContainerComponent = wrap(InnerComponent, {
+        something() {
+          return this.getInnerComponent();
+        }
+      });
+      element = TestUtils.renderIntoDocument(<ContainerComponent />);
+    });
+
+    it('should return the inner component', function () {
+      expect(element.getInnerComponent()).to.equal(element.refs.innerComponent);
+    });
+
+    it('should be accessible inside other functions', function () {
+      expect(element.something()).to.equal(element.refs.innerComponent);
+    });
+  });
+
   describe('when I pass in contextTypes', function () {
     var expectedContextTypes;
 
