@@ -154,10 +154,6 @@ describe('Container', function () {
     it('should pass that value to the inner component via props', function () {
       expect(initialProps).to.eql({ foo: 'bar' });
     });
-
-    it('should make the marty context available in the current context', function () {
-      expect(fetchContext.context).to.equal(context);
-    });
   });
 
   describe('when I fetch multiple values', function () {
@@ -233,10 +229,6 @@ describe('Container', function () {
 
       expect(handler).to.be.calledWith(expectedResults);
     });
-
-    it('should make the marty context available in the current context', function () {
-      expect(handlerContext.context).to.equal(context);
-    });
   });
 
   describe('when a fetch is pending and there is a pending handler', function () {
@@ -256,10 +248,6 @@ describe('Container', function () {
 
     it('should call the handler with the fetches and component', function () {
       expect(handler).to.be.calledOnce;
-    });
-
-    it('should make the marty context available in the current context', function () {
-      expect(handlerContext.context).to.equal(context);
     });
   });
 
@@ -296,10 +284,6 @@ describe('Container', function () {
       };
 
       expect(handler).to.be.calledWith(expectedErrors);
-    });
-
-    it('should make the marty context available in the current context', function () {
-      expect(handlerContext.context).to.equal(context);
     });
   });
 
