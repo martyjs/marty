@@ -1,3 +1,9 @@
+0.9.3 / 2015-03-28
+===================
+
+- Allow you to specify your own contextTypes on the container #234
+- Allow you to extend containers with your own functions (#224)
+
 0.9.2 / 2015-03-27
 ===================
 
