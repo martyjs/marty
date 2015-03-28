@@ -112,6 +112,22 @@ describe('Container', function () {
     });
   });
 
+  describe('when I pass in contextTypes', function () {
+    var expectedContextTypes;
+
+    beforeEach(function () {
+      element = wrap(InnerComponent, {
+        contextTypes: {
+          foo: React.PropTypes.object
+        }
+      });
+    });
+
+    it('should include them in the containers contextTypes', function () {
+      expect(element.contextTypes.foo).to.eql(React.PropTypes.object);
+    });
+  });
+
   describe('when I pass props to the container component', function () {
     beforeEach(function () {
       expectedProps = { foo: 'bar' };
