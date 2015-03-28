@@ -91,7 +91,7 @@ describe('Container', function () {
   });
 
   describe('when fetch is a function', function () {
-     beforeEach(function () {
+    beforeEach(function () {
       element = render(wrap(InnerComponent, {
         fetch() {
           return {
@@ -154,6 +154,41 @@ describe('Container', function () {
     it('should pass that value to the inner component via props', function () {
       expect(initialProps).to.eql({ foo: 'bar' });
     });
+
+    it('should make the marty context available in the current context', function () {
+      expect(fetchContext.context.marty).to.eql(context);
+    });
+  });
+
+  describe('when the parent updates its props then it should update its childrens', function () {
+    var ParentComponent;
+
+    beforeEach(function () {
+      ContainerComponent = wrap(InnerComponent);
+
+      ParentComponent = React.createClass({
+        getInitialState() {
+          return {
+            foo: 'bar'
+          };
+        },
+        render() {
+          return <div><ContainerComponent foo={this.state.foo} /></div>;
+        }
+      });
+
+      var element = TestUtils.renderIntoDocument(<ParentComponent />);
+
+      element.replaceState({
+        foo: 'baz'
+      });
+    });
+
+    it('should update the inner components props', function () {
+      expect(updateProps).to.be.calledWith({
+        foo: 'baz'
+      });
+    });
   });
 
   describe('when I fetch multiple values', function () {
@@ -178,6 +213,10 @@ describe('Container', function () {
         }
       });
     });
+
+    it('should make the marty context available in the current context', function () {
+      expect(fetchContext.context.marty).to.eql(context);
+    });
   });
 
   describe('when all of the fetchs are done and a done handler is not implemented', function () {
@@ -201,6 +240,22 @@ describe('Container', function () {
           baz: 'bam'
         }
       });
+    });
+  });
+
+  describe('when you pass in other functions', function () {
+    beforeEach(function () {
+      ContainerComponent = wrap(InnerComponent, {
+        something() {
+          return [this, 'foo'];
+        }
+      });
+
+      element = TestUtils.renderIntoDocument(<ContainerComponent />);
+    });
+
+    it('should expose the function with the element as the context', function () {
+      expect(element.something()).to.eql([element, 'foo']);
     });
   });
 
@@ -249,6 +304,10 @@ describe('Container', function () {
     it('should call the handler with the fetches and component', function () {
       expect(handler).to.be.calledOnce;
     });
+
+    it('should make the marty context available in the current context', function () {
+      expect(fetchContext.context.marty).to.eql(context);
+    });
   });
 
   describe('when a fetch failed and there is a failed handler', function () {
@@ -284,6 +343,10 @@ describe('Container', function () {
       };
 
       expect(handler).to.be.calledWith(expectedErrors);
+    });
+
+    it('should make the marty context available in the current context', function () {
+      expect(fetchContext.context.marty).to.eql(context);
     });
   });
 
