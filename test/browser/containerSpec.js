@@ -91,7 +91,7 @@ describe('Container', function () {
   });
 
   describe('when fetch is a function', function () {
-     beforeEach(function () {
+    beforeEach(function () {
       element = render(wrap(InnerComponent, {
         fetch() {
           return {
@@ -109,6 +109,22 @@ describe('Container', function () {
           baz: 'bam'
         }
       });
+    });
+  });
+
+  describe('when I pass in contextTypes', function () {
+    var expectedContextTypes;
+
+    beforeEach(function () {
+      element = wrap(InnerComponent, {
+        contextTypes: {
+          foo: React.PropTypes.object
+        }
+      });
+    });
+
+    it('should include them in the containers contextTypes', function () {
+      expect(element.contextTypes.foo).to.eql(React.PropTypes.object);
     });
   });
 
@@ -140,7 +156,38 @@ describe('Container', function () {
     });
 
     it('should make the marty context available in the current context', function () {
-      expect(fetchContext.context).to.equal(context);
+      expect(fetchContext.context.marty).to.eql(context);
+    });
+  });
+
+  describe('when the parent updates its props then it should update its childrens', function () {
+    var ParentComponent;
+
+    beforeEach(function () {
+      ContainerComponent = wrap(InnerComponent);
+
+      ParentComponent = React.createClass({
+        getInitialState() {
+          return {
+            foo: 'bar'
+          };
+        },
+        render() {
+          return <div><ContainerComponent foo={this.state.foo} /></div>;
+        }
+      });
+
+      var element = TestUtils.renderIntoDocument(<ParentComponent />);
+
+      element.replaceState({
+        foo: 'baz'
+      });
+    });
+
+    it('should update the inner components props', function () {
+      expect(updateProps).to.be.calledWith({
+        foo: 'baz'
+      });
     });
   });
 
@@ -166,6 +213,10 @@ describe('Container', function () {
         }
       });
     });
+
+    it('should make the marty context available in the current context', function () {
+      expect(fetchContext.context.marty).to.eql(context);
+    });
   });
 
   describe('when all of the fetchs are done and a done handler is not implemented', function () {
@@ -189,6 +240,22 @@ describe('Container', function () {
           baz: 'bam'
         }
       });
+    });
+  });
+
+  describe('when you pass in other functions', function () {
+    beforeEach(function () {
+      ContainerComponent = wrap(InnerComponent, {
+        something() {
+          return [this, 'foo'];
+        }
+      });
+
+      element = TestUtils.renderIntoDocument(<ContainerComponent />);
+    });
+
+    it('should expose the function with the element as the context', function () {
+      expect(element.something()).to.eql([element, 'foo']);
     });
   });
 
@@ -217,10 +284,6 @@ describe('Container', function () {
 
       expect(handler).to.be.calledWith(expectedResults);
     });
-
-    it('should make the marty context available in the current context', function () {
-      expect(handlerContext.context).to.equal(context);
-    });
   });
 
   describe('when a fetch is pending and there is a pending handler', function () {
@@ -243,7 +306,7 @@ describe('Container', function () {
     });
 
     it('should make the marty context available in the current context', function () {
-      expect(handlerContext.context).to.equal(context);
+      expect(fetchContext.context.marty).to.eql(context);
     });
   });
 
@@ -283,7 +346,7 @@ describe('Container', function () {
     });
 
     it('should make the marty context available in the current context', function () {
-      expect(handlerContext.context).to.equal(context);
+      expect(fetchContext.context.marty).to.eql(context);
     });
   });
 
