@@ -704,6 +704,8 @@ var StoreObserver = require(59);
 var getFetchResult = require(14);
 var getClassName = require(62);
 
+var RESERVED_FUNCTIONS = ["contextTypes", "componentDidMount", "onStoreChanged", "componentWillUnmount", "getInitialState", "getState", "render"];
+
 function createContainer(InnerComponent, config) {
   config = config || {};
 
@@ -714,13 +716,12 @@ function createContainer(InnerComponent, config) {
   var observer;
   var id = uuid.type("Component");
   var innerComponentDisplayName = InnerComponent.displayName || getClassName(InnerComponent);
+  var contextTypes = _.extend({
+    marty: React.PropTypes.object
+  }, config.contextTypes);
 
-  var Container = React.createClass({
-    displayName: "Container",
-
-    contextTypes: {
-      marty: React.PropTypes.object
-    },
+  var Container = React.createClass(_.extend({
+    contextTypes: contextTypes,
     componentDidMount: function componentDidMount() {
       var component = {
         id: id,
@@ -730,7 +731,7 @@ function createContainer(InnerComponent, config) {
       observer = new StoreObserver({
         component: component,
         onStoreChanged: this.onStoreChanged,
-        stores: getStoresToListenTo(config, component)
+        stores: getStoresToListenTo(this.listenTo, component)
       });
     },
     onStoreChanged: function onStoreChanged() {
@@ -741,57 +742,45 @@ function createContainer(InnerComponent, config) {
         observer.dispose();
       }
     },
-    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-      config.props = nextProps;
-    },
     getInitialState: function getInitialState() {
-      config = _.defaults(config, {
-        // Have a default implementation of done so it can be
-        // called from other handlers
-        done: function done(results) {
-          return React.createElement(InnerComponent, _extends({}, this.props, results));
-        }
-      });
-
       return this.getState();
     },
     getState: function getState() {
-      // Make the context available so you can call `.for(this)` within the handlers
-      config.context = this.context.marty;
-
-      // Make props available so you can pass them to the children
-      config.props = this.props;
-
       return {
-        result: getFetchResult(config)
+        result: getFetchResult(this)
       };
     },
+    done: function done(results) {
+      return React.createElement(InnerComponent, _extends({}, this.props, results));
+    },
     render: function render() {
+      var container = this;
+
       return this.state.result.when({
         done: function done(results) {
-          if (_.isFunction(config.done)) {
-            return config.done.call(config, results);
+          if (_.isFunction(container.done)) {
+            return container.done(results);
           }
 
           throw new Error("The `done` handler must be a function");
         },
         pending: function pending() {
-          if (_.isFunction(config.pending)) {
-            return config.pending.call(config);
+          if (_.isFunction(container.pending)) {
+            return container.pending();
           }
 
           return React.createElement("div", null);
         },
         failed: function failed(error) {
-          if (_.isFunction(config.failed)) {
-            return config.failed.call(config, error);
+          if (_.isFunction(container.failed)) {
+            return container.failed(error);
           }
 
           throw error;
         }
       });
     }
-  });
+  }, _.omit(config, RESERVED_FUNCTIONS)));
 
   Container.InnerComponent = InnerComponent;
   Container.displayName = innerComponentDisplayName + "Container";
@@ -801,9 +790,7 @@ function createContainer(InnerComponent, config) {
 
 module.exports = createContainer;
 
-function getStoresToListenTo(config, component) {
-  var stores = config.listenTo;
-
+function getStoresToListenTo(stores, component) {
   if (!stores) {
     return [];
   }
@@ -1499,7 +1486,8 @@ var Registry = (function () {
         }
 
         clazz.id = id;
-        clazz.type = type;
+        defaultInstance.id = defaultInstance.id || id;
+        defaultInstance.type = clazz.type = type;
 
         this.types[type][id] = clazz;
 
