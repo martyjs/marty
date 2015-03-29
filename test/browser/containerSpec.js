@@ -25,14 +25,29 @@ describe('Container', function () {
     Store = Marty.createStore({
       id: 'ContainerStore',
       getInitialState() {
-        return {}
+        return {
+          foos: {},
+          bars: {}
+        };
       },
       addFoo(foo) {
-        this.state[foo.id] = foo;
+        this.state.foos[foo.id] = foo;
+        this.hasChanged();
+      },
+      addBar(bar) {
+        this.state.bars[bar.id] = bar;
         this.hasChanged();
       },
       getFoo(id) {
-        return this.state[id];
+        return this.state.foos[id];
+      },
+      getBar(id) {
+        return this.fetch({
+          id: 'bar-' + id,
+          locally() {
+
+          }
+        })
       }
     });
 
@@ -258,6 +273,88 @@ describe('Container', function () {
         bar: {
           baz: 'bam'
         }
+      });
+    });
+  });
+
+  describe('when you are fetching from a store', function () {
+    var BarStore, finishQuery, expectedId;
+
+    beforeEach(function () {
+      expectedId = 456;
+      BarStore = Marty.createStore({
+        id: 'BarContainerStore',
+        getInitialState() {
+          return {};
+        },
+        addBar(bar) {
+          this.state[bar.id] = bar;
+          this.hasChanged();
+        },
+        getBar(id) {
+          return this.fetch({
+            id: 'bar-' + id,
+            locally() {
+              return this.state[id];
+            },
+            remotely() {
+              return new Promise(function (resolve) {
+                this.addBar({ id: id });
+                finishQuery = resolve;
+              }.bind(this));
+            }
+          })
+        }
+      });
+    });
+
+    describe('when the store is resolved to a context', function () {
+      beforeEach(function (done) {
+        ContainerComponent = wrap(InnerComponent, {
+          listenTo: BarStore,
+          fetch: {
+            bar() {
+              return BarStore.for(this).getBar(expectedId);
+            }
+          }
+        });
+
+        element = TestUtils.renderIntoDocument(<ContainerComponent />);
+
+        finishQuery();
+
+        setTimeout(done, 1);
+      });
+
+      it('should render the inner component when the fetch is complete', function () {
+        expect(initialProps).to.eql({
+          bar: { id: expectedId }
+        });
+      });
+    });
+
+    describe('when calling the store directly', function () {
+      beforeEach(function (done) {
+        ContainerComponent = wrap(InnerComponent, {
+          listenTo: BarStore,
+          fetch: {
+            bar() {
+              return BarStore.getBar(expectedId);
+            }
+          }
+        });
+
+        element = TestUtils.renderIntoDocument(<ContainerComponent />);
+
+        finishQuery();
+
+        setTimeout(done, 1);
+      });
+
+      it('should render the inner component when the fetch is complete', function () {
+        expect(initialProps).to.eql({
+          bar: { id: expectedId }
+        });
       });
     });
   });
