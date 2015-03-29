@@ -25,29 +25,14 @@ describe('Container', function () {
     Store = Marty.createStore({
       id: 'ContainerStore',
       getInitialState() {
-        return {
-          foos: {},
-          bars: {}
-        };
+        return {};
       },
       addFoo(foo) {
-        this.state.foos[foo.id] = foo;
-        this.hasChanged();
-      },
-      addBar(bar) {
-        this.state.bars[bar.id] = bar;
+        this.state[foo.id] = foo;
         this.hasChanged();
       },
       getFoo(id) {
-        return this.state.foos[id];
-      },
-      getBar(id) {
-        return this.fetch({
-          id: 'bar-' + id,
-          locally() {
-
-          }
-        })
+        return this.state[id];
       }
     });
 
