@@ -400,10 +400,15 @@ describe('Store#fetch()', function () {
     });
 
     describe('#cacheError', function () {
+      var remotely;
+
       beforeEach(function () {
         expectedError = new Error();
-        locally = sinon.spy(function () {
-          throw expectedError;
+        locally = sinon.stub();
+        remotely = sinon.spy(function () {
+          return new Promise(function (resolve, reject) {
+            reject(expectedError);
+          });
         });
       });
 
@@ -412,12 +417,14 @@ describe('Store#fetch()', function () {
           store.fetch({
             id: 'foo',
             locally: locally,
+            remotely: remotely,
             cacheError: true
           });
 
           store.fetch({
             id: 'foo',
             locally: locally,
+            remotely: remotely,
             cacheError: true
           });
         });
@@ -503,28 +510,6 @@ describe('Store#fetch()', function () {
     });
   });
 
-  describe('when the local fetch throws an exception', function () {
-    beforeEach(function () {
-      expectedError = new Error();
-
-      actualResult = store.fetch('foo', function () {
-        throw expectedError;
-      });
-    });
-
-    it('should have a status of failed', function () {
-      expect(actualResult.status).to.equal('FAILED');
-    });
-
-    it('should say its failed', function () {
-      expect(actualResult.failed).to.be.true;
-    });
-
-    it('should have the result', function () {
-      expect(actualResult.error).to.equal(expectedError);
-    });
-  });
-
   describe('when the local fetch returns null', function () {
     var remotely;
 
@@ -560,28 +545,6 @@ describe('Store#fetch()', function () {
 
       it('should have the result', function () {
         expect(actualResult.error.status).to.eql(404);
-      });
-    });
-
-    describe('when the remote fetch throws an exception', function () {
-      beforeEach(function () {
-        expectedError = new Error();
-
-        actualResult = store.fetch('foo', noop, function () {
-          throw expectedError;
-        });
-      });
-
-      it('should have a status of failed', function () {
-        expect(actualResult.status).to.equal('FAILED');
-      });
-
-      it('should say its failed', function () {
-        expect(actualResult.failed).to.be.true;
-      });
-
-      it('should have the error', function () {
-        expect(actualResult.error).to.equal(expectedError);
       });
     });
 
