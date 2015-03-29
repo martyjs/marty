@@ -664,6 +664,20 @@
               Containers
           </a>
           
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/containers/separating-components-and-containers-in-different-files.html">Separating Components and Containers in different files</a>
+                </li>
+              
+            
+            </ul>
+          
         </li>
       
         
@@ -1207,7 +1221,7 @@
 
 <p>There are many other inconsistencies between APIs on the server and in the browser. For example if you want to modify a cookie in the browser you would do <code>document.cookie = &quot;foo=bar&quot;</code> whereas on the server (using express.js) you would do <code>res.cookie(&#39;foo&#39;, &#39;bar&#39;)</code>. Routing is another example which you need to define with two incompatible APIs.</p>
 
-<p><a href="/guides/isomorphism/marty-express.html">marty-express</a> is an <a href="expressjs.com">express.js</a> middleware which aims to resolve these differences allowing you to have a single code base. It will do a number of things for your you:</p>
+<p><a href="/guides/isomorphism/marty-express.html">marty-express</a> is an <a href="http://expressjs.com">express.js</a> middleware which aims to resolve these differences allowing you to have a single code base. It will do a number of things for your you:</p>
 
 <ul>
 <li>Consumes <a href="https://github.com/rackt/react-router">react-router</a> routes and automatically renders them on the server. It will also manage <code>Marty.renderToString</code> for you.</li>
@@ -1269,7 +1283,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.1</li>
+        <li>v0.9.5</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

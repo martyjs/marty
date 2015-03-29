@@ -801,7 +801,7 @@
 
 <h3 id="done">done(props)</h3>
 
-<p>Creates the inner components, passing through the result of the <a href="#fetch">fetch</a> via props. Override if you want more control about how the inner component is created.</p>
+<p>Creates the inner components, passing through the result of the <a href="#fetch">fetch</a> via props. Override if you want more control about how the inner component is created. You should ensure the component should have the ref <code>innerComponent</code>.</p>
 
 <h3 id="pending">pending()</h3>
 
@@ -822,6 +822,10 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
+<h3 id="getInnerComponent">getInnerComponent()</h3>
+
+<p>Returns the inner component.</p>
+
     </div>
   </div>
 </div>
@@ -830,7 +834,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.1</li>
+        <li>v0.9.5</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

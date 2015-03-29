@@ -664,6 +664,20 @@
               Containers
           </a>
           
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/guides/containers/separating-components-and-containers-in-different-files.html">Separating Components and Containers in different files</a>
+                </li>
+              
+            
+            </ul>
+          
         </li>
       
         
@@ -1127,27 +1141,27 @@
 <div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UserQueries</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createQueries</span><span class="p">({</span>
   <span class="na">id</span><span class="p">:</span> <span class="s1">'UserQueries'</span><span class="p">,</span>
   <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
     <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
       <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
     <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UserQueries</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Queries</span> <span class="p">{</span>
   <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
     <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
       <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
       <span class="p">}</span>
-    <span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">err</span><span class="p">));</span>
+    <span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">err</span><span class="p">));</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></div>
 </div>
@@ -1164,7 +1178,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.1</li>
+        <li>v0.9.5</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
