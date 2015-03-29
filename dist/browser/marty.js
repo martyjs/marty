@@ -734,6 +734,9 @@ function createContainer(InnerComponent, config) {
         stores: getStoresToListenTo(this.listenTo, component)
       });
     },
+    componentWillReceiveProps: function componentWillReceiveProps() {
+      this.setState(this.getState());
+    },
     onStoreChanged: function onStoreChanged() {
       this.setState(this.getState());
     },
@@ -3113,75 +3116,67 @@ function fetch(id, local, remote) {
   return tryAndGetLocally() || tryAndGetRemotely();
 
   function tryAndGetLocally(remoteCalled) {
-    try {
-      var result = options.locally.call(store);
+    var result = options.locally.call(store);
 
-      if (_.isUndefined(result)) {
-        return;
-      }
-
-      if (_.isNull(result)) {
-        return fetchNotFound();
-      }
-
-      if (!remoteCalled) {
-        finished();
-      }
-
-      return fetchDone(result);
-    } catch (error) {
-      return fetchFailed(error);
+    if (_.isUndefined(result)) {
+      return;
     }
+
+    if (_.isNull(result)) {
+      return fetchNotFound();
+    }
+
+    if (!remoteCalled) {
+      finished();
+    }
+
+    return fetchDone(result);
   }
 
   function tryAndGetRemotely() {
-    try {
-      result = options.remotely.call(store);
+    result = options.remotely.call(store);
 
-      if (result) {
-        if (_.isFunction(result.then)) {
-          instance.fetchInProgress[options.id] = true;
+    if (result) {
+      if (_.isFunction(result.then)) {
+        instance.fetchInProgress[options.id] = true;
 
-          result.then(function () {
-            instance.fetchHistory[options.id] = true;
-            result = tryAndGetLocally(true);
-
-            if (result) {
-              fetchDone();
-              store.hasChanged();
-            } else {
-              fetchNotFound();
-              store.hasChanged();
-            }
-          })["catch"](function (error) {
-            fetchFailed(error);
-            store.hasChanged();
-
-            instance.dispatcher.dispatchAction({
-              type: StoreConstants.FETCH_FAILED,
-              arguments: [error, options.id, store]
-            });
-          });
-
-          return fetchPending();
-        } else {
+        result.then(function () {
           instance.fetchHistory[options.id] = true;
           result = tryAndGetLocally(true);
 
           if (result) {
-            return result;
+            fetchDone();
+            store.hasChanged();
+          } else {
+            fetchNotFound();
+            store.hasChanged();
           }
+        })["catch"](function (error) {
+          fetchFailed(error);
+          store.hasChanged();
+
+          instance.dispatcher.dispatchAction({
+            type: StoreConstants.FETCH_FAILED,
+            arguments: [error, options.id, store]
+          });
+        });
+
+        return fetchPending();
+      } else {
+        instance.fetchHistory[options.id] = true;
+        result = tryAndGetLocally(true);
+
+        if (result) {
+          return result;
         }
       }
-
-      if (warnings.promiseNotReturnedFromRemotely) {
-        log.warn(promiseNotReturnedWarning());
-      }
-
-      return fetchNotFound();
-    } catch (error) {
-      return fetchFailed(error);
     }
+
+    if (warnings.promiseNotReturnedFromRemotely) {
+      log.warn(promiseNotReturnedWarning());
+    }
+
+    return fetchNotFound();
   }
 
   function promiseNotReturnedWarning() {
@@ -4056,37 +4051,37 @@ module.exports = {
 
 module.exports = {
   any: require(99),
-  bind: require(131),
-  defaults: require(167),
-  each: require(88),
-  extend: require(166),
-  find: require(87),
-  has: require(169),
-  initial: require(82),
-  isArray: require(157),
+  bind: require(130),
+  defaults: require(168),
+  each: require(87),
+  extend: require(167),
+  find: require(86),
+  has: require(170),
+  initial: require(81),
+  isArray: require(158),
   isFunction: require(119),
-  isNull: require(160),
-  isObject: require(161),
-  isString: require(162),
-  isUndefined: require(164),
-  last: require(83),
-  map: require(90),
-  matches: require(179),
-  noop: require(180),
-  object: require(85),
-  omit: require(172),
-  pick: require(173),
-  toArray: require(165),
-  union: require(84),
-  values: require(174),
-  once: require(93),
-  filter: require(86),
-  invoke: require(89),
-  sortBy: require(91),
-  functions: require(168),
+  isNull: require(161),
+  isObject: require(162),
+  isString: require(163),
+  isUndefined: require(165),
+  last: require(82),
+  map: require(89),
+  matches: require(180),
+  noop: require(181),
+  object: require(84),
+  omit: require(173),
+  pick: require(174),
+  toArray: require(166),
+  union: require(83),
+  values: require(175),
+  once: require(92),
+  filter: require(85),
+  invoke: require(88),
+  sortBy: require(90),
+  functions: require(169),
   difference: require(79) };
 
-},{"119":119,"131":131,"157":157,"160":160,"161":161,"162":162,"164":164,"165":165,"166":166,"167":167,"168":168,"169":169,"172":172,"173":173,"174":174,"179":179,"180":180,"79":79,"82":82,"83":83,"84":84,"85":85,"86":86,"87":87,"88":88,"89":89,"90":90,"91":91,"93":93,"99":99}],66:[function(require,module,exports){
+},{"119":119,"130":130,"158":158,"161":161,"162":162,"163":163,"165":165,"166":166,"167":167,"168":168,"169":169,"170":170,"173":173,"174":174,"175":175,"180":180,"181":181,"79":79,"81":81,"82":82,"83":83,"84":84,"85":85,"86":86,"87":87,"88":88,"89":89,"90":90,"92":92,"99":99}],66:[function(require,module,exports){
 "use strict";
 
 var log = require(28);
@@ -6326,18 +6321,18 @@ require(77);
 
 },{"77":77}],79:[function(require,module,exports){
 var baseDifference = require(106),
-    baseFlatten = require(110),
-    isArguments = require(156),
-    isArray = require(157);
+    baseFlatten = require(111),
+    isArguments = require(157),
+    isArray = require(158),
+    restParam = require(93);
 
 /**
  * Creates an array excluding all values of the provided arrays using
  * `SameValueZero` for equality comparisons.
  *
- * **Note:** `SameValueZero` comparisons are like strict equality comparisons,
- * e.g. `===`, except that `NaN` matches `NaN`. See the
- * [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
- * for more details.
+ * **Note:** [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+ * comparisons are like strict equality comparisons, e.g. `===`, except that
+ * `NaN` matches `NaN`.
  *
  * @static
  * @memberOf _
@@ -6350,25 +6345,17 @@ var baseDifference = require(106),
  * _.difference([1, 2, 3], [4, 2]);
  * // => [1, 3]
  */
-function difference() {
-  var args = arguments,
-      index = -1,
-      length = args.length;
-
-  while (++index < length) {
-    var value = args[index];
-    if (isArray(value) || isArguments(value)) {
-      break;
-    }
-  }
-  return baseDifference(value, baseFlatten(args, false, true, ++index));
-}
+var difference = restParam(function(array, values) {
+  return (isArray(array) || isArguments(array))
+    ? baseDifference(array, baseFlatten(values, false, true))
+    : [];
+});
 
 module.exports = difference;
 
-},{"106":106,"110":110,"156":156,"157":157}],80:[function(require,module,exports){
-var baseSlice = require(126),
-    isIterateeCall = require(147);
+},{"106":106,"111":111,"157":157,"158":158,"93":93}],80:[function(require,module,exports){
+var baseSlice = require(125),
+    isIterateeCall = require(149);
 
 /**
  * Creates a slice of `array` with `n` elements dropped from the end.
@@ -6408,73 +6395,7 @@ function dropRight(array, n, guard) {
 
 module.exports = dropRight;
 
-},{"126":126,"147":147}],81:[function(require,module,exports){
-var baseCallback = require(102);
-
-/**
- * This method is like `_.find` except that it returns the index of the first
- * element `predicate` returns truthy for, instead of the element itself.
- *
- * If a property name is provided for `predicate` the created `_.property`
- * style callback returns the property value of the given element.
- *
- * If a value is also provided for `thisArg` the created `_.matchesProperty`
- * style callback returns `true` for elements that have a matching property
- * value, else `false`.
- *
- * If an object is provided for `predicate` the created `_.matches` style
- * callback returns `true` for elements that have the properties of the given
- * object, else `false`.
- *
- * @static
- * @memberOf _
- * @category Array
- * @param {Array} array The array to search.
- * @param {Function|Object|string} [predicate=_.identity] The function invoked
- *  per iteration.
- * @param {*} [thisArg] The `this` binding of `predicate`.
- * @returns {number} Returns the index of the found element, else `-1`.
- * @example
- *
- * var users = [
- *   { 'user': 'barney',  'active': false },
- *   { 'user': 'fred',    'active': false },
- *   { 'user': 'pebbles', 'active': true }
- * ];
- *
- * _.findIndex(users, function(chr) {
- *   return chr.user == 'barney';
- * });
- * // => 0
- *
- * // using the `_.matches` callback shorthand
- * _.findIndex(users, { 'user': 'fred', 'active': false });
- * // => 1
- *
- * // using the `_.matchesProperty` callback shorthand
- * _.findIndex(users, 'active', false);
- * // => 0
- *
- * // using the `_.property` callback shorthand
- * _.findIndex(users, 'active');
- * // => 2
- */
-function findIndex(array, predicate, thisArg) {
-  var index = -1,
-      length = array ? array.length : 0;
-
-  predicate = baseCallback(predicate, thisArg, 3);
-  while (++index < length) {
-    if (predicate(array[index], index, array)) {
-      return index;
-    }
-  }
-  return -1;
-}
-
-module.exports = findIndex;
-
-},{"102":102}],82:[function(require,module,exports){
+},{"125":125,"149":149}],81:[function(require,module,exports){
 var dropRight = require(80);
 
 /**
@@ -6496,7 +6417,7 @@ function initial(array) {
 
 module.exports = initial;
 
-},{"80":80}],83:[function(require,module,exports){
+},{"80":80}],82:[function(require,module,exports){
 /**
  * Gets the last element of `array`.
  *
@@ -6517,18 +6438,18 @@ function last(array) {
 
 module.exports = last;
 
-},{}],84:[function(require,module,exports){
-var baseFlatten = require(110),
-    baseUniq = require(129);
+},{}],83:[function(require,module,exports){
+var baseFlatten = require(111),
+    baseUniq = require(128),
+    restParam = require(93);
 
 /**
  * Creates an array of unique values, in order, of the provided arrays using
  * `SameValueZero` for equality comparisons.
  *
- * **Note:** `SameValueZero` comparisons are like strict equality comparisons,
- * e.g. `===`, except that `NaN` matches `NaN`. See the
- * [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
- * for more details.
+ * **Note:** [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+ * comparisons are like strict equality comparisons, e.g. `===`, except that
+ * `NaN` matches `NaN`.
  *
  * @static
  * @memberOf _
@@ -6540,19 +6461,20 @@ var baseFlatten = require(110),
  * _.union([1, 2], [4, 2], [2, 1]);
  * // => [1, 2, 4]
  */
-function union() {
-  return baseUniq(baseFlatten(arguments, false, true, 0));
-}
+var union = restParam(function(arrays) {
+  return baseUniq(baseFlatten(arrays, false, true));
+});
 
 module.exports = union;
 
-},{"110":110,"129":129}],85:[function(require,module,exports){
-var isArray = require(157);
+},{"111":111,"128":128,"93":93}],84:[function(require,module,exports){
+var isArray = require(158);
 
 /**
- * Creates an object composed from arrays of property names and values. Provide
- * either a single two dimensional array, e.g. `[[key1, value1], [key2, value2]]`
- * or two arrays, one of property names and one of corresponding values.
+ * The inverse of `_.pairs`; this method returns an object composed from arrays
+ * of property names and values. Provide either a single two dimensional array,
+ * e.g. `[[key1, value1], [key2, value2]]` or two arrays, one of property names
+ * and one of corresponding values.
  *
  * @static
  * @memberOf _
@@ -6562,6 +6484,9 @@ var isArray = require(157);
  * @param {Array} [values=[]] The property values.
  * @returns {Object} Returns the new object.
  * @example
+ *
+ * _.zipObject([['fred', 30], ['barney', 40]]);
+ * // => { 'fred': 30, 'barney': 40 }
  *
  * _.zipObject(['fred', 'barney'], [30, 40]);
  * // => { 'fred': 30, 'barney': 40 }
@@ -6587,16 +6512,16 @@ function zipObject(props, values) {
 
 module.exports = zipObject;
 
-},{"157":157}],86:[function(require,module,exports){
+},{"158":158}],85:[function(require,module,exports){
 var arrayFilter = require(97),
     baseCallback = require(102),
     baseFilter = require(108),
-    isArray = require(157);
+    isArray = require(158);
 
 /**
  * Iterates over elements of `collection`, returning an array of all elements
  * `predicate` returns truthy for. The predicate is bound to `thisArg` and
- * invoked with three arguments; (value, index|key, collection).
+ * invoked with three arguments: (value, index|key, collection).
  *
  * If a property name is provided for `predicate` the created `_.property`
  * style callback returns the property value of the given element.
@@ -6650,17 +6575,14 @@ function filter(collection, predicate, thisArg) {
 
 module.exports = filter;
 
-},{"102":102,"108":108,"157":157,"97":97}],87:[function(require,module,exports){
-var baseCallback = require(102),
-    baseEach = require(107),
-    baseFind = require(109),
-    findIndex = require(81),
-    isArray = require(157);
+},{"102":102,"108":108,"158":158,"97":97}],86:[function(require,module,exports){
+var baseEach = require(107),
+    createFind = require(139);
 
 /**
  * Iterates over elements of `collection`, returning the first element
  * `predicate` returns truthy for. The predicate is bound to `thisArg` and
- * invoked with three arguments; (value, index|key, collection).
+ * invoked with three arguments: (value, index|key, collection).
  *
  * If a property name is provided for `predicate` the created `_.property`
  * style callback returns the property value of the given element.
@@ -6707,26 +6629,18 @@ var baseCallback = require(102),
  * _.result(_.find(users, 'active'), 'user');
  * // => 'barney'
  */
-function find(collection, predicate, thisArg) {
-  if (isArray(collection)) {
-    var index = findIndex(collection, predicate, thisArg);
-    return index > -1 ? collection[index] : undefined;
-  }
-  predicate = baseCallback(predicate, thisArg, 3);
-  return baseFind(collection, predicate, baseEach);
-}
+var find = createFind(baseEach);
 
 module.exports = find;
 
-},{"102":102,"107":107,"109":109,"157":157,"81":81}],88:[function(require,module,exports){
+},{"107":107,"139":139}],87:[function(require,module,exports){
 var arrayEach = require(96),
     baseEach = require(107),
-    bindCallback = require(131),
-    isArray = require(157);
+    createForEach = require(140);
 
 /**
  * Iterates over elements of `collection` invoking `iteratee` for each element.
- * The `iteratee` is bound to `thisArg` and invoked with three arguments;
+ * The `iteratee` is bound to `thisArg` and invoked with three arguments:
  * (value, index|key, collection). Iterator functions may exit iteration early
  * by explicitly returning `false`.
  *
@@ -6754,17 +6668,14 @@ var arrayEach = require(96),
  * });
  * // => logs each value-key pair and returns the object (iteration order is not guaranteed)
  */
-function forEach(collection, iteratee, thisArg) {
-  return (typeof iteratee == 'function' && typeof thisArg == 'undefined' && isArray(collection))
-    ? arrayEach(collection, iteratee)
-    : baseEach(collection, bindCallback(iteratee, thisArg, 3));
-}
+var forEach = createForEach(arrayEach, baseEach);
 
 module.exports = forEach;
 
-},{"107":107,"131":131,"157":157,"96":96}],89:[function(require,module,exports){
-var baseInvoke = require(116),
-    baseSlice = require(126);
+},{"107":107,"140":140,"96":96}],88:[function(require,module,exports){
+var baseEach = require(107),
+    isLength = require(150),
+    restParam = require(93);
 
 /**
  * Invokes the method named by `methodName` on each element in `collection`,
@@ -6788,31 +6699,40 @@ var baseInvoke = require(116),
  * _.invoke([123, 456], String.prototype.split, '');
  * // => [['1', '2', '3'], ['4', '5', '6']]
  */
-function invoke(collection, methodName) {
-  return baseInvoke(collection, methodName, baseSlice(arguments, 2));
-}
+var invoke = restParam(function(collection, methodName, args) {
+  var index = -1,
+      isFunc = typeof methodName == 'function',
+      length = collection ? collection.length : 0,
+      result = isLength(length) ? Array(length) : [];
+
+  baseEach(collection, function(value) {
+    var func = isFunc ? methodName : (value != null && value[methodName]);
+    result[++index] = func ? func.apply(value, args) : undefined;
+  });
+  return result;
+});
 
 module.exports = invoke;
 
-},{"116":116,"126":126}],90:[function(require,module,exports){
+},{"107":107,"150":150,"93":93}],89:[function(require,module,exports){
 var arrayMap = require(98),
     baseCallback = require(102),
     baseMap = require(121),
-    isArray = require(157);
+    isArray = require(158);
 
 /**
  * Creates an array of values by running each element in `collection` through
  * `iteratee`. The `iteratee` is bound to `thisArg` and invoked with three
- * arguments; (value, index|key, collection).
+ * arguments: (value, index|key, collection).
  *
- * If a property name is provided for `predicate` the created `_.property`
+ * If a property name is provided for `iteratee` the created `_.property`
  * style callback returns the property value of the given element.
  *
  * If a value is also provided for `thisArg` the created `_.matchesProperty`
  * style callback returns `true` for elements that have a matching property
  * value, else `false`.
  *
- * If an object is provided for `predicate` the created `_.matches` style
+ * If an object is provided for `iteratee` the created `_.matches` style
  * callback returns `true` for elements that have the properties of the given
  * object, else `false`.
  *
@@ -6821,9 +6741,9 @@ var arrayMap = require(98),
  *
  * The guarded methods are:
  * `ary`, `callback`, `chunk`, `clone`, `create`, `curry`, `curryRight`, `drop`,
- * `dropRight`, `fill`, `flatten`, `invert`, `max`, `min`, `parseInt`, `slice`,
- * `sortBy`, `take`, `takeRight`, `template`, `trim`, `trimLeft`, `trimRight`,
- * `trunc`, `random`, `range`, `sample`, `uniq`, and `words`
+ * `dropRight`, `every`, `fill`, `flatten`, `invert`, `max`, `min`, `parseInt`,
+ * `slice`, `sortBy`, `take`, `takeRight`, `template`, `trim`, `trimLeft`,
+ * `trimRight`, `trunc`, `random`, `range`, `sample`, `some`, `uniq`, and `words`
  *
  * @static
  * @memberOf _
@@ -6864,29 +6784,29 @@ function map(collection, iteratee, thisArg) {
 
 module.exports = map;
 
-},{"102":102,"121":121,"157":157,"98":98}],91:[function(require,module,exports){
+},{"102":102,"121":121,"158":158,"98":98}],90:[function(require,module,exports){
 var baseCallback = require(102),
     baseEach = require(107),
-    baseSortBy = require(127),
-    compareAscending = require(135),
-    isIterateeCall = require(147),
-    isLength = require(148);
+    baseSortBy = require(126),
+    compareAscending = require(134),
+    isIterateeCall = require(149),
+    isLength = require(150);
 
 /**
  * Creates an array of elements, sorted in ascending order by the results of
  * running each element in a collection through `iteratee`. This method performs
  * a stable sort, that is, it preserves the original sort order of equal elements.
- * The `iteratee` is bound to `thisArg` and invoked with three arguments;
+ * The `iteratee` is bound to `thisArg` and invoked with three arguments:
  * (value, index|key, collection).
  *
- * If a property name is provided for `predicate` the created `_.property`
+ * If a property name is provided for `iteratee` the created `_.property`
  * style callback returns the property value of the given element.
  *
  * If a value is also provided for `thisArg` the created `_.matchesProperty`
  * style callback returns `true` for elements that have a matching property
  * value, else `false`.
  *
- * If an object is provided for `predicate` the created `_.matches` style
+ * If an object is provided for `iteratee` the created `_.matches` style
  * callback returns `true` for elements that have the properties of the given
  * object, else `false`.
  *
@@ -6941,7 +6861,7 @@ function sortBy(collection, iteratee, thisArg) {
 
 module.exports = sortBy;
 
-},{"102":102,"107":107,"127":127,"135":135,"147":147,"148":148}],92:[function(require,module,exports){
+},{"102":102,"107":107,"126":126,"134":134,"149":149,"150":150}],91:[function(require,module,exports){
 /** Used as the `TypeError` message for "Functions" methods. */
 var FUNC_ERROR_TEXT = 'Expected a function';
 
@@ -6984,13 +6904,13 @@ function before(n, func) {
 
 module.exports = before;
 
-},{}],93:[function(require,module,exports){
-var before = require(92);
+},{}],92:[function(require,module,exports){
+var before = require(91);
 
 /**
  * Creates a function that is restricted to invoking `func` once. Repeat calls
  * to the function return the value of the first call. The `func` is invoked
- * with the `this` binding of the created function.
+ * with the `this` binding and arguments of the created function.
  *
  * @static
  * @memberOf _
@@ -7010,10 +6930,70 @@ function once(func) {
 
 module.exports = once;
 
-},{"92":92}],94:[function(require,module,exports){
+},{"91":91}],93:[function(require,module,exports){
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/* Native method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max;
+
+/**
+ * Creates a function that invokes `func` with the `this` binding of the
+ * created function and arguments from `start` and beyond provided as an array.
+ *
+ * **Note:** This method is based on the [rest parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
+ *
+ * @static
+ * @memberOf _
+ * @category Function
+ * @param {Function} func The function to apply a rest parameter to.
+ * @param {number} [start=func.length-1] The start position of the rest parameter.
+ * @returns {Function} Returns the new function.
+ * @example
+ *
+ * var say = _.restParam(function(what, names) {
+ *   return what + ' ' + _.initial(names).join(', ') +
+ *     (_.size(names) > 1 ? ', & ' : '') + _.last(names);
+ * });
+ *
+ * say('hello', 'fred', 'barney', 'pebbles');
+ * // => 'hello fred, barney, & pebbles'
+ */
+function restParam(func, start) {
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  start = nativeMax(typeof start == 'undefined' ? (func.length - 1) : (+start || 0), 0);
+  return function() {
+    var args = arguments,
+        index = -1,
+        length = nativeMax(args.length - start, 0),
+        rest = Array(length);
+
+    while (++index < length) {
+      rest[index] = args[start + index];
+    }
+    switch (start) {
+      case 0: return func.call(this, rest);
+      case 1: return func.call(this, args[0], rest);
+      case 2: return func.call(this, args[0], args[1], rest);
+    }
+    var otherArgs = Array(start + 1);
+    index = -1;
+    while (++index < start) {
+      otherArgs[index] = args[index];
+    }
+    otherArgs[start] = rest;
+    return func.apply(this, otherArgs);
+  };
+}
+
+module.exports = restParam;
+
+},{}],94:[function(require,module,exports){
 (function (global){
-var cachePush = require(134),
-    isNative = require(159);
+var cachePush = require(133),
+    isNative = require(160);
 
 /** Native method references. */
 var Set = isNative(Set = global.Set) && Set;
@@ -7043,7 +7023,7 @@ SetCache.prototype.push = cachePush;
 module.exports = SetCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"134":134,"159":159}],95:[function(require,module,exports){
+},{"133":133,"160":160}],95:[function(require,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -7068,7 +7048,7 @@ module.exports = arrayCopy;
 },{}],96:[function(require,module,exports){
 /**
  * A specialized version of `_.forEach` for arrays without support for callback
- * shorthands or `this` binding.
+ * shorthands and `this` binding.
  *
  * @private
  * @param {Array} array The array to iterate over.
@@ -7092,7 +7072,7 @@ module.exports = arrayEach;
 },{}],97:[function(require,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for callback
- * shorthands or `this` binding.
+ * shorthands and `this` binding.
  *
  * @private
  * @param {Array} array The array to iterate over.
@@ -7119,7 +7099,7 @@ module.exports = arrayFilter;
 },{}],98:[function(require,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for callback
- * shorthands or `this` binding.
+ * shorthands and `this` binding.
  *
  * @private
  * @param {Array} array The array to iterate over.
@@ -7142,7 +7122,7 @@ module.exports = arrayMap;
 },{}],99:[function(require,module,exports){
 /**
  * A specialized version of `_.some` for arrays without support for callback
- * shorthands or `this` binding.
+ * shorthands and `this` binding.
  *
  * @private
  * @param {Array} array The array to iterate over.
@@ -7181,7 +7161,7 @@ module.exports = assignDefaults;
 
 },{}],101:[function(require,module,exports){
 var baseCopy = require(105),
-    keys = require(170);
+    keys = require(171);
 
 /**
  * The base implementation of `_.assign` without support for argument juggling,
@@ -7216,13 +7196,12 @@ function baseAssign(object, source, customizer) {
 
 module.exports = baseAssign;
 
-},{"105":105,"170":170}],102:[function(require,module,exports){
+},{"105":105,"171":171}],102:[function(require,module,exports){
 var baseMatches = require(122),
     baseMatchesProperty = require(123),
     baseProperty = require(124),
-    bindCallback = require(131),
-    identity = require(178),
-    isBindable = require(145);
+    bindCallback = require(130),
+    identity = require(179);
 
 /**
  * The base implementation of `_.callback` which supports specifying the
@@ -7237,9 +7216,9 @@ var baseMatches = require(122),
 function baseCallback(func, thisArg, argCount) {
   var type = typeof func;
   if (type == 'function') {
-    return (typeof thisArg != 'undefined' && isBindable(func))
-      ? bindCallback(func, thisArg, argCount)
-      : func;
+    return typeof thisArg == 'undefined'
+      ? func
+      : bindCallback(func, thisArg, argCount);
   }
   if (func == null) {
     return identity;
@@ -7254,17 +7233,17 @@ function baseCallback(func, thisArg, argCount) {
 
 module.exports = baseCallback;
 
-},{"122":122,"123":123,"124":124,"131":131,"145":145,"178":178}],103:[function(require,module,exports){
+},{"122":122,"123":123,"124":124,"130":130,"179":179}],103:[function(require,module,exports){
 var arrayCopy = require(95),
     arrayEach = require(96),
     baseCopy = require(105),
-    baseForOwn = require(113),
-    initCloneArray = require(142),
-    initCloneByTag = require(143),
-    initCloneObject = require(144),
-    isArray = require(157),
-    isObject = require(161),
-    keys = require(170);
+    baseForOwn = require(114),
+    initCloneArray = require(145),
+    initCloneByTag = require(146),
+    initCloneObject = require(147),
+    isArray = require(158),
+    isObject = require(162),
+    keys = require(171);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -7311,9 +7290,8 @@ cloneableTags[weakMapTag] = false;
 var objectProto = Object.prototype;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -7386,7 +7364,7 @@ function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
 
 module.exports = baseClone;
 
-},{"105":105,"113":113,"142":142,"143":143,"144":144,"157":157,"161":161,"170":170,"95":95,"96":96}],104:[function(require,module,exports){
+},{"105":105,"114":114,"145":145,"146":146,"147":147,"158":158,"162":162,"171":171,"95":95,"96":96}],104:[function(require,module,exports){
 /**
  * The base implementation of `compareAscending` which compares values and
  * sorts them in ascending order without guaranteeing a stable sort.
@@ -7441,9 +7419,9 @@ function baseCopy(source, object, props) {
 module.exports = baseCopy;
 
 },{}],106:[function(require,module,exports){
-var baseIndexOf = require(115),
-    cacheIndexOf = require(133),
-    createCache = require(137);
+var baseIndexOf = require(116),
+    cacheIndexOf = require(132),
+    createCache = require(138);
 
 /**
  * The base implementation of `_.difference` which accepts a single array
@@ -7494,10 +7472,9 @@ function baseDifference(array, values) {
 
 module.exports = baseDifference;
 
-},{"115":115,"133":133,"137":137}],107:[function(require,module,exports){
-var baseForOwn = require(113),
-    isLength = require(148),
-    toObject = require(155);
+},{"116":116,"132":132,"138":138}],107:[function(require,module,exports){
+var baseForOwn = require(114),
+    createBaseEach = require(136);
 
 /**
  * The base implementation of `_.forEach` without support for callback
@@ -7508,30 +7485,16 @@ var baseForOwn = require(113),
  * @param {Function} iteratee The function invoked per iteration.
  * @returns {Array|Object|string} Returns `collection`.
  */
-function baseEach(collection, iteratee) {
-  var length = collection ? collection.length : 0;
-  if (!isLength(length)) {
-    return baseForOwn(collection, iteratee);
-  }
-  var index = -1,
-      iterable = toObject(collection);
-
-  while (++index < length) {
-    if (iteratee(iterable[index], index, iterable) === false) {
-      break;
-    }
-  }
-  return collection;
-}
+var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"113":113,"148":148,"155":155}],108:[function(require,module,exports){
+},{"114":114,"136":136}],108:[function(require,module,exports){
 var baseEach = require(107);
 
 /**
  * The base implementation of `_.filter` without support for callback
- * shorthands or `this` binding.
+ * shorthands and `this` binding.
  *
  * @private
  * @param {Array|Object|string} collection The collection to iterate over.
@@ -7578,10 +7541,35 @@ function baseFind(collection, predicate, eachFunc, retKey) {
 module.exports = baseFind;
 
 },{}],110:[function(require,module,exports){
-var isArguments = require(156),
-    isArray = require(157),
-    isLength = require(148),
-    isObjectLike = require(149);
+/**
+ * The base implementation of `_.findIndex` and `_.findLastIndex` without
+ * support for callback shorthands and `this` binding.
+ *
+ * @private
+ * @param {Array} array The array to search.
+ * @param {Function} predicate The function invoked per iteration.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseFindIndex(array, predicate, fromRight) {
+  var length = array.length,
+      index = fromRight ? length : -1;
+
+  while ((fromRight ? index-- : ++index < length)) {
+    if (predicate(array[index], index, array)) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = baseFindIndex;
+
+},{}],111:[function(require,module,exports){
+var isArguments = require(157),
+    isArray = require(158),
+    isLength = require(150),
+    isObjectLike = require(151);
 
 /**
  * The base implementation of `_.flatten` with added support for restricting
@@ -7591,11 +7579,10 @@ var isArguments = require(156),
  * @param {Array} array The array to flatten.
  * @param {boolean} isDeep Specify a deep flatten.
  * @param {boolean} isStrict Restrict flattening to arrays and `arguments` objects.
- * @param {number} fromIndex The index to start from.
  * @returns {Array} Returns the new flattened array.
  */
-function baseFlatten(array, isDeep, isStrict, fromIndex) {
-  var index = fromIndex - 1,
+function baseFlatten(array, isDeep, isStrict) {
+  var index = -1,
       length = array.length,
       resIndex = -1,
       result = [];
@@ -7606,7 +7593,7 @@ function baseFlatten(array, isDeep, isStrict, fromIndex) {
     if (isObjectLike(value) && isLength(value.length) && (isArray(value) || isArguments(value))) {
       if (isDeep) {
         // Recursively flatten arrays (susceptible to call stack limits).
-        value = baseFlatten(value, isDeep, isStrict, 0);
+        value = baseFlatten(value, isDeep, isStrict);
       }
       var valIndex = -1,
           valLength = value.length;
@@ -7624,8 +7611,8 @@ function baseFlatten(array, isDeep, isStrict, fromIndex) {
 
 module.exports = baseFlatten;
 
-},{"148":148,"149":149,"156":156,"157":157}],111:[function(require,module,exports){
-var toObject = require(155);
+},{"150":150,"151":151,"157":157,"158":158}],112:[function(require,module,exports){
+var createBaseFor = require(137);
 
 /**
  * The base implementation of `baseForIn` and `baseForOwn` which iterates
@@ -7639,26 +7626,13 @@ var toObject = require(155);
  * @param {Function} keysFunc The function to get the keys of `object`.
  * @returns {Object} Returns `object`.
  */
-function baseFor(object, iteratee, keysFunc) {
-  var index = -1,
-      iterable = toObject(object),
-      props = keysFunc(object),
-      length = props.length;
-
-  while (++index < length) {
-    var key = props[index];
-    if (iteratee(iterable[key], key, iterable) === false) {
-      break;
-    }
-  }
-  return object;
-}
+var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"155":155}],112:[function(require,module,exports){
-var baseFor = require(111),
-    keysIn = require(171);
+},{"137":137}],113:[function(require,module,exports){
+var baseFor = require(112),
+    keysIn = require(172);
 
 /**
  * The base implementation of `_.forIn` without support for callback
@@ -7675,9 +7649,9 @@ function baseForIn(object, iteratee) {
 
 module.exports = baseForIn;
 
-},{"111":111,"171":171}],113:[function(require,module,exports){
-var baseFor = require(111),
-    keys = require(170);
+},{"112":112,"172":172}],114:[function(require,module,exports){
+var baseFor = require(112),
+    keys = require(171);
 
 /**
  * The base implementation of `_.forOwn` without support for callback
@@ -7694,8 +7668,8 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"111":111,"170":170}],114:[function(require,module,exports){
-var isFunction = require(158);
+},{"112":112,"171":171}],115:[function(require,module,exports){
+var isFunction = require(159);
 
 /**
  * The base implementation of `_.functions` which creates an array of
@@ -7723,8 +7697,8 @@ function baseFunctions(object, props) {
 
 module.exports = baseFunctions;
 
-},{"158":158}],115:[function(require,module,exports){
-var indexOfNaN = require(141);
+},{"159":159}],116:[function(require,module,exports){
+var indexOfNaN = require(144);
 
 /**
  * The base implementation of `_.indexOf` without support for binary searches.
@@ -7752,37 +7726,7 @@ function baseIndexOf(array, value, fromIndex) {
 
 module.exports = baseIndexOf;
 
-},{"141":141}],116:[function(require,module,exports){
-var baseEach = require(107),
-    isLength = require(148);
-
-/**
- * The base implementation of `_.invoke` which requires additional arguments
- * to be provided as an array of arguments rather than individually.
- *
- * @private
- * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function|string} methodName The name of the method to invoke or
- *  the function invoked per iteration.
- * @param {Array} [args] The arguments to invoke the method with.
- * @returns {Array} Returns the array of results.
- */
-function baseInvoke(collection, methodName, args) {
-  var index = -1,
-      isFunc = typeof methodName == 'function',
-      length = collection ? collection.length : 0,
-      result = isLength(length) ? Array(length) : [];
-
-  baseEach(collection, function(value) {
-    var func = isFunc ? methodName : (value != null && value[methodName]);
-    result[++index] = func ? func.apply(value, args) : undefined;
-  });
-  return result;
-}
-
-module.exports = baseInvoke;
-
-},{"107":107,"148":148}],117:[function(require,module,exports){
+},{"144":144}],117:[function(require,module,exports){
 var baseIsEqualDeep = require(118);
 
 /**
@@ -7793,12 +7737,12 @@ var baseIsEqualDeep = require(118);
  * @param {*} value The value to compare.
  * @param {*} other The other value to compare.
  * @param {Function} [customizer] The function to customize comparing values.
- * @param {boolean} [isWhere] Specify performing partial comparisons.
+ * @param {boolean} [isLoose] Specify performing partial comparisons.
  * @param {Array} [stackA] Tracks traversed `value` objects.
  * @param {Array} [stackB] Tracks traversed `other` objects.
  * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
  */
-function baseIsEqual(value, other, customizer, isWhere, stackA, stackB) {
+function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
   // Exit early for identical values.
   if (value === other) {
     // Treat `+0` vs. `-0` as not equal.
@@ -7813,21 +7757,22 @@ function baseIsEqual(value, other, customizer, isWhere, stackA, stackB) {
     // Return `false` unless both values are `NaN`.
     return value !== value && other !== other;
   }
-  return baseIsEqualDeep(value, other, baseIsEqual, customizer, isWhere, stackA, stackB);
+  return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
 }
 
 module.exports = baseIsEqual;
 
 },{"118":118}],118:[function(require,module,exports){
-var equalArrays = require(138),
-    equalByTag = require(139),
-    equalObjects = require(140),
-    isArray = require(157),
-    isTypedArray = require(163);
+var equalArrays = require(141),
+    equalByTag = require(142),
+    equalObjects = require(143),
+    isArray = require(158),
+    isTypedArray = require(164);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
     arrayTag = '[object Array]',
+    funcTag = '[object Function]',
     objectTag = '[object Object]';
 
 /** Used for native method references. */
@@ -7837,9 +7782,8 @@ var objectProto = Object.prototype;
 var hasOwnProperty = objectProto.hasOwnProperty;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -7853,12 +7797,12 @@ var objToString = objectProto.toString;
  * @param {Object} other The other object to compare.
  * @param {Function} equalFunc The function to determine equivalents of values.
  * @param {Function} [customizer] The function to customize comparing objects.
- * @param {boolean} [isWhere] Specify performing partial comparisons.
+ * @param {boolean} [isLoose] Specify performing partial comparisons.
  * @param {Array} [stackA=[]] Tracks traversed `value` objects.
  * @param {Array} [stackB=[]] Tracks traversed `other` objects.
  * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
  */
-function baseIsEqualDeep(object, other, equalFunc, customizer, isWhere, stackA, stackB) {
+function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, stackB) {
   var objIsArr = isArray(object),
       othIsArr = isArray(other),
       objTag = arrayTag,
@@ -7880,21 +7824,27 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isWhere, stackA, 
       othIsArr = isTypedArray(other);
     }
   }
-  var objIsObj = objTag == objectTag,
-      othIsObj = othTag == objectTag,
+  var objIsObj = (objTag == objectTag || (isLoose && objTag == funcTag)),
+      othIsObj = (othTag == objectTag || (isLoose && othTag == funcTag)),
       isSameTag = objTag == othTag;
 
   if (isSameTag && !(objIsArr || objIsObj)) {
     return equalByTag(object, other, objTag);
   }
-  var valWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
-      othWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
+  if (isLoose) {
+    if (!isSameTag && !(objIsObj && othIsObj)) {
+      return false;
+    }
+  } else {
+    var valWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
+        othWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
 
-  if (valWrapped || othWrapped) {
-    return equalFunc(valWrapped ? object.value() : object, othWrapped ? other.value() : other, customizer, isWhere, stackA, stackB);
-  }
-  if (!isSameTag) {
-    return false;
+    if (valWrapped || othWrapped) {
+      return equalFunc(valWrapped ? object.value() : object, othWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
+    }
+    if (!isSameTag) {
+      return false;
+    }
   }
   // Assume cyclic values are equal.
   // For more information on detecting circular references see https://es5.github.io/#JO.
@@ -7911,7 +7861,7 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isWhere, stackA, 
   stackA.push(object);
   stackB.push(other);
 
-  var result = (objIsArr ? equalArrays : equalObjects)(object, other, equalFunc, customizer, isWhere, stackA, stackB);
+  var result = (objIsArr ? equalArrays : equalObjects)(object, other, equalFunc, customizer, isLoose, stackA, stackB);
 
   stackA.pop();
   stackB.pop();
@@ -7921,7 +7871,7 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isWhere, stackA, 
 
 module.exports = baseIsEqualDeep;
 
-},{"138":138,"139":139,"140":140,"157":157,"163":163}],119:[function(require,module,exports){
+},{"141":141,"142":142,"143":143,"158":158,"164":164}],119:[function(require,module,exports){
 /**
  * The base implementation of `_.isFunction` without support for environments
  * with incorrect `typeof` results.
@@ -7941,15 +7891,9 @@ module.exports = baseIsFunction;
 },{}],120:[function(require,module,exports){
 var baseIsEqual = require(117);
 
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
 /**
  * The base implementation of `_.isMatch` without support for callback
- * shorthands or `this` binding.
+ * shorthands and `this` binding.
  *
  * @private
  * @param {Object} object The object to inspect.
@@ -7960,30 +7904,27 @@ var hasOwnProperty = objectProto.hasOwnProperty;
  * @returns {boolean} Returns `true` if `object` is a match, else `false`.
  */
 function baseIsMatch(object, props, values, strictCompareFlags, customizer) {
-  var length = props.length;
-  if (object == null) {
-    return !length;
-  }
   var index = -1,
+      length = props.length,
       noCustomizer = !customizer;
 
   while (++index < length) {
     if ((noCustomizer && strictCompareFlags[index])
           ? values[index] !== object[props[index]]
-          : !hasOwnProperty.call(object, props[index])
+          : !(props[index] in object)
         ) {
       return false;
     }
   }
   index = -1;
   while (++index < length) {
-    var key = props[index];
-    if (noCustomizer && strictCompareFlags[index]) {
-      var result = hasOwnProperty.call(object, key);
-    } else {
-      var objValue = object[key],
-          srcValue = values[index];
+    var key = props[index],
+        objValue = object[key],
+        srcValue = values[index];
 
+    if (noCustomizer && strictCompareFlags[index]) {
+      var result = typeof objValue != 'undefined' || (key in object);
+    } else {
       result = customizer ? customizer(objValue, srcValue, key) : undefined;
       if (typeof result == 'undefined') {
         result = baseIsEqual(srcValue, objValue, customizer, true);
@@ -8003,7 +7944,7 @@ var baseEach = require(107);
 
 /**
  * The base implementation of `_.map` without support for callback shorthands
- * or `this` binding.
+ * and `this` binding.
  *
  * @private
  * @param {Array|Object|string} collection The collection to iterate over.
@@ -8022,14 +7963,10 @@ module.exports = baseMap;
 
 },{"107":107}],122:[function(require,module,exports){
 var baseIsMatch = require(120),
-    isStrictComparable = require(150),
-    keys = require(170);
-
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
+    constant = require(178),
+    isStrictComparable = require(152),
+    keys = require(171),
+    toObject = require(156);
 
 /**
  * The base implementation of `_.matches` which does not clone `source`.
@@ -8042,13 +7979,17 @@ function baseMatches(source) {
   var props = keys(source),
       length = props.length;
 
+  if (!length) {
+    return constant(true);
+  }
   if (length == 1) {
     var key = props[0],
         value = source[key];
 
     if (isStrictComparable(value)) {
       return function(object) {
-        return object != null && object[key] === value && hasOwnProperty.call(object, key);
+        return object != null && object[key] === value &&
+          (typeof value != 'undefined' || (key in toObject(object)));
       };
     }
   }
@@ -8061,15 +8002,16 @@ function baseMatches(source) {
     strictCompareFlags[length] = isStrictComparable(value);
   }
   return function(object) {
-    return baseIsMatch(object, props, values, strictCompareFlags);
+    return object != null && baseIsMatch(toObject(object), props, values, strictCompareFlags);
   };
 }
 
 module.exports = baseMatches;
 
-},{"120":120,"150":150,"170":170}],123:[function(require,module,exports){
+},{"120":120,"152":152,"156":156,"171":171,"178":178}],123:[function(require,module,exports){
 var baseIsEqual = require(117),
-    isStrictComparable = require(150);
+    isStrictComparable = require(152),
+    toObject = require(156);
 
 /**
  * The base implementation of `_.matchesProperty` which does not coerce `key`
@@ -8083,7 +8025,8 @@ var baseIsEqual = require(117),
 function baseMatchesProperty(key, value) {
   if (isStrictComparable(value)) {
     return function(object) {
-      return object != null && object[key] === value;
+      return object != null && object[key] === value &&
+        (typeof value != 'undefined' || (key in toObject(object)));
     };
   }
   return function(object) {
@@ -8093,7 +8036,7 @@ function baseMatchesProperty(key, value) {
 
 module.exports = baseMatchesProperty;
 
-},{"117":117,"150":150}],124:[function(require,module,exports){
+},{"117":117,"152":152,"156":156}],124:[function(require,module,exports){
 /**
  * The base implementation of `_.property` which does not coerce `key` to a string.
  *
@@ -8110,25 +8053,6 @@ function baseProperty(key) {
 module.exports = baseProperty;
 
 },{}],125:[function(require,module,exports){
-var identity = require(178),
-    metaMap = require(151);
-
-/**
- * The base implementation of `setData` without support for hot loop detection.
- *
- * @private
- * @param {Function} func The function to associate metadata with.
- * @param {*} data The metadata.
- * @returns {Function} Returns `func`.
- */
-var baseSetData = !metaMap ? identity : function(func, data) {
-  metaMap.set(func, data);
-  return func;
-};
-
-module.exports = baseSetData;
-
-},{"151":151,"178":178}],126:[function(require,module,exports){
 /**
  * The base implementation of `_.slice` without an iteratee call guard.
  *
@@ -8162,7 +8086,7 @@ function baseSlice(array, start, end) {
 
 module.exports = baseSlice;
 
-},{}],127:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 /**
  * The base implementation of `_.sortBy` which uses `comparer` to define
  * the sort order of `array` and replaces criteria objects with their
@@ -8185,7 +8109,7 @@ function baseSortBy(array, comparer) {
 
 module.exports = baseSortBy;
 
-},{}],128:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 /**
  * Converts `value` to a string if it is not one. An empty string is returned
  * for `null` or `undefined` values.
@@ -8203,10 +8127,10 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{}],129:[function(require,module,exports){
-var baseIndexOf = require(115),
-    cacheIndexOf = require(133),
-    createCache = require(137);
+},{}],128:[function(require,module,exports){
+var baseIndexOf = require(116),
+    cacheIndexOf = require(132),
+    createCache = require(138);
 
 /**
  * The base implementation of `_.uniq` without support for callback shorthands
@@ -8262,7 +8186,7 @@ function baseUniq(array, iteratee) {
 
 module.exports = baseUniq;
 
-},{"115":115,"133":133,"137":137}],130:[function(require,module,exports){
+},{"116":116,"132":132,"138":138}],129:[function(require,module,exports){
 /**
  * The base implementation of `_.values` and `_.valuesIn` which creates an
  * array of `object` property values corresponding to the property names
@@ -8286,8 +8210,8 @@ function baseValues(object, props) {
 
 module.exports = baseValues;
 
-},{}],131:[function(require,module,exports){
-var identity = require(178);
+},{}],130:[function(require,module,exports){
+var identity = require(179);
 
 /**
  * A specialized version of `baseCallback` which only supports `this` binding
@@ -8327,10 +8251,10 @@ function bindCallback(func, thisArg, argCount) {
 
 module.exports = bindCallback;
 
-},{"178":178}],132:[function(require,module,exports){
+},{"179":179}],131:[function(require,module,exports){
 (function (global){
-var constant = require(177),
-    isNative = require(159);
+var constant = require(178),
+    isNative = require(160);
 
 /** Native method references. */
 var ArrayBuffer = isNative(ArrayBuffer = global.ArrayBuffer) && ArrayBuffer,
@@ -8386,8 +8310,8 @@ if (!bufferSlice) {
 module.exports = bufferClone;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"159":159,"177":177}],133:[function(require,module,exports){
-var isObject = require(161);
+},{"160":160,"178":178}],132:[function(require,module,exports){
+var isObject = require(162);
 
 /**
  * Checks if `value` is in `cache` mimicking the return signature of
@@ -8407,8 +8331,8 @@ function cacheIndexOf(cache, value) {
 
 module.exports = cacheIndexOf;
 
-},{"161":161}],134:[function(require,module,exports){
-var isObject = require(161);
+},{"162":162}],133:[function(require,module,exports){
+var isObject = require(162);
 
 /**
  * Adds `value` to the cache.
@@ -8429,7 +8353,7 @@ function cachePush(value) {
 
 module.exports = cachePush;
 
-},{"161":161}],135:[function(require,module,exports){
+},{"162":162}],134:[function(require,module,exports){
 var baseCompareAscending = require(104);
 
 /**
@@ -8447,13 +8371,15 @@ function compareAscending(object, other) {
 
 module.exports = compareAscending;
 
-},{"104":104}],136:[function(require,module,exports){
-var bindCallback = require(131),
-    isIterateeCall = require(147);
+},{"104":104}],135:[function(require,module,exports){
+var bindCallback = require(130),
+    isIterateeCall = require(149);
 
 /**
  * Creates a function that assigns properties of source object(s) to a given
  * destination object.
+ *
+ * **Note:** This function is used to create `_.assign`, `_.defaults`, and `_.merge`.
  *
  * @private
  * @param {Function} assigner The function to assign values.
@@ -8496,11 +8422,72 @@ function createAssigner(assigner) {
 
 module.exports = createAssigner;
 
-},{"131":131,"147":147}],137:[function(require,module,exports){
+},{"130":130,"149":149}],136:[function(require,module,exports){
+var isLength = require(150),
+    toObject = require(156);
+
+/**
+ * Creates a `baseEach` or `baseEachRight` function.
+ *
+ * @private
+ * @param {Function} eachFunc The function to iterate over a collection.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new base function.
+ */
+function createBaseEach(eachFunc, fromRight) {
+  return function(collection, iteratee) {
+    var length = collection ? collection.length : 0;
+    if (!isLength(length)) {
+      return eachFunc(collection, iteratee);
+    }
+    var index = fromRight ? length : -1,
+        iterable = toObject(collection);
+
+    while ((fromRight ? index-- : ++index < length)) {
+      if (iteratee(iterable[index], index, iterable) === false) {
+        break;
+      }
+    }
+    return collection;
+  };
+}
+
+module.exports = createBaseEach;
+
+},{"150":150,"156":156}],137:[function(require,module,exports){
+var toObject = require(156);
+
+/**
+ * Creates a base function for `_.forIn` or `_.forInRight`.
+ *
+ * @private
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new base function.
+ */
+function createBaseFor(fromRight) {
+  return function(object, iteratee, keysFunc) {
+    var iterable = toObject(object),
+        props = keysFunc(object),
+        length = props.length,
+        index = fromRight ? length : -1;
+
+    while ((fromRight ? index-- : ++index < length)) {
+      var key = props[index];
+      if (iteratee(iterable[key], key, iterable) === false) {
+        break;
+      }
+    }
+    return object;
+  };
+}
+
+module.exports = createBaseFor;
+
+},{"156":156}],138:[function(require,module,exports){
 (function (global){
 var SetCache = require(94),
-    constant = require(177),
-    isNative = require(159);
+    constant = require(178),
+    isNative = require(160);
 
 /** Native method references. */
 var Set = isNative(Set = global.Set) && Set;
@@ -8522,7 +8509,56 @@ var createCache = !(nativeCreate && Set) ? constant(null) : function(values) {
 module.exports = createCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"159":159,"177":177,"94":94}],138:[function(require,module,exports){
+},{"160":160,"178":178,"94":94}],139:[function(require,module,exports){
+var baseCallback = require(102),
+    baseFind = require(109),
+    baseFindIndex = require(110),
+    isArray = require(158);
+
+/**
+ * Creates a `_.find` or `_.findLast` function.
+ *
+ * @private
+ * @param {Function} eachFunc The function to iterate over a collection.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new find function.
+ */
+function createFind(eachFunc, fromRight) {
+  return function(collection, predicate, thisArg) {
+    predicate = baseCallback(predicate, thisArg, 3);
+    if (isArray(collection)) {
+      var index = baseFindIndex(collection, predicate, fromRight);
+      return index > -1 ? collection[index] : undefined;
+    }
+    return baseFind(collection, predicate, eachFunc);
+  }
+}
+
+module.exports = createFind;
+
+},{"102":102,"109":109,"110":110,"158":158}],140:[function(require,module,exports){
+var bindCallback = require(130),
+    isArray = require(158);
+
+/**
+ * Creates a function for `_.forEach` or `_.forEachRight`.
+ *
+ * @private
+ * @param {Function} arrayFunc The function to iterate over an array.
+ * @param {Function} eachFunc The function to iterate over a collection.
+ * @returns {Function} Returns the new each function.
+ */
+function createForEach(arrayFunc, eachFunc) {
+  return function(collection, iteratee, thisArg) {
+    return (typeof iteratee == 'function' && typeof thisArg == 'undefined' && isArray(collection))
+      ? arrayFunc(collection, iteratee)
+      : eachFunc(collection, bindCallback(iteratee, thisArg, 3));
+  };
+}
+
+module.exports = createForEach;
+
+},{"130":130,"158":158}],141:[function(require,module,exports){
 /**
  * A specialized version of `baseIsEqualDeep` for arrays with support for
  * partial deep comparisons.
@@ -8532,18 +8568,18 @@ module.exports = createCache;
  * @param {Array} other The other array to compare.
  * @param {Function} equalFunc The function to determine equivalents of values.
  * @param {Function} [customizer] The function to customize comparing arrays.
- * @param {boolean} [isWhere] Specify performing partial comparisons.
+ * @param {boolean} [isLoose] Specify performing partial comparisons.
  * @param {Array} [stackA] Tracks traversed `value` objects.
  * @param {Array} [stackB] Tracks traversed `other` objects.
  * @returns {boolean} Returns `true` if the arrays are equivalent, else `false`.
  */
-function equalArrays(array, other, equalFunc, customizer, isWhere, stackA, stackB) {
+function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stackB) {
   var index = -1,
       arrLength = array.length,
       othLength = other.length,
       result = true;
 
-  if (arrLength != othLength && !(isWhere && othLength > arrLength)) {
+  if (arrLength != othLength && !(isLoose && othLength > arrLength)) {
     return false;
   }
   // Deep compare the contents, ignoring non-numeric properties.
@@ -8553,23 +8589,23 @@ function equalArrays(array, other, equalFunc, customizer, isWhere, stackA, stack
 
     result = undefined;
     if (customizer) {
-      result = isWhere
+      result = isLoose
         ? customizer(othValue, arrValue, index)
         : customizer(arrValue, othValue, index);
     }
     if (typeof result == 'undefined') {
       // Recursively compare arrays (susceptible to call stack limits).
-      if (isWhere) {
+      if (isLoose) {
         var othIndex = othLength;
         while (othIndex--) {
           othValue = other[othIndex];
-          result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isWhere, stackA, stackB);
+          result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
           if (result) {
             break;
           }
         }
       } else {
-        result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isWhere, stackA, stackB);
+        result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
       }
     }
   }
@@ -8578,7 +8614,7 @@ function equalArrays(array, other, equalFunc, customizer, isWhere, stackA, stack
 
 module.exports = equalArrays;
 
-},{}],139:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
     dateTag = '[object Date]',
@@ -8629,8 +8665,8 @@ function equalByTag(object, other, tag) {
 
 module.exports = equalByTag;
 
-},{}],140:[function(require,module,exports){
-var keys = require(170);
+},{}],143:[function(require,module,exports){
+var keys = require(171);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -8647,26 +8683,26 @@ var hasOwnProperty = objectProto.hasOwnProperty;
  * @param {Object} other The other object to compare.
  * @param {Function} equalFunc The function to determine equivalents of values.
  * @param {Function} [customizer] The function to customize comparing values.
- * @param {boolean} [isWhere] Specify performing partial comparisons.
+ * @param {boolean} [isLoose] Specify performing partial comparisons.
  * @param {Array} [stackA] Tracks traversed `value` objects.
  * @param {Array} [stackB] Tracks traversed `other` objects.
  * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
  */
-function equalObjects(object, other, equalFunc, customizer, isWhere, stackA, stackB) {
+function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, stackB) {
   var objProps = keys(object),
       objLength = objProps.length,
       othProps = keys(other),
       othLength = othProps.length;
 
-  if (objLength != othLength && !isWhere) {
+  if (objLength != othLength && !isLoose) {
     return false;
   }
-  var hasCtor,
+  var skipCtor = isLoose,
       index = -1;
 
   while (++index < objLength) {
     var key = objProps[index],
-        result = hasOwnProperty.call(other, key);
+        result = isLoose ? key in other : hasOwnProperty.call(other, key);
 
     if (result) {
       var objValue = object[key],
@@ -8674,21 +8710,21 @@ function equalObjects(object, other, equalFunc, customizer, isWhere, stackA, sta
 
       result = undefined;
       if (customizer) {
-        result = isWhere
+        result = isLoose
           ? customizer(othValue, objValue, key)
           : customizer(objValue, othValue, key);
       }
       if (typeof result == 'undefined') {
         // Recursively compare objects (susceptible to call stack limits).
-        result = (objValue && objValue === othValue) || equalFunc(objValue, othValue, customizer, isWhere, stackA, stackB);
+        result = (objValue && objValue === othValue) || equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB);
       }
     }
     if (!result) {
       return false;
     }
-    hasCtor || (hasCtor = key == 'constructor');
+    skipCtor || (skipCtor = key == 'constructor');
   }
-  if (!hasCtor) {
+  if (!skipCtor) {
     var objCtor = object.constructor,
         othCtor = other.constructor;
 
@@ -8705,10 +8741,9 @@ function equalObjects(object, other, equalFunc, customizer, isWhere, stackA, sta
 
 module.exports = equalObjects;
 
-},{"170":170}],141:[function(require,module,exports){
+},{"171":171}],144:[function(require,module,exports){
 /**
  * Gets the index at which the first occurrence of `NaN` is found in `array`.
- * If `fromRight` is provided elements of `array` are iterated from right to left.
  *
  * @private
  * @param {Array} array The array to search.
@@ -8731,7 +8766,7 @@ function indexOfNaN(array, fromIndex, fromRight) {
 
 module.exports = indexOfNaN;
 
-},{}],142:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -8759,8 +8794,8 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],143:[function(require,module,exports){
-var bufferClone = require(132);
+},{}],146:[function(require,module,exports){
+var bufferClone = require(131);
 
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
@@ -8825,7 +8860,7 @@ function initCloneByTag(object, tag, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"132":132}],144:[function(require,module,exports){
+},{"131":131}],147:[function(require,module,exports){
 /**
  * Initializes an object clone.
  *
@@ -8843,51 +8878,10 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{}],145:[function(require,module,exports){
-var baseSetData = require(125),
-    isNative = require(159),
-    support = require(176);
-
-/** Used to detect named functions. */
-var reFuncName = /^\s*function[ \n\r\t]+\w/;
-
-/** Used to detect functions containing a `this` reference. */
-var reThis = /\bthis\b/;
-
-/** Used to resolve the decompiled source of functions. */
-var fnToString = Function.prototype.toString;
-
+},{}],148:[function(require,module,exports){
 /**
- * Checks if `func` is eligible for `this` binding.
- *
- * @private
- * @param {Function} func The function to check.
- * @returns {boolean} Returns `true` if `func` is eligible, else `false`.
- */
-function isBindable(func) {
-  var result = !(support.funcNames ? func.name : support.funcDecomp);
-
-  if (!result) {
-    var source = fnToString.call(func);
-    if (!support.funcNames) {
-      result = !reFuncName.test(source);
-    }
-    if (!result) {
-      // Check if `func` references the `this` keyword and store the result.
-      result = reThis.test(source) || isNative(func);
-      baseSetData(func, result);
-    }
-  }
-  return result;
-}
-
-module.exports = isBindable;
-
-},{"125":125,"159":159,"176":176}],146:[function(require,module,exports){
-/**
- * Used as the maximum length of an array-like value.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
- * for more details.
+ * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
+ * of an array-like value.
  */
 var MAX_SAFE_INTEGER = Math.pow(2, 53) - 1;
 
@@ -8907,10 +8901,10 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],147:[function(require,module,exports){
-var isIndex = require(146),
-    isLength = require(148),
-    isObject = require(161);
+},{}],149:[function(require,module,exports){
+var isIndex = require(148),
+    isLength = require(150),
+    isObject = require(162);
 
 /**
  * Checks if the provided arguments are from an iteratee call.
@@ -8941,20 +8935,17 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"146":146,"148":148,"161":161}],148:[function(require,module,exports){
+},{"148":148,"150":150,"162":162}],150:[function(require,module,exports){
 /**
- * Used as the maximum length of an array-like value.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
- * for more details.
+ * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
+ * of an array-like value.
  */
 var MAX_SAFE_INTEGER = Math.pow(2, 53) - 1;
 
 /**
  * Checks if `value` is a valid array-like length.
  *
- * **Note:** This function is based on ES `ToLength`. See the
- * [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength)
- * for more details.
+ * **Note:** This function is based on [`ToLength`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength).
  *
  * @private
  * @param {*} value The value to check.
@@ -8966,7 +8957,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],149:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 /**
  * Checks if `value` is object-like.
  *
@@ -8975,13 +8966,13 @@ module.exports = isLength;
  * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
  */
 function isObjectLike(value) {
-  return (value && typeof value == 'object') || false;
+  return !!value && typeof value == 'object';
 }
 
 module.exports = isObjectLike;
 
-},{}],150:[function(require,module,exports){
-var isObject = require(161);
+},{}],152:[function(require,module,exports){
+var isObject = require(162);
 
 /**
  * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
@@ -8997,21 +8988,8 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"161":161}],151:[function(require,module,exports){
-(function (global){
-var isNative = require(159);
-
-/** Native method references. */
-var WeakMap = isNative(WeakMap = global.WeakMap) && WeakMap;
-
-/** Used to store function metadata. */
-var metaMap = WeakMap && new WeakMap;
-
-module.exports = metaMap;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"159":159}],152:[function(require,module,exports){
-var toObject = require(155);
+},{"162":162}],153:[function(require,module,exports){
+var toObject = require(156);
 
 /**
  * A specialized version of `_.pick` that picks `object` properties specified
@@ -9040,8 +9018,8 @@ function pickByArray(object, props) {
 
 module.exports = pickByArray;
 
-},{"155":155}],153:[function(require,module,exports){
-var baseForIn = require(112);
+},{"156":156}],154:[function(require,module,exports){
+var baseForIn = require(113);
 
 /**
  * A specialized version of `_.pick` that picks `object` properties `predicate`
@@ -9064,13 +9042,13 @@ function pickByCallback(object, predicate) {
 
 module.exports = pickByCallback;
 
-},{"112":112}],154:[function(require,module,exports){
-var isArguments = require(156),
-    isArray = require(157),
-    isIndex = require(146),
-    isLength = require(148),
-    keysIn = require(171),
-    support = require(176);
+},{"113":113}],155:[function(require,module,exports){
+var isArguments = require(157),
+    isArray = require(158),
+    isIndex = require(148),
+    isLength = require(150),
+    keysIn = require(172),
+    support = require(177);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -9108,8 +9086,8 @@ function shimKeys(object) {
 
 module.exports = shimKeys;
 
-},{"146":146,"148":148,"156":156,"157":157,"171":171,"176":176}],155:[function(require,module,exports){
-var isObject = require(161);
+},{"148":148,"150":150,"157":157,"158":158,"172":172,"177":177}],156:[function(require,module,exports){
+var isObject = require(162);
 
 /**
  * Converts `value` to an object if it is not one.
@@ -9124,9 +9102,9 @@ function toObject(value) {
 
 module.exports = toObject;
 
-},{"161":161}],156:[function(require,module,exports){
-var isLength = require(148),
-    isObjectLike = require(149);
+},{"162":162}],157:[function(require,module,exports){
+var isLength = require(150),
+    isObjectLike = require(151);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]';
@@ -9135,9 +9113,8 @@ var argsTag = '[object Arguments]';
 var objectProto = Object.prototype;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -9159,15 +9136,15 @@ var objToString = objectProto.toString;
  */
 function isArguments(value) {
   var length = isObjectLike(value) ? value.length : undefined;
-  return (isLength(length) && objToString.call(value) == argsTag) || false;
+  return isLength(length) && objToString.call(value) == argsTag;
 }
 
 module.exports = isArguments;
 
-},{"148":148,"149":149}],157:[function(require,module,exports){
-var isLength = require(148),
-    isNative = require(159),
-    isObjectLike = require(149);
+},{"150":150,"151":151}],158:[function(require,module,exports){
+var isLength = require(150),
+    isNative = require(160),
+    isObjectLike = require(151);
 
 /** `Object#toString` result references. */
 var arrayTag = '[object Array]';
@@ -9176,9 +9153,8 @@ var arrayTag = '[object Array]';
 var objectProto = Object.prototype;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -9202,15 +9178,15 @@ var nativeIsArray = isNative(nativeIsArray = Array.isArray) && nativeIsArray;
  * // => false
  */
 var isArray = nativeIsArray || function(value) {
-  return (isObjectLike(value) && isLength(value.length) && objToString.call(value) == arrayTag) || false;
+  return isObjectLike(value) && isLength(value.length) && objToString.call(value) == arrayTag;
 };
 
 module.exports = isArray;
 
-},{"148":148,"149":149,"159":159}],158:[function(require,module,exports){
+},{"150":150,"151":151,"160":160}],159:[function(require,module,exports){
 (function (global){
 var baseIsFunction = require(119),
-    isNative = require(159);
+    isNative = require(160);
 
 /** `Object#toString` result references. */
 var funcTag = '[object Function]';
@@ -9219,9 +9195,8 @@ var funcTag = '[object Function]';
 var objectProto = Object.prototype;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -9254,9 +9229,9 @@ var isFunction = !(baseIsFunction(/x/) || (Uint8Array && !baseIsFunction(Uint8Ar
 module.exports = isFunction;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"119":119,"159":159}],159:[function(require,module,exports){
-var escapeRegExp = require(175),
-    isObjectLike = require(149);
+},{"119":119,"160":160}],160:[function(require,module,exports){
+var escapeRegExp = require(176),
+    isObjectLike = require(151);
 
 /** `Object#toString` result references. */
 var funcTag = '[object Function]';
@@ -9271,9 +9246,8 @@ var objectProto = Object.prototype;
 var fnToString = Function.prototype.toString;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -9306,12 +9280,12 @@ function isNative(value) {
   if (objToString.call(value) == funcTag) {
     return reNative.test(fnToString.call(value));
   }
-  return (isObjectLike(value) && reHostCtor.test(value)) || false;
+  return isObjectLike(value) && reHostCtor.test(value);
 }
 
 module.exports = isNative;
 
-},{"149":149,"175":175}],160:[function(require,module,exports){
+},{"151":151,"176":176}],161:[function(require,module,exports){
 /**
  * Checks if `value` is `null`.
  *
@@ -9334,12 +9308,10 @@ function isNull(value) {
 
 module.exports = isNull;
 
-},{}],161:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 /**
- * Checks if `value` is the language type of `Object`.
+ * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
  * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * **Note:** See the [ES5 spec](https://es5.github.io/#x8) for more details.
  *
  * @static
  * @memberOf _
@@ -9361,13 +9333,13 @@ function isObject(value) {
   // Avoid a V8 JIT bug in Chrome 19-20.
   // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
   var type = typeof value;
-  return type == 'function' || (value && type == 'object') || false;
+  return type == 'function' || (!!value && type == 'object');
 }
 
 module.exports = isObject;
 
-},{}],162:[function(require,module,exports){
-var isObjectLike = require(149);
+},{}],163:[function(require,module,exports){
+var isObjectLike = require(151);
 
 /** `Object#toString` result references. */
 var stringTag = '[object String]';
@@ -9376,9 +9348,8 @@ var stringTag = '[object String]';
 var objectProto = Object.prototype;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -9399,14 +9370,14 @@ var objToString = objectProto.toString;
  * // => false
  */
 function isString(value) {
-  return typeof value == 'string' || (isObjectLike(value) && objToString.call(value) == stringTag) || false;
+  return typeof value == 'string' || (isObjectLike(value) && objToString.call(value) == stringTag);
 }
 
 module.exports = isString;
 
-},{"149":149}],163:[function(require,module,exports){
-var isLength = require(148),
-    isObjectLike = require(149);
+},{"151":151}],164:[function(require,module,exports){
+var isLength = require(150),
+    isObjectLike = require(151);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -9453,9 +9424,8 @@ typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
 var objectProto = Object.prototype;
 
 /**
- * Used to resolve the `toStringTag` of values.
- * See the [ES spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * for more details.
+ * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
+ * of values.
  */
 var objToString = objectProto.toString;
 
@@ -9476,12 +9446,12 @@ var objToString = objectProto.toString;
  * // => false
  */
 function isTypedArray(value) {
-  return (isObjectLike(value) && isLength(value.length) && typedArrayTags[objToString.call(value)]) || false;
+  return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[objToString.call(value)];
 }
 
 module.exports = isTypedArray;
 
-},{"148":148,"149":149}],164:[function(require,module,exports){
+},{"150":150,"151":151}],165:[function(require,module,exports){
 /**
  * Checks if `value` is `undefined`.
  *
@@ -9504,10 +9474,10 @@ function isUndefined(value) {
 
 module.exports = isUndefined;
 
-},{}],165:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 var arrayCopy = require(95),
-    isLength = require(148),
-    values = require(174);
+    isLength = require(150),
+    values = require(175);
 
 /**
  * Converts `value` to an array.
@@ -9537,15 +9507,15 @@ function toArray(value) {
 
 module.exports = toArray;
 
-},{"148":148,"174":174,"95":95}],166:[function(require,module,exports){
+},{"150":150,"175":175,"95":95}],167:[function(require,module,exports){
 var baseAssign = require(101),
-    createAssigner = require(136);
+    createAssigner = require(135);
 
 /**
  * Assigns own enumerable properties of source object(s) to the destination
  * object. Subsequent sources overwrite property assignments of previous sources.
  * If `customizer` is provided it is invoked to produce the assigned values.
- * The `customizer` is bound to `thisArg` and invoked with five arguments;
+ * The `customizer` is bound to `thisArg` and invoked with five arguments:
  * (objectValue, sourceValue, key, object, source).
  *
  * @static
@@ -9574,10 +9544,10 @@ var assign = createAssigner(baseAssign);
 
 module.exports = assign;
 
-},{"101":101,"136":136}],167:[function(require,module,exports){
-var arrayCopy = require(95),
-    assign = require(166),
-    assignDefaults = require(100);
+},{"101":101,"135":135}],168:[function(require,module,exports){
+var assign = require(167),
+    assignDefaults = require(100),
+    restParam = require(93);
 
 /**
  * Assigns own enumerable properties of source object(s) to the destination
@@ -9595,20 +9565,20 @@ var arrayCopy = require(95),
  * _.defaults({ 'user': 'barney' }, { 'age': 36 }, { 'user': 'fred' });
  * // => { 'user': 'barney', 'age': 36 }
  */
-function defaults(object) {
+var defaults = restParam(function(args) {
+  var object = args[0];
   if (object == null) {
     return object;
   }
-  var args = arrayCopy(arguments);
   args.push(assignDefaults);
   return assign.apply(undefined, args);
-}
+});
 
 module.exports = defaults;
 
-},{"100":100,"166":166,"95":95}],168:[function(require,module,exports){
-var baseFunctions = require(114),
-    keysIn = require(171);
+},{"100":100,"167":167,"93":93}],169:[function(require,module,exports){
+var baseFunctions = require(115),
+    keysIn = require(172);
 
 /**
  * Creates an array of function property names from all enumerable properties,
@@ -9631,7 +9601,7 @@ function functions(object) {
 
 module.exports = functions;
 
-},{"114":114,"171":171}],169:[function(require,module,exports){
+},{"115":115,"172":172}],170:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -9661,11 +9631,11 @@ function has(object, key) {
 
 module.exports = has;
 
-},{}],170:[function(require,module,exports){
-var isLength = require(148),
-    isNative = require(159),
-    isObject = require(161),
-    shimKeys = require(154);
+},{}],171:[function(require,module,exports){
+var isLength = require(150),
+    isNative = require(160),
+    isObject = require(162),
+    shimKeys = require(155);
 
 /* Native method references for those with the same name as other `lodash` methods. */
 var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -9711,13 +9681,13 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"148":148,"154":154,"159":159,"161":161}],171:[function(require,module,exports){
-var isArguments = require(156),
-    isArray = require(157),
-    isIndex = require(146),
-    isLength = require(148),
-    isObject = require(161),
-    support = require(176);
+},{"150":150,"155":155,"160":160,"162":162}],172:[function(require,module,exports){
+var isArguments = require(157),
+    isArray = require(158),
+    isIndex = require(148),
+    isLength = require(150),
+    isObject = require(162),
+    support = require(177);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -9778,14 +9748,15 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"146":146,"148":148,"156":156,"157":157,"161":161,"176":176}],172:[function(require,module,exports){
+},{"148":148,"150":150,"157":157,"158":158,"162":162,"177":177}],173:[function(require,module,exports){
 var arrayMap = require(98),
     baseDifference = require(106),
-    baseFlatten = require(110),
-    bindCallback = require(131),
-    keysIn = require(171),
-    pickByArray = require(152),
-    pickByCallback = require(153);
+    baseFlatten = require(111),
+    bindCallback = require(130),
+    keysIn = require(172),
+    pickByArray = require(153),
+    pickByCallback = require(154),
+    restParam = require(93);
 
 /**
  * The opposite of `_.pick`; this method creates an object composed of the
@@ -9793,7 +9764,7 @@ var arrayMap = require(98),
  * Property names may be specified as individual arguments or as arrays of
  * property names. If `predicate` is provided it is invoked for each property
  * of `object` omitting the properties `predicate` returns truthy for. The
- * predicate is bound to `thisArg` and invoked with three arguments;
+ * predicate is bound to `thisArg` and invoked with three arguments:
  * (value, key, object).
  *
  * @static
@@ -9815,34 +9786,35 @@ var arrayMap = require(98),
  * _.omit(object, _.isNumber);
  * // => { 'user': 'fred' }
  */
-function omit(object, predicate, thisArg) {
+var omit = restParam(function(object, props) {
   if (object == null) {
     return {};
   }
-  if (typeof predicate != 'function') {
-    var props = arrayMap(baseFlatten(arguments, false, false, 1), String);
+  if (typeof props[0] != 'function') {
+    var props = arrayMap(baseFlatten(props), String);
     return pickByArray(object, baseDifference(keysIn(object), props));
   }
-  predicate = bindCallback(predicate, thisArg, 3);
+  var predicate = bindCallback(props[0], props[1], 3);
   return pickByCallback(object, function(value, key, object) {
     return !predicate(value, key, object);
   });
-}
+});
 
 module.exports = omit;
 
-},{"106":106,"110":110,"131":131,"152":152,"153":153,"171":171,"98":98}],173:[function(require,module,exports){
-var baseFlatten = require(110),
-    bindCallback = require(131),
-    pickByArray = require(152),
-    pickByCallback = require(153);
+},{"106":106,"111":111,"130":130,"153":153,"154":154,"172":172,"93":93,"98":98}],174:[function(require,module,exports){
+var baseFlatten = require(111),
+    bindCallback = require(130),
+    pickByArray = require(153),
+    pickByCallback = require(154),
+    restParam = require(93);
 
 /**
  * Creates an object composed of the picked `object` properties. Property
  * names may be specified as individual arguments or as arrays of property
  * names. If `predicate` is provided it is invoked for each property of `object`
  * picking the properties `predicate` returns truthy for. The predicate is
- * bound to `thisArg` and invoked with three arguments; (value, key, object).
+ * bound to `thisArg` and invoked with three arguments: (value, key, object).
  *
  * @static
  * @memberOf _
@@ -9863,20 +9835,20 @@ var baseFlatten = require(110),
  * _.pick(object, _.isString);
  * // => { 'user': 'fred' }
  */
-function pick(object, predicate, thisArg) {
+var pick = restParam(function(object, props) {
   if (object == null) {
     return {};
   }
-  return typeof predicate == 'function'
-    ? pickByCallback(object, bindCallback(predicate, thisArg, 3))
-    : pickByArray(object, baseFlatten(arguments, false, false, 1));
-}
+  return typeof props[0] == 'function'
+    ? pickByCallback(object, bindCallback(props[0], props[1], 3))
+    : pickByArray(object, baseFlatten(props));
+});
 
 module.exports = pick;
 
-},{"110":110,"131":131,"152":152,"153":153}],174:[function(require,module,exports){
-var baseValues = require(130),
-    keys = require(170);
+},{"111":111,"130":130,"153":153,"154":154,"93":93}],175:[function(require,module,exports){
+var baseValues = require(129),
+    keys = require(171);
 
 /**
  * Creates an array of the own enumerable property values of `object`.
@@ -9909,20 +9881,20 @@ function values(object) {
 
 module.exports = values;
 
-},{"130":130,"170":170}],175:[function(require,module,exports){
-var baseToString = require(128);
+},{"129":129,"171":171}],176:[function(require,module,exports){
+var baseToString = require(127);
 
 /**
- * Used to match `RegExp` special characters.
- * See this [article on `RegExp` characters](http://www.regular-expressions.info/characters.html#special)
- * for more details.
+ * Used to match `RegExp` [special characters](http://www.regular-expressions.info/characters.html#special).
+ * In addition to special characters the forward slash is escaped to allow for
+ * easier `eval` use and `Function` compilation.
  */
 var reRegExpChars = /[.*+?^${}()|[\]\/\\]/g,
     reHasRegExpChars = RegExp(reRegExpChars.source);
 
 /**
- * Escapes the `RegExp` special characters "\", "^", "$", ".", "|", "?", "*",
- * "+", "(", ")", "[", "]", "{" and "}" in `string`.
+ * Escapes the `RegExp` special characters "\", "/", "^", "$", ".", "|", "?",
+ * "*", "+", "(", ")", "[", "]", "{" and "}" in `string`.
  *
  * @static
  * @memberOf _
@@ -9932,7 +9904,7 @@ var reRegExpChars = /[.*+?^${}()|[\]\/\\]/g,
  * @example
  *
  * _.escapeRegExp('[lodash](https://lodash.com/)');
- * // => '\[lodash\]\(https://lodash\.com/\)'
+ * // => '\[lodash\]\(https:\/\/lodash\.com\/\)'
  */
 function escapeRegExp(string) {
   string = baseToString(string);
@@ -9943,13 +9915,8 @@ function escapeRegExp(string) {
 
 module.exports = escapeRegExp;
 
-},{"128":128}],176:[function(require,module,exports){
+},{"127":127}],177:[function(require,module,exports){
 (function (global){
-var isNative = require(159);
-
-/** Used to detect functions containing a `this` reference. */
-var reThis = /\bthis\b/;
-
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -9978,7 +9945,7 @@ var support = {};
    * @memberOf _.support
    * @type boolean
    */
-  support.funcDecomp = !isNative(global.WinRTError) && reThis.test(function() { return this; });
+  support.funcDecomp = /\bthis\b/.test(function() { return this; });
 
   /**
    * Detect if `Function#name` is supported (all but IE).
@@ -10022,7 +9989,7 @@ var support = {};
 module.exports = support;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"159":159}],177:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 /**
  * Creates a function that returns `value`.
  *
@@ -10047,7 +10014,7 @@ function constant(value) {
 
 module.exports = constant;
 
-},{}],178:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 /**
  * This method returns the first argument provided to it.
  *
@@ -10069,7 +10036,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],179:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 var baseClone = require(103),
     baseMatches = require(122);
 
@@ -10104,7 +10071,7 @@ function matches(source) {
 
 module.exports = matches;
 
-},{"103":103,"122":122}],180:[function(require,module,exports){
+},{"103":103,"122":122}],181:[function(require,module,exports){
 /**
  * A no-operation function which returns `undefined` regardless of the
  * arguments it receives.
@@ -10148,7 +10115,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.4",
+    version: "0.9.5",
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,

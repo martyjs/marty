@@ -66,75 +66,67 @@ function fetch(id, local, remote) {
   return tryAndGetLocally() || tryAndGetRemotely();
 
   function tryAndGetLocally(remoteCalled) {
-    try {
-      var result = options.locally.call(store);
+    var result = options.locally.call(store);
 
-      if (_.isUndefined(result)) {
-        return;
-      }
-
-      if (_.isNull(result)) {
-        return fetchNotFound();
-      }
-
-      if (!remoteCalled) {
-        finished();
-      }
-
-      return fetchDone(result);
-    } catch (error) {
-      return fetchFailed(error);
+    if (_.isUndefined(result)) {
+      return;
     }
+
+    if (_.isNull(result)) {
+      return fetchNotFound();
+    }
+
+    if (!remoteCalled) {
+      finished();
+    }
+
+    return fetchDone(result);
   }
 
   function tryAndGetRemotely() {
-    try {
-      result = options.remotely.call(store);
+    result = options.remotely.call(store);
 
-      if (result) {
-        if (_.isFunction(result.then)) {
-          instance.fetchInProgress[options.id] = true;
+    if (result) {
+      if (_.isFunction(result.then)) {
+        instance.fetchInProgress[options.id] = true;
 
-          result.then(function () {
-            instance.fetchHistory[options.id] = true;
-            result = tryAndGetLocally(true);
-
-            if (result) {
-              fetchDone();
-              store.hasChanged();
-            } else {
-              fetchNotFound();
-              store.hasChanged();
-            }
-          })["catch"](function (error) {
-            fetchFailed(error);
-            store.hasChanged();
-
-            instance.dispatcher.dispatchAction({
-              type: StoreConstants.FETCH_FAILED,
-              arguments: [error, options.id, store]
-            });
-          });
-
-          return fetchPending();
-        } else {
+        result.then(function () {
           instance.fetchHistory[options.id] = true;
           result = tryAndGetLocally(true);
 
           if (result) {
-            return result;
+            fetchDone();
+            store.hasChanged();
+          } else {
+            fetchNotFound();
+            store.hasChanged();
           }
+        })["catch"](function (error) {
+          fetchFailed(error);
+          store.hasChanged();
+
+          instance.dispatcher.dispatchAction({
+            type: StoreConstants.FETCH_FAILED,
+            arguments: [error, options.id, store]
+          });
+        });
+
+        return fetchPending();
+      } else {
+        instance.fetchHistory[options.id] = true;
+        result = tryAndGetLocally(true);
+
+        if (result) {
+          return result;
         }
       }
-
-      if (warnings.promiseNotReturnedFromRemotely) {
-        log.warn(promiseNotReturnedWarning());
-      }
-
-      return fetchNotFound();
-    } catch (error) {
-      return fetchFailed(error);
     }
+
+    if (warnings.promiseNotReturnedFromRemotely) {
+      log.warn(promiseNotReturnedWarning());
+    }
+
+    return fetchNotFound();
   }
 
   function promiseNotReturnedWarning() {

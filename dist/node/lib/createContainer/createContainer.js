@@ -40,6 +40,9 @@ function createContainer(InnerComponent, config) {
         stores: getStoresToListenTo(this.listenTo, component)
       });
     },
+    componentWillReceiveProps: function componentWillReceiveProps() {
+      this.setState(this.getState());
+    },
     onStoreChanged: function onStoreChanged() {
       this.setState(this.getState());
     },
