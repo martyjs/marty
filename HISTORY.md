@@ -1,3 +1,8 @@
+0.9.6 / 2015-03-30
+===================
+
+- Use latest props when container is updating fetches (#244)
+
 0.9.5 / 2015-03-29
 ===================
 
