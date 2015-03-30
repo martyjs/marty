@@ -4,12 +4,12 @@ var log = require("../logger");
 var _ = require("../utils/mindash");
 var fetch = require("../store/fetchResult");
 
-function getFetchResult(config) {
+function getFetchResult(component) {
   var errors = {};
   var results = {};
   var isPending = false;
   var hasFailed = false;
-  var fetches = invokeFetches(config);
+  var fetches = invokeFetches(component);
 
   _.each(fetches, function (fetch, key) {
     if (fetch.done) {
@@ -33,11 +33,11 @@ function getFetchResult(config) {
   return fetch.done(results);
 }
 
-function invokeFetches(config) {
+function invokeFetches(component) {
   var fetches = {};
 
-  if (_.isFunction(config.fetch)) {
-    var result = config.fetch.call(config);
+  if (_.isFunction(component.fetch)) {
+    var result = component.fetch.call(component);
 
     if (result._isFetchResult) {
       throw new Error("Cannot return a single fetch result. You must return an object " + "literal where the keys map to props and the values can be fetch results");
@@ -51,11 +51,11 @@ function invokeFetches(config) {
       fetches[key] = result;
     });
   } else {
-    _.each(config.fetch, function (getResult, key) {
+    _.each(component.fetch, function (getResult, key) {
       if (!_.isFunction(getResult)) {
         log.warn("The fetch " + key + " was not a function and so ignoring");
       } else {
-        var result = getResult.call(config);
+        var result = getResult.call(component);
 
         if (!result || !result._isFetchResult) {
           result = fetch.done(result);
