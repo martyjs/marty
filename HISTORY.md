@@ -1,4 +1,4 @@
-0.9.4 / 2015-03-29
+0.9.5 / 2015-03-29
 ===================
 
 - Don't swallow errors when fetching `locally` or `remotely` (#238)
