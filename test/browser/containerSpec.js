@@ -180,10 +180,18 @@ describe('Container', function () {
   });
 
   describe('when the parent updates its props then it should update its childrens', function () {
-    var ParentComponent;
+    var ParentComponent, fetch;
 
     beforeEach(function () {
-      ContainerComponent = wrap(InnerComponent);
+      fetch = sinon.spy();
+      ContainerComponent = wrap(InnerComponent, {
+        fetch: {
+          bar: function () {
+            fetch(this.props);
+            return 'bam';
+          }
+        }
+      });
 
       ParentComponent = React.createClass({
         getInitialState() {
@@ -205,6 +213,13 @@ describe('Container', function () {
 
     it('should update the inner components props', function () {
       expect(updateProps).to.be.calledWith({
+        foo: 'baz',
+        bar: 'bam'
+      });
+    });
+
+    it('should refresh the props', function () {
+      expect(fetch).to.be.calledWith({
         foo: 'baz'
       });
     });
