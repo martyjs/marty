@@ -40,6 +40,8 @@ class UserQueries extends Marty.Queries {
     }).catch((err) => this.dispatch(UserConstants.RECEIVE_USER_FAILED, id, err));
   }
 }
+
+export default Marty.register(UserQueries);
 {% endsample %}
 
 ##Why have Queries at all?

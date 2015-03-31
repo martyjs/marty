@@ -41,7 +41,9 @@ class UserActionCreators extends Marty.ActionCreators {
   }
 }
 
-UserActionCreators.updateEmail(123, "foo@bar.com");
+userActionCreators = Marty.register(UserActionCreators);
+
+userActionCreators.updateEmail(123, "foo@bar.com");
 
 Dispatcher.register(function (action) {
   console.log(action.type) // => "UPDATE_EMAIL"

@@ -45,7 +45,9 @@ class UserAPI extends Marty.HttpStateSource {
   }
 }
 
-UserAPI.getUsers();
+var userAPI = Marty.register(UserAPI);
+
+userAPI.getUsers();
 {% endsample %}
 
 Marty comes with a number of state sources out of the box:

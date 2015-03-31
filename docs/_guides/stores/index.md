@@ -49,7 +49,9 @@ class UsersStore extends Marty.Store {
   }
 }
 
-var listener = UsersStore.addChangeListener(function () {
+var usersStore = Marty.register(UsersStore);
+
+var listener = usersStore.addChangeListener(function () {
   console.log('Users store changed');
   listener.dispose();
 });
@@ -89,4 +91,6 @@ class UsersStore extends Marty.Store {
     }
   }
 }
+
+export default Marty.register(UsersStore);
 {% endsample %}

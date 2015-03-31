@@ -35,4 +35,6 @@ class UserActionCreators extends Marty.ActionCreators {
       .catch((err) => this.dispatch(UserConstants.SAVE_USER_FAILED, user, err));
   }
 }
+
+export default Marty.register(UserActionCreators);
 {% endsample %}
