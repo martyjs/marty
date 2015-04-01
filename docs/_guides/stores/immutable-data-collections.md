@@ -51,4 +51,6 @@ class UsersStore extends Marty.Store {
     this.state = this.state.push(user);
   }
 }
+
+export default Marty.register(UsersStore);
 {% endsample %}

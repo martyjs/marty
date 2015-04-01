@@ -39,7 +39,9 @@ class UserActionCreators extends Marty.ActionCreators {
   }
 }
 
-UserActionCreators.updateUserEmail(122, "foo@bar.com");
+userActionCreators = Marty.register(UserActionCreators);
+
+userActionCreators.updateUserEmail(122, "foo@bar.com");
 {% endsample %}
 
 In the above scenario, ``UserConstants.UPDATE_USER_EMAIL`` creates an action creator which, when invoked, will create an action with type `UPDATE_USER_EMAIL`.
@@ -98,6 +100,8 @@ class UserStore extends Marty.Store {
     this.hasChanged();
   }
 }
+
+export default Marty.register(UserStore);
 {% endsample %}
 
 When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its [``handlers`` hash]({% url /api/stores/index.html#handlers %}) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in ``this.state``).
@@ -161,22 +165,22 @@ class User extends React.Component {
   }
   updateEmail(e) {
     var email = e.target.value;
-    UserActionCreators.updateUserEmail(this.props.userId, email);
+    userActionCreators.updateUserEmail(this.props.userId, email);
   }
   getInitialState() {
     return {
-      user: UserStore.getUser(this.props.userId)
+      user: userStore.getUser(this.props.userId)
     };
   }
   componentDidMount() {
-    this.userStoreListener = UserStore.addChangeListener(this.onUserStoreChanged);
+    this.userStoreListener = userStore.addChangeListener(this.onUserStoreChanged);
   }
   componentWillUnmount(nextProps) {
     this.userStoreListener.dispose();
   }
   onUserStoreChanged() {
     this.setState({
-      user: UserStore.getUser(this.props.userId)
+      user: userStore.getUser(this.props.userId)
     });
   }
 }
@@ -225,7 +229,7 @@ class User extends React.Component {
   }
   updateEmail(e) {
     var email = e.target.value;
-    UserActionCreators.updateUserEmail(this.props.userId, email);
+    userActionCreators.updateUserEmail(this.props.userId, email);
   }
 }
 
@@ -233,7 +237,7 @@ module.exports = Marty.createContainer(User, {
   listenTo: UserStore,
   fetch: {
     user() {
-      return UserStore.getUser(this.props.userId)
+      return userStore.getUser(this.props.userId)
     }
   }
 });
