@@ -75,7 +75,7 @@ var UserQueries = Marty.createQueries({
   getUser: function (userId) {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
 
-    UserAPI.getUser(userId).then(function (res) {
+    return UserAPI.getUser(userId).then(function (res) {
       this.dispatch(UserConstants.RECEIVE_USER, userId, res.body);
     }.bind(this)).catch(function (err) {
       this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err);
@@ -127,7 +127,7 @@ class UserQueries extends Marty.Queries {
   getUser(userId) {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
 
-    userAPI.getUser(userId)
+    return userAPI.getUser(userId)
       .then(res => this.dispatch(UserConstants.RECEIVE_USER, userId, res.body))
       .catch(err => this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err));
   }
