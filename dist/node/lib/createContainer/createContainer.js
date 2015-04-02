@@ -19,7 +19,6 @@ function createContainer(InnerComponent, config) {
     throw new Error("Must specify an inner component");
   }
 
-  var observer;
   var id = uuid.type("Component");
   var innerComponentDisplayName = InnerComponent.displayName || getClassName(InnerComponent);
   var contextTypes = _.extend({
@@ -34,22 +33,49 @@ function createContainer(InnerComponent, config) {
         displayName: innerComponentDisplayName
       };
 
-      observer = new StoreObserver({
+      this.observer = new StoreObserver({
         component: component,
         onStoreChanged: this.onStoreChanged,
         stores: getStoresToListenTo(this.listenTo, component)
       });
+
+      if (_.isFunction(config.componentDidMount)) {
+        config.componentDidMount.call(this);
+      }
+    },
+    componentWillMount: function componentWillMount() {
+      if (_.isFunction(config.componentWillMount)) {
+        config.componentWillMount.call(this);
+      }
     },
     componentWillReceiveProps: function componentWillReceiveProps(props) {
       this.props = props;
       this.setState(this.getState(props));
+
+      if (_.isFunction(config.componentWillReceiveProps)) {
+        config.componentWillReceiveProps.call(this, props);
+      }
+    },
+    componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+      if (_.isFunction(config.componentWillUpdate)) {
+        config.componentWillUpdate.call(this, nextProps, nextState);
+      }
+    },
+    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+      if (_.isFunction(config.componentDidUpdate)) {
+        config.componentDidUpdate.call(this, prevProps, prevState);
+      }
     },
     onStoreChanged: function onStoreChanged() {
       this.setState(this.getState());
     },
     componentWillUnmount: function componentWillUnmount() {
-      if (observer) {
-        observer.dispose();
+      if (this.observer) {
+        this.observer.dispose();
+      }
+
+      if (_.isFunction(config.componentWillUnmount)) {
+        config.componentWillUnmount.call(this);
       }
     },
     getInitialState: function getInitialState() {
