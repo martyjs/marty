@@ -61,6 +61,77 @@ describe('Container', function () {
     });
   });
 
+  describe('component lifestyle', function () {
+    var ParentComponent;
+    var componentWillReceiveProps;
+    var componentWillUpdate;
+    var componentDidUpdate;
+    var componentDidMount;
+    var componentWillUnmount;
+    var componentWillMount;
+
+    beforeEach(function () {
+      componentWillReceiveProps = sinon.spy();
+      componentWillUpdate = sinon.spy();
+      componentDidUpdate = sinon.spy();
+      componentDidMount = sinon.spy();
+      componentWillUnmount = sinon.spy();
+      componentWillMount = sinon.spy();
+
+      ContainerComponent = wrap(InnerComponent, {
+        componentWillReceiveProps: componentWillReceiveProps,
+        componentWillUpdate: componentWillUpdate,
+        componentDidUpdate: componentDidUpdate,
+        componentDidMount: componentDidMount,
+        componentWillUnmount: componentWillUnmount,
+        componentWillMount: componentWillMount
+      });
+
+      ParentComponent = React.createClass({
+        render() {
+          return <div><ContainerComponent foo={this.state.foo} /></div>;
+        },
+        getInitialState() {
+          return {
+            foo: 'bar'
+          };
+        }
+      });
+
+      element = TestUtils.renderIntoDocument(<ParentComponent />);
+
+      element.setState({
+        foo: 'baz'
+      });
+
+      React.unmountComponentAtNode(element.getDOMNode().parentNode);
+    });
+
+    it('should call componentWillReceiveProps if passed in', function () {
+      expect(componentWillReceiveProps).to.be.calledOnce;
+    });
+
+    it('should call componentWillUpdate if passed in', function () {
+      expect(componentWillUpdate).to.be.calledOnce;
+    });
+
+    it('should call componentDidUpdate if passed in', function () {
+      expect(componentDidUpdate).to.be.calledOnce;
+    });
+
+    it('should call componentDidMount if passed in', function () {
+      expect(componentDidMount).to.be.calledOnce;
+    });
+
+    it('should call componentWillUnmount if passed in', function () {
+      expect(componentWillUnmount).to.be.calledOnce;
+    });
+
+    it('should call componentWillMount if passed in', function () {
+      expect(componentWillMount).to.be.calledOnce;
+    });
+  });
+
   describe('when I pass in a simple component', function () {
     beforeEach(function () {
       ContainerComponent = Marty.createContainer(InnerComponent);
