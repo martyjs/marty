@@ -19,7 +19,7 @@ var User = React.createClass({
 module.exports = Marty.createContainer(User, {
   listenTo: UserStore,
   fetch: {
-    user() {
+    user: function() {
       return UserStore.for(this).getUser(this.props.id);
     }
   },
