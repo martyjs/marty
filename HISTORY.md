@@ -1,3 +1,9 @@
+0.9.7 / 2015-04-02
+===================
+
+- Fix bug where single instance of observer per container (#248)
+- Allow you to pass in component life style hooks (componentWillReceiveProps, componentWillUpdate, componentDidUpdate, componentDidMount, componentWillUnmount and componentWillMount) (#249)
+
 0.9.6 / 2015-03-30
 ===================
 
