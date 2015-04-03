@@ -1,6 +1,6 @@
 var React = require('react');
 var sinon = require('sinon');
-var fetch = require('../../fetch');
+var fetch = require('../../lib/store/fetch');
 var expect = require('chai').expect;
 var TestUtils = require('react/addons').addons.TestUtils;
 var ContextComponent = require('../../lib/components/context');

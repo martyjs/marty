@@ -5,8 +5,8 @@ var Dispatcher = require('marty-core/lib/dispatcher');
 var stubbedLogger = require('../lib/stubbedLogger');
 var ActionPayload = require('marty-core/lib/actionPayload');
 var describeStyles = require('./../lib/describeStyles');
-var ActionHandlerNotFoundError = require('../../errors/actionHandlerNotFound');
-var ActionPredicateUndefinedError = require('../../errors/actionPredicateUndefined');
+var ActionHandlerNotFoundError = require('marty-core/lib/errors/actionHandlerNotFound');
+var ActionPredicateUndefinedError = require('marty-core/lib/errors/actionPredicateUndefined');
 
 describeStyles('Store', function (styles, currentStyle) {
   var store, changeListener, listener, dispatcher, dispatchToken = 'foo', initialState = {};
