@@ -21,7 +21,7 @@ describe('aliases', function () {
 
   describe('marty/environment', function () {
     it('should resolve to environment', function () {
-      expect(require('../../environment')).to.equal(require('../../lib/environment'));
+      expect(require('../../environment')).to.equal(require('marty-core/lib/environment'));
     });
   });
 

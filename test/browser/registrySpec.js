@@ -2,7 +2,7 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var warnings = require('marty-core/lib/warnings');
 var uuid = require('marty-core/lib/utils/uuid');
-var Dispatcher = require('../../lib/dispatcher');
+var Dispatcher = require('marty-core/lib/dispatcher');
 
 describe('Registry', function () {
   var registry, action, query, id, context, expectedId;

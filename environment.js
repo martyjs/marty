@@ -1,1 +1,1 @@
-module.exports = require('./lib/environment');
+module.exports = require('marty-core/lib/environment');

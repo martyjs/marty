@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var sinon = require('sinon');
-var logger = require('../../lib/logger');
+var logger = require('marty-core/lib/logger');
 
 function stubbedLogger() {
   var sandbox = sinon.sandbox.create();
