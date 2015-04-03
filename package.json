@@ -26,7 +26,12 @@
     "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",
     "lodash": "^3.5.0",
-    "wolfy87-eventemitter": "^4.2.11"
+    "wolfy87-eventemitter": "^4.2.11",
+    "marty-core": "^0.10.0",
+    "marty-store": "git+ssh://git@github.com:jhollingworth/marty-store",
+    "marty-queries": "git+ssh://git@github.com:jhollingworth/marty-queries",
+    "marty-constants": "git+ssh://git@github.com:jhollingworth/marty-constants",
+    "marty-action-creators": "git+ssh://git@github.com:jhollingworth/marty-action-creators"
   },
   "devDependencies": {
     "babel": "^4.7.1",
