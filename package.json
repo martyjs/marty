@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.9.7",
+  "version": "0.10.0",
   "description": "A Javascript library for state management in React applications",
   "main": "dist/node/marty.js",
   "browser": "marty.js",
@@ -20,12 +20,18 @@
     "flux"
   ],
   "dependencies": {
+    "babelify": "^5.0.4",
     "cookies-js": "^1.2.1",
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",
     "lodash": "^3.5.0",
-    "babelify": "^5.0.4"
+    "wolfy87-eventemitter": "^4.2.11",
+    "marty-core": "^0.10.0",
+    "marty-store": "git+ssh://git@github.com:jhollingworth/marty-store",
+    "marty-queries": "git+ssh://git@github.com:jhollingworth/marty-queries",
+    "marty-constants": "git+ssh://git@github.com:jhollingworth/marty-constants",
+    "marty-action-creators": "git+ssh://git@github.com:jhollingworth/marty-action-creators"
   },
   "devDependencies": {
     "babel": "^4.7.1",

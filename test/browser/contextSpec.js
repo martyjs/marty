@@ -1,7 +1,7 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
 var Context = require('../../lib/context');
-var Instances = require('../../lib/instances');
+var Instances = require('marty-core/lib/instances');
 
 describe('Context', function () {
   var context;

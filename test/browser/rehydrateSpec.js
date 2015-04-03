@@ -1,7 +1,7 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var Instances = require('../../lib/instances');
-var UnknownStoreError = require('../../errors/unknownStore');
+var Instances = require('marty-core/lib/instances');
+var UnknownStoreError = require('marty-core/lib/errors/unknownStore');
 
 describe('Marty#rehydrate()', function () {
   var serverStores, browserStores, ServerMarty, BrowserMarty;

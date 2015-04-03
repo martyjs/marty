@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var ActionPayload = require('../../../lib/actionPayload');
+var ActionPayload = require('marty-core/lib/actionPayload');
 
 function MockDispatcher() {
   this.id = 'MockDispatcher';

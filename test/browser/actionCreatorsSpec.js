@@ -3,11 +3,11 @@ var _ = require('lodash');
 var expect = require('chai').expect;
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
-var constants = require('../../lib/constants');
-var autoDispatch = require('../../autoDispatch');
+var constants = require('marty-constants');
+var autoDispatch = require('marty-action-creators/lib/autoDispatch');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
-var serializeError = require('../../lib/utils/serializeError');
+var serializeError = require('marty-core/lib/utils/serializeError');
 var describeStyles = require('./../lib/describeStyles');
 
 describe('ActionCreators', function () {

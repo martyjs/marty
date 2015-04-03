@@ -1,8 +1,8 @@
 var sinon = require('sinon');
 var _ = require('lodash');
 var expect = require('chai').expect;
-var warnings = require('../../lib/warnings');
-var constants = require('../../lib/constants');
+var warnings = require('marty-core/lib/warnings');
+var constants = require('marty-constants');
 
 describe('Constants', function () {
   var input, actualResult, actionCreatorContext;

@@ -1,12 +1,12 @@
 var React = require('react');
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var uuid = require('../../lib/utils/uuid');
-var Instances = require('../../lib/instances');
+var uuid = require('marty-core/lib/utils/uuid');
+var Instances = require('marty-core/lib/instances');
 var StateMixin = require('../../lib/stateMixin');
-var Diagnostics = require('../../lib/diagnostics');
+var Diagnostics = require('marty-core/lib/diagnostics');
 var stubbedLogger = require('../lib/stubbedLogger');
-var ActionPayload = require('../../lib/actionPayload');
+var ActionPayload = require('marty-core/lib/actionPayload');
 var TestUtils = require('react/addons').addons.TestUtils;
 
 describe('StateMixin', function () {

@@ -1,7 +1,7 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var Diagnostics = require('../../lib/diagnostics');
-var ActionPayload = require('../../lib/actionPayload');
+var Diagnostics = require('marty-core/lib/diagnostics');
+var ActionPayload = require('marty-core/lib/actionPayload');
 
 describe('ActionPayload', function () {
   var action, store, storeState, actionType, args, source, creator, internal;

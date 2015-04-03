@@ -1,9 +1,9 @@
 var _ = require('lodash');
 var sinon = require('sinon');
-var fetch = require('../../fetch');
+var fetch = require('marty-store/lib/fetch');
 var Marty = require('../../marty');
 var expect = require('chai').expect;
-var warnings = require('../../lib/warnings');
+var warnings = require('marty-core/lib/warnings');
 var Promise = require('es6-promise').Promise;
 var MockDispatcher = require('./lib/mockDispatcher');
 

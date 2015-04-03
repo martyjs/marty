@@ -3,12 +3,11 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
-var constants = require('../../lib/constants');
-var autoDispatch = require('../../autoDispatch');
+var constants = require('marty-constants');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var describeStyles = require('./../lib/describeStyles');
-var serializeError = require('../../lib/utils/serializeError');
+var serializeError = require('marty-core/lib/utils/serializeError');
 
 describe('Queries', function () {
   var queries, dispatcher, actualResult, actualError, Marty;

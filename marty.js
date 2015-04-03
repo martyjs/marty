@@ -2,35 +2,29 @@ require('es6-promise').polyfill();
 
 var state = require('./lib/state');
 var create = require('./lib/create');
-var logger = require('./lib/logger');
-var _ = require('./lib/utils/mindash');
-var dispose = require('./lib/dispose');
+var logger = require('marty-core/lib/logger');
+var _ = require('marty-core/lib/utils/mindash');
 var classes = require('./lib/classes');
-var warnings = require('./lib/warnings');
 var Registry = require('./lib/registry');
-var Dispatcher = require('./lib/dispatcher');
-var Diagnostics = require('./lib/diagnostics');
-var environment = require('./lib/environment');
-var EventEmitter = require('events').EventEmitter;
 var renderToString = require('./lib/renderToString');
+var MartyBuilder = require('marty-core/lib/martyBuilder');
+
+var builder = new MartyBuilder('0.9.7');
+
+require('marty-core/register')(builder);
+require('marty-store/register')(builder);
+require('marty-queries/register')(builder);
+require('marty-constants/register')(builder);
+require('marty-action-creators/register')(builder);
 
 function createInstance() {
-  return _.extend({
-    logger: logger,
-    dispose: dispose,
-    version: '0.9.7',
-    warnings: warnings,
-    dispatcher: Dispatcher,
-    diagnostics: Diagnostics,
+  var marty = builder.build();
+
+  return _.extend(marty, {
     registry: new Registry(),
-    __events: new EventEmitter(),
     renderToString: renderToString,
     createInstance: createInstance,
-
-    // Legacy
-    Dispatcher: Dispatcher,
-    Diagnostics: Diagnostics
-  }, state, create, classes, environment);
+  }, state, create, classes);
 }
 
 module.exports = createInstance();
