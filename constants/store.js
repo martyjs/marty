@@ -1,1 +1,4 @@
-module.exports = require('../lib/constants/store');
+// TODO. Review if it belongs here.
+import constants from './index';
+
+export default constants(['FETCH_FAILED']);

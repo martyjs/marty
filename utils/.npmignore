@@ -1,0 +1,14 @@
+dist
+playground
+examples
+node_modules
+__tests__
+.gitattributes
+.gitignore
+.jscsrc
+.jshintignore
+.jshintrc
+.travis.yml
+CNAME
+karma.conf.js
+Makefile

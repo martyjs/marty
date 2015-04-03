@@ -20,6 +20,7 @@
     "flux"
   ],
   "dependencies": {
+    "marty-constants": "file:./constants",
     "cookies-js": "^1.2.1",
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
