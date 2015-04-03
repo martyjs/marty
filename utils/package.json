@@ -1,0 +1,58 @@
+{
+  "name": "marty-utils",
+  "version": "0.10.0",
+  "description": "Marty utils. A Javascript library for state management in React applications",
+  "main": "index.js",
+  "directories": {
+    "doc": "./doc"
+  },
+  "scripts": {
+    "build": "NODE_ENV=production browserify index.js --no-bundle-external --standalone MartyConstants -o ./dist/marty-constants.js && uglifyjs ./dist/marty-constants.js -cm -o ./dist/marty-constants.min.js",
+    "livereload": "livereloadify ./playground",
+    "start": "npm run watch & npm run livereload & npm run playground",
+    "playground": "static ./playground --cache 0 --port 3000",
+    "test": "mocha --compilers js:babel/register $(find . -type d -name __tests__ -not -path './node_modules/*')",
+    "watch": "watchify -o ./playground/playground-compiled.js -v -d playground/playground.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:marty/utils.git"
+  },
+  "keywords": [
+    "react",
+    "flux",
+    "marty",
+    "utils"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "babel": "^5.0.6",
+    "babelify": "^6.0.1",
+    "browserify": "^9.0.6",
+    "bundle-collapser": "^1.0.0",
+    "chai": "^2.2.0",
+    "livereloadify": "^2.0.0",
+    "mocha": "^2.2.1",
+    "node-static": "^0.7.6",
+    "semver": "^4.2.0",
+    "uglify-js": "^2.4.15",
+    "watchify": "^3.1.0"
+  },
+  "author": "James Hollingworth",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/marty/utils/master/LICENSE"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/marty/utils/issues"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  },
+  "homepage": "https://utils.martyjs.org"
+}

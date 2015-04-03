@@ -1,1 +1,1 @@
-module.exports = require('./lib/constants');
+module.exports = require('marty-constants');
