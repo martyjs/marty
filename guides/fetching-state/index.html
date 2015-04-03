@@ -1171,7 +1171,9 @@
       <span class="p">}</span>
     <span class="p">});</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserStore</span><span class="p">);</span></code></pre></div>
 </div>
 
 <p>When you call fetch, Marty will first try calling the <code>locally</code> function. It the state is present in the store then it&#39;s returned and the fetch will finish executing. If the store can&#39;t find the state locally it should return <code>undefined</code>. This causes the fetch function to invoke <code>remotely</code>. Once <code>remotely</code> has finished executing then fetch will then re-execute the <code>locally</code> function with the expectation that the state is now in the store. If it isn&#39;t then the fetch will fail with a &quot;Not found&quot; error. If the <code>remotely</code> function needs to get the state asynchronously you can return a promise. The fetch function will wait for the promise to be resolved before re-executing <code>locally</code>.</p>
@@ -1195,7 +1197,7 @@
   <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
 
-    <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
     <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
@@ -1237,15 +1239,19 @@
   <span class="p">}</span>
 <span class="p">}</span>
 
+<span class="kd">var</span> <span class="nx">userAPI</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserAPI</span><span class="p">);</span>
+
 <span class="kr">class</span> <span class="nx">UserQueries</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Queries</span> <span class="p">{</span>
   <span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
 
-    <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nx">userAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">))</span>
       <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">err</span><span class="p">));</span>
   <span class="p">}</span>
 <span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">userQueries</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserQueries</span><span class="p">);</span>
 
 <span class="kr">class</span> <span class="nx">UserStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
@@ -1266,7 +1272,7 @@
         <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">userId</span><span class="p">];</span>
       <span class="p">},</span>
       <span class="na">remotely</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">UserQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nx">userQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">)</span>
       <span class="p">}</span>
     <span class="p">});</span>
   <span class="p">}</span>
@@ -1312,7 +1318,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.5</li>
+        <li>v0.9.7</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

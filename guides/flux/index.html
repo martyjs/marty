@@ -1163,7 +1163,9 @@
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
+<span class="nx">userActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserActionCreators</span><span class="p">);</span>
+
+<span class="nx">userActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span></code></pre></div>
 </div>
 
 <p>In the above scenario, <code>UserConstants.UPDATE_USER_EMAIL</code> creates an action creator which, when invoked, will create an action with type <code>UPDATE_USER_EMAIL</code>.</p>
@@ -1213,7 +1215,9 @@ Normally you don't manually register callbacks with the dispatcher, instead you 
     <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">userId</span><span class="p">].</span><span class="nx">email</span> <span class="o">=</span> <span class="nx">email</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserStore</span><span class="p">);</span></code></pre></div>
 </div>
 
 <p>When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its <a href="/api/stores/index.html#handlers"><code>handlers</code> hash</a> to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in <code>this.state</code>).</p>
@@ -1269,22 +1273,22 @@ If you have a view that's interested in a domain, it can ask the store to notify
   <span class="p">}</span>
   <span class="nx">updateEmail</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+    <span class="nx">userActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="nx">getInitialState</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
-      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">userStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
     <span class="p">};</span>
   <span class="p">}</span>
   <span class="nx">componentDidMount</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">userStoreListener</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onUserStoreChanged</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">userStoreListener</span> <span class="o">=</span> <span class="nx">userStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onUserStoreChanged</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="nx">componentWillUnmount</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">userStoreListener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span>
   <span class="p">}</span>
   <span class="nx">onUserStoreChanged</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-      <span class="na">user</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+      <span class="na">user</span><span class="p">:</span> <span class="nx">userStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
     <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></div>
@@ -1327,7 +1331,7 @@ If you have a view that's interested in a domain, it can ask the store to notify
   <span class="p">}</span>
   <span class="nx">updateEmail</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-    <span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
+    <span class="nx">userActionCreators</span><span class="p">.</span><span class="nx">updateUserEmail</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
@@ -1335,7 +1339,7 @@ If you have a view that's interested in a domain, it can ask the store to notify
   <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
   <span class="na">fetch</span><span class="p">:</span> <span class="p">{</span>
     <span class="nx">user</span><span class="p">()</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
+      <span class="k">return</span> <span class="nx">userStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">)</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
@@ -1357,7 +1361,7 @@ If you have a view that's interested in a domain, it can ask the store to notify
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.5</li>
+        <li>v0.9.7</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

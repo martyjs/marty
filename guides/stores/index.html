@@ -1173,7 +1173,9 @@
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="kd">var</span> <span class="nx">listener</span> <span class="o">=</span> <span class="nx">UsersStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<span class="kd">var</span> <span class="nx">usersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UsersStore</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">listener</span> <span class="o">=</span> <span class="nx">usersStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Users store changed'</span><span class="p">);</span>
   <span class="nx">listener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span>
 <span class="p">});</span></code></pre></div>
@@ -1204,7 +1206,9 @@
       <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UsersStore</span><span class="p">);</span></code></pre></div>
 </div>
 
     </div>
@@ -1215,7 +1219,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.5</li>
+        <li>v0.9.7</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

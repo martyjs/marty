@@ -1147,7 +1147,7 @@
 <span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">User</span><span class="p">,</span> <span class="p">{</span>
   <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
   <span class="na">fetch</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nx">user</span><span class="p">()</span> <span class="p">{</span>
+    <span class="na">user</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">UserStore</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">},</span>
@@ -1205,7 +1205,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.5</li>
+        <li>v0.9.7</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>
