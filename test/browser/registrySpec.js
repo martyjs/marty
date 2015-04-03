@@ -1,6 +1,6 @@
 var sinon = require('sinon');
 var expect = require('chai').expect;
-var warnings = require('../../lib/warnings');
+var warnings = require('marty-core/lib/warnings');
 var uuid = require('../../lib/utils/uuid');
 var Dispatcher = require('../../lib/dispatcher');
 

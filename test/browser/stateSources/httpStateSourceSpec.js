@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var expect = require('chai').expect;
 var Marty = require('../../../marty');
 var uuid = require('../../../lib/utils/uuid');
-var warnings = require('../../../lib/warnings');
+var warnings = require('marty-core/lib/warnings');
 var describeStyles = require('../../lib/describeStyles');
 var HttpStateSource = require('../../../lib/stateSource/inbuilt/http');
 

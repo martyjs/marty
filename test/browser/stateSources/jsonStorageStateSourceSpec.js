@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var Marty = require('../../../marty');
-var warnings = require('../../../lib/warnings');
+var warnings = require('marty-core/lib/warnings');
 var describeStyles = require('../../lib/describeStyles');
 
 describeStyles('JSONStorageStateSource', function (styles) {
