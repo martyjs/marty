@@ -1,1 +1,1 @@
-module.exports = require('../lib/errors/actionHandlerNotFound');
+module.exports = require('marty-core/lib/errors/actionHandlerNotFound');

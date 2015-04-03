@@ -1,1 +1,1 @@
-module.exports = require('../lib/errors/unknownStore');
+module.exports = require('marty-core/lib/errors/unknownStore');

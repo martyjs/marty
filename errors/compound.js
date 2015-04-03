@@ -1,1 +1,1 @@
-module.exports = require('../lib/errors/compound');
+module.exports = require('marty-core/lib/errors/compound');

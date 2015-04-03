@@ -1,1 +1,1 @@
-module.exports = require('../lib/errors/actionPredicateUndefined');
+module.exports = require('marty-core/lib/errors/actionPredicateUndefined');
