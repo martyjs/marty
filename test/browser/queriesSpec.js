@@ -4,7 +4,6 @@ var expect = require('chai').expect;
 var Dispatcher = require('flux').Dispatcher;
 var Promise = require('es6-promise').Promise;
 var constants = require('marty-constants');
-var autoDispatch = require('../../lib/actionCreators/autoDispatch');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var describeStyles = require('./../lib/describeStyles');

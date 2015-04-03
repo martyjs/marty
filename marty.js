@@ -13,7 +13,9 @@ var builder = new MartyBuilder('0.9.7');
 
 require('marty-core/register')(builder);
 require('marty-store/register')(builder);
+require('marty-queries/register')(builder);
 require('marty-constants/register')(builder);
+require('marty-action-creators/register')(builder);
 
 function createInstance() {
   var marty = builder.build();
