@@ -13,12 +13,20 @@ var Diagnostics = require('marty-core/lib/diagnostics');
 var environment = require('marty-core/lib/environment');
 var EventEmitter = require('events').EventEmitter;
 var renderToString = require('./lib/renderToString');
+var MartyBuilder = require('marty-core/lib/martyBuilder');
+
+var builder = new MartyBuilder('0.9.7');
+
+require('marty-store/register')(builder);
+require('marty-constants/register')(builder);
 
 function createInstance() {
-  return _.extend({
+  var marty = builder.build();
+
+
+  return _.extend(marty, {
     logger: logger,
     dispose: dispose,
-    version: '0.9.7',
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
