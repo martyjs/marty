@@ -8,7 +8,7 @@ var autoDispatch = require('../../autoDispatch');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
 var describeStyles = require('./../lib/describeStyles');
-var serializeError = require('../../lib/utils/serializeError');
+var serializeError = require('marty-core/lib/utils/serializeError');
 
 describe('Queries', function () {
   var queries, dispatcher, actualResult, actualError, Marty;

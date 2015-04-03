@@ -7,7 +7,7 @@ var constants = require('../../lib/constants');
 var autoDispatch = require('../../autoDispatch');
 var stubbedLogger = require('../lib/stubbedLogger');
 var MockDispatcher = require('./lib/mockDispatcher');
-var serializeError = require('../../lib/utils/serializeError');
+var serializeError = require('marty-core/lib/utils/serializeError');
 var describeStyles = require('./../lib/describeStyles');
 
 describe('ActionCreators', function () {
