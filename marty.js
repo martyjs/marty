@@ -2,15 +2,15 @@ require('es6-promise').polyfill();
 
 var state = require('./lib/state');
 var create = require('./lib/create');
-var logger = require('./lib/logger');
-var _ = require('./lib/utils/mindash');
+var logger = require('marty-core/lib/logger');
+var _ = require('marty-core/lib/utils/mindash');
 var dispose = require('./lib/dispose');
 var classes = require('./lib/classes');
-var warnings = require('./lib/warnings');
+var warnings = require('marty-core/lib/warnings');
 var Registry = require('./lib/registry');
 var Dispatcher = require('./lib/dispatcher');
-var Diagnostics = require('./lib/diagnostics');
-var environment = require('./lib/environment');
+var Diagnostics = require('marty-core/lib/diagnostics');
+var environment = require('marty-core/lib/environment');
 var EventEmitter = require('events').EventEmitter;
 var renderToString = require('./lib/renderToString');
 
