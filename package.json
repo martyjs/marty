@@ -31,6 +31,7 @@
     "marty-store": "git+ssh://git@github.com:jhollingworth/marty-store",
     "marty-queries": "git+ssh://git@github.com:jhollingworth/marty-queries",
     "marty-constants": "git+ssh://git@github.com:jhollingworth/marty-constants",
+    "marty-container": "git+ssh://git@github.com:jhollingworth/marty-container",
     "marty-action-creators": "git+ssh://git@github.com:jhollingworth/marty-action-creators"
   },
   "devDependencies": {

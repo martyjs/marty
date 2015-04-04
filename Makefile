@@ -2,7 +2,7 @@ BIN = ./node_modules/.bin
 
 .PHONY: bootstrap bootstrap-js bootstrap-ruby start test test-server test-browser docs release-docs build build-browser build-server server-watch;
 
-SRC = $(shell find ./lib ./errors ./http ./constants ./*.js -type f -name '*.js')
+SRC = $(shell find ./lib ./*.js -type f -name '*.js')
 ES6_SRC = $(shell find ./lib ./marty.js -type f -name '*.js')
 
 test: lint test-server test-browser
