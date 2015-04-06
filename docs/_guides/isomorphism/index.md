@@ -78,7 +78,7 @@ Marty.renderToString({
 });
 {% endhighlight %}
 
-Rendering the HTML is only have the battle, we need a way of synchronizing the state of the stores between the server and browser. To solve this, Marty introduces the concept of dehydrating and rehydrating your application. When you call [``Marty.dehydrate()``]({% url /api/top-level-api/#dehydrate %}), it will iterate through all the stores, serializing their state to a JSON object (Use [``Store#dehyrdate``]({% url /api/stores/index.html#dehydrate %}) to control how a store is dehydrated). [``Marty.renderToString``]({% url /api/top-level-api/index.html#renderToString %}) automatically does this for you, adding the dehydrated state to the window object (``window.__marty``). When the application loads in the browser you should call [``Marty.rehydrate()``]({% url /api/top-level-api/#rehydrate %}) which will use the dehydrated state to return the stores to its state on the server (Use [``Store#rehydrate``]({% url /api/stores/index.html#rehydrate %}) to control how a store is rehydrated).
+Rendering the HTML is only half the battle, we need a way of synchronizing the state of the stores between the server and browser. To solve this, Marty introduces the concept of dehydrating and rehydrating your application. When you call [``Marty.dehydrate()``]({% url /api/top-level-api/#dehydrate %}), it will iterate through all the stores, serializing their state to a JSON object (Use [``Store#dehyrdate``]({% url /api/stores/index.html#dehydrate %}) to control how a store is dehydrated). [``Marty.renderToString``]({% url /api/top-level-api/index.html#renderToString %}) automatically does this for you, adding the dehydrated state to the window object (``window.__marty``). When the application loads in the browser you should call [``Marty.rehydrate()``]({% url /api/top-level-api/#rehydrate %}) which will use the dehydrated state to return the stores to its state on the server (Use [``Store#rehydrate``]({% url /api/stores/index.html#rehydrate %}) to control how a store is rehydrated).
 
 We've found its useful to know what fetches have been happening on the server (e.g. to identify fetches that are failing or taking too long) so [``Marty.renderToString``]({% url /api/top-level-api/index.html#renderToString %}) will also return diagnostic information about what fetches were made when rendering the component.
 
@@ -146,4 +146,4 @@ var UserStore = Marty.createStore({
 });
 {% endhighlight %}
 
-What this means is if you want you're code to run on the server you will need to remember to add ``.for(this)``. We will warn you if you do this accidentally so its worth watching you're logs.
+What this means is if you want your code to run on the server you will need to remember to add ``.for(this)``. We will warn you if you do this accidentally so its worth watching you're logs.
