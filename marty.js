@@ -1,30 +1,14 @@
+require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
-var state = require('./lib/state');
-var create = require('./lib/create');
-var _ = require('marty-core/lib/utils/mindash');
-var classes = require('./lib/classes');
-var Registry = require('./lib/registry');
-var renderToString = require('./lib/renderToString');
-var MartyBuilder = require('marty-core/lib/martyBuilder');
+var Marty = require('marty-core/lib/marty');
+var marty = new Marty('v0.10.0-beta', require('react'));
 
-var builder = new MartyBuilder('0.9.7');
+marty.use(require('marty-core'));
+marty.use(require('marty-store'));
+marty.use(require('marty-queries'));
+marty.use(require('marty-container'));
+marty.use(require('marty-constants'));
+marty.use(require('marty-action-creators'));
 
-require('marty-core/register')(builder);
-require('marty-store/register')(builder);
-require('marty-queries/register')(builder);
-require('marty-container/register')(builder);
-require('marty-constants/register')(builder);
-require('marty-action-creators/register')(builder);
-
-function createInstance() {
-  var marty = builder.build();
-
-  return _.extend(marty, {
-    registry: new Registry(),
-    renderToString: renderToString,
-    createInstance: createInstance,
-  }, state, create, classes);
-}
-
-module.exports = createInstance();
+module.exports = marty;
