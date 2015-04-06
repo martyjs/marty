@@ -2,8 +2,7 @@
   "name": "marty",
   "version": "0.10.0",
   "description": "A Javascript library for state management in React applications",
-  "main": "dist/node/marty.js",
-  "browser": "marty.js",
+  "main": "marty.js",
   "directories": {
     "doc": "./doc",
     "lib": "./lib"
