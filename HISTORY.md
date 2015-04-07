@@ -1,4 +1,11 @@
-0.9.7 / 2015-04-02
+0.9.8 / 2015-07-04
+===================
+
+- Do not setState in container unless component is mounted (#265)
+- Generate lifecycle methods at container creation (#263)
+- Make it easier to use with webpack (#259)
+
+0.9.7 / 2015-04-04
 ===================
 
 - Fix bug where single instance of observer per container (#248)
