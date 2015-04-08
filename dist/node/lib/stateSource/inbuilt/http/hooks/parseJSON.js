@@ -9,7 +9,16 @@ module.exports = {
   after: function after(res) {
     if (isJson(res)) {
       return res.json().then(function (body) {
-        res.body = body;
+        try {
+          res.body = body;
+        } catch (e) {
+          if (e instanceof TypeError) {
+            // Workaround for Chrome 43+ where Response.body is not settable.
+            Object.defineProperty(res, "body", { value: body });
+          } else {
+            throw e;
+          }
+        }
 
         return res;
       });

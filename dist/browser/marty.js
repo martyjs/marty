@@ -2189,7 +2189,16 @@ module.exports = {
   after: function after(res) {
     if (isJson(res)) {
       return res.json().then(function (body) {
-        res.body = body;
+        try {
+          res.body = body;
+        } catch (e) {
+          if (e instanceof TypeError) {
+            // Workaround for Chrome 43+ where Response.body is not settable.
+            Object.defineProperty(res, "body", { value: body });
+          } else {
+            throw e;
+          }
+        }
 
         return res;
       });
@@ -10175,7 +10184,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.8",
+    version: "0.9.9",
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
