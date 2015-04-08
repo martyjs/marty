@@ -70,7 +70,7 @@ module.exports = Marty.createContainer(User, {
 
 // renderToString.js
 Marty.renderToString({
-    component: User,
+    type: User,
     props: { id: 123 },
     context: Marty.createContext()
 }).then(function (render) {
