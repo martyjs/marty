@@ -1202,14 +1202,14 @@
 
 <span class="c1">// renderToString.js</span>
 <span class="nx">Marty</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">({</span>
-    <span class="na">component</span><span class="p">:</span> <span class="nx">User</span><span class="p">,</span>
+    <span class="na">type</span><span class="p">:</span> <span class="nx">User</span><span class="p">,</span>
     <span class="na">props</span><span class="p">:</span> <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="mi">123</span> <span class="p">},</span>
     <span class="na">context</span><span class="p">:</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContext</span><span class="p">()</span>
 <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">render</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">render</span><span class="p">.</span><span class="nx">html</span><span class="p">).</span><span class="nx">end</span><span class="p">();</span>
 <span class="p">});</span></code></pre></div>
 
-<p>Rendering the HTML is only have the battle, we need a way of synchronizing the state of the stores between the server and browser. To solve this, Marty introduces the concept of dehydrating and rehydrating your application. When you call <a href="/api/top-level-api/#dehydrate"><code>Marty.dehydrate()</code></a>, it will iterate through all the stores, serializing their state to a JSON object (Use <a href="/api/stores/index.html#dehydrate"><code>Store#dehyrdate</code></a> to control how a store is dehydrated). <a href="/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> automatically does this for you, adding the dehydrated state to the window object (<code>window.__marty</code>). When the application loads in the browser you should call <a href="/api/top-level-api/#rehydrate"><code>Marty.rehydrate()</code></a> which will use the dehydrated state to return the stores to its state on the server (Use <a href="/api/stores/index.html#rehydrate"><code>Store#rehydrate</code></a> to control how a store is rehydrated).</p>
+<p>Rendering the HTML is only half the battle, we need a way of synchronizing the state of the stores between the server and browser. To solve this, Marty introduces the concept of dehydrating and rehydrating your application. When you call <a href="/api/top-level-api/#dehydrate"><code>Marty.dehydrate()</code></a>, it will iterate through all the stores, serializing their state to a JSON object (Use <a href="/api/stores/index.html#dehydrate"><code>Store#dehyrdate</code></a> to control how a store is dehydrated). <a href="/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> automatically does this for you, adding the dehydrated state to the window object (<code>window.__marty</code>). When the application loads in the browser you should call <a href="/api/top-level-api/#rehydrate"><code>Marty.rehydrate()</code></a> which will use the dehydrated state to return the stores to its state on the server (Use <a href="/api/stores/index.html#rehydrate"><code>Store#rehydrate</code></a> to control how a store is rehydrated).</p>
 
 <p>We&#39;ve found its useful to know what fetches have been happening on the server (e.g. to identify fetches that are failing or taking too long) so <a href="/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> will also return diagnostic information about what fetches were made when rendering the component.</p>
 
@@ -1273,7 +1273,7 @@
     <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>What this means is if you want you&#39;re code to run on the server you will need to remember to add <code>.for(this)</code>. We will warn you if you do this accidentally so its worth watching you&#39;re logs.</p>
+<p>What this means is if you want your code to run on the server you will need to remember to add <code>.for(this)</code>. We will warn you if you do this accidentally so its worth watching you&#39;re logs.</p>
 
     </div>
   </div>
@@ -1283,7 +1283,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.7</li>
+        <li>v0.9.9</li>
         <li>·</li>
         <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
         <li>·</li>

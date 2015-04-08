@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Immutable data collections</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/v/0.9.9/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="/v/0.9.9/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.9/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.9/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.9/css/docs.css">
+
+  <script type="text/javascript" src="/v/0.9.9/js/codemirror.js"></script>
+</head>
+<body>
+
+  
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/v/0.9.9/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li class="active">
+            <a href="/v/0.9.9/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/flux/index.html">
+                    Flux
+                  </a>
+                </li>
+              
+                <li  class="active">
+                  
+
+                  <a  href="/v/0.9.9/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/es6/index.html">
+                    ES6
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.9.9/api/top-level-api">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/context/index.html">
+                    Context
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/registry/index.html">
+                    Registry
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.9/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.9.9/support">Support</a>
+          </li>
+          <li>
+            <a href="/v/0.9.9/devtools">Developer Tools</a>
+          </li>
+          <li>
+            
+
+            <a href="/v/0.9.9/blog/2015/03/24/marty-v0.9.html">Blog</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/jhollingworth/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+      
+      
+
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/getting-started/index.html">
+              Getting Started
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/flux/index.html">
+              Flux
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  href="/v/0.9.9/guides/stores/index.html">
+              Stores
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a  class="active"
+                      href="/v/0.9.9/guides/stores/immutable-data-collections.html">Immutable data collections</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/fetching-state/index.html">
+              Fetching state
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/action-creators/index.html">
+              Action Creators
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.9/guides/action-creators/actions-vs-action-creators.html">Actions vs. Action Creators</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.9/guides/action-creators/handling-errors.html">Handling Errors</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.9/guides/action-creators/migrating-from-v8.html">Migrating from Marty v0.8</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/queries/index.html">
+              Queries
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/containers/index.html">
+              Containers
+          </a>
+          
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.9/guides/containers/separating-components-and-containers-in-different-files.html">Separating Components and Containers in different files</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/state-mixin/index.html">
+              State Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/state-sources/index.html">
+              State Sources
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/isomorphism/index.html">
+              Isomorphism
+          </a>
+          
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.9/guides/isomorphism/marty-express.html">marty-express</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/es6/index.html">
+              ES6
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/developer-tools/index.html">
+              Developer Tools
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/constants/index.html">
+              Constants
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/dispatcher/index.html">
+              Dispatcher
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/upgrading/index.html">
+              Upgrading
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.9/guides/upgrading/08_09.html">Upgrading from Marty 0.8 to 0.9</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.9/guides/further-reading/index.html">
+              Further reading
+          </a>
+          
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    
+      <h1 class="page-title">Immutable data collections</h1>
+    
+    <div class="content">
+      <p>Within a Flux application you want the stores to be the <strong>only</strong> place you can change state. This can be very difficult to achieve using the in built Javascript collections since they are mutable. This can make it very difficult to debug issues since any piece of code that touches that collection could be the cause.</p>
+
+<p>The solution is to use immutable data collections like <a href="http://facebook.github.io/immutable-js/">immutable.js</a> or <a href="http://swannodette.github.io/mori/">mori</a>. Operations on immutable data structures do not mutate the instance itself but rather return a new instance which is the result of the mutation.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nx">of</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">users2</span> <span class="o">=</span> <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="c1">// ["foo"]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users2</span><span class="p">)</span> <span class="c1">// ["foo", "bar"]</span></code></pre></div>
+
+
+Using immutable data collections help you sleep soundly with the knowledge that nothing outside of stores will be able to change its state.
+
+Whilst immutable data collections are not required, we try to make it as easy to use as possible. For example, you can simply set ``this.state`` with the mutated collection. If the state has changed it will call ``this.hasChanged()`` for you.
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'UsersStore'</span><span class="p">,</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">();</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+  <span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UsersStore</span><span class="p">);</span></code></pre></div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.9.9</li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/jhollingworth/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/v/0.9.9/js/style.js"></script>
+  <script type="text/javascript" src="/v/0.9.9/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>
