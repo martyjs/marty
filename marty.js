@@ -1,36 +1,32 @@
+require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
-var state = require('./lib/state');
-var create = require('./lib/create');
-var logger = require('./lib/logger');
-var _ = require('./lib/utils/mindash');
-var dispose = require('./lib/dispose');
-var classes = require('./lib/classes');
-var warnings = require('./lib/warnings');
-var Registry = require('./lib/registry');
-var Dispatcher = require('./lib/dispatcher');
-var Diagnostics = require('./lib/diagnostics');
-var environment = require('./lib/environment');
-var EventEmitter = require('events').EventEmitter;
-var renderToString = require('./lib/renderToString');
+var Marty = require('marty-core').Marty;
+var marty = new Marty('0.10.0-alpha', react());
 
-function createInstance() {
-  return _.extend({
-    logger: logger,
-    dispose: dispose,
-    version: '0.9.7',
-    warnings: warnings,
-    dispatcher: Dispatcher,
-    diagnostics: Diagnostics,
-    registry: new Registry(),
-    __events: new EventEmitter(),
-    renderToString: renderToString,
-    createInstance: createInstance,
+marty.use(require('marty-core'));
+marty.use(require('marty-constants'));
+marty.use(require('marty-store'));
+marty.use(require('marty-action-creators'));
+marty.use(require('marty-queries'));
+marty.use(require('marty-state-mixin'));
+marty.use(require('marty-container'));
+marty.use(require('marty-isomorphism'));
+marty.use(require('marty-http-state-source'));
+marty.use(require('marty-cookie-state-source'));
+marty.use(require('marty-location-state-source'));
+marty.use(require('marty-session-storage-state-source'));
+marty.use(require('marty-json-storage-state-source'));
+marty.use(require('marty-local-storage-state-source'));
 
-    // Legacy
-    Dispatcher: Dispatcher,
-    Diagnostics: Diagnostics
-  }, state, create, classes, environment);
+module.exports = marty;
+
+// Due to [NPM peer dependency issues](https://github.com/npm/npm/issues/5875)
+// we need to try resolving react from the parent if its not present locally
+function react() {
+  try {
+    return require('react');
+  } catch (e) {
+    return module.parent.require('react');
+  }
 }
-
-module.exports = createInstance();
