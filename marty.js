@@ -2,7 +2,7 @@ require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
 var Marty = require('marty-core').Marty;
-var marty = new Marty('0.10.0-alpha', require('react'));
+var marty = new Marty('0.10.0-alpha', react());
 
 marty.use(require('marty-core'));
 marty.use(require('marty-constants'));
@@ -20,3 +20,13 @@ marty.use(require('marty-json-storage-state-source'));
 marty.use(require('marty-local-storage-state-source'));
 
 module.exports = marty;
+
+// Due to [NPM peer dependency issues](https://github.com/npm/npm/issues/5875)
+// we need to try resolving react from the parent if its not present locally
+function react() {
+  try {
+    return require('react');
+  } catch (e) {
+    return module.parent.require('react');
+  }
+}
