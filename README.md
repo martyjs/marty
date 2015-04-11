@@ -46,7 +46,7 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 ##Browser Support
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/martyjs.svg)](https://saucelabs.com/u/martyjs)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/martyjs.svg)](https://saucelabs.com/u/jhollingworth)
 
 ## Maintainers
 
