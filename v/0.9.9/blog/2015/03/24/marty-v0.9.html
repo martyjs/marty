@@ -276,7 +276,7 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>
-            <a href="http://github.com/jhollingworth/marty">
+            <a href="http://github.com/martyjs/marty">
               <i class="fa fa-github"></i>
               Github
             </a>
@@ -308,14 +308,14 @@
         <div class="hidden-xs" style="margin-top:3px">
           <a href="https://twitter.com/share" class="twitter-share-button" data-text="marty.js 0.9 - Isomorphism, ES6 classes and much more" data-size="large" data-count="none" data-hashtags="martyjs">Tweet</a>
           <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-          <a class="github-button" href="https://github.com/jhollingworth/marty" data-style="mega" data-count-href="/jhollingworth/marty/stargazers" data-count-api="/repos/jhollingworth/marty#stargazers_count">Star</a>
+          <a class="github-button" href="https://github.com/martyjs/marty" data-style="mega" data-count-href="/martyjs/marty/stargazers" data-count-api="/repos/martyjs/marty#stargazers_count">Star</a>
         </div>
         <div class="visible-xs-block" style="margin-top:40px">
           <a href="https://twitter.com/share" class="twitter-share-button" data-text="marty.js 0.9 - Isomorphism, ES6 classes and much more" data-count="none" data-hashtags="martyjs">Tweet</a>
           <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 
           <!-- Place this tag where you want the button to render. -->
-          <a class="github-button" href="https://github.com/jhollingworth/marty" data-count-href="/jhollingworth/marty/stargazers" data-count-api="/repos/jhollingworth/marty#stargazers_count">Star</a>
+          <a class="github-button" href="https://github.com/martyjs/marty" data-count-href="/martyjs/marty/stargazers" data-count-api="/repos/martyjs/marty#stargazers_count">Star</a>
         </div>
       </div>
     </h1>
@@ -336,11 +336,11 @@
 
 <p>We&#39;ve also created <a href="/v/0.9.9/guides/isomorphism/marty-express.html">marty-express</a>, a middleware for <a href="expressjs.com">express.js</a> which consumes <a href="https://github.com/rackt/react-router">react-router</a> routes so you don&#39;t have to have to duplicate your routing on the client and the server. It also modifies the <a href="/v/0.9.9/api/state-sources/http.html">HTTP state source</a> so HTTP requests made on the server will behave the same as they would in the browser.</p>
 
-<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/v/0.9.9/guides/isomorphism/index.html">guide on how to get started</a>. Our <a href="https://github.com/jhollingworth/marty-chat-example">example chat app</a> has also been updated to be isomorphic.</p>
+<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/v/0.9.9/guides/isomorphism/index.html">guide on how to get started</a>. Our <a href="https://github.com/martyjs/marty-chat-example">example chat app</a> has also been updated to be isomorphic.</p>
 
 <h2 id="es6-classes">ES6 Classes</h2>
 
-<p>To complement React ability to define components using ES6 classes we now support defining all types using classes as well. You can read our guide on <a href="/v/0.9.9/guides/es6/index.html">ES6</a> to find out how to make the switch. We have also created a new version of the <a href="https://github.com/jhollingworth/marty-chat-example-es6">example chat app which uses ES6 classes</a>.</p>
+<p>To complement React ability to define components using ES6 classes we now support defining all types using classes as well. You can read our guide on <a href="/v/0.9.9/guides/es6/index.html">ES6</a> to find out how to make the switch. We have also created a new version of the <a href="https://github.com/martyjs/marty-chat-example-es6">example chat app which uses ES6 classes</a>.</p>
 
 <div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
   <span class="na">id</span><span class="p">:</span> <span class="s1">'UsersStore'</span><span class="p">,</span>
@@ -476,26 +476,26 @@
 <h3>New features</h3>
 
 <ul>
-<li>Isomorphism (<a href="http://github.com/jhollingworth/marty/issues/13">#13</a>)</li>
-<li>CookieStateSource &amp; LocationStateSource (<a href="http://github.com/jhollingworth/marty/issues/205">#205</a>)</li>
-<li>ES6 Classes (<a href="http://github.com/jhollingworth/marty/issues/89">#89</a>)</li>
-<li>Add dataType option to http state source (<a href="http://github.com/jhollingworth/marty/issues/176">#176</a>)</li>
-<li>Lodash v3 instead of underscore (<a href="http://github.com/jhollingworth/marty/issues/170">#170</a>)</li>
-<li>HttpStateSource hooks (<a href="http://github.com/jhollingworth/marty/issues/118">#118</a>)</li>
-<li>FetchResult#toPromise (<a href="http://github.com/jhollingworth/marty/issues/180">#180</a>)</li>
-<li>Clear fetch history in Store#clear (<a href="http://github.com/jhollingworth/marty/issues/149">#149</a>)</li>
-<li>Batch store change events (<a href="http://github.com/jhollingworth/marty/issues/183">#183</a>)</li>
-<li>Allow you to specify when function context (<a href="http://github.com/jhollingworth/marty/issues/184">#184</a>)</li>
-<li>Marty.createContainer (<a href="http://github.com/jhollingworth/marty/issues/206">#206</a>)</li>
-<li>Set request credentials to &#39;same-origin&#39; (<a href="http://github.com/jhollingworth/marty/issues/209">#209</a>)</li>
+<li>Isomorphism (<a href="http://github.com/martyjs/marty/issues/13">#13</a>)</li>
+<li>CookieStateSource &amp; LocationStateSource (<a href="http://github.com/martyjs/marty/issues/205">#205</a>)</li>
+<li>ES6 Classes (<a href="http://github.com/martyjs/marty/issues/89">#89</a>)</li>
+<li>Add dataType option to http state source (<a href="http://github.com/martyjs/marty/issues/176">#176</a>)</li>
+<li>Lodash v3 instead of underscore (<a href="http://github.com/martyjs/marty/issues/170">#170</a>)</li>
+<li>HttpStateSource hooks (<a href="http://github.com/martyjs/marty/issues/118">#118</a>)</li>
+<li>FetchResult#toPromise (<a href="http://github.com/martyjs/marty/issues/180">#180</a>)</li>
+<li>Clear fetch history in Store#clear (<a href="http://github.com/martyjs/marty/issues/149">#149</a>)</li>
+<li>Batch store change events (<a href="http://github.com/martyjs/marty/issues/183">#183</a>)</li>
+<li>Allow you to specify when function context (<a href="http://github.com/martyjs/marty/issues/184">#184</a>)</li>
+<li>Marty.createContainer (<a href="http://github.com/martyjs/marty/issues/206">#206</a>)</li>
+<li>Set request credentials to &#39;same-origin&#39; (<a href="http://github.com/martyjs/marty/issues/209">#209</a>)</li>
 </ul>
 
 <p><strong>Bugs</strong></p>
 
 <ul>
-<li>dependsOn doesn&#39;t update when dependent store updates (<a href="http://github.com/jhollingworth/marty/issues/113">#113</a>)</li>
-<li>Don&#39;t auto set content-type if using FormData (<a href="http://github.com/jhollingworth/marty/issues/140">#140</a>)</li>
-<li>Fetch API compatibility (<a href="http://github.com/jhollingworth/marty/issues/133">#133</a>)</li>
+<li>dependsOn doesn&#39;t update when dependent store updates (<a href="http://github.com/martyjs/marty/issues/113">#113</a>)</li>
+<li>Don&#39;t auto set content-type if using FormData (<a href="http://github.com/martyjs/marty/issues/140">#140</a>)</li>
+<li>Fetch API compatibility (<a href="http://github.com/martyjs/marty/issues/133">#133</a>)</li>
 </ul>
 
 <h3>Deprecations</h3>
@@ -540,15 +540,15 @@
 
   <footer class="bs-docs-footer" role="contentinfo">
     <div class="container">
-      <p>Code licensed under <a href="https://github.com/jhollingworth/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
         <li>v0.9.9</li>
         <li>·</li>
-        <li><a href="https://github.com/jhollingworth/marty">GitHub</a></li>
+        <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>
-        <li><a href="https://github.com/jhollingworth/marty/issues">Issues</a></li>
+        <li><a href="https://github.com/martyjs/marty/issues">Issues</a></li>
         <li>·</li>
-        <li><a href="https://github.com/jhollingworth/marty/releases">Releases</a></li>
+        <li><a href="https://github.com/martyjs/marty/releases">Releases</a></li>
       </ul>
     </div>
   </footer>
