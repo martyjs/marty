@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/martyjs/marty](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/martyjs/marty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build Status](https://travis-ci.org/marty/marty.svg?branch=master)](https://travis-ci.org/marty/marty)
+[![Build Status](https://travis-ci.org/martyjs/marty.svg?branch=master)](https://travis-ci.org/martyjs/marty)
 
 ## Quick start
 
@@ -46,7 +46,7 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 ##Browser Support
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/marty.svg)](https://saucelabs.com/u/marty)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/martyjs.svg)](https://saucelabs.com/u/martyjs)
 
 ## Maintainers
 
@@ -54,4 +54,4 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 ## License
 
-* [MIT](https://raw.github.com/marty/marty/master/LICENSE)
+* [MIT](https://raw.github.com/martyjs/marty/master/LICENSE)
