@@ -7,8 +7,8 @@ section: Getting Started
 
 Welcome to Marty! This guide will help you learn how to use it. If you've never heard of Flux before I suggest you read an [overview of Flux]({% url /guides/flux %}). Or if you prefer you can look at some examples:
 
-* [Marty Todo MVC](https://github.com/jhollingworth/marty-todo-mvc)
-* [Marty Chat Example](https://github.com/jhollingworth/marty-chat-example)
+* [Marty Todo MVC](https://github.com/martyjs/marty-todo-mvc)
+* [Marty Chat Example](https://github.com/martyjs/marty-chat-example)
 
 The quickest way to start writing some code is to use our [yeoman generator](https://github.com/jhollingworth/generator-marty). First you will need to install yeoman and the marty generator
 
@@ -27,7 +27,7 @@ open http://localhost:5000
 
 Initially it only generates the basic folder structure. You can use <code>yo marty:domain {domain name}</code> to automatically create an action creator, store, constants, state source and component for the given domain.
 
-If you'd prefer to do your own thing you can download the [latest version from Github](https://github.com/jhollingworth/marty/releases) or you can get it from NPM or Bower
+If you'd prefer to do your own thing you can download the [latest version from Github](https://github.com/martyjs/marty/releases) or you can get it from NPM or Bower
 
 {% highlight bash %}
 npm install --save marty
@@ -44,7 +44,7 @@ module.exports = Marty.createStore({
 })
 {% endhighlight %}
 
-Or [require.js](http://requirejs.org) ([Working example](https://github.com/jhollingworth/marty/tree/master/examples/requirejs))
+Or [require.js](http://requirejs.org) ([Working example](https://github.com/martyjs/marty/tree/master/examples/requirejs))
 
 {% highlight js %}
 require(['marty'], function (Marty) {
@@ -54,7 +54,7 @@ require(['marty'], function (Marty) {
 });
 {% endhighlight %}
 
-Or you can access it from the window object ([Working example](https://github.com/jhollingworth/marty/tree/master/examples/window))
+Or you can access it from the window object ([Working example](https://github.com/martyjs/marty/tree/master/examples/window))
 
 {% highlight js %}
 window.Marty.createStore({

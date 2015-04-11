@@ -12,7 +12,7 @@ sectionid: support
 
   <h2 id="chat">Want to chat?</h2>
 
-  We have a <a href="https://gitter.im/jhollingworth/marty">Gitter chatroom</a> where you can chat about marty.
+  We have a <a href="https://gitter.im/martyjs/marty">Gitter chatroom</a> where you can chat about marty.
 
 
 <h2 id="mailing-list">Mailing list</h2>
@@ -20,7 +20,7 @@ We have a new <a href="https://groups.google.com/forum/#!forum/martyjs">mailing 
 
 <h2 id="issues">Github issues</h2>
 
-If you've got found a bug in Marty, then please <a href="https://github.com/jhollingworth/marty/issues">create an issue on Github</a>.
+If you've got found a bug in Marty, then please <a href="https://github.com/martyjs/marty/issues">create an issue on Github</a>.
 
 <h2 id="twitter">Twitter</h2>
 

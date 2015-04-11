@@ -1,6 +1,8 @@
-[![Build Status](https://travis-ci.org/jhollingworth/marty.svg?branch=master)](https://travis-ci.org/jhollingworth/marty)
-
 [Marty](http://martyjs.org) is a Javascript library for state management in React applications. It is an implementation of the [Flux architecture](http://facebook.github.io/flux/docs/overview.html).
+
+[![Join the chat at https://gitter.im/martyjs/marty](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/martyjs/marty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![Build Status](https://travis-ci.org/marty/marty.svg?branch=master)](https://travis-ci.org/marty/marty)
 
 ## Quick start
 
@@ -44,7 +46,7 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 ##Browser Support
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/jhollingworth.svg)](https://saucelabs.com/u/jhollingworth)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/marty.svg)](https://saucelabs.com/u/marty)
 
 ## Maintainers
 
@@ -52,4 +54,4 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
 
 ## License
 
-* [MIT](https://raw.github.com/jhollingworth/marty/master/LICENSE)
+* [MIT](https://raw.github.com/marty/marty/master/LICENSE)
