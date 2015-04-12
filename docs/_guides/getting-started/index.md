@@ -7,7 +7,7 @@ section: Getting Started
 
 Welcome to Marty! This guide will help you learn how to use it. If you've never heard of Flux before I suggest you read an [overview of Flux]({% url /guides/flux %}). Or if you prefer you can look at some examples:
 
-* [Marty Todo MVC](https://github.com/martyjs/marty-todo-mvc)
+* [Marty Todo MVC](https://github.com/martyjs/marty-todomvc)
 * [Marty Chat Example](https://github.com/martyjs/marty-chat-example)
 
 The quickest way to start writing some code is to use our [yeoman generator](https://github.com/jhollingworth/generator-marty). First you will need to install yeoman and the marty generator
