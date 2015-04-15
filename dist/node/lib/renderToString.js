@@ -22,7 +22,7 @@ function renderToString(options) {
       return;
     }
 
-    if (!context instanceof Context) {
+    if (!(context instanceof Context)) {
       reject(new Error("context must be an instance of Context"));
       return;
     }

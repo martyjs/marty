@@ -79,9 +79,9 @@ Calls [Store#dehydrate]({% url /api/stores/index.html#dehydrate %}) if present o
 
 Given some dehyrdated state, it will call [Store#rehydrate]({% url /api/stores/index.html#rehydrate %}) if present or [Store#replaceState]({% url /api/stores/index.html#replaceState %}) on all registered stores passing in the dehyrdated state. The key of the states must match the Id of the store. If you don't pass in states then it will look at the ``window.__marty.state``. If a [context](#createContext) is passed in then we will rehyrdate all stores within the context.
 
-<h3 id="createContext">Marty.createContext(options)</h3>
+<h3 id="createContext">Marty.createContext([values])</h3>
 
-Creates a [context]({% url /api/context/index.html %}) which contains a dispatcher and instances of all types currently registered within [Marty.registry](#registry).
+Creates a [context]({% url /api/context/index.html %}) which contains a dispatcher and instances of all types currently registered within [Marty.registry](#registry). Optionally will be extended with ``values`` object.
 
 <h3 id="renderToString">Marty.renderToString(options)</h3>
 

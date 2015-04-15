@@ -92,4 +92,11 @@ describe('context', function () {
       }
     });
   });
+  describe('#createContext([values])', function() {
+    it('should extend the new context instance with an object', function() {
+      var value = {some: 'object'};
+      var context = Marty.createContext({field: value});
+      expect(context.field).to.eql(value);
+    });
+  });
 });
