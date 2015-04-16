@@ -1,8 +1,16 @@
-0.9.9 / 2015-08-04
+0.9.11 / 2015-04-16
+===================
+- Allow you to extend contexts to resolve [#276](https://github.com/martyjs/marty/issues/276)
+
+0.9.10 / 2015-04-11
+===================
+- Update definition of React peer dependency
+
+0.9.9 / 2015-04-08
 ===================
 - Fix for parsing JSON in Chrome 43 [#268](https://github.com/jhollingworth/marty/issues/268)
 
-0.9.8 / 2015-07-04
+0.9.8 / 2015-04-07
 ===================
 
 - Do not setState in container unless component is mounted [#265](https://github.com/jhollingworth/marty/issues/265)
