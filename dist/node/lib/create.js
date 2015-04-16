@@ -34,8 +34,8 @@ function register(clazz, id) {
   return this.registry.register(clazz);
 }
 
-function createContext() {
-  return this.registry.createContext();
+function createContext(values) {
+  return this.registry.createContext(values);
 }
 
 function createConstants(obj) {
