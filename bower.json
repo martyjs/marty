@@ -1,7 +1,7 @@
 {
   "name": "marty",
   "main": "dist/browser/marty.js",
-  "version": "0.9.10",
+  "version": "0.9.11",
   "homepage": "martyjs.org",
   "authors": [
     "jhollingworth <jamiehollingworth@gmail.com>"
