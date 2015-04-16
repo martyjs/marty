@@ -828,9 +828,9 @@
 
 <p>Given some dehyrdated state, it will call <a href="/api/stores/index.html#rehydrate">Store#rehydrate</a> if present or <a href="/api/stores/index.html#replaceState">Store#replaceState</a> on all registered stores passing in the dehyrdated state. The key of the states must match the Id of the store. If you don&#39;t pass in states then it will look at the <code>window.__marty.state</code>. If a <a href="#createContext">context</a> is passed in then we will rehyrdate all stores within the context.</p>
 
-<h3 id="createContext">Marty.createContext(options)</h3>
+<h3 id="createContext">Marty.createContext([values])</h3>
 
-<p>Creates a <a href="/api/context/index.html">context</a> which contains a dispatcher and instances of all types currently registered within <a href="#registry">Marty.registry</a>.</p>
+<p>Creates a <a href="/api/context/index.html">context</a> which contains a dispatcher and instances of all types currently registered within <a href="#registry">Marty.registry</a>. Optionally will be extended with <code>values</code> object.</p>
 
 <h3 id="renderToString">Marty.renderToString(options)</h3>
 
@@ -909,7 +909,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.9</li>
+        <li>v0.9.11</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>

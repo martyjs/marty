@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Action Creators</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/v/0.9.11/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="/v/0.9.11/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.11/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.11/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.11/css/docs.css">
+
+  <script type="text/javascript" src="/v/0.9.11/js/codemirror.js"></script>
+</head>
+<body>
+
+  
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/v/0.9.11/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li class="active">
+            <a href="/v/0.9.11/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/flux/index.html">
+                    Flux
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li  class="active">
+                  
+
+                  <a  class="active" href="/v/0.9.11/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/es6/index.html">
+                    ES6
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.9.11/api/top-level-api">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/context/index.html">
+                    Context
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/registry/index.html">
+                    Registry
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.11/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.9.11/support">Support</a>
+          </li>
+          <li>
+            <a href="/v/0.9.11/devtools">Developer Tools</a>
+          </li>
+          <li>
+            
+
+            <a href="/v/0.9.11/blog/2015/03/24/marty-v0.9.html">Blog</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/martyjs/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+      
+      
+
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/getting-started/index.html">
+              Getting Started
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/flux/index.html">
+              Flux
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/stores/index.html">
+              Stores
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.11/guides/stores/immutable-data-collections.html">Immutable data collections</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/fetching-state/index.html">
+              Fetching state
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  class="active" href="/v/0.9.11/guides/action-creators/index.html">
+              Action Creators
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.11/guides/action-creators/actions-vs-action-creators.html">Actions vs. Action Creators</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.11/guides/action-creators/handling-errors.html">Handling Errors</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.11/guides/action-creators/migrating-from-v8.html">Migrating from Marty v0.8</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/queries/index.html">
+              Queries
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/containers/index.html">
+              Containers
+          </a>
+          
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.11/guides/containers/separating-components-and-containers-in-different-files.html">Separating Components and Containers in different files</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/state-mixin/index.html">
+              State Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/state-sources/index.html">
+              State Sources
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/isomorphism/index.html">
+              Isomorphism
+          </a>
+          
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.11/guides/isomorphism/marty-express.html">marty-express</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/es6/index.html">
+              ES6
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/developer-tools/index.html">
+              Developer Tools
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/constants/index.html">
+              Constants
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/dispatcher/index.html">
+              Dispatcher
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/upgrading/index.html">
+              Upgrading
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.9.11/guides/upgrading/08_09.html">Upgrading from Marty 0.8 to 0.9</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.9.11/guides/further-reading/index.html">
+              Further reading
+          </a>
+          
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    
+      <h1 class="page-title">Action Creators</h1>
+    
+    <div class="content">
+      <p>Action Creators are where any changes to your applications state start. Actions are functions that are responsible for coordinating changes to local and remote state.</p>
+
+<p>All actions have a type of string which gives a terse description of what the action does (e.g. &quot;UPDATE_USER_EMAIL&quot;). Stores listen for new actions (using the <a href="/v/0.9.11/guides/dispatcher/index.html">dispatcher</a>) and use <a href="/v/0.9.11/api/stores/index.html#handlers">action&#39;s type to determine whether to do something with it</a>. Action types help us build loosely coupled applications that can grow without increasing complexity.</p>
+
+<p>To create an action, you should pass its type followed by any arguments to the <a href="/v/0.9.11/api/actionCreators/index.html#dispatch"><code>dispatch</code></a> function.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">getDefault</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_EMAIL"</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'UserActionCreators'</span><span class="p">,</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">UserActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span>
+
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="c1">// =&gt; "UPDATE_EMAIL"</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">arguments</span><span class="p">)</span> <span class="c1">// =&gt; [123, "foo@bar.com"];</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">Dispatcher</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">getDefault</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_EMAIL"</span><span class="p">]);</span>
+
+<span class="kr">class</span> <span class="nx">UserActionCreators</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">ActionCreators</span> <span class="p">{</span>
+  <span class="nx">updateEmail</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">userActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserActionCreators</span><span class="p">);</span>
+
+<span class="nx">userActionCreators</span><span class="p">.</span><span class="nx">updateEmail</span><span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="s2">"foo@bar.com"</span><span class="p">);</span>
+
+<span class="nx">Dispatcher</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="c1">// =&gt; "UPDATE_EMAIL"</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">arguments</span><span class="p">)</span> <span class="c1">// =&gt; [123, "foo@bar.com"];</span>
+<span class="p">});</span></code></pre></div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.9.11</li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/v/0.9.11/js/style.js"></script>
+  <script type="text/javascript" src="/v/0.9.11/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>
