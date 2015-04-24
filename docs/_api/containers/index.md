@@ -49,7 +49,7 @@ module.exports = Marty.createContainer(User, {
 });
 {% endhighlight %}
 
-If any of the values within the object hash are [fetch results]({% url /api/stores.html#fetch-result %}) then Marty will wait for the fetches to complete before rendering the inner component. Marty will call the [pending](#pending) handler if any of the fetches are pending and the [failed](#failed) handler if any have failed.
+If any of the values within the object hash are [fetch results]({% url /api/stores/index.html#fetch-result %}) then Marty will wait for the fetches to complete before rendering the inner component. Marty will call the [pending](#pending) handler if any of the fetches are pending and the [failed](#failed) handler if any have failed.
 
 <h3 id="done">done(props)</h3>
 
