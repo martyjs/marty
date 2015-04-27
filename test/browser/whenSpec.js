@@ -49,7 +49,7 @@ describe('when', function () {
 
     it('should log the error and any additional metadata', function () {
       var expectedMessage = util.format(
-        'An error occured when handling the DONE state of the fetch \'%s\' from the store %s',
+        'An error occurred when handling the DONE state of the fetch \'%s\' from the store %s',
         expectedFetchId,
         expectedStore
       );

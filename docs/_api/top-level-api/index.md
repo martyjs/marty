@@ -85,7 +85,7 @@ Creates a [context]({% url /api/context/index.html %}) which contains a dispatch
 
 <h3 id="renderToString">Marty.renderToString(options)</h3>
 
-[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occured. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**). It uses React contexts to pass the Marty context to child components (context key is ``marty``).
+[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**). It uses React contexts to pass the Marty context to child components (context key is ``marty``).
 
 {% highlight js %}
 var options = {
