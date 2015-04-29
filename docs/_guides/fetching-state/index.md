@@ -75,11 +75,14 @@ var UserQueries = Marty.createQueries({
   getUser: function (userId) {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
 
-    return UserAPI.getUser(userId).then(function (res) {
-      this.dispatch(UserConstants.RECEIVE_USER, userId, res.body);
-    }.bind(this)).catch(function (err) {
-      this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err);
-    }.bind(this));
+    return UserAPI.getUser(userId).then(
+      function (res) {
+        this.dispatch(UserConstants.RECEIVE_USER, userId, res.body);
+      }.bind(this)),
+      function (err) {
+        this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err);
+      }.bind(this)
+    );
   }
 });
 
@@ -128,8 +131,10 @@ class UserQueries extends Marty.Queries {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, userId);
 
     return userAPI.getUser(userId)
-      .then(res => this.dispatch(UserConstants.RECEIVE_USER, userId, res.body))
-      .catch(err => this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err));
+      .then(
+        res => this.dispatch(UserConstants.RECEIVE_USER, userId, res.body),
+        err => this.dispatch(UserConstants.RECEIVE_USER_FAILED, userId, err)
+      );
   }
 }
 
