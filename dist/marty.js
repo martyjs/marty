@@ -59,168 +59,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-/*
- * Cookies.js - 1.2.1
- * https://github.com/ScottHamper/Cookies
- *
- * This is free and unencumbered software released into the public domain.
- */
-(function (global, undefined) {
-    'use strict';
-
-    var factory = function (window) {
-        if (typeof window.document !== 'object') {
-            throw new Error('Cookies.js requires a `window` with a `document` object');
-        }
-
-        var Cookies = function (key, value, options) {
-            return arguments.length === 1 ?
-                Cookies.get(key) : Cookies.set(key, value, options);
-        };
-
-        // Allows for setter injection in unit tests
-        Cookies._document = window.document;
-
-        // Used to ensure cookie keys do not collide with
-        // built-in `Object` properties
-        Cookies._cacheKeyPrefix = 'cookey.'; // Hurr hurr, :)
-        
-        Cookies._maxExpireDate = new Date('Fri, 31 Dec 9999 23:59:59 UTC');
-
-        Cookies.defaults = {
-            path: '/',
-            secure: false
-        };
-
-        Cookies.get = function (key) {
-            if (Cookies._cachedDocumentCookie !== Cookies._document.cookie) {
-                Cookies._renewCache();
-            }
-
-            return Cookies._cache[Cookies._cacheKeyPrefix + key];
-        };
-
-        Cookies.set = function (key, value, options) {
-            options = Cookies._getExtendedOptions(options);
-            options.expires = Cookies._getExpiresDate(value === undefined ? -1 : options.expires);
-
-            Cookies._document.cookie = Cookies._generateCookieString(key, value, options);
-
-            return Cookies;
-        };
-
-        Cookies.expire = function (key, options) {
-            return Cookies.set(key, undefined, options);
-        };
-
-        Cookies._getExtendedOptions = function (options) {
-            return {
-                path: options && options.path || Cookies.defaults.path,
-                domain: options && options.domain || Cookies.defaults.domain,
-                expires: options && options.expires || Cookies.defaults.expires,
-                secure: options && options.secure !== undefined ?  options.secure : Cookies.defaults.secure
-            };
-        };
-
-        Cookies._isValidDate = function (date) {
-            return Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date.getTime());
-        };
-
-        Cookies._getExpiresDate = function (expires, now) {
-            now = now || new Date();
-
-            if (typeof expires === 'number') {
-                expires = expires === Infinity ?
-                    Cookies._maxExpireDate : new Date(now.getTime() + expires * 1000);
-            } else if (typeof expires === 'string') {
-                expires = new Date(expires);
-            }
-
-            if (expires && !Cookies._isValidDate(expires)) {
-                throw new Error('`expires` parameter cannot be converted to a valid Date instance');
-            }
-
-            return expires;
-        };
-
-        Cookies._generateCookieString = function (key, value, options) {
-            key = key.replace(/[^#$&+\^`|]/g, encodeURIComponent);
-            key = key.replace(/\(/g, '%28').replace(/\)/g, '%29');
-            value = (value + '').replace(/[^!#$&-+\--:<-\[\]-~]/g, encodeURIComponent);
-            options = options || {};
-
-            var cookieString = key + '=' + value;
-            cookieString += options.path ? ';path=' + options.path : '';
-            cookieString += options.domain ? ';domain=' + options.domain : '';
-            cookieString += options.expires ? ';expires=' + options.expires.toUTCString() : '';
-            cookieString += options.secure ? ';secure' : '';
-
-            return cookieString;
-        };
-
-        Cookies._getCacheFromString = function (documentCookie) {
-            var cookieCache = {};
-            var cookiesArray = documentCookie ? documentCookie.split('; ') : [];
-
-            for (var i = 0; i < cookiesArray.length; i++) {
-                var cookieKvp = Cookies._getKeyValuePairFromCookieString(cookiesArray[i]);
-
-                if (cookieCache[Cookies._cacheKeyPrefix + cookieKvp.key] === undefined) {
-                    cookieCache[Cookies._cacheKeyPrefix + cookieKvp.key] = cookieKvp.value;
-                }
-            }
-
-            return cookieCache;
-        };
-
-        Cookies._getKeyValuePairFromCookieString = function (cookieString) {
-            // "=" is a valid character in a cookie value according to RFC6265, so cannot `split('=')`
-            var separatorIndex = cookieString.indexOf('=');
-
-            // IE omits the "=" when the cookie value is an empty string
-            separatorIndex = separatorIndex < 0 ? cookieString.length : separatorIndex;
-
-            return {
-                key: decodeURIComponent(cookieString.substr(0, separatorIndex)),
-                value: decodeURIComponent(cookieString.substr(separatorIndex + 1))
-            };
-        };
-
-        Cookies._renewCache = function () {
-            Cookies._cache = Cookies._getCacheFromString(Cookies._document.cookie);
-            Cookies._cachedDocumentCookie = Cookies._document.cookie;
-        };
-
-        Cookies._areEnabled = function () {
-            var testKey = 'cookies.js';
-            var areEnabled = Cookies.set(testKey, 1).get(testKey) === '1';
-            Cookies.expire(testKey);
-            return areEnabled;
-        };
-
-        Cookies.enabled = Cookies._areEnabled();
-
-        return Cookies;
-    };
-
-    var cookiesExport = typeof global.document === 'object' ? factory(global) : factory;
-
-    // AMD support
-    if (typeof define === 'function' && define.amd) {
-        define(function () { return cookiesExport; });
-    // CommonJS/Node.js support
-    } else if (typeof exports === 'object') {
-        // Support Node.js specific `module.exports` (which can be a function)
-        if (typeof module === 'object' && typeof module.exports === 'object') {
-            exports = module.exports = cookiesExport;
-        }
-        // But always support CommonJS module 1.1.1 spec (`exports` cannot be a function)
-        exports.Cookies = cookiesExport;
-    } else {
-        global.Cookies = cookiesExport;
-    }
-})(typeof window === 'undefined' ? this : window);
-},{}],3:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -1183,7 +1021,4427 @@ process.umask = function() { return 0; };
     }
 }).call(this);
 }).call(this,require(1),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"1":1}],4:[function(require,module,exports){
+},{"1":1}],3:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  if (self.fetch) {
+    return
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = name.toString();
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = value.toString();
+    }
+    return value
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    var self = this
+    if (headers instanceof Headers) {
+      headers.forEach(function(name, values) {
+        values.forEach(function(value) {
+          self.append(name, value)
+        })
+      })
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        self.append(name, headers[name])
+      })
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name)
+    value = normalizeValue(value)
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[normalizeName(name)]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[normalizeName(name)] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = [normalizeValue(value)]
+  }
+
+  // Instead of iterable for now.
+  Headers.prototype.forEach = function(callback) {
+    var self = this
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      callback(name, self.map[name])
+    })
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true
+  }
+
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob();
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self,
+    XDomainRequest: 'XDomainRequest' in self
+  }
+
+  function Body() {
+    this.bodyUsed = false
+
+    if (support.blob) {
+      this._initBody = function(body) {
+        this._bodyInit = body
+        if (typeof body === 'string') {
+          this._bodyText = body
+        } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+          this._bodyBlob = body
+        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+          this._bodyFormData = body
+        } else if (!body) {
+          this._bodyText = ''
+        } else {
+          throw new Error('unsupported BodyInit type')
+        }
+      }
+
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this._initBody = function(body) {
+        this._bodyInit = body
+        if (typeof body === 'string') {
+          this._bodyText = body
+        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+          this._bodyFormData = body
+        } else if (!body) {
+          this._bodyText = ''
+        } else {
+          throw new Error('unsupported BodyInit type')
+        }
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : Promise.resolve(this._bodyText)
+      }
+    }
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
+    }
+
+    this.json = function() {
+      return this.text().then(JSON.parse)
+    }
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase()
+    return (methods.indexOf(upcased) > -1) ? upcased : method
+  }
+
+  function Request(url, options) {
+    options = options || {}
+    this.url = url
+
+    this.credentials = options.credentials || 'omit'
+    this.headers = new Headers(options.headers)
+    this.method = normalizeMethod(options.method || 'GET')
+    this.mode = options.mode || null
+    this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(options.body)
+  }
+
+  function decode(body) {
+    var form = new FormData()
+    body.trim().split('&').forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+    return form
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  Request.prototype.fetch = function() {
+    var self = this
+
+    return new Promise(function(resolve, reject) {
+      var legacyCors = false;
+      if (support.XDomainRequest) {
+        var origin = location.protocol + '//' + location.host;
+        if (!/^\/[^\/]/.test(self.url)) { // exclude relative urls
+          legacyCors = (/^\/\//.test(self.url) ? location.protocol + self.url : self.url).substring(0, origin.length) !== origin;
+        }
+      }
+      var xhr = legacyCors ? new XDomainRequest() : new XMLHttpRequest()
+
+      if (legacyCors) {
+        xhr.getAllResponseHeaders = function() {
+          return 'Content-Type: '+xhr.contentType;
+        };
+      } else if (self.credentials === 'cors') {
+        xhr.withCredentials = true;
+      }
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return;
+      }
+
+      xhr.onload = function() {
+        var status = (xhr.status === 1223) ? 204 : xhr.status
+
+        // If XDomainRequest there is no status code so just hope for the best...
+        if (legacyCors) {
+          status = 200;
+        }
+        if (status < 100 || status > 599) {
+          reject(new TypeError('Network request failed'))
+          return
+        }
+        var options = {
+          status: status,
+          statusText: xhr.statusText,
+          headers: headers(xhr),
+          url: responseURL()
+        }
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        resolve(new Response(body, options))
+      }
+
+      xhr.onerror = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.open(self.method, self.url, true)
+
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
+
+      self.headers.forEach(function(name, values) {
+        values.forEach(function(value) {
+          xhr.setRequestHeader(name, value)
+        })
+      })
+
+      xhr.send(typeof self._bodyInit === 'undefined' ? null : self._bodyInit)
+    })
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this._initBody(bodyInit)
+    this.type = 'default'
+    this.url = null
+    this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
+    this.statusText = options.statusText
+    this.headers = options.headers
+    this.url = options.url || ''
+  }
+
+  Body.call(Response.prototype)
+
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
+
+  self.fetch = function (url, options) {
+    return new Request(url, options).fetch()
+  }
+  self.fetch.polyfill = true
+})();
+
+},{}],4:[function(require,module,exports){
+require(3);
+
+},{"3":3}],5:[function(require,module,exports){
+"use strict";
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var DispatchCoordinator = require(21);
+
+var ActionCreators = (function (_DispatchCoordinator) {
+  function ActionCreators(options) {
+    _classCallCheck(this, ActionCreators);
+
+    _get(Object.getPrototypeOf(ActionCreators.prototype), "constructor", this).call(this, "ActionCreators", options);
+  }
+
+  _inherits(ActionCreators, _DispatchCoordinator);
+
+  return ActionCreators;
+})(DispatchCoordinator);
+
+module.exports = ActionCreators;
+
+},{"21":21}],6:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+
+function autoDispatch(constant) {
+  return function () {
+    var args = _.toArray(arguments);
+
+    args.unshift(constant);
+
+    this.dispatch.apply(this, args);
+  };
+}
+
+module.exports = autoDispatch;
+
+},{"62":62}],7:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var createClass = require(18);
+var ActionCreators = require(5);
+var RESERVED_KEYWORDS = ["dispatch"];
+
+function createActionCreatorsClass(properties) {
+  _.extend.apply(_, [properties].concat(properties.mixins));
+  _.each(RESERVED_KEYWORDS, function (keyword) {
+    if (properties[keyword]) {
+      throw new Error("" + keyword + " is a reserved keyword");
+    }
+  });
+
+  var classProperties = _.omit(properties, "mixins", "types");
+
+  return createClass(classProperties, properties, ActionCreators);
+}
+
+module.exports = createActionCreatorsClass;
+
+},{"18":18,"5":5,"62":62}],8:[function(require,module,exports){
+"use strict";
+
+var autoDispatch = require(6);
+var ActionCreators = require(5);
+var createActionCreatorsClass = require(7);
+
+module.exports = function (marty) {
+  marty.register("autoDispatch", autoDispatch);
+  marty.registerClass("ActionCreators", ActionCreators);
+  marty.register("createActionCreators", createActionCreators);
+
+  function createActionCreators(properties) {
+    var ActionCreatorsClass = createActionCreatorsClass(properties);
+    var defaultInstance = this.register(ActionCreatorsClass);
+
+    return defaultInstance;
+  }
+};
+
+},{"5":5,"6":6,"7":7}],9:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var log = require(24);
+var warnings = require(41);
+
+function constants(obj) {
+  return toConstant(obj);
+
+  function toConstant(obj) {
+    if (!obj) {
+      return {};
+    }
+
+    if (_.isArray(obj)) {
+      return arrayToConstants(obj);
+    }
+
+    if (_.isObject(obj)) {
+      return objectToConstants(obj);
+    }
+  }
+
+  function objectToConstants(obj) {
+    return _.object(_.map(obj, valueToArray));
+
+    function valueToArray(value, actionType) {
+      return [actionType, toConstant(value)];
+    }
+  }
+
+  function arrayToConstants(array) {
+    var constants = {};
+
+    _.each(array, function (actionType) {
+      var types = [actionType, actionType + "_STARTING", actionType + "_DONE", actionType + "_FAILED"];
+
+      _.each(types, function (type) {
+        constants[type] = createActionCreator(type);
+      });
+    });
+
+    return constants;
+  }
+
+  function createActionCreator(actionType) {
+    var constantActionCreator = function constantActionCreator(actionCreator) {
+      if (warnings.invokeConstant) {
+        log.warn("Warning: Invoking constants has been depreciated. " + "Please migrate to new style of creating action creators " + "http://martyjs.org/guides/action-creators/migrating-from-v8.html");
+      }
+
+      if (!_.isFunction(actionCreator)) {
+        actionCreator = autoDispatch;
+      }
+
+      return function () {
+        var context = actionContext(this);
+
+        actionCreator.apply(context, arguments);
+
+        function actionContext(creators) {
+          return _.extend({}, creators, {
+            dispatch: function dispatch() {
+              var args = _.toArray(arguments);
+
+              args.unshift(actionType);
+
+              creators.dispatch.apply(creators, args);
+            }
+          });
+        }
+      };
+
+      function autoDispatch() {
+        this.dispatch.apply(this, arguments);
+      }
+    };
+
+    constantActionCreator.type = actionType;
+    constantActionCreator.isActionCreator = true;
+    constantActionCreator.toString = function () {
+      return actionType;
+    };
+
+    return constantActionCreator;
+  }
+}
+
+module.exports = constants;
+
+},{"24":24,"41":41,"62":62}],10:[function(require,module,exports){
+"use strict";
+
+var constants = require(9);
+
+module.exports = function (marty) {
+  marty.register("createConstants", createConstants);
+
+  function createConstants(obj) {
+    return constants(obj);
+  }
+};
+
+module.exports.constants = constants;
+
+},{"9":9}],11:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var log = require(24);
+var _ = require(62);
+var uuid = require(40);
+var StoreObserver = require(32);
+var getFetchResult = require(12);
+var getClassName = require(35);
+
+var RESERVED_FUNCTIONS = ["contextTypes", "componentDidMount", "onStoreChanged", "componentWillUnmount", "getInitialState", "getState", "render"];
+
+module.exports = function (React) {
+  return function createContainer(InnerComponent, config) {
+    config = config || {};
+
+    if (!InnerComponent) {
+      throw new Error("Must specify an inner component");
+    }
+
+    var id = uuid.type("Component");
+    var innerComponentDisplayName = InnerComponent.displayName || getClassName(InnerComponent);
+    var contextTypes = _.extend({
+      marty: React.PropTypes.object
+    }, config.contextTypes);
+
+    var Container = React.createClass(_.extend({
+      contextTypes: contextTypes,
+      componentDidMount: function componentDidMount() {
+        var component = {
+          id: id,
+          displayName: innerComponentDisplayName
+        };
+
+        this.observer = new StoreObserver({
+          component: component,
+          onStoreChanged: this.onStoreChanged,
+          stores: getStoresToListenTo(this.listenTo, component)
+        });
+
+        if (_.isFunction(config.componentDidMount)) {
+          config.componentDidMount.call(this);
+        }
+      },
+      componentWillMount: function componentWillMount() {
+        if (_.isFunction(config.componentWillMount)) {
+          config.componentWillMount.call(this);
+        }
+      },
+      componentWillReceiveProps: function componentWillReceiveProps(props) {
+        this.props = props;
+        this.setState(this.getState(props));
+
+        if (_.isFunction(config.componentWillReceiveProps)) {
+          config.componentWillReceiveProps.call(this, props);
+        }
+      },
+      componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+        if (_.isFunction(config.componentWillUpdate)) {
+          config.componentWillUpdate.call(this, nextProps, nextState);
+        }
+      },
+      componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+        if (_.isFunction(config.componentDidUpdate)) {
+          config.componentDidUpdate.call(this, prevProps, prevState);
+        }
+      },
+      onStoreChanged: function onStoreChanged() {
+        this.setState(this.getState());
+      },
+      componentWillUnmount: function componentWillUnmount() {
+        if (this.observer) {
+          this.observer.dispose();
+        }
+
+        if (_.isFunction(config.componentWillUnmount)) {
+          config.componentWillUnmount.call(this);
+        }
+      },
+      getInitialState: function getInitialState() {
+        return this.getState();
+      },
+      getState: function getState() {
+        return {
+          result: getFetchResult(this)
+        };
+      },
+      done: function done(results) {
+        return React.createElement(InnerComponent, _extends({ ref: "innerComponent" }, this.props, results));
+      },
+      getInnerComponent: function getInnerComponent() {
+        return this.refs.innerComponent;
+      },
+      render: function render() {
+        var container = this;
+
+        return this.state.result.when({
+          done: function done(results) {
+            if (_.isFunction(container.done)) {
+              return container.done(results);
+            }
+
+            throw new Error("The `done` handler must be a function");
+          },
+          pending: function pending() {
+            if (_.isFunction(container.pending)) {
+              return container.pending();
+            }
+
+            return React.createElement("div", null);
+          },
+          failed: function failed(error) {
+            if (_.isFunction(container.failed)) {
+              return container.failed(error);
+            }
+
+            throw error;
+          }
+        });
+      }
+    }, _.omit(config, RESERVED_FUNCTIONS)));
+
+    Container.InnerComponent = InnerComponent;
+    Container.displayName = innerComponentDisplayName + "Container";
+
+    return Container;
+  };
+
+  function getStoresToListenTo(stores, component) {
+    if (!stores) {
+      return [];
+    }
+
+    if (!_.isArray(stores)) {
+      stores = [stores];
+    }
+
+    return _.filter(stores, function (store) {
+      var isStore = store.constructor.type === "Store";
+
+      if (!isStore) {
+        log.warn("Warning: Trying to listen to something that isn't a store", store, component.displayName);
+      }
+
+      return isStore;
+    });
+  }
+};
+
+},{"12":12,"24":24,"32":32,"35":35,"40":40,"62":62}],12:[function(require,module,exports){
+"use strict";
+
+var log = require(24);
+var _ = require(62);
+var fetch = require(71);
+
+function getFetchResult(component) {
+  var errors = {};
+  var results = {};
+  var isPending = false;
+  var hasFailed = false;
+  var fetches = invokeFetches(component);
+
+  _.each(fetches, function (fetch, key) {
+    if (fetch.done) {
+      results[key] = fetch.result;
+    } else if (fetch.pending) {
+      isPending = true;
+    } else if (fetch.failed) {
+      hasFailed = true;
+      errors[key] = fetch.error;
+    }
+  });
+
+  if (hasFailed) {
+    return fetch.failed(errors);
+  }
+
+  if (isPending) {
+    return fetch.pending();
+  }
+
+  return fetch.done(results);
+}
+
+function invokeFetches(component) {
+  var fetches = {};
+
+  if (_.isFunction(component.fetch)) {
+    var result = component.fetch.call(component);
+
+    if (result._isFetchResult) {
+      throw new Error("Cannot return a single fetch result. You must return an object " + "literal where the keys map to props and the values can be fetch results");
+    }
+
+    _.each(result, function (result, key) {
+      if (!result || !result._isFetchResult) {
+        result = fetch.done(result);
+      }
+
+      fetches[key] = result;
+    });
+  } else {
+    _.each(component.fetch, function (getResult, key) {
+      if (!_.isFunction(getResult)) {
+        log.warn("The fetch " + key + " was not a function and so ignoring");
+      } else {
+        var result = getResult.call(component);
+
+        if (!result || !result._isFetchResult) {
+          result = fetch.done(result);
+        }
+
+        fetches[key] = result;
+      }
+    });
+  }
+
+  return fetches;
+}
+
+module.exports = getFetchResult;
+
+},{"24":24,"62":62,"71":71}],13:[function(require,module,exports){
+"use strict";
+
+module.exports = function (marty, React) {
+  marty.register("createContainer", require(11)(React));
+};
+
+},{"11":11}],14:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var cookieFactory = defaultCookieFactory;
+var StateSource = require(30);
+
+var CookieStateSource = (function (_StateSource) {
+  function CookieStateSource(options) {
+    _classCallCheck(this, CookieStateSource);
+
+    _get(Object.getPrototypeOf(CookieStateSource.prototype), "constructor", this).call(this, options);
+    this._isCookieStateSource = true;
+    this._cookies = cookieFactory(this.context);
+  }
+
+  _inherits(CookieStateSource, _StateSource);
+
+  _createClass(CookieStateSource, {
+    get: {
+      value: function get(key) {
+        return this._cookies.get(key);
+      }
+    },
+    set: {
+      value: function set(key, value, options) {
+        return this._cookies.set(key, value, options);
+      }
+    },
+    expire: {
+      value: function expire(key) {
+        return this._cookies.expire(key);
+      }
+    }
+  }, {
+    setCookieFactory: {
+      value: function setCookieFactory(value) {
+        cookieFactory = value;
+      }
+    }
+  });
+
+  return CookieStateSource;
+})(StateSource);
+
+function defaultCookieFactory() {
+  return require(81);
+}
+
+module.exports = CookieStateSource;
+
+},{"30":30,"81":81}],15:[function(require,module,exports){
+"use strict";
+
+var CookieStateSource = require(14);
+
+module.exports = function (marty) {
+  marty.registerStateSource("CookieStateSource", "cookie", CookieStateSource);
+};
+
+},{"14":14}],16:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var log = require(24);
+var uuid = require(40);
+var warnings = require(41);
+var resolve = require(38);
+var Environment = require(22);
+
+var DispatchCoordinator = (function () {
+  function DispatchCoordinator(type, options) {
+    _classCallCheck(this, DispatchCoordinator);
+
+    if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
+      log.warn("Warning: Options were not passed into an action creators' constructor");
+    }
+
+    options = options || {};
+
+    this.__type = type;
+    this.__context = options.context;
+    this.__id = uuid.type(this.__type);
+    this.__dispatcher = options.dispatcher;
+  }
+
+  _createClass(DispatchCoordinator, {
+    dispatch: {
+      value: function dispatch(type) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        return this.__dispatcher.dispatchAction({
+          type: type,
+          arguments: args
+        });
+      }
+    },
+    "for": {
+      value: function _for(obj) {
+        return resolve(this, obj);
+      }
+    },
+    context: {
+      get: function () {
+        return this.__context;
+      }
+    }
+  });
+
+  return DispatchCoordinator;
+})();
+
+module.exports = DispatchCoordinator;
+
+},{"22":22,"24":24,"38":38,"40":40,"41":41}],17:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var uuid = require(40);
+
+function ActionPayload(options) {
+  options || (options = {});
+
+  var stores = [];
+  var components = [];
+  var rollbackHandlers = [];
+  var actionHandledCallbacks = {};
+
+  _.extend(this, options);
+
+  this.id = options.id || uuid.small();
+  this.type = actionType(options.type);
+  this.arguments = _.toArray(options.arguments);
+
+  this.toJSON = toJSON;
+  this.handled = handled;
+  this.toString = toString;
+  this.rollback = rollback;
+  this.addStoreHandler = addStoreHandler;
+  this.onActionHandled = onActionHandled;
+  this.addRollbackHandler = addRollbackHandler;
+  this.addComponentHandler = addComponentHandler;
+  this.timestamp = options.timestamp || new Date();
+
+  Object.defineProperty(this, "stores", {
+    get: function get() {
+      return stores;
+    }
+  });
+
+  Object.defineProperty(this, "components", {
+    get: function get() {
+      return components;
+    }
+  });
+
+  function actionType(type) {
+    if (_.isFunction(type)) {
+      return type.toString();
+    }
+
+    return type;
+  }
+
+  function toString() {
+    return JSON.stringify(this.toJSON(), null, 2);
+  }
+
+  function toJSON() {
+    var json = _.pick(this, "id", "type", "stores", "arguments", "timestamp", "components");
+
+    return json;
+  }
+
+  function rollback() {
+    var _this = this;
+
+    _.each(rollbackHandlers, function (rollback) {
+      return rollback(_this.error);
+    });
+  }
+
+  function handled() {
+    _.each(actionHandledCallbacks, function (callback) {
+      return callback();
+    });
+  }
+
+  function onActionHandled(id, cb) {
+    actionHandledCallbacks[id] = cb;
+  }
+
+  function addComponentHandler(component, store) {
+    components.push(_.extend({
+      id: uuid.small(),
+      store: store.id || store.displayName
+    }, component));
+  }
+
+  function addStoreHandler(store, handlerName) {
+    stores.push({
+      id: uuid.small(),
+      handler: handlerName,
+      store: store.id || store.displayName
+    });
+  }
+
+  function addRollbackHandler(rollbackHandler, context) {
+    if (_.isFunction(rollbackHandler)) {
+      if (context) {
+        rollbackHandler = _.bind(rollbackHandler, context);
+      }
+
+      rollbackHandlers.push(rollbackHandler);
+    }
+  }
+}
+
+module.exports = ActionPayload;
+
+},{"40":40,"62":62}],18:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+
+function createClass(properties, defaultOptions, BaseType) {
+  function Class(options) {
+    classCallCheck(this, Class);
+    this.id = properties.id;
+    this.displayName = properties.displayName;
+
+    var base = get(Object.getPrototypeOf(Class.prototype), "constructor", this);
+    var baseOptions = _.extend({}, defaultOptions, options, properties);
+
+    if (defaultOptions.dispatcher) {
+      baseOptions.dispatcher = defaultOptions.dispatcher;
+    }
+
+    base.call(this, baseOptions);
+  }
+
+  if (BaseType) {
+    inherits(Class, BaseType);
+  }
+
+  _.extend(Class.prototype, properties);
+
+  Class.id = properties.id;
+  Class.displayName = properties.displayName;
+
+  return Class;
+}
+
+function get(_x, _x2, _x3) {
+  var _again = true;
+
+  _function: while (_again) {
+    _again = false;
+    var object = _x,
+        property = _x2,
+        receiver = _x3;
+    desc = parent = getter = undefined;
+
+    var desc = Object.getOwnPropertyDescriptor(object, property);
+    if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);
+      if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;
+        _x2 = property;
+        _x3 = receiver;
+        _again = true;
+        continue _function;
+      }
+    } else if ("value" in desc && desc.writable) {
+      return desc.value;
+    } else {
+      var getter = desc.get;
+      if (getter === undefined) {
+        return undefined;
+      }
+      return getter.call(receiver);
+    }
+  }
+}
+
+function inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+
+  if (superClass) {
+    subClass.__proto__ = superClass;
+  }
+}
+
+function classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+module.exports = createClass;
+
+},{"62":62}],19:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var uuid = require(40);
+var Dispatcher = require(82).Dispatcher;
+var ActionPayload = require(17);
+var EventEmitter = require(193);
+
+var ACTION_DISPATCHED = "ACTION_DISPATCHED";
+
+function createDispatcher() {
+  var emitter = new EventEmitter();
+  var dispatcher = new Dispatcher();
+
+  dispatcher.id = uuid.generate();
+  dispatcher.isDefault = false;
+  dispatcher.dispatchAction = function (options) {
+    var action = new ActionPayload(options);
+
+    this.dispatch(action);
+
+    action.handled();
+    emitter.emit(ACTION_DISPATCHED, action);
+
+    return action;
+  };
+
+  dispatcher.onActionDispatched = function (callback, context) {
+    if (context) {
+      callback = _.bind(callback, context);
+    }
+
+    emitter.on(ACTION_DISPATCHED, callback);
+
+    return {
+      dispose: function dispose() {
+        emitter.removeListener(ACTION_DISPATCHED, callback);
+      }
+    };
+  };
+
+  return dispatcher;
+}
+
+module.exports = createDispatcher;
+
+},{"17":17,"193":193,"40":40,"62":62,"82":82}],20:[function(require,module,exports){
+"use strict";
+
+var diagnostics = {
+  trace: trace,
+  enabled: false,
+  devtoolsEnabled: false };
+
+module.exports = diagnostics;
+
+function trace() {
+  if (diagnostics.enabled) {
+    console && console.log.apply(console, arguments);
+  }
+}
+
+},{}],21:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var log = require(24);
+var uuid = require(40);
+var warnings = require(41);
+var resolve = require(38);
+var Environment = require(22);
+
+var DispatchCoordinator = (function () {
+  function DispatchCoordinator(type, options) {
+    _classCallCheck(this, DispatchCoordinator);
+
+    if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
+      log.warn("Warning: Options were not passed into an action creators' constructor");
+    }
+
+    options = options || {};
+
+    this.__type = type;
+    this.__context = options.context;
+    this.__id = uuid.type(this.__type);
+    this.__dispatcher = options.dispatcher;
+  }
+
+  _createClass(DispatchCoordinator, {
+    dispatch: {
+      value: function dispatch(type) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        return this.__dispatcher.dispatchAction({
+          type: type,
+          arguments: args
+        });
+      }
+    },
+    "for": {
+      value: function _for(obj) {
+        return resolve(this, obj);
+      }
+    },
+    context: {
+      get: function () {
+        return this.__context;
+      }
+    }
+  });
+
+  return DispatchCoordinator;
+})();
+
+module.exports = DispatchCoordinator;
+
+},{"22":22,"24":24,"38":38,"40":40,"41":41}],22:[function(require,module,exports){
+"use strict";
+
+var windowDefined = typeof window !== "undefined";
+var environment = windowDefined ? "browser" : "server";
+
+module.exports = {
+  environment: environment,
+  isServer: environment === "server",
+  isBrowser: environment === "browser"
+};
+
+},{}],23:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var logger = require(24);
+var warnings = require(41);
+var diagnostics = require(20);
+var environment = require(22);
+var StateSource = require(30);
+var getClassName = require(35);
+var createStateSourceClass = require(29);
+
+module.exports = function (marty) {
+  marty.registerClass("StateSource", StateSource);
+
+  marty.register("logger", logger);
+  marty.register("dispose", dispose);
+  marty.register("warnings", warnings);
+  marty.register("register", register);
+  marty.register("diagnostics", diagnostics);
+  marty.register("createStateSource", createStateSource);
+
+  marty.registerProperty("isASingleton", {
+    get: function get() {
+      return !!this.__isASingleton;
+    },
+    set: function set(value) {
+      if (this.warnings.martyIsASingleton) {
+        logger.warn("Warning: Marty will no longer be a singleton in future releases " + "http://martyjs.org/guides/marty-is-a-singelton.html")["this"].__isASingleton = value;
+      }
+    }
+  });
+
+  _.each(environment, function (value, key) {
+    marty.register(key, value);
+  });
+
+  function dispose() {
+    this.registry.dispose();
+    this.dispatcher.dispose();
+  }
+
+  function createStateSource(properties) {
+    var BaseType = properties.type ? marty.stateSources[properties.type] : StateSource;
+
+    if (!BaseType) {
+      throw new Error("Unknown state source " + properties.type);
+    }
+
+    var StateSourceClass = createStateSourceClass(properties, BaseType);
+    var defaultInstance = this.register(StateSourceClass);
+
+    return defaultInstance;
+  }
+
+  function register(clazz, id) {
+    var className = getClassName(clazz);
+
+    if (!clazz.id) {
+      clazz.id = id || className;
+    }
+
+    if (!clazz.displayName) {
+      clazz.displayName = clazz.id;
+    }
+
+    return this.registry.register(clazz);
+  }
+};
+
+},{"20":20,"22":22,"24":24,"29":29,"30":30,"35":35,"41":41,"62":62}],24:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var Diagnostics = require(20);
+
+if (console) {
+  module.exports = console;
+  module.exports.trace = function trace() {
+    if (Diagnostics.enabled) {
+      console.log.apply(console, arguments);
+    }
+  };
+} else {
+  module.exports = {
+    log: _.noop,
+    warn: _.noop,
+    error: _.noop
+  };
+}
+
+},{"20":20,"62":62}],25:[function(require,module,exports){
+"use strict";
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _ = require(62);
+var Registry = require(28);
+var MartyBuilder = require(26);
+var createDispatcher = require(19);
+
+var Marty = function Marty(version, react) {
+  _classCallCheck(this, Marty);
+
+  var builder = new MartyBuilder(this);
+
+  this.version = version;
+  this.dispatcher = createDispatcher();
+  this.registry = new Registry({
+    defaultDispatcher: this.dispatcher
+  });
+
+  this.use = function use(cb) {
+    if (!_.isFunction(cb)) {
+      throw new Error("Must pass in a function");
+    }
+
+    cb(builder, react);
+  };
+};
+
+module.exports = Marty;
+
+},{"19":19,"26":26,"28":28,"62":62}],26:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var MartyBuilder = (function () {
+  function MartyBuilder(marty) {
+    _classCallCheck(this, MartyBuilder);
+
+    this._marty = marty;
+    this.stateSources = {};
+  }
+
+  _createClass(MartyBuilder, {
+    registerStateSource: {
+      value: function registerStateSource(id, stateSourceId, clazz) {
+        this.registerClass(id, clazz);
+        this.stateSources[stateSourceId] = clazz;
+      }
+    },
+    registerClass: {
+      value: function registerClass(id, clazz) {
+        this._marty[id] = clazz;
+        this._marty.registry.addClass(id, clazz);
+      }
+    },
+    registerProperty: {
+      value: function registerProperty(id, description) {
+        Object.defineProperty(this._marty, id, description);
+      }
+    },
+    register: {
+      value: function register(id, value) {
+        this._marty[id] = value;
+      }
+    }
+  });
+
+  return MartyBuilder;
+})();
+
+module.exports = MartyBuilder;
+
+},{}],27:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+
+module.exports = {
+  getItem: _.noop,
+  setItem: _.noop
+};
+
+},{"62":62}],28:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _ = require(62);
+var log = require(24);
+var warnings = require(41);
+var classId = require(33);
+var Environment = require(22);
+var humanStrings = require(37);
+
+var FUNCTIONS_TO_NOT_WRAP = ["fetch"];
+
+var Registry = (function () {
+  function Registry(options) {
+    _classCallCheck(this, Registry);
+
+    this.types = {};
+    this.classes = {};
+    this.defaults = {};
+    this.defaultDispatcher = options.defaultDispatcher;
+  }
+
+  _createClass(Registry, {
+    addClass: {
+      value: function addClass(id, clazz) {
+        this.classes[id] = clazz;
+        addClassHelper(this, id);
+      }
+    },
+    getClassId: {
+      value: function getClassId(obj) {
+        var id = _.findKey(this.classes, function (type) {
+          return obj instanceof type;
+        });
+
+        if (!id) {
+          throw new Error("Unknown type");
+        }
+
+        return id;
+      }
+    },
+    dispose: {
+      value: function dispose() {
+        this.types = {};
+      }
+    },
+    get: {
+      value: function get(type, id) {
+        return (this.types[type] || {})[id];
+      }
+    },
+    getAll: {
+      value: function getAll(type) {
+        return _.values(this.types[type] || {});
+      }
+    },
+    getDefault: {
+      value: function getDefault(type, id) {
+        return this.defaults[type][id];
+      }
+    },
+    getAllDefaults: {
+      value: function getAllDefaults(type) {
+        return _.values(this.defaults[type]);
+      }
+    },
+    register: {
+      value: function register(clazz) {
+        var defaultInstance = new clazz({
+          dispatcher: this.defaultDispatcher
+        });
+        var type = this.getClassId(defaultInstance);
+
+        defaultInstance.__isDefaultInstance = true;
+
+        if (!this.types[type]) {
+          this.types[type] = {};
+        }
+
+        if (!this.defaults[type]) {
+          this.defaults[type] = {};
+        }
+
+        var id = classId(clazz, type);
+
+        if (!id) {
+          throw CannotRegisterClassError(clazz, type);
+        }
+
+        if (this.types[type][id]) {
+          throw ClassAlreadyRegisteredWithId(clazz, type);
+        }
+
+        clazz.id = id;
+        defaultInstance.id = defaultInstance.id || id;
+        defaultInstance.type = clazz.type = type;
+
+        this.types[type][id] = clazz;
+
+        if (Environment.isServer) {
+          _.each(_.functions(defaultInstance), wrapResolverFunctions, defaultInstance);
+        }
+
+        this.defaults[type][id] = defaultInstance;
+
+        return defaultInstance;
+      }
+    },
+    resolve: {
+      value: function resolve(type, id, options) {
+        var clazz = (this.types[type] || {})[id];
+
+        if (!clazz) {
+          throw CannotFindTypeWithId(type, id);
+        }
+
+        return new clazz(options);
+      }
+    }
+  });
+
+  return Registry;
+})();
+
+module.exports = Registry;
+
+function wrapResolverFunctions(functionName) {
+  if (FUNCTIONS_TO_NOT_WRAP.indexOf(functionName) !== -1) {
+    return;
+  }
+
+  var instance = this;
+  var originalFunc = instance[functionName];
+
+  instance[functionName] = function () {
+    if (warnings.callingResolverOnServer && Environment.isServer) {
+      var type = instance.__type;
+      var displayName = instance.displayName || instance.id;
+      var warningMessage = "Warning: You are calling `" + functionName + "` on the static instance of the " + type + " " + ("'" + displayName + "'. You should resolve the instance for the current context");
+
+      log.warn(warningMessage);
+    }
+
+    return originalFunc.apply(instance, arguments);
+  };
+}
+
+function addClassHelper(registry, classId) {
+  var pluralClassId = classId;
+
+  if (pluralClassId[pluralClassId.length - 1] !== "s") {
+    pluralClassId += "s";
+  }
+
+  registry["get" + classId] = partial(registry.get, classId);
+  registry["resolve" + classId] = partial(registry.resolve, classId);
+  registry["getAll" + pluralClassId] = partial(registry.getAll, classId);
+  registry["getDefault" + classId] = partial(registry.getDefault, classId);
+  registry["getAllDefault" + pluralClassId] = partial(registry.getAllDefaults, classId);
+
+  function partial(func, type) {
+    return function () {
+      var args = _.toArray(arguments);
+      args.unshift(type);
+      return func.apply(this, args);
+    };
+  }
+}
+
+function CannotFindTypeWithId(type, id) {
+  return new Error("Could not find " + type + " with Id " + id);
+}
+
+function CannotRegisterClassError(clazz, type) {
+  var displayName = clazz.displayName || clazz.id;
+  var typeDisplayName = humanStrings[type] || type;
+  var warningPrefix = "Cannot register the " + typeDisplayName;
+
+  if (displayName) {
+    warningPrefix += " '" + displayName + "'";
+  }
+
+  return new Error("" + warningPrefix + " because it does not have an Id");
+}
+
+function ClassAlreadyRegisteredWithId(clazz, type) {
+  var displayName = clazz.displayName || clazz.id;
+  var typeDisplayName = humanStrings[type] || type;
+  var warningPrefix = "Cannot register the " + typeDisplayName;
+
+  if (displayName) {
+    warningPrefix += " '" + displayName + "'";
+  }
+
+  return new Error("" + warningPrefix + " because there is already a class with that Id.");
+}
+
+},{"22":22,"24":24,"33":33,"37":37,"41":41,"62":62}],29:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var createClass = require(18);
+
+function createStateSourceClass(properties, baseType) {
+  properties = properties || {};
+
+  var merge = [{}, properties].concat(properties.mixins || []);
+
+  properties = _.extend.apply(_, merge);
+
+  return createClass(properties, properties, baseType);
+}
+
+module.exports = createStateSourceClass;
+
+},{"18":18,"62":62}],30:[function(require,module,exports){
+"use strict";
+
+module.exports = require(31);
+
+},{"31":31}],31:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var log = require(24);
+var uuid = require(40);
+var warnings = require(41);
+var resolve = require(38);
+var Environment = require(22);
+
+var StateSource = (function () {
+  function StateSource(options) {
+    _classCallCheck(this, StateSource);
+
+    if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
+      log.warn("Warning: Options were not passed into a state source's constructor");
+    }
+
+    options = options || {};
+
+    this.__type = "StateSource";
+    this.__context = options.context;
+    this.__id = uuid.type(this.__type);
+  }
+
+  _createClass(StateSource, {
+    context: {
+      get: function () {
+        return this.__context;
+      }
+    },
+    "for": {
+      value: function _for(obj) {
+        return resolve(this, obj);
+      }
+    },
+    dispose: {
+      value: function dispose() {}
+    }
+  });
+
+  return StateSource;
+})();
+
+module.exports = StateSource;
+
+},{"22":22,"24":24,"38":38,"40":40,"41":41}],32:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var log = require(24);
+var _ = require(62);
+
+var StoreObserver = (function () {
+  function StoreObserver(options) {
+    var _this = this;
+
+    _classCallCheck(this, StoreObserver);
+
+    options = options || {};
+
+    this.component = options.component;
+    this.onStoreChanged = options.onStoreChanged || _.noop;
+
+    this.listeners = _.map(options.stores, function (store) {
+      return _this.listenToStore(store);
+    });
+  }
+
+  _createClass(StoreObserver, {
+    dispose: {
+      value: function dispose() {
+        _.invoke(this.listeners, "dispose");
+      }
+    },
+    listenToStore: {
+      value: function listenToStore(store) {
+        var _this = this;
+
+        var component = this.component;
+        var storeDisplayName = store.displayName || store.id;
+
+        log.trace("The " + component.displayName + " component  (" + component.id + ") is listening to the " + storeDisplayName + " store");
+
+        return store["for"](component).addChangeListener(function (state, store) {
+          var storeDisplayName = store.displayName || store.id;
+
+          log.trace("" + storeDisplayName + " store has changed. " + ("The " + _this.component.displayName + " component (" + _this.component.id + ") is updating"));
+
+          if (store && store.action) {
+            store.action.addComponentHandler({
+              displayName: _this.component.displayName
+            }, store);
+          }
+
+          _this.onStoreChanged(store);
+        });
+      }
+    }
+  });
+
+  return StoreObserver;
+})();
+
+module.exports = StoreObserver;
+
+},{"24":24,"62":62}],33:[function(require,module,exports){
+"use strict";
+
+var uuid = require(40);
+var log = require(24);
+var warnings = require(41);
+var humanStrings = require(37);
+
+function classId(clazz, type) {
+  if (clazz.id) {
+    return clazz.id;
+  }
+
+  var displayName = "";
+
+  if (clazz.displayName) {
+    displayName = "'" + clazz.displayName + "' ";
+  }
+
+  var typeDisplayName = humanStrings[type] || type;
+
+  if (warnings.classDoesNotHaveAnId) {
+    log.warn("Warning: The " + typeDisplayName + " " + displayName + "does not have an Id");
+  }
+
+  return clazz.displayName || uuid.generate();
+}
+
+module.exports = classId;
+
+},{"24":24,"37":37,"40":40,"41":41}],34:[function(require,module,exports){
+"use strict";
+
+function deferred() {
+  var result = {};
+  result.promise = new Promise(function (resolve, reject) {
+    result.resolve = resolve;
+    result.reject = reject;
+  });
+  return result;
+}
+
+module.exports = deferred;
+
+},{}],35:[function(require,module,exports){
+"use strict";
+
+var DEFAULT_CLASS_NAME = "Class";
+
+function getClassName(clazz) {
+  var className = clazz.name || clazz.constructor && clazz.constructor.name;
+
+  if (!className) {
+    var funcNameRegex = /function (.{1,})\(/;
+    var results = funcNameRegex.exec(clazz.toString());
+    className = results && results.length > 1 ? results[1] : "";
+  }
+
+  return className === DEFAULT_CLASS_NAME ? null : className;
+}
+
+module.exports = getClassName;
+
+},{}],36:[function(require,module,exports){
+"use strict";
+
+function getContext(obj) {
+  if (!obj) {
+    return;
+  }
+
+  if (isContext(obj)) {
+    return obj;
+  }
+
+  if (isContext(obj.context)) {
+    return obj.context;
+  }
+
+  if (obj.context && isContext(obj.context.marty)) {
+    return obj.context.marty;
+  }
+
+  function isContext(obj) {
+    return obj && obj.__isContext;
+  }
+}
+
+module.exports = getContext;
+
+},{}],37:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+  Store: "store",
+  StateSource: "state source",
+  ActionCreators: "action creators"
+};
+
+},{}],38:[function(require,module,exports){
+"use strict";
+
+var log = require(24);
+var warnings = require(41);
+var getContext = require(36);
+
+function resolve(obj, subject) {
+  var context = getContext(subject);
+
+  if (context) {
+    return context.resolve(obj);
+  }
+
+  if (!obj.__isDefaultInstance && warnings.cannotFindContext) {
+    log.warn("Warning: Could not find context in object", obj);
+  }
+
+  return obj;
+}
+
+module.exports = resolve;
+
+},{"24":24,"36":36,"41":41}],39:[function(require,module,exports){
+"use strict";
+
+function timeout(time) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, time);
+  });
+}
+
+module.exports = timeout;
+
+},{}],40:[function(require,module,exports){
+"use strict";
+
+function generate() {
+  return [s4(), s4(), "-", s4(), s4(), s4(), "-", s4(), s4(), s4()].join("");
+}
+
+function small() {
+  return s4() + s4() + s4() + s4();
+}
+
+function type(instanceType) {
+  return [instanceType, "-", s4(), s4(), s4(), s4()].join("");
+}
+
+function s4() {
+  return Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
+}
+
+module.exports = {
+  type: type,
+  small: small,
+  generate: generate
+};
+
+},{}],41:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+
+var warnings = {
+  without: without,
+  invokeConstant: true,
+  reservedFunction: true,
+  cannotFindContext: true,
+  martyIsASingelton: true,
+  classDoesNotHaveAnId: true,
+  stateIsNullOrUndefined: true,
+  callingResolverOnServer: true,
+  stateSourceAlreadyExists: true,
+  superNotCalledWithOptions: true,
+  promiseNotReturnedFromRemotely: true,
+  contextNotPassedInToConstructor: true
+};
+
+module.exports = warnings;
+
+function without(warningsToDisable, cb, context) {
+  if (!_.isArray(warningsToDisable)) {
+    warningsToDisable = [warningsToDisable];
+  }
+
+  if (context) {
+    cb = _.bind(cb, context);
+  }
+
+  try {
+    _.each(warningsToDisable, function (warning) {
+      warnings[warning] = false;
+    });
+
+    cb();
+  } finally {
+    _.each(warningsToDisable, function (warning) {
+      warnings[warning] = true;
+    });
+  }
+}
+
+},{"62":62}],42:[function(require,module,exports){
+"use strict";
+
+function ActionHandlerNotFoundError(actionHandler, store) {
+  this.name = "Action handler not found";
+  this.message = "The action handler \"" + actionHandler + "\" could not be found";
+
+  if (store) {
+    var displayName = store.displayName || store.id;
+    this.message += " in the " + displayName + " store";
+  }
+}
+
+ActionHandlerNotFoundError.prototype = Error.prototype;
+
+module.exports = ActionHandlerNotFoundError;
+
+},{}],43:[function(require,module,exports){
+"use strict";
+
+function ActionPredicateUndefinedError(actionHandler, store) {
+  this.name = "Action predicate undefined";
+  this.message = "The action predicate for \"" + actionHandler + "\" was undefined";
+
+  if (store) {
+    var displayName = store.displayName || store.id;
+    this.message += " in the " + displayName + " store";
+  }
+}
+
+ActionPredicateUndefinedError.prototype = Error.prototype;
+
+module.exports = ActionPredicateUndefinedError;
+
+},{}],44:[function(require,module,exports){
+"use strict";
+
+function CompoundError(errors) {
+  this.errors = errors;
+  this.name = "Compound error";
+}
+
+CompoundError.prototype = Error.prototype;
+
+module.exports = CompoundError;
+
+},{}],45:[function(require,module,exports){
+"use strict";
+
+function NotFoundError(message) {
+  this.name = "Not found";
+  this.message = message || "Not found";
+  this.status = 404;
+}
+
+NotFoundError.prototype = Error.prototype;
+
+module.exports = NotFoundError;
+
+},{}],46:[function(require,module,exports){
+"use strict";
+
+function UnkownStoreError(store) {
+  this.name = "Unknown store";
+  this.message = "Unknown store " + store;
+}
+
+UnkownStoreError.prototype = Error.prototype;
+
+module.exports = UnkownStoreError;
+
+},{}],47:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+  id: "includeCredentials",
+  before: function before(req) {
+    // Enable sending Cookies for authentication.
+    // Ref: https://fetch.spec.whatwg.org/#concept-request-credentials-mode
+    req.credentials = "same-origin";
+  }
+};
+
+},{}],48:[function(require,module,exports){
+"use strict";
+
+var CONTENT_TYPE = "Content-Type";
+var JSON_CONTENT_TYPE = "application/json";
+var _ = require(62);
+
+module.exports = {
+  id: "parseJSON",
+  after: function after(res) {
+    if (isJson(res)) {
+      return res.json().then(function (body) {
+        res.body = body;
+
+        return res;
+      });
+    }
+
+    return res;
+  }
+};
+
+function isJson(res) {
+  var contentTypes = res.headers.get(CONTENT_TYPE);
+
+  if (!_.isArray(contentTypes)) {
+    if (contentTypes === undefined || contentTypes === null) {
+      contentTypes = [];
+    } else {
+      contentTypes = [contentTypes];
+    }
+  }
+
+  return _.any(contentTypes, function (contentType) {
+    return contentType.indexOf(JSON_CONTENT_TYPE) !== -1;
+  });
+}
+
+},{"62":62}],49:[function(require,module,exports){
+"use strict";
+
+var CONTENT_TYPE = "Content-Type";
+var JSON_CONTENT_TYPE = "application/json";
+var _ = require(62);
+
+module.exports = {
+  id: "stringifyJSON",
+  before: function before(req) {
+    var contentType = req.headers[CONTENT_TYPE] || JSON_CONTENT_TYPE;
+
+    if (typeof FormData !== "undefined" && req.body instanceof FormData) {
+      return;
+    }
+
+    if (contentType === JSON_CONTENT_TYPE && _.isObject(req.body)) {
+      req.body = JSON.stringify(req.body);
+      req.headers[CONTENT_TYPE] = JSON_CONTENT_TYPE;
+    }
+  }
+};
+
+},{"62":62}],50:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var hooks = {};
+var log = require(24);
+var _ = require(62);
+var StateSource = require(30);
+var accepts = {
+  html: "text/html",
+  text: "text/plain",
+  json: "application/json",
+  xml: "application/xml, text/xml",
+  script: "text/javascript, application/javascript, application/x-javascript" };
+
+var HttpStateSource = (function (_StateSource) {
+  function HttpStateSource(options) {
+    _classCallCheck(this, HttpStateSource);
+
+    _get(Object.getPrototypeOf(HttpStateSource.prototype), "constructor", this).call(this, options);
+    this._isHttpStateSource = true;
+  }
+
+  _inherits(HttpStateSource, _StateSource);
+
+  _createClass(HttpStateSource, {
+    request: {
+      value: function request(req) {
+        var _this = this;
+
+        if (!req.headers) {
+          req.headers = {};
+        }
+
+        beforeRequest(this, req);
+
+        return fetch(req.url, req).then(function (res) {
+          return afterRequest(_this, res);
+        });
+      }
+    },
+    get: {
+      value: function get(options) {
+        return this.request(requestOptions("GET", this, options));
+      }
+    },
+    put: {
+      value: function put(options) {
+        return this.request(requestOptions("PUT", this, options));
+      }
+    },
+    post: {
+      value: function post(options) {
+        return this.request(requestOptions("POST", this, options));
+      }
+    },
+    "delete": {
+      value: function _delete(options) {
+        return this.request(requestOptions("DELETE", this, options));
+      }
+    },
+    patch: {
+      value: function patch(options) {
+        return this.request(requestOptions("PATCH", this, options));
+      }
+    }
+  }, {
+    addHook: {
+      value: function addHook(hook) {
+        if (hook) {
+          if (_.isUndefined(hook.priority)) {
+            hook.priority = Object.keys(hooks).length;
+          }
+
+          hooks[hook.id] = hook;
+        }
+      }
+    },
+    removeHook: {
+      value: function removeHook(hook) {
+        if (hook) {
+          delete hooks[hook.id];
+        }
+      }
+    },
+    defaultBaseUrl: {
+      get: function () {
+        return "";
+      }
+    }
+  });
+
+  return HttpStateSource;
+})(StateSource);
+
+HttpStateSource.addHook(require(48));
+HttpStateSource.addHook(require(49));
+HttpStateSource.addHook(require(47));
+
+module.exports = HttpStateSource;
+
+function requestOptions(method, source, options) {
+  var baseUrl = source.baseUrl || HttpStateSource.defaultBaseUrl;
+
+  if (_.isString(options)) {
+    options = _.extend({
+      url: options
+    });
+  }
+
+  _.defaults(options, {
+    headers: {}
+  });
+
+  options.method = method.toLowerCase();
+
+  if (baseUrl) {
+    var separator = "";
+    var firstCharOfUrl = options.url[0];
+    var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
+
+    // Do some text wrangling to make sure concatenation of base url
+    // stupid people (i.e. me)
+    if (lastCharOfBaseUrl !== "/" && firstCharOfUrl !== "/") {
+      separator = "/";
+    } else if (lastCharOfBaseUrl === "/" && firstCharOfUrl === "/") {
+      options.url = options.url.substring(1);
+    }
+
+    options.url = baseUrl + separator + options.url;
+  }
+
+  if (options.contentType) {
+    options.headers["Content-Type"] = options.contentType;
+  }
+
+  if (options.dataType) {
+    var contentType = accepts[options.dataType];
+
+    if (!contentType) {
+      log.warn("Unknown data type " + options.dataType);
+    } else {
+      options.headers.Accept = contentType;
+    }
+  }
+
+  return options;
+}
+
+function beforeRequest(source, req) {
+  _.each(getHooks("before"), function (hook) {
+    try {
+      hook.before.call(source, req);
+    } catch (e) {
+      log.error("Failed to execute hook before http request", e, hook);
+      throw e;
+    }
+  });
+}
+
+function afterRequest(source, res) {
+  var current;
+
+  _.each(getHooks("after"), function (hook) {
+    var execute = function execute(res) {
+      try {
+        return hook.after.call(source, res);
+      } catch (e) {
+        log.error("Failed to execute hook after http response", e, hook);
+        throw e;
+      }
+    };
+
+    if (current) {
+      current = current.then(function (res) {
+        return execute(res);
+      });
+    } else {
+      current = execute(res);
+
+      if (current && !_.isFunction(current.then)) {
+        current = Promise.resolve(current);
+      }
+    }
+  });
+
+  return current || res;
+}
+
+function getHooks(func) {
+  return _.sortBy(_.filter(hooks, has(func)), priority);
+
+  function priority(hook) {
+    return hook.priority;
+  }
+
+  function has(func) {
+    return function (hook) {
+      return hook && _.isFunction(hook[func]);
+    };
+  }
+}
+
+},{"24":24,"30":30,"47":47,"48":48,"49":49,"62":62}],51:[function(require,module,exports){
+"use strict";
+
+var HttpStateSource = require(50);
+
+module.exports = function (marty) {
+  marty.registerStateSource("HttpStateSource", "http", HttpStateSource);
+};
+
+},{"50":50}],52:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _ = require(62);
+var uuid = require(40);
+var timeout = require(39);
+var deferred = require(34);
+var FetchDiagnostics = require(53);
+var createDispatcher = require(19);
+
+var DEFAULT_TIMEOUT = 1000;
+
+var Context = (function () {
+  function Context(registry) {
+    var _this = this;
+
+    _classCallCheck(this, Context);
+
+    this.instances = {};
+    this.__isContext = true;
+    this.id = uuid.type("Context");
+    this.dispatcher = createDispatcher();
+
+    _.each((registry || {}).types, function (classes, type) {
+      var options = {
+        context: _this,
+        dispatcher: _this.dispatcher
+      };
+
+      _this.instances[type] = {};
+
+      _.each(classes, function (clazz) {
+        _this.instances[type][clazz.id] = registry.resolve(type, clazz.id, options);
+      });
+    });
+  }
+
+  _createClass(Context, {
+    fetch: {
+      value: function fetch(cb, options) {
+        var _this = this;
+
+        var fetchDone;
+
+        options = _.defaults(options || {}, {
+          timeout: DEFAULT_TIMEOUT
+        });
+
+        this.__deferredFetchDone = deferred();
+        this.__diagnostics = new FetchDiagnostics();
+        fetchDone = this.__deferredFetchDone.promise;
+
+        try {
+          cb.call(this);
+        } catch (e) {
+          this.__deferredFetchDone.reject(e);
+
+          return fetchDone;
+        }
+
+        if (!this.__diagnostics.hasPendingFetches) {
+          this.__deferredFetchDone.resolve();
+        }
+
+        return Promise.race([fetchDone, timeout(options.timeout)]).then(function () {
+          return _this.__diagnostics.toJSON();
+        });
+      }
+    },
+    fetchStarted: {
+      value: function fetchStarted(storeId, fetchId) {
+        var diagnostics = this.__diagnostics;
+
+        diagnostics.fetchStarted(storeId, fetchId);
+      }
+    },
+    fetchDone: {
+      value: function fetchDone(storeId, fetchId, status, options) {
+        var diagnostics = this.__diagnostics;
+
+        diagnostics.fetchDone(storeId, fetchId, status, options);
+
+        if (!diagnostics.hasPendingFetches) {
+          this.__deferredFetchDone.resolve();
+        }
+      }
+    },
+    dispose: {
+      value: function dispose() {
+        _.each(this.instances, function (instances) {
+          _.each(instances, function (instance) {
+            if (_.isFunction(instance.dispose)) {
+              instance.dispose();
+            }
+          });
+        });
+
+        this.instances = null;
+        this.dispatcher = null;
+      }
+    },
+    resolve: {
+      value: function resolve(obj) {
+        if (!obj.constructor) {
+          throw new Error("Cannot resolve object");
+        }
+
+        var id = obj.constructor.id;
+        var type = obj.constructor.type;
+
+        if (!this.instances[type]) {
+          throw new Error("Context does not have any instances of " + type);
+        }
+
+        if (!this.instances[type][id]) {
+          throw new Error("Context does not have an instance of the " + type + " id");
+        }
+
+        return this.instances[type][id];
+      }
+    },
+    getAll: {
+      value: function getAll(type) {
+        return _.values(this.instances[type]);
+      }
+    },
+    getAllStores: {
+      value: function getAllStores() {
+        return this.getAll("Store");
+      }
+    },
+    getAllStateSources: {
+      value: function getAllStateSources() {
+        return this.getAll("StateSource");
+      }
+    },
+    getAllActionCreators: {
+      value: function getAllActionCreators() {
+        return this.getAll("ActionCreators");
+      }
+    },
+    getAllQueries: {
+      value: function getAllQueries() {
+        return this.getAll("Queries");
+      }
+    }
+  });
+
+  return Context;
+})();
+
+module.exports = Context;
+
+},{"19":19,"34":34,"39":39,"40":40,"53":53,"62":62}],53:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _ = require(62);
+
+var FetchDiagnostics = (function () {
+  function FetchDiagnostics() {
+    _classCallCheck(this, FetchDiagnostics);
+
+    this.numberOfPendingFetches = 0;
+    this.fetches = [];
+  }
+
+  _createClass(FetchDiagnostics, {
+    fetchStarted: {
+      value: function fetchStarted(storeId, fetchId) {
+        this.numberOfPendingFetches++;
+        this.fetches.push({
+          status: "PENDING",
+          storeId: storeId,
+          fetchId: fetchId,
+          startTime: new Date()
+        });
+      }
+    },
+    fetchDone: {
+      value: function fetchDone(storeId, fetchId, status, options) {
+        var fetch = _.find(this.fetches, {
+          storeId: storeId,
+          fetchId: fetchId
+        });
+
+        if (fetch) {
+          _.extend(fetch, {
+            status: status,
+            time: new Date() - fetch.startTime
+          }, options);
+
+          this.numberOfPendingFetches--;
+        }
+      }
+    },
+    hasPendingFetches: {
+      get: function () {
+        return this.numberOfPendingFetches > 0;
+      }
+    },
+    toJSON: {
+      value: function toJSON() {
+        return _.map(this.fetches, fetchWithTime);
+
+        function fetchWithTime(fetch) {
+          if (_.isUndefined(fetch.time)) {
+            fetch.time = new Date() - fetch.startTime;
+          }
+
+          delete fetch.startTime;
+
+          return fetch;
+        }
+      }
+    }
+  });
+
+  return FetchDiagnostics;
+})();
+
+module.exports = FetchDiagnostics;
+
+},{"62":62}],54:[function(require,module,exports){
+"use strict";
+
+var Context = require(52);
+var renderToString = require(55);
+
+module.exports = function (marty, React) {
+  marty.register("createContext", createContext);
+  marty.register("renderToString", renderToString(React));
+
+  function createContext() {
+    return new Context(this.registry);
+  }
+};
+
+},{"52":52,"55":55}],55:[function(require,module,exports){
+"use strict";
+
+var Context = require(52);
+var _ = require(62);
+
+// React is passed down to us so we can't require it in
+module.exports = function (React) {
+  return function renderToString(options) {
+    options = options || {};
+
+    var Marty = this;
+    var context = options.context;
+    var fetchOptions = { timeout: options.timeout };
+
+    return new Promise(function (resolve, reject) {
+      if (!options.type) {
+        reject(new Error("Must pass in a React component type"));
+        return;
+      }
+
+      if (!context) {
+        reject(new Error("Must pass in a context"));
+        return;
+      }
+
+      if (!context instanceof Context) {
+        reject(new Error("context must be an instance of Context"));
+        return;
+      }
+
+      startFetches().then(dehydrateAndRenderHtml);
+
+      function dehydrateAndRenderHtml(diagnostics) {
+        context.fetch(function () {
+          try {
+            var element = createElement();
+
+            if (!element) {
+              reject(new Error("createElement must return an element"));
+              return;
+            }
+
+            var html = React.renderToString(element);
+            html += dehydratedState(context);
+            resolve({
+              html: html,
+              diagnostics: diagnostics
+            });
+          } catch (e) {
+            reject(e);
+          } finally {
+            context.dispose();
+          }
+        }, fetchOptions);
+      }
+
+      function startFetches() {
+        return context.fetch(function () {
+          try {
+            var element = createElement();
+
+            if (!element) {
+              reject(new Error("createElement must return an element"));
+              return;
+            }
+
+            React.renderToString(element);
+          } catch (e) {
+            reject(e);
+          }
+        }, fetchOptions);
+      }
+
+      function createElement() {
+        var ContextContainer = React.createClass({
+          displayName: "ContextContainer",
+
+          childContextTypes: {
+            marty: React.PropTypes.object.isRequired
+          },
+          getChildContext: function getChildContext() {
+            return {
+              marty: context
+            };
+          },
+          render: function render() {
+            var props = _.extend({}, options.props, { ref: "subject" });
+
+            return React.createElement(options.type, props);
+          }
+        });
+
+        return React.createElement(ContextContainer);
+      }
+
+      function dehydratedState(context) {
+        var state = Marty.dehydrate(context);
+
+        return "<script id=\"__marty-state\">" + state + "</script>";
+      }
+    });
+  };
+};
+
+},{"52":52,"62":62}],56:[function(require,module,exports){
+"use strict";
+
+var JSONStorageStateSource = require(57);
+
+module.exports = function (marty) {
+  marty.registerStateSource("JSONStorageStateSource", "jsonStorage", JSONStorageStateSource);
+};
+
+},{"57":57}],57:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var noopStorage = require(27);
+var StateSource = require(30);
+
+var JSONStorageStateSource = (function (_StateSource) {
+  function JSONStorageStateSource(options) {
+    _classCallCheck(this, JSONStorageStateSource);
+
+    _get(Object.getPrototypeOf(JSONStorageStateSource.prototype), "constructor", this).call(this, options);
+    this._isJSONStorageStateSource = true;
+
+    if (!this.storage) {
+      this.storage = JSONStorageStateSource.defaultStorage;
+    }
+  }
+
+  _inherits(JSONStorageStateSource, _StateSource);
+
+  _createClass(JSONStorageStateSource, {
+    get: {
+      value: function get(key) {
+        var raw = getStorage(this).getItem(getNamespacedKey(this, key));
+
+        if (!raw) {
+          return raw;
+        }
+
+        try {
+          var payload = JSON.parse(raw);
+          return payload.value;
+        } catch (e) {
+          throw new Error("Unable to parse JSON from storage");
+        }
+      }
+    },
+    set: {
+      value: function set(key, value) {
+        // Wrap the value in an object so as to preserve it's type
+        // during serialization.
+        var payload = {
+          value: value
+        };
+        var raw = JSON.stringify(payload);
+        getStorage(this).setItem(getNamespacedKey(this, key), raw);
+      }
+    }
+  }, {
+    defaultNamespace: {
+      get: function () {
+        return "";
+      }
+    },
+    defaultStorage: {
+      get: function () {
+        return typeof window === "undefined" ? noopStorage : window.localStorage;
+      }
+    }
+  });
+
+  return JSONStorageStateSource;
+})(StateSource);
+
+function getNamespacedKey(source, key) {
+  return getNamespace(source) + key;
+}
+
+function getNamespace(source) {
+  return source.namespace || JSONStorageStateSource.defaultNamespace;
+}
+
+function getStorage(source) {
+  return source.storage || JSONStorageStateSource.defaultStorage || noopStorage;
+}
+
+module.exports = JSONStorageStateSource;
+
+},{"27":27,"30":30}],58:[function(require,module,exports){
+"use strict";
+
+var LocalStorageStateSource = require(59);
+
+module.exports = function (marty) {
+  marty.registerStateSource("LocalStorageStateSource", "localStorage", LocalStorageStateSource);
+};
+
+},{"59":59}],59:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var noopStorage = require(27);
+var StateSource = require(30);
+
+var LocalStorageStateSource = (function (_StateSource) {
+  function LocalStorageStateSource(options) {
+    _classCallCheck(this, LocalStorageStateSource);
+
+    _get(Object.getPrototypeOf(LocalStorageStateSource.prototype), "constructor", this).call(this, options);
+    this._isLocalStorageStateSource = true;
+    this.storage = typeof window === "undefined" ? noopStorage : window.localStorage;
+  }
+
+  _inherits(LocalStorageStateSource, _StateSource);
+
+  _createClass(LocalStorageStateSource, {
+    get: {
+      value: function get(key) {
+        return this.storage.getItem(getNamespacedKey(this, key));
+      }
+    },
+    set: {
+      value: function set(key, value) {
+        return this.storage.setItem(getNamespacedKey(this, key), value);
+      }
+    }
+  }, {
+    defaultNamespace: {
+      get: function () {
+        return "";
+      }
+    }
+  });
+
+  return LocalStorageStateSource;
+})(StateSource);
+
+function getNamespacedKey(source, key) {
+  return getNamespace(source) + key;
+}
+
+function getNamespace(source) {
+  return source.namespace || LocalStorageStateSource.defaultNamespace;
+}
+
+module.exports = LocalStorageStateSource;
+
+},{"27":27,"30":30}],60:[function(require,module,exports){
+"use strict";
+
+var LocationStateSource = require(61);
+
+module.exports = function (marty) {
+  marty.registerStateSource("LocationStateSource", "location", LocationStateSource);
+};
+
+},{"61":61}],61:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _ = require(62);
+var StateSource = require(30);
+var locationFactory = defaultLocationFactory;
+
+var LocationStateSource = (function (_StateSource) {
+  function LocationStateSource(options) {
+    _classCallCheck(this, LocationStateSource);
+
+    _get(Object.getPrototypeOf(LocationStateSource.prototype), "constructor", this).call(this, options);
+    this._isLocationStateSource = true;
+  }
+
+  _inherits(LocationStateSource, _StateSource);
+
+  _createClass(LocationStateSource, {
+    getLocation: {
+      value: function getLocation(location) {
+        return locationFactory(this.context, location);
+      }
+    }
+  }, {
+    setLocationFactory: {
+      value: function setLocationFactory(value) {
+        locationFactory = value;
+      }
+    }
+  });
+
+  return LocationStateSource;
+})(StateSource);
+
+module.exports = LocationStateSource;
+
+function defaultLocationFactory(context, location) {
+  var l = location || window.location;
+
+  return {
+    url: l.url,
+    path: l.pathname,
+    hostname: l.hostname,
+    query: query(l.search),
+    protocol: l.protocol.replace(":", "")
+  };
+
+  function query(search) {
+    var result = {};
+
+    _.each(search.substr(1).split("&"), function (part) {
+      var item = part.split("=");
+      result[item[0]] = decodeURIComponent(item[1]);
+    });
+
+    return result;
+  }
+}
+
+},{"30":30,"62":62}],62:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+  any: require(108),
+  bind: require(139),
+  defaults: require(178),
+  each: require(96),
+  extend: require(177),
+  find: require(95),
+  findKey: require(179),
+  first: require(88),
+  rest: require(91),
+  has: require(181),
+  initial: require(89),
+  isArray: require(168),
+  isFunction: require(128),
+  isNull: require(171),
+  isObject: require(172),
+  isString: require(173),
+  isUndefined: require(175),
+  last: require(90),
+  map: require(98),
+  matches: require(191),
+  noop: require(192),
+  object: require(93),
+  omit: require(184),
+  pick: require(185),
+  toArray: require(176),
+  union: require(92),
+  values: require(186),
+  once: require(101),
+  filter: require(94),
+  invoke: require(97),
+  sortBy: require(99),
+  functions: require(180),
+  difference: require(85) };
+
+},{"101":101,"108":108,"128":128,"139":139,"168":168,"171":171,"172":172,"173":173,"175":175,"176":176,"177":177,"178":178,"179":179,"180":180,"181":181,"184":184,"185":185,"186":186,"191":191,"192":192,"85":85,"88":88,"89":89,"90":90,"91":91,"92":92,"93":93,"94":94,"95":95,"96":96,"97":97,"98":98,"99":99}],63:[function(require,module,exports){
+"use strict";
+
+var Queries = require(65);
+var _ = require(62);
+var createClass = require(18);
+
+var RESERVED_KEYWORDS = ["dispatch"];
+
+function createQueriesClass(properties) {
+  _.extend.apply(_, [properties].concat(properties.mixins));
+  _.each(RESERVED_KEYWORDS, function (keyword) {
+    if (properties[keyword]) {
+      throw new Error("" + keyword + " is a reserved keyword");
+    }
+  });
+
+  var classProperties = _.omit(properties, "mixins", "types");
+
+  return createClass(classProperties, properties, Queries);
+}
+
+module.exports = createQueriesClass;
+
+},{"18":18,"62":62,"65":65}],64:[function(require,module,exports){
+"use strict";
+
+var Queries = require(65);
+var createQueriesClass = require(63);
+
+module.exports = function (marty) {
+  marty.registerClass("Queries", Queries);
+  marty.register("createQueries", createQueries);
+
+  function createQueries(properties) {
+    var QueriesClass = createQueriesClass(properties);
+    var defaultInstance = this.register(QueriesClass);
+
+    return defaultInstance;
+  }
+};
+
+},{"63":63,"65":65}],65:[function(require,module,exports){
+"use strict";
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var DispatchCoordinator = require(16);
+
+var Queries = (function (_DispatchCoordinator) {
+  function Queries(options) {
+    _classCallCheck(this, Queries);
+
+    _get(Object.getPrototypeOf(Queries.prototype), "constructor", this).call(this, "Queries", options);
+  }
+
+  _inherits(Queries, _DispatchCoordinator);
+
+  return Queries;
+})(DispatchCoordinator);
+
+module.exports = Queries;
+
+},{"16":16}],66:[function(require,module,exports){
+"use strict";
+
+var SessionStorageStateSource = require(67);
+
+module.exports = function (marty) {
+  marty.registerStateSource("SessionStorageStateSource", "sessionStorage", SessionStorageStateSource);
+};
+
+},{"67":67}],67:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var noopStorage = require(27);
+var StateSource = require(30);
+
+var SessionStorageStateSource = (function (_StateSource) {
+  function SessionStorageStateSource(options) {
+    _classCallCheck(this, SessionStorageStateSource);
+
+    _get(Object.getPrototypeOf(SessionStorageStateSource.prototype), "constructor", this).call(this, options);
+    this._isSessionStorageStateSource = true;
+    this.storage = typeof window === "undefined" ? noopStorage : window.sessionStorage;
+  }
+
+  _inherits(SessionStorageStateSource, _StateSource);
+
+  _createClass(SessionStorageStateSource, {
+    get: {
+      value: function get(key) {
+        return this.storage.getItem(getNamespacedKey(this, key));
+      }
+    },
+    set: {
+      value: function set(key, value) {
+        return this.storage.setItem(getNamespacedKey(this, key), value);
+      }
+    }
+  }, {
+    defaultNamespace: {
+      get: function () {
+        return "";
+      }
+    }
+  });
+
+  return SessionStorageStateSource;
+})(StateSource);
+
+function getNamespacedKey(source, key) {
+  return getNamespace(source) + key;
+}
+
+function getNamespace(source) {
+  return source.namespace || SessionStorageStateSource.defaultNamespace;
+}
+
+module.exports = SessionStorageStateSource;
+
+},{"27":27,"30":30}],68:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var StateMixin = require(69);
+
+module.exports = function (marty, React) {
+  marty.register("createStateMixin", createStateMixin);
+
+  function createStateMixin(options) {
+    return new StateMixin(_.defaults(options, {
+      React: React
+    }));
+  }
+};
+
+},{"62":62,"69":69}],69:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var uuid = require(40);
+var StoreObserver = require(32);
+var reservedKeys = ["listenTo", "getState", "getInitialState"];
+
+function StateMixin(options) {
+  var config, instanceMethods;
+
+  if (!options) {
+    throw new Error("The state mixin is expecting some options");
+  }
+
+  var React = options.React;
+
+  if (isStore(options)) {
+    config = storeMixinConfig(options);
+  } else {
+    config = simpleMixinConfig(options);
+    instanceMethods = _.omit(options, reservedKeys);
+  }
+
+  var mixin = _.extend({
+    contextTypes: {
+      marty: React.PropTypes.object
+    },
+    componentDidMount: function componentDidMount() {
+      var component = {
+        id: this.__id,
+        displayName: this.displayName || this.constructor.displayName };
+
+      this.__observer = new StoreObserver({
+        component: component,
+        stores: config.stores,
+        onStoreChanged: this.onStoreChanged
+      });
+    },
+    onStoreChanged: function onStoreChanged() {
+      this.setState(this.getState());
+    },
+    componentWillUnmount: function componentWillUnmount() {
+      if (this.__observer) {
+        this.__observer.dispose();
+      }
+    },
+    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+      var oldProps = this.props;
+      this.props = nextProps;
+
+      var newState = this.getState();
+
+      this.props = oldProps;
+      this.setState(newState);
+    },
+    getState: function getState() {
+      return config.getState(this);
+    },
+    getInitialState: function getInitialState() {
+      var el = this._currentElement;
+
+      if (!this.displayName && el && el.type) {
+        this.displayName = el.type.displayName;
+      }
+
+      this.state = {};
+      this.__id = uuid.type("Component");
+
+      if (options.getInitialState) {
+        this.state = options.getInitialState();
+      }
+
+      this.state = _.extend(this.state, this.getState());
+
+      return this.state;
+    }
+  }, instanceMethods);
+
+  return mixin;
+
+  function storeMixinConfig(store) {
+    return {
+      stores: [store],
+      getState: function getState() {
+        return store.getState();
+      }
+    };
+  }
+
+  function simpleMixinConfig(options) {
+    var stores = options.listenTo || [];
+    var storesToGetStateFrom = findStoresToGetStateFrom(options);
+
+    if (!_.isArray(stores)) {
+      stores = [stores];
+    }
+
+    if (!areStores(stores)) {
+      throw new Error("Can only listen to stores");
+    }
+
+    stores = stores.concat(_.values(storesToGetStateFrom));
+
+    return {
+      stores: stores,
+      getState: getState
+    };
+
+    function getState(view) {
+      var state = _.object(_.map(storesToGetStateFrom, getStateFromStore));
+
+      if (options.getState) {
+        state = _.extend(state, options.getState.call(view));
+      }
+
+      return state;
+
+      function getStateFromStore(store, name) {
+        return [name, store.getState()];
+      }
+    }
+
+    function findStoresToGetStateFrom(options) {
+      var storesToGetStateFrom = {};
+      _.each(options, function (value, key) {
+        if (reservedKeys.indexOf(key) === -1 && isStore(value)) {
+          storesToGetStateFrom[key] = value;
+        }
+      });
+
+      return storesToGetStateFrom;
+    }
+  }
+
+  function areStores(stores) {
+    for (var i = stores.length - 1; i >= 0; i--) {
+      if (!isStore(stores[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function isStore(store) {
+    return store.getState && store.addChangeListener;
+  }
+}
+
+module.exports = StateMixin;
+
+},{"32":32,"40":40,"62":62}],70:[function(require,module,exports){
+"use strict";
+
+var log = require(24);
+var Store = require(76);
+var _ = require(62);
+var warnings = require(41);
+var createClass = require(18);
+
+var RESERVED_FUNCTIONS = ["getState"];
+var VIRTUAL_FUNCTIONS = ["clear", "dispose"];
+
+function createStoreClass(properties) {
+  validateStoreOptions(properties);
+  addMixins(properties);
+
+  var overrideFunctions = getOverrideFunctions(properties);
+  var functionsToOmit = _.union(VIRTUAL_FUNCTIONS, RESERVED_FUNCTIONS);
+  var classProperties = _.extend(_.omit(properties, functionsToOmit), overrideFunctions);
+
+  return createClass(classProperties, classProperties, Store);
+}
+
+function getOverrideFunctions(properties) {
+  var overrideFunctions = _.pick(properties, VIRTUAL_FUNCTIONS);
+
+  _.each(_.functions(overrideFunctions), function (name) {
+    var override = overrideFunctions[name];
+
+    overrideFunctions[name] = function () {
+      Store.prototype[name].call(this);
+      override.call(this);
+    };
+  });
+
+  return overrideFunctions;
+}
+
+function addMixins(properties) {
+  var handlers = _.map(properties.mixins, function (mixin) {
+    return mixin.handlers;
+  });
+
+  var mixins = _.map(properties.mixins, function (mixin) {
+    return _.omit(mixin, "handlers");
+  });
+
+  _.extend.apply(_, [properties].concat(mixins));
+  _.extend.apply(_, [properties.handlers].concat(handlers));
+}
+
+function validateStoreOptions(properties) {
+  var displayName = properties.displayName;
+
+  _.each(RESERVED_FUNCTIONS, function (functionName) {
+    if (properties[functionName]) {
+      if (displayName) {
+        functionName += " in " + displayName;
+      }
+
+      if (warnings.reservedFunction) {
+        log.warn("Warning: " + functionName + " is reserved for use by Marty. Please use a different name");
+      }
+    }
+  });
+}
+
+module.exports = createStoreClass;
+
+},{"18":18,"24":24,"41":41,"62":62,"76":76}],71:[function(require,module,exports){
+"use strict";
+
+var when = require(80);
+var NotFoundError = require(45);
+
+module.exports = {
+  done: done,
+  failed: failed,
+  pending: pending,
+  notFound: notFound
+};
+
+function pending(id, store) {
+  return fetchResult({
+    id: id,
+    pending: true,
+    status: "PENDING"
+  }, store);
+}
+
+function failed(error, id, store) {
+  return fetchResult({
+    id: id,
+    error: error,
+    failed: true,
+    status: "FAILED"
+  }, store);
+}
+
+function done(result, id, store) {
+  return fetchResult({
+    id: id,
+    done: true,
+    status: "DONE",
+    result: result
+  }, store);
+}
+
+function notFound(id, store) {
+  return failed(new NotFoundError(), id, store);
+}
+
+function fetchResult(initialResult, store) {
+  initialResult.when = when;
+  initialResult.toPromise = toPromise;
+  initialResult._isFetchResult = true;
+
+  if (store) {
+    initialResult.store = store.displayName || store.id;
+  }
+
+  return initialResult;
+
+  function toPromise() {
+    return new Promise(function (resolve, reject) {
+      var listener;
+
+      if (!tryResolveFetch(initialResult) && store) {
+        listener = store.addFetchChangedListener(tryResolveFetch);
+      }
+
+      function tryResolveFetch(latestResult) {
+        if (latestResult.id !== initialResult.id) {
+          return;
+        }
+
+        if (latestResult.done) {
+          initialResult.done = true;
+          initialResult.pending = false;
+          initialResult.status = "DONE";
+          initialResult.result = latestResult.result;
+
+          resolve(latestResult.result);
+        } else if (latestResult.failed) {
+          initialResult.failed = true;
+          initialResult.pending = false;
+          initialResult.status = "FAILED";
+          initialResult.error = latestResult.error;
+
+          reject(latestResult.error);
+        } else {
+          return false;
+        }
+
+        if (listener) {
+          listener.dispose();
+        }
+
+        return true;
+      }
+    });
+  }
+}
+
+},{"45":45,"80":80}],72:[function(require,module,exports){
+"use strict";
+
+var constants = require(9);
+
+module.exports = constants(["PENDING", "FAILED", "DONE", "FETCH_FAILED"]);
+
+},{"9":9}],73:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+
+function handleAction(action) {
+  this.__validateHandlers();
+
+  var store = this;
+  var handlers = _.object(_.map(store.handlers, getHandlerWithPredicates));
+
+  _.each(handlers, function (predicates, handlerName) {
+    _.each(predicates, function (predicate) {
+      if (predicate(action)) {
+        var rollbackHandler;
+
+        try {
+          store.action = action;
+          action.addStoreHandler(store, handlerName, predicate.toJSON());
+          rollbackHandler = store[handlerName].apply(store, action.arguments);
+        } finally {
+          action.addRollbackHandler(rollbackHandler, store);
+        }
+      }
+    });
+  });
+}
+
+function getHandlerWithPredicates(actionPredicates, handler) {
+  _.isArray(actionPredicates) || (actionPredicates = [actionPredicates]);
+
+  var predicates = _.map(actionPredicates, toFunc);
+
+  return [handler, predicates];
+
+  function toFunc(actionPredicate) {
+    if (actionPredicate.isActionCreator) {
+      actionPredicate = {
+        type: actionPredicate.toString()
+      };
+    } else if (_.isString(actionPredicate)) {
+      actionPredicate = {
+        type: actionPredicate
+      };
+    }
+
+    var func = _.matches(actionPredicate);
+
+    func.toJSON = function () {
+      return actionPredicate;
+    };
+
+    return func;
+  }
+}
+
+module.exports = handleAction;
+
+},{"62":62}],74:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var when = require(80);
+var fetch = require(71);
+var Store = require(76);
+var state = require(75);
+var fetchConstants = require(72);
+var createStoreClass = require(70);
+
+module.exports = function (marty) {
+  marty.registerClass("Store", Store);
+  marty.register("createStore", createStore);
+
+  _.each(state, function (value, key) {
+    marty.register(key, value);
+  });
+
+  function createStore(properties) {
+    var StoreClass = createStoreClass(properties);
+    var defaultInstance = this.register(StoreClass);
+
+    return defaultInstance;
+  }
+};
+
+module.exports.when = when;
+module.exports.fetch = fetch;
+module.exports.Store = Store;
+module.exports.fetchConstants = fetchConstants;
+
+},{"62":62,"70":70,"71":71,"72":72,"75":75,"76":76,"80":80}],75:[function(require,module,exports){
+"use strict";
+
+var log = require(24);
+var _ = require(62);
+var UnknownStoreError = require(46);
+
+var SERIALIZED_WINDOW_OBJECT = "__marty";
+
+module.exports = {
+  rehydrate: rehydrate,
+  dehydrate: dehydrate,
+  clearState: clearState,
+  replaceState: replaceState
+};
+
+function getDefaultStores(context) {
+  return context.registry.getAllDefaultStores();
+}
+
+function clearState() {
+  _.each(getDefaultStores(this), function (store) {
+    store.clear();
+  });
+}
+
+function replaceState(states) {
+  _.each(getDefaultStores(this), function (store) {
+    var id = storeId(store);
+
+    if (states[id]) {
+      store.replaceState(states[id]);
+    }
+  });
+}
+
+function rehydrate(storeStates) {
+  var stores = indexById(getDefaultStores(this));
+  storeStates = storeStates || getStoreStatesFromWindow();
+
+  _.each(storeStates, function (dehydratedStore, storeName) {
+    var store = stores[storeName];
+    var state = dehydratedStore.state;
+
+    if (!store) {
+      throw new UnknownStoreError(storeName);
+    }
+
+    store.__fetchHistory = dehydratedStore.fetchHistory;
+
+    if (_.isFunction(store.rehydrate)) {
+      store.rehydrate(state);
+    } else {
+      try {
+        store.replaceState(state);
+      } catch (e) {
+        log.error("Failed to rehydrate the state of " + storeName + ". You might be able " + "to solve this problem by implementing Store#rehydrate()");
+
+        throw e;
+      }
+    }
+  });
+
+  function indexById(stores) {
+    return _.object(_.map(stores, function (store) {
+      return storeId(store);
+    }), stores);
+  }
+
+  function getStoreStatesFromWindow() {
+    if (!window || !window[SERIALIZED_WINDOW_OBJECT]) {
+      return;
+    }
+
+    return window[SERIALIZED_WINDOW_OBJECT].stores;
+  }
+}
+
+function dehydrate(context) {
+  var dehydratedStores = {};
+  var stores = context ? context.getAllStores() : getDefaultStores(this);
+
+  _.each(stores, function (store) {
+    var id = storeId(store);
+
+    if (id) {
+      dehydratedStores[id] = {
+        fetchHistory: store.__fetchHistory,
+        state: (store.dehydrate || store.getState).call(store)
+      };
+    }
+  });
+
+  dehydratedStores.toString = function () {
+    return "(window.__marty||(window.__marty={})).stores=" + JSON.stringify(dehydratedStores);
+  };
+
+  dehydratedStores.toJSON = function () {
+    return _.omit(dehydratedStores, "toString", "toJSON");
+  };
+
+  return dehydratedStores;
+}
+
+function storeId(store) {
+  return store.constructor.id;
+}
+
+},{"24":24,"46":46,"62":62}],76:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var log = require(24);
+var fetch = require(78);
+var _ = require(62);
+var uuid = require(40);
+var warnings = require(41);
+var resolve = require(38);
+var StoreEvents = require(77);
+var Environment = require(22);
+var handleAction = require(73);
+var EventEmitter = require(193);
+var validateHandlers = require(79);
+
+var Store = (function () {
+  function Store(options) {
+    var _this = this;
+
+    _classCallCheck(this, Store);
+
+    if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
+      log.warn("Warning: Options were not passed into a store's constructor");
+    }
+
+    options = options || {};
+
+    this.__type = "Store";
+    this.__id = uuid.type(this.__type);
+    this.__state = {};
+    this.__fetchHistory = {};
+    this.__failedFetches = {};
+    this.__fetchInProgress = {};
+    this.__context = options.context;
+    this.__emitter = new EventEmitter();
+    this.__dispatcher = options.dispatcher;
+    this.__validateHandlers = _.once(function () {
+      return validateHandlers(_this);
+    });
+
+    var initialState = this.getInitialState();
+
+    if (_.isUndefined(initialState)) {
+      initialState = {};
+    }
+
+    this.replaceState(initialState);
+
+    this.dispatchToken = this.__dispatcher.register(_.bind(this.handleAction, this));
+  }
+
+  _createClass(Store, {
+    "for": {
+      value: function _for(obj) {
+        return resolve(this, obj);
+      }
+    },
+    context: {
+      get: function () {
+        return this.__context;
+      }
+    },
+    state: {
+      get: function () {
+        return this.getState();
+      },
+      set: function (newState) {
+        this.replaceState(newState);
+      }
+    },
+    getInitialState: {
+      value: function getInitialState() {
+        return {};
+      }
+    },
+    getState: {
+      value: function getState() {
+        return this.__state;
+      }
+    },
+    setState: {
+      value: function setState(state) {
+        var newState = _.extend({}, this.state, state);
+
+        this.replaceState(newState);
+      }
+    },
+    replaceState: {
+      value: function replaceState(newState) {
+        var currentState = this.__state;
+
+        if (_.isUndefined(newState) || _.isNull(newState)) {
+          if (warnings.stateIsNullOrUndefined) {
+            var displayName = this.displayName || this.id;
+
+            log.warn("Warning: Trying to replace the state of the store " + displayName + " with null or undefined");
+          }
+        }
+
+        if (newState !== currentState) {
+          this.__state = newState;
+          this.hasChanged();
+        }
+      }
+    },
+    clear: {
+      value: function clear(newState) {
+        this.__fetchHistory = {};
+        this.__failedFetches = {};
+        this.__fetchInProgress = {};
+
+        if (!newState && _.isFunction(this.getInitialState)) {
+          newState = this.getInitialState();
+        }
+
+        this.state = newState || {};
+      }
+    },
+    dispose: {
+      value: function dispose() {
+        var emitter = this.__emitter;
+        var dispatchToken = this.dispatchToken;
+
+        emitter.removeAllListeners(StoreEvents.CHANGE_EVENT);
+        emitter.removeAllListeners(StoreEvents.FETCH_CHANGE_EVENT);
+        this.clear();
+
+        if (dispatchToken) {
+          this.__dispatcher.unregister(dispatchToken);
+          this.dispatchToken = undefined;
+        }
+      }
+    },
+    hasChanged: {
+      value: function hasChanged(eventArgs) {
+        var _this = this;
+
+        var emitChange = function () {
+          var emitter = _this.__emitter;
+
+          emitter.emit.call(emitter, StoreEvents.CHANGE_EVENT, _this.state, _this, eventArgs);
+
+          // Clear the action once the component has seen it
+          _this.action = null;
+        };
+
+        if (this.action) {
+          this.action.onActionHandled(this.id, emitChange);
+        } else {
+          emitChange();
+        }
+      }
+    },
+    hasAlreadyFetched: {
+      value: function hasAlreadyFetched(fetchId) {
+        return !!this.__fetchHistory[fetchId];
+      }
+    },
+    addChangeListener: {
+      value: function addChangeListener(callback, context) {
+        var _this = this;
+
+        var emitter = this.__emitter;
+
+        if (context) {
+          callback = _.bind(callback, context);
+        }
+
+        log.trace("The " + this.displayName + " store (" + this.id + ") is adding a change listener");
+
+        emitter.on(StoreEvents.CHANGE_EVENT, callback);
+
+        return {
+          dispose: function () {
+            log.trace("The " + _this.displayName + " store (" + _this.id + ") is disposing of a change listener");
+
+            emitter.removeListener(StoreEvents.CHANGE_EVENT, callback);
+          }
+        };
+      }
+    },
+    addFetchChangedListener: {
+      value: function addFetchChangedListener(callback, context) {
+        var emitter = this.__emitter;
+
+        if (context) {
+          callback = _.bind(callback, context);
+        }
+
+        emitter.on(StoreEvents.FETCH_CHANGE_EVENT, callback);
+
+        return {
+          dispose: function () {
+            emitter.removeListener(StoreEvents.FETCH_CHANGE_EVENT, callback);
+          }
+        };
+      }
+    },
+    waitFor: {
+      value: function waitFor(stores) {
+        var dispatcher = this.__dispatcher;
+
+        if (!_.isArray(stores)) {
+          stores = _.toArray(arguments);
+        }
+
+        dispatcher.waitFor(dispatchTokens(stores));
+
+        function dispatchTokens(stores) {
+          var tokens = [];
+
+          _.each(stores, function (store) {
+            if (store.dispatchToken) {
+              tokens.push(store.dispatchToken);
+            }
+
+            if (_.isString(store)) {
+              tokens.push(store);
+            }
+          });
+
+          return tokens;
+        }
+      }
+    }
+  });
+
+  return Store;
+})();
+
+Store.prototype.fetch = fetch;
+Store.prototype.handleAction = handleAction;
+
+module.exports = Store;
+
+},{"193":193,"22":22,"24":24,"38":38,"40":40,"41":41,"62":62,"73":73,"77":77,"78":78,"79":79}],77:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+  CHANGE_EVENT: "changed",
+  FETCH_CHANGE_EVENT: "fetch-changed"
+};
+
+},{}],78:[function(require,module,exports){
+"use strict";
+
+var log = require(24);
+var _ = require(62);
+var warnings = require(41);
+var fetchResult = require(71);
+var StoreEvents = require(77);
+var CompoundError = require(44);
+var NotFoundError = require(45);
+var FetchConstants = require(72);
+
+function fetch(id, local, remote) {
+  var store = this;
+  var options,
+      result,
+      error,
+      cacheError,
+      context = this.context;
+
+  if (_.isObject(id)) {
+    options = id;
+  } else {
+    options = {
+      id: id,
+      locally: local,
+      remotely: remote
+    };
+  }
+
+  _.defaults(options, {
+    locally: _.noop,
+    remotely: _.noop
+  });
+
+  if (!options || _.isUndefined(options.id)) {
+    throw new Error("must specify an id");
+  }
+
+  result = dependencyResult(this, options);
+
+  if (result) {
+    return result;
+  }
+
+  cacheError = _.isUndefined(options.cacheError) || options.cacheError;
+
+  if (cacheError) {
+    error = store.__failedFetches[options.id];
+
+    if (error) {
+      return fetchFailed(error);
+    }
+  }
+
+  if (store.__fetchInProgress[options.id]) {
+    return fetchResult.pending(options.id, store);
+  }
+
+  if (context) {
+    context.fetchStarted(store.id, options.id);
+  }
+
+  return tryAndGetLocally() || tryAndGetRemotely();
+
+  function tryAndGetLocally(remoteCalled) {
+    var result = options.locally.call(store);
+
+    if (_.isUndefined(result)) {
+      return;
+    }
+
+    if (_.isNull(result)) {
+      return fetchNotFound();
+    }
+
+    if (!remoteCalled) {
+      finished();
+    }
+
+    return fetchDone(result);
+  }
+
+  function tryAndGetRemotely() {
+    result = options.remotely.call(store);
+
+    if (result) {
+      if (_.isFunction(result.then)) {
+        store.__fetchInProgress[options.id] = true;
+
+        result.then(function () {
+          store.__fetchHistory[options.id] = true;
+          result = tryAndGetLocally(true);
+
+          if (result) {
+            fetchDone();
+            store.hasChanged();
+          } else {
+            fetchNotFound();
+            store.hasChanged();
+          }
+        })["catch"](function (error) {
+          fetchFailed(error);
+          store.hasChanged();
+
+          store.__dispatcher.dispatchAction({
+            type: FetchConstants.FETCH_FAILED,
+            arguments: [error, options.id, store]
+          });
+        });
+
+        return fetchPending();
+      } else {
+        store.__fetchHistory[options.id] = true;
+        result = tryAndGetLocally(true);
+
+        if (result) {
+          return result;
+        }
+      }
+    }
+
+    if (warnings.promiseNotReturnedFromRemotely) {
+      log.warn(promiseNotReturnedWarning());
+    }
+
+    return fetchNotFound();
+  }
+
+  function promiseNotReturnedWarning() {
+    var inStore = "";
+    if (store.displayName) {
+      inStore = " in " + store.displayName;
+    }
+
+    return "The remote fetch for '" + options.id + "' " + inStore + " " + "did not return a promise and the state was " + "not present after remotely finished executing. " + "This might be because you forgot to return a promise.";
+  }
+
+  function finished() {
+    store.__fetchHistory[options.id] = true;
+
+    delete store.__fetchInProgress[options.id];
+  }
+
+  function fetchPending() {
+    return fetchResult.pending(options.id, store);
+  }
+
+  function fetchDone(result) {
+    finished();
+
+    if (context && result) {
+      context.fetchDone(store.id, options.id, "DONE", {
+        result: result
+      });
+    }
+
+    return fetchChanged(fetchResult.done(result, options.id, store));
+  }
+
+  function fetchFailed(error) {
+    if (cacheError) {
+      store.__failedFetches[options.id] = error;
+    }
+
+    finished();
+
+    if (context) {
+      context.fetchDone(store.id, options.id, "FAILED", {
+        error: error
+      });
+    }
+
+    return fetchChanged(fetchResult.failed(error, options.id, store));
+  }
+
+  function fetchNotFound() {
+    return fetchFailed(new NotFoundError(), options.id, store);
+  }
+
+  function fetchChanged(fetch) {
+    store.__emitter.emit(StoreEvents.FETCH_CHANGE_EVENT, fetch);
+    return fetch;
+  }
+}
+
+function dependencyResult(store, options) {
+  var pending = false;
+  var errors = [];
+  var dependencies = options.dependsOn;
+
+  if (!dependencies) {
+    return;
+  }
+
+  if (!_.isArray(dependencies)) {
+    dependencies = [dependencies];
+  }
+
+  _.each(dependencies, function (dependency) {
+    switch (dependency.status) {
+      case FetchConstants.PENDING.toString():
+        pending = true;
+        break;
+      case FetchConstants.FAILED.toString():
+        errors.push(dependency.error);
+        break;
+    }
+  });
+
+  if (errors.length) {
+    var error = errors.length === 1 ? errors[0] : new CompoundError(errors);
+
+    return fetchResult.failed(error, options.id, store);
+  }
+
+  if (pending) {
+    // Wait for all dependencies to be done and then notify listeners
+    Promise.all(_.invoke(dependencies, "toPromise")).then(function () {
+      store.fetch(options);
+      store.hasChanged();
+    })["catch"](function () {
+      store.fetch(options);
+      store.hasChanged();
+    });
+
+    return fetchResult.pending(options.id, store);
+  }
+}
+
+fetch.done = fetchResult.done;
+fetch.failed = fetchResult.failed;
+fetch.pending = fetchResult.pending;
+fetch.notFound = fetchResult.notFound;
+
+module.exports = fetch;
+
+},{"24":24,"41":41,"44":44,"45":45,"62":62,"71":71,"72":72,"77":77}],79:[function(require,module,exports){
+"use strict";
+
+var _ = require(62);
+var ActionHandlerNotFoundError = require(42);
+var ActionPredicateUndefinedError = require(43);
+
+function validateHandlers(store) {
+  _.each(store.handlers, function (actionPredicate, handlerName) {
+    var actionHandler = store[handlerName];
+
+    if (_.isUndefined(actionHandler) || _.isNull(actionHandler)) {
+      throw new ActionHandlerNotFoundError(handlerName, store);
+    }
+
+    if (!actionPredicate) {
+      throw new ActionPredicateUndefinedError(handlerName, store);
+    }
+  });
+}
+
+module.exports = validateHandlers;
+
+},{"42":42,"43":43,"62":62}],80:[function(require,module,exports){
+"use strict";
+
+var log = require(24);
+var _ = require(62);
+var StatusConstants = require(72);
+
+when.all = all;
+when.join = join;
+
+function when(handlers, parentContext) {
+  handlers || (handlers = {});
+
+  var handler = handlers[this.status.toLowerCase()];
+
+  if (!handler) {
+    throw new Error("Could not find a " + this.status + " handler");
+  }
+
+  if (parentContext) {
+    WhenContext.prototype = parentContext;
+  }
+
+  try {
+    switch (this.status) {
+      case StatusConstants.PENDING.toString():
+        return handler.call(new WhenContext());
+      case StatusConstants.FAILED.toString():
+        return handler.call(new WhenContext(), this.error);
+      case StatusConstants.DONE.toString():
+        return handler.call(new WhenContext(), this.result);
+      default:
+        throw new Error("Unknown fetch result status");
+    }
+  } catch (e) {
+    var errorMessage = "An error occured when handling the DONE state of ";
+
+    if (this.id) {
+      errorMessage += "the fetch '" + this.id + "'";
+    } else {
+      errorMessage += "a fetch";
+    }
+
+    if (this.store) {
+      errorMessage += " from the store " + this.store;
+    }
+
+    log.error(errorMessage, e);
+
+    throw e;
+  }
+
+  function WhenContext() {
+    _.extend(this, handlers);
+  }
+}
+
+function join() {
+  var parentContext;
+  var handlers = _.last(arguments);
+  var fetchResults = _.initial(arguments);
+
+  if (!areHandlers(handlers) && areHandlers(_.last(fetchResults))) {
+    parentContext = handlers;
+    handlers = fetchResults.pop();
+  }
+
+  return all(fetchResults, handlers, parentContext);
+}
+
+function all(fetchResults, handlers, parentContext) {
+  if (!fetchResults || !handlers) {
+    throw new Error("No fetch results or handlers specified");
+  }
+
+  if (!_.isArray(fetchResults) || _.any(fetchResults, notFetchResult)) {
+    throw new Error("Must specify a set of fetch results");
+  }
+
+  var context = {
+    result: results(fetchResults),
+    error: firstError(fetchResults),
+    status: aggregateStatus(fetchResults)
+  };
+
+  return when.call(context, handlers, parentContext);
+}
+
+function areHandlers(obj) {
+  return _.isFunction(obj.done);
+}
+
+function results(fetchResults) {
+  return fetchResults.map(function (result) {
+    return result.result;
+  });
+}
+
+function firstError(fetchResults) {
+  var failedResult = _.find(fetchResults, {
+    status: StatusConstants.FAILED.toString()
+  });
+
+  if (failedResult) {
+    return failedResult.error;
+  }
+}
+
+function notFetchResult(result) {
+  return !result._isFetchResult;
+}
+
+function aggregateStatus(fetchResults) {
+  for (var i = fetchResults.length - 1; i >= 0; i--) {
+    var status = fetchResults[i].status;
+
+    if (status === StatusConstants.FAILED.toString() || status === StatusConstants.PENDING.toString()) {
+      return status;
+    }
+  }
+
+  return StatusConstants.DONE.toString();
+}
+
+module.exports = when;
+/* fetchResults, handlers */
+
+},{"24":24,"62":62,"72":72}],81:[function(require,module,exports){
+/*
+ * Cookies.js - 1.2.1
+ * https://github.com/ScottHamper/Cookies
+ *
+ * This is free and unencumbered software released into the public domain.
+ */
+(function (global, undefined) {
+    'use strict';
+
+    var factory = function (window) {
+        if (typeof window.document !== 'object') {
+            throw new Error('Cookies.js requires a `window` with a `document` object');
+        }
+
+        var Cookies = function (key, value, options) {
+            return arguments.length === 1 ?
+                Cookies.get(key) : Cookies.set(key, value, options);
+        };
+
+        // Allows for setter injection in unit tests
+        Cookies._document = window.document;
+
+        // Used to ensure cookie keys do not collide with
+        // built-in `Object` properties
+        Cookies._cacheKeyPrefix = 'cookey.'; // Hurr hurr, :)
+        
+        Cookies._maxExpireDate = new Date('Fri, 31 Dec 9999 23:59:59 UTC');
+
+        Cookies.defaults = {
+            path: '/',
+            secure: false
+        };
+
+        Cookies.get = function (key) {
+            if (Cookies._cachedDocumentCookie !== Cookies._document.cookie) {
+                Cookies._renewCache();
+            }
+
+            return Cookies._cache[Cookies._cacheKeyPrefix + key];
+        };
+
+        Cookies.set = function (key, value, options) {
+            options = Cookies._getExtendedOptions(options);
+            options.expires = Cookies._getExpiresDate(value === undefined ? -1 : options.expires);
+
+            Cookies._document.cookie = Cookies._generateCookieString(key, value, options);
+
+            return Cookies;
+        };
+
+        Cookies.expire = function (key, options) {
+            return Cookies.set(key, undefined, options);
+        };
+
+        Cookies._getExtendedOptions = function (options) {
+            return {
+                path: options && options.path || Cookies.defaults.path,
+                domain: options && options.domain || Cookies.defaults.domain,
+                expires: options && options.expires || Cookies.defaults.expires,
+                secure: options && options.secure !== undefined ?  options.secure : Cookies.defaults.secure
+            };
+        };
+
+        Cookies._isValidDate = function (date) {
+            return Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date.getTime());
+        };
+
+        Cookies._getExpiresDate = function (expires, now) {
+            now = now || new Date();
+
+            if (typeof expires === 'number') {
+                expires = expires === Infinity ?
+                    Cookies._maxExpireDate : new Date(now.getTime() + expires * 1000);
+            } else if (typeof expires === 'string') {
+                expires = new Date(expires);
+            }
+
+            if (expires && !Cookies._isValidDate(expires)) {
+                throw new Error('`expires` parameter cannot be converted to a valid Date instance');
+            }
+
+            return expires;
+        };
+
+        Cookies._generateCookieString = function (key, value, options) {
+            key = key.replace(/[^#$&+\^`|]/g, encodeURIComponent);
+            key = key.replace(/\(/g, '%28').replace(/\)/g, '%29');
+            value = (value + '').replace(/[^!#$&-+\--:<-\[\]-~]/g, encodeURIComponent);
+            options = options || {};
+
+            var cookieString = key + '=' + value;
+            cookieString += options.path ? ';path=' + options.path : '';
+            cookieString += options.domain ? ';domain=' + options.domain : '';
+            cookieString += options.expires ? ';expires=' + options.expires.toUTCString() : '';
+            cookieString += options.secure ? ';secure' : '';
+
+            return cookieString;
+        };
+
+        Cookies._getCacheFromString = function (documentCookie) {
+            var cookieCache = {};
+            var cookiesArray = documentCookie ? documentCookie.split('; ') : [];
+
+            for (var i = 0; i < cookiesArray.length; i++) {
+                var cookieKvp = Cookies._getKeyValuePairFromCookieString(cookiesArray[i]);
+
+                if (cookieCache[Cookies._cacheKeyPrefix + cookieKvp.key] === undefined) {
+                    cookieCache[Cookies._cacheKeyPrefix + cookieKvp.key] = cookieKvp.value;
+                }
+            }
+
+            return cookieCache;
+        };
+
+        Cookies._getKeyValuePairFromCookieString = function (cookieString) {
+            // "=" is a valid character in a cookie value according to RFC6265, so cannot `split('=')`
+            var separatorIndex = cookieString.indexOf('=');
+
+            // IE omits the "=" when the cookie value is an empty string
+            separatorIndex = separatorIndex < 0 ? cookieString.length : separatorIndex;
+
+            return {
+                key: decodeURIComponent(cookieString.substr(0, separatorIndex)),
+                value: decodeURIComponent(cookieString.substr(separatorIndex + 1))
+            };
+        };
+
+        Cookies._renewCache = function () {
+            Cookies._cache = Cookies._getCacheFromString(Cookies._document.cookie);
+            Cookies._cachedDocumentCookie = Cookies._document.cookie;
+        };
+
+        Cookies._areEnabled = function () {
+            var testKey = 'cookies.js';
+            var areEnabled = Cookies.set(testKey, 1).get(testKey) === '1';
+            Cookies.expire(testKey);
+            return areEnabled;
+        };
+
+        Cookies.enabled = Cookies._areEnabled();
+
+        return Cookies;
+    };
+
+    var cookiesExport = typeof global.document === 'object' ? factory(global) : factory;
+
+    // AMD support
+    if (typeof define === 'function' && define.amd) {
+        define(function () { return cookiesExport; });
+    // CommonJS/Node.js support
+    } else if (typeof exports === 'object') {
+        // Support Node.js specific `module.exports` (which can be a function)
+        if (typeof module === 'object' && typeof module.exports === 'object') {
+            exports = module.exports = cookiesExport;
+        }
+        // But always support CommonJS module 1.1.1 spec (`exports` cannot be a function)
+        exports.Cookies = cookiesExport;
+    } else {
+        global.Cookies = cookiesExport;
+    }
+})(typeof window === 'undefined' ? this : window);
+},{}],82:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -1193,9 +5451,9 @@ process.umask = function() { return 0; };
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-module.exports.Dispatcher = require(5)
+module.exports.Dispatcher = require(83)
 
-},{"5":5}],5:[function(require,module,exports){
+},{"83":83}],83:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -1210,7 +5468,7 @@ module.exports.Dispatcher = require(5)
 
 "use strict";
 
-var invariant = require(6);
+var invariant = require(84);
 
 var _lastID = 1;
 var _prefix = 'ID_';
@@ -1447,7 +5705,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"6":6}],6:[function(require,module,exports){
+},{"84":84}],84:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -1502,341 +5760,12 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],7:[function(require,module,exports){
-(function() {
-  'use strict';
-
-  if (self.fetch) {
-    return
-  }
-
-  function Headers(headers) {
-    this.map = {}
-
-    var self = this
-    if (headers instanceof Headers) {
-      headers.forEach(function(name, values) {
-        values.forEach(function(value) {
-          self.append(name, value)
-        })
-      })
-
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        self.append(name, headers[name])
-      })
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = name.toLowerCase()
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[name.toLowerCase()]
-  }
-
-  Headers.prototype.get = function(name) {
-    var values = this.map[name.toLowerCase()]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[name.toLowerCase()] || []
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(name.toLowerCase())
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[name.toLowerCase()] = [value]
-  }
-
-  // Instead of iterable for now.
-  Headers.prototype.forEach = function(callback) {
-    var self = this
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      callback(name, self.map[name])
-    })
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    reader.readAsText(blob)
-    return fileReaderReady(reader)
-  }
-
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob();
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-    if (support.blob) {
-      this._initBody = function(body) {
-        this._bodyInit = body
-        if (typeof body === 'string') {
-          this._bodyText = body
-        } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-          this._bodyBlob = body
-        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-          this._bodyFormData = body
-        } else if (!body) {
-          this._bodyText = ''
-        } else {
-          throw new Error('unsupported BodyInit type')
-        }
-      }
-
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
-      }
-
-      this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
-        } else {
-          return Promise.resolve(this._bodyText)
-        }
-      }
-    } else {
-      this._initBody = function(body) {
-        this._bodyInit = body
-        if (typeof body === 'string') {
-          this._bodyText = body
-        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-          this._bodyFormData = body
-        } else if (!body) {
-          this._bodyText = ''
-        } else {
-          throw new Error('unsupported BodyInit type')
-        }
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(url, options) {
-    options = options || {}
-    this.url = url
-
-    this.credentials = options.credentials || 'omit'
-    this.headers = new Headers(options.headers)
-    this.method = normalizeMethod(options.method || 'GET')
-    this.mode = options.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(options.body)
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
-    })
-    return head
-  }
-
-  Request.prototype.fetch = function() {
-    var self = this
-
-    return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest()
-      if (self.credentials === 'cors') {
-        xhr.withCredentials = true;
-      }
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return;
-      }
-
-      xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
-        var options = {
-          status: status,
-          statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
-        }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText;
-        resolve(new Response(body, options))
-      }
-
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.open(self.method, self.url, true)
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      self.headers.forEach(function(name, values) {
-        values.forEach(function(value) {
-          xhr.setRequestHeader(name, value)
-        })
-      })
-
-      xhr.send(typeof self._bodyInit === 'undefined' ? null : self._bodyInit)
-    })
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this._initBody(bodyInit)
-    this.type = 'default'
-    this.url = null
-    this.status = options.status
-    this.statusText = options.statusText
-    this.headers = options.headers
-    this.url = options.url || ''
-  }
-
-  Body.call(Response.prototype)
-
-  self.Headers = Headers;
-  self.Request = Request;
-  self.Response = Response;
-
-  self.fetch = function (url, options) {
-    return new Request(url, options).fetch()
-  }
-  self.fetch.polyfill = true
-})();
-
-},{}],8:[function(require,module,exports){
-require(7);
-
-},{"7":7}],9:[function(require,module,exports){
-var baseDifference = require(39),
-    baseFlatten = require(44),
-    isArguments = require(91),
-    isArray = require(92),
-    restParam = require(26);
+},{}],85:[function(require,module,exports){
+var baseDifference = require(115),
+    baseFlatten = require(120),
+    isArguments = require(167),
+    isArray = require(168),
+    restParam = require(102);
 
 /**
  * Creates an array excluding all values of the provided arrays using
@@ -1865,9 +5794,9 @@ var difference = restParam(function(array, values) {
 
 module.exports = difference;
 
-},{"26":26,"39":39,"44":44,"91":91,"92":92}],10:[function(require,module,exports){
-var baseSlice = require(58),
-    isIterateeCall = require(83);
+},{"102":102,"115":115,"120":120,"167":167,"168":168}],86:[function(require,module,exports){
+var baseSlice = require(134),
+    isIterateeCall = require(159);
 
 /**
  * Creates a slice of `array` with `n` elements dropped from the beginning.
@@ -1906,9 +5835,9 @@ function drop(array, n, guard) {
 
 module.exports = drop;
 
-},{"58":58,"83":83}],11:[function(require,module,exports){
-var baseSlice = require(58),
-    isIterateeCall = require(83);
+},{"134":134,"159":159}],87:[function(require,module,exports){
+var baseSlice = require(134),
+    isIterateeCall = require(159);
 
 /**
  * Creates a slice of `array` with `n` elements dropped from the end.
@@ -1948,7 +5877,7 @@ function dropRight(array, n, guard) {
 
 module.exports = dropRight;
 
-},{"58":58,"83":83}],12:[function(require,module,exports){
+},{"134":134,"159":159}],88:[function(require,module,exports){
 /**
  * Gets the first element of `array`.
  *
@@ -1972,8 +5901,8 @@ function first(array) {
 
 module.exports = first;
 
-},{}],13:[function(require,module,exports){
-var dropRight = require(11);
+},{}],89:[function(require,module,exports){
+var dropRight = require(87);
 
 /**
  * Gets all but the last element of `array`.
@@ -1994,7 +5923,7 @@ function initial(array) {
 
 module.exports = initial;
 
-},{"11":11}],14:[function(require,module,exports){
+},{"87":87}],90:[function(require,module,exports){
 /**
  * Gets the last element of `array`.
  *
@@ -2015,8 +5944,8 @@ function last(array) {
 
 module.exports = last;
 
-},{}],15:[function(require,module,exports){
-var drop = require(10);
+},{}],91:[function(require,module,exports){
+var drop = require(86);
 
 /**
  * Gets all but the first element of `array`.
@@ -2038,10 +5967,10 @@ function rest(array) {
 
 module.exports = rest;
 
-},{"10":10}],16:[function(require,module,exports){
-var baseFlatten = require(44),
-    baseUniq = require(61),
-    restParam = require(26);
+},{"86":86}],92:[function(require,module,exports){
+var baseFlatten = require(120),
+    baseUniq = require(137),
+    restParam = require(102);
 
 /**
  * Creates an array of unique values, in order, of the provided arrays using
@@ -2067,8 +5996,8 @@ var union = restParam(function(arrays) {
 
 module.exports = union;
 
-},{"26":26,"44":44,"61":61}],17:[function(require,module,exports){
-var isArray = require(92);
+},{"102":102,"120":120,"137":137}],93:[function(require,module,exports){
+var isArray = require(168);
 
 /**
  * The inverse of `_.pairs`; this method returns an object composed from arrays
@@ -2112,11 +6041,11 @@ function zipObject(props, values) {
 
 module.exports = zipObject;
 
-},{"92":92}],18:[function(require,module,exports){
-var arrayFilter = require(30),
-    baseCallback = require(35),
-    baseFilter = require(41),
-    isArray = require(92);
+},{"168":168}],94:[function(require,module,exports){
+var arrayFilter = require(106),
+    baseCallback = require(111),
+    baseFilter = require(117),
+    isArray = require(168);
 
 /**
  * Iterates over elements of `collection`, returning an array of all elements
@@ -2175,9 +6104,9 @@ function filter(collection, predicate, thisArg) {
 
 module.exports = filter;
 
-},{"30":30,"35":35,"41":41,"92":92}],19:[function(require,module,exports){
-var baseEach = require(40),
-    createFind = require(72);
+},{"106":106,"111":111,"117":117,"168":168}],95:[function(require,module,exports){
+var baseEach = require(116),
+    createFind = require(148);
 
 /**
  * Iterates over elements of `collection`, returning the first element
@@ -2233,10 +6162,10 @@ var find = createFind(baseEach);
 
 module.exports = find;
 
-},{"40":40,"72":72}],20:[function(require,module,exports){
-var arrayEach = require(29),
-    baseEach = require(40),
-    createForEach = require(74);
+},{"116":116,"148":148}],96:[function(require,module,exports){
+var arrayEach = require(105),
+    baseEach = require(116),
+    createForEach = require(150);
 
 /**
  * Iterates over elements of `collection` invoking `iteratee` for each element.
@@ -2272,10 +6201,10 @@ var forEach = createForEach(arrayEach, baseEach);
 
 module.exports = forEach;
 
-},{"29":29,"40":40,"74":74}],21:[function(require,module,exports){
-var baseEach = require(40),
-    isLength = require(84),
-    restParam = require(26);
+},{"105":105,"116":116,"150":150}],97:[function(require,module,exports){
+var baseEach = require(116),
+    isLength = require(160),
+    restParam = require(102);
 
 /**
  * Invokes the method named by `methodName` on each element in `collection`,
@@ -2314,11 +6243,11 @@ var invoke = restParam(function(collection, methodName, args) {
 
 module.exports = invoke;
 
-},{"26":26,"40":40,"84":84}],22:[function(require,module,exports){
-var arrayMap = require(31),
-    baseCallback = require(35),
-    baseMap = require(54),
-    isArray = require(92);
+},{"102":102,"116":116,"160":160}],98:[function(require,module,exports){
+var arrayMap = require(107),
+    baseCallback = require(111),
+    baseMap = require(130),
+    isArray = require(168);
 
 /**
  * Creates an array of values by running each element in `collection` through
@@ -2384,13 +6313,13 @@ function map(collection, iteratee, thisArg) {
 
 module.exports = map;
 
-},{"31":31,"35":35,"54":54,"92":92}],23:[function(require,module,exports){
-var baseCallback = require(35),
-    baseEach = require(40),
-    baseSortBy = require(59),
-    compareAscending = require(67),
-    isIterateeCall = require(83),
-    isLength = require(84);
+},{"107":107,"111":111,"130":130,"168":168}],99:[function(require,module,exports){
+var baseCallback = require(111),
+    baseEach = require(116),
+    baseSortBy = require(135),
+    compareAscending = require(143),
+    isIterateeCall = require(159),
+    isLength = require(160);
 
 /**
  * Creates an array of elements, sorted in ascending order by the results of
@@ -2461,7 +6390,7 @@ function sortBy(collection, iteratee, thisArg) {
 
 module.exports = sortBy;
 
-},{"35":35,"40":40,"59":59,"67":67,"83":83,"84":84}],24:[function(require,module,exports){
+},{"111":111,"116":116,"135":135,"143":143,"159":159,"160":160}],100:[function(require,module,exports){
 /** Used as the `TypeError` message for "Functions" methods. */
 var FUNC_ERROR_TEXT = 'Expected a function';
 
@@ -2504,8 +6433,8 @@ function before(n, func) {
 
 module.exports = before;
 
-},{}],25:[function(require,module,exports){
-var before = require(24);
+},{}],101:[function(require,module,exports){
+var before = require(100);
 
 /**
  * Creates a function that is restricted to invoking `func` once. Repeat calls
@@ -2530,7 +6459,7 @@ function once(func) {
 
 module.exports = once;
 
-},{"24":24}],26:[function(require,module,exports){
+},{"100":100}],102:[function(require,module,exports){
 /** Used as the `TypeError` message for "Functions" methods. */
 var FUNC_ERROR_TEXT = 'Expected a function';
 
@@ -2590,10 +6519,10 @@ function restParam(func, start) {
 
 module.exports = restParam;
 
-},{}],27:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 (function (global){
-var cachePush = require(66),
-    isNative = require(94);
+var cachePush = require(142),
+    isNative = require(170);
 
 /** Native method references. */
 var Set = isNative(Set = global.Set) && Set;
@@ -2623,7 +6552,7 @@ SetCache.prototype.push = cachePush;
 module.exports = SetCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"66":66,"94":94}],28:[function(require,module,exports){
+},{"142":142,"170":170}],104:[function(require,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -2645,7 +6574,7 @@ function arrayCopy(source, array) {
 
 module.exports = arrayCopy;
 
-},{}],29:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 /**
  * A specialized version of `_.forEach` for arrays without support for callback
  * shorthands and `this` binding.
@@ -2669,7 +6598,7 @@ function arrayEach(array, iteratee) {
 
 module.exports = arrayEach;
 
-},{}],30:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for callback
  * shorthands and `this` binding.
@@ -2696,7 +6625,7 @@ function arrayFilter(array, predicate) {
 
 module.exports = arrayFilter;
 
-},{}],31:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for callback
  * shorthands and `this` binding.
@@ -2719,7 +6648,7 @@ function arrayMap(array, iteratee) {
 
 module.exports = arrayMap;
 
-},{}],32:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 /**
  * A specialized version of `_.some` for arrays without support for callback
  * shorthands and `this` binding.
@@ -2744,7 +6673,7 @@ function arraySome(array, predicate) {
 
 module.exports = arraySome;
 
-},{}],33:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 /**
  * Used by `_.defaults` to customize its `_.assign` use.
  *
@@ -2759,9 +6688,9 @@ function assignDefaults(objectValue, sourceValue) {
 
 module.exports = assignDefaults;
 
-},{}],34:[function(require,module,exports){
-var baseCopy = require(38),
-    keys = require(106);
+},{}],110:[function(require,module,exports){
+var baseCopy = require(114),
+    keys = require(182);
 
 /**
  * The base implementation of `_.assign` without support for argument juggling,
@@ -2796,12 +6725,12 @@ function baseAssign(object, source, customizer) {
 
 module.exports = baseAssign;
 
-},{"106":106,"38":38}],35:[function(require,module,exports){
-var baseMatches = require(55),
-    baseMatchesProperty = require(56),
-    baseProperty = require(57),
-    bindCallback = require(63),
-    identity = require(114);
+},{"114":114,"182":182}],111:[function(require,module,exports){
+var baseMatches = require(131),
+    baseMatchesProperty = require(132),
+    baseProperty = require(133),
+    bindCallback = require(139),
+    identity = require(190);
 
 /**
  * The base implementation of `_.callback` which supports specifying the
@@ -2833,17 +6762,17 @@ function baseCallback(func, thisArg, argCount) {
 
 module.exports = baseCallback;
 
-},{"114":114,"55":55,"56":56,"57":57,"63":63}],36:[function(require,module,exports){
-var arrayCopy = require(28),
-    arrayEach = require(29),
-    baseCopy = require(38),
-    baseForOwn = require(47),
-    initCloneArray = require(79),
-    initCloneByTag = require(80),
-    initCloneObject = require(81),
-    isArray = require(92),
-    isObject = require(96),
-    keys = require(106);
+},{"131":131,"132":132,"133":133,"139":139,"190":190}],112:[function(require,module,exports){
+var arrayCopy = require(104),
+    arrayEach = require(105),
+    baseCopy = require(114),
+    baseForOwn = require(123),
+    initCloneArray = require(155),
+    initCloneByTag = require(156),
+    initCloneObject = require(157),
+    isArray = require(168),
+    isObject = require(172),
+    keys = require(182);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -2964,7 +6893,7 @@ function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
 
 module.exports = baseClone;
 
-},{"106":106,"28":28,"29":29,"38":38,"47":47,"79":79,"80":80,"81":81,"92":92,"96":96}],37:[function(require,module,exports){
+},{"104":104,"105":105,"114":114,"123":123,"155":155,"156":156,"157":157,"168":168,"172":172,"182":182}],113:[function(require,module,exports){
 /**
  * The base implementation of `compareAscending` which compares values and
  * sorts them in ascending order without guaranteeing a stable sort.
@@ -2991,7 +6920,7 @@ function baseCompareAscending(value, other) {
 
 module.exports = baseCompareAscending;
 
-},{}],38:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 /**
  * Copies the properties of `source` to `object`.
  *
@@ -3018,10 +6947,10 @@ function baseCopy(source, object, props) {
 
 module.exports = baseCopy;
 
-},{}],39:[function(require,module,exports){
-var baseIndexOf = require(49),
-    cacheIndexOf = require(65),
-    createCache = require(71);
+},{}],115:[function(require,module,exports){
+var baseIndexOf = require(125),
+    cacheIndexOf = require(141),
+    createCache = require(147);
 
 /**
  * The base implementation of `_.difference` which accepts a single array
@@ -3072,9 +7001,9 @@ function baseDifference(array, values) {
 
 module.exports = baseDifference;
 
-},{"49":49,"65":65,"71":71}],40:[function(require,module,exports){
-var baseForOwn = require(47),
-    createBaseEach = require(69);
+},{"125":125,"141":141,"147":147}],116:[function(require,module,exports){
+var baseForOwn = require(123),
+    createBaseEach = require(145);
 
 /**
  * The base implementation of `_.forEach` without support for callback
@@ -3089,8 +7018,8 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"47":47,"69":69}],41:[function(require,module,exports){
-var baseEach = require(40);
+},{"123":123,"145":145}],117:[function(require,module,exports){
+var baseEach = require(116);
 
 /**
  * The base implementation of `_.filter` without support for callback
@@ -3113,7 +7042,7 @@ function baseFilter(collection, predicate) {
 
 module.exports = baseFilter;
 
-},{"40":40}],42:[function(require,module,exports){
+},{"116":116}],118:[function(require,module,exports){
 /**
  * The base implementation of `_.find`, `_.findLast`, `_.findKey`, and `_.findLastKey`,
  * without support for callback shorthands and `this` binding, which iterates
@@ -3140,7 +7069,7 @@ function baseFind(collection, predicate, eachFunc, retKey) {
 
 module.exports = baseFind;
 
-},{}],43:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 /**
  * The base implementation of `_.findIndex` and `_.findLastIndex` without
  * support for callback shorthands and `this` binding.
@@ -3165,11 +7094,11 @@ function baseFindIndex(array, predicate, fromRight) {
 
 module.exports = baseFindIndex;
 
-},{}],44:[function(require,module,exports){
-var isArguments = require(91),
-    isArray = require(92),
-    isLength = require(84),
-    isObjectLike = require(85);
+},{}],120:[function(require,module,exports){
+var isArguments = require(167),
+    isArray = require(168),
+    isLength = require(160),
+    isObjectLike = require(161);
 
 /**
  * The base implementation of `_.flatten` with added support for restricting
@@ -3211,8 +7140,8 @@ function baseFlatten(array, isDeep, isStrict) {
 
 module.exports = baseFlatten;
 
-},{"84":84,"85":85,"91":91,"92":92}],45:[function(require,module,exports){
-var createBaseFor = require(70);
+},{"160":160,"161":161,"167":167,"168":168}],121:[function(require,module,exports){
+var createBaseFor = require(146);
 
 /**
  * The base implementation of `baseForIn` and `baseForOwn` which iterates
@@ -3230,9 +7159,9 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"70":70}],46:[function(require,module,exports){
-var baseFor = require(45),
-    keysIn = require(107);
+},{"146":146}],122:[function(require,module,exports){
+var baseFor = require(121),
+    keysIn = require(183);
 
 /**
  * The base implementation of `_.forIn` without support for callback
@@ -3249,9 +7178,9 @@ function baseForIn(object, iteratee) {
 
 module.exports = baseForIn;
 
-},{"107":107,"45":45}],47:[function(require,module,exports){
-var baseFor = require(45),
-    keys = require(106);
+},{"121":121,"183":183}],123:[function(require,module,exports){
+var baseFor = require(121),
+    keys = require(182);
 
 /**
  * The base implementation of `_.forOwn` without support for callback
@@ -3268,8 +7197,8 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"106":106,"45":45}],48:[function(require,module,exports){
-var isFunction = require(93);
+},{"121":121,"182":182}],124:[function(require,module,exports){
+var isFunction = require(169);
 
 /**
  * The base implementation of `_.functions` which creates an array of
@@ -3297,8 +7226,8 @@ function baseFunctions(object, props) {
 
 module.exports = baseFunctions;
 
-},{"93":93}],49:[function(require,module,exports){
-var indexOfNaN = require(78);
+},{"169":169}],125:[function(require,module,exports){
+var indexOfNaN = require(154);
 
 /**
  * The base implementation of `_.indexOf` without support for binary searches.
@@ -3326,8 +7255,8 @@ function baseIndexOf(array, value, fromIndex) {
 
 module.exports = baseIndexOf;
 
-},{"78":78}],50:[function(require,module,exports){
-var baseIsEqualDeep = require(51);
+},{"154":154}],126:[function(require,module,exports){
+var baseIsEqualDeep = require(127);
 
 /**
  * The base implementation of `_.isEqual` without support for `this` binding
@@ -3362,12 +7291,12 @@ function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"51":51}],51:[function(require,module,exports){
-var equalArrays = require(75),
-    equalByTag = require(76),
-    equalObjects = require(77),
-    isArray = require(92),
-    isTypedArray = require(98);
+},{"127":127}],127:[function(require,module,exports){
+var equalArrays = require(151),
+    equalByTag = require(152),
+    equalObjects = require(153),
+    isArray = require(168),
+    isTypedArray = require(174);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -3471,7 +7400,7 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, 
 
 module.exports = baseIsEqualDeep;
 
-},{"75":75,"76":76,"77":77,"92":92,"98":98}],52:[function(require,module,exports){
+},{"151":151,"152":152,"153":153,"168":168,"174":174}],128:[function(require,module,exports){
 /**
  * The base implementation of `_.isFunction` without support for environments
  * with incorrect `typeof` results.
@@ -3488,8 +7417,8 @@ function baseIsFunction(value) {
 
 module.exports = baseIsFunction;
 
-},{}],53:[function(require,module,exports){
-var baseIsEqual = require(50);
+},{}],129:[function(require,module,exports){
+var baseIsEqual = require(126);
 
 /**
  * The base implementation of `_.isMatch` without support for callback
@@ -3539,8 +7468,8 @@ function baseIsMatch(object, props, values, strictCompareFlags, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"50":50}],54:[function(require,module,exports){
-var baseEach = require(40);
+},{"126":126}],130:[function(require,module,exports){
+var baseEach = require(116);
 
 /**
  * The base implementation of `_.map` without support for callback shorthands
@@ -3561,12 +7490,12 @@ function baseMap(collection, iteratee) {
 
 module.exports = baseMap;
 
-},{"40":40}],55:[function(require,module,exports){
-var baseIsMatch = require(53),
-    constant = require(113),
-    isStrictComparable = require(86),
-    keys = require(106),
-    toObject = require(90);
+},{"116":116}],131:[function(require,module,exports){
+var baseIsMatch = require(129),
+    constant = require(189),
+    isStrictComparable = require(162),
+    keys = require(182),
+    toObject = require(166);
 
 /**
  * The base implementation of `_.matches` which does not clone `source`.
@@ -3608,10 +7537,10 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"106":106,"113":113,"53":53,"86":86,"90":90}],56:[function(require,module,exports){
-var baseIsEqual = require(50),
-    isStrictComparable = require(86),
-    toObject = require(90);
+},{"129":129,"162":162,"166":166,"182":182,"189":189}],132:[function(require,module,exports){
+var baseIsEqual = require(126),
+    isStrictComparable = require(162),
+    toObject = require(166);
 
 /**
  * The base implementation of `_.matchesProperty` which does not coerce `key`
@@ -3636,7 +7565,7 @@ function baseMatchesProperty(key, value) {
 
 module.exports = baseMatchesProperty;
 
-},{"50":50,"86":86,"90":90}],57:[function(require,module,exports){
+},{"126":126,"162":162,"166":166}],133:[function(require,module,exports){
 /**
  * The base implementation of `_.property` which does not coerce `key` to a string.
  *
@@ -3652,7 +7581,7 @@ function baseProperty(key) {
 
 module.exports = baseProperty;
 
-},{}],58:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 /**
  * The base implementation of `_.slice` without an iteratee call guard.
  *
@@ -3686,7 +7615,7 @@ function baseSlice(array, start, end) {
 
 module.exports = baseSlice;
 
-},{}],59:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 /**
  * The base implementation of `_.sortBy` which uses `comparer` to define
  * the sort order of `array` and replaces criteria objects with their
@@ -3709,7 +7638,7 @@ function baseSortBy(array, comparer) {
 
 module.exports = baseSortBy;
 
-},{}],60:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 /**
  * Converts `value` to a string if it is not one. An empty string is returned
  * for `null` or `undefined` values.
@@ -3727,10 +7656,10 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{}],61:[function(require,module,exports){
-var baseIndexOf = require(49),
-    cacheIndexOf = require(65),
-    createCache = require(71);
+},{}],137:[function(require,module,exports){
+var baseIndexOf = require(125),
+    cacheIndexOf = require(141),
+    createCache = require(147);
 
 /**
  * The base implementation of `_.uniq` without support for callback shorthands
@@ -3786,7 +7715,7 @@ function baseUniq(array, iteratee) {
 
 module.exports = baseUniq;
 
-},{"49":49,"65":65,"71":71}],62:[function(require,module,exports){
+},{"125":125,"141":141,"147":147}],138:[function(require,module,exports){
 /**
  * The base implementation of `_.values` and `_.valuesIn` which creates an
  * array of `object` property values corresponding to the property names
@@ -3810,8 +7739,8 @@ function baseValues(object, props) {
 
 module.exports = baseValues;
 
-},{}],63:[function(require,module,exports){
-var identity = require(114);
+},{}],139:[function(require,module,exports){
+var identity = require(190);
 
 /**
  * A specialized version of `baseCallback` which only supports `this` binding
@@ -3851,10 +7780,10 @@ function bindCallback(func, thisArg, argCount) {
 
 module.exports = bindCallback;
 
-},{"114":114}],64:[function(require,module,exports){
+},{"190":190}],140:[function(require,module,exports){
 (function (global){
-var constant = require(113),
-    isNative = require(94);
+var constant = require(189),
+    isNative = require(170);
 
 /** Native method references. */
 var ArrayBuffer = isNative(ArrayBuffer = global.ArrayBuffer) && ArrayBuffer,
@@ -3910,8 +7839,8 @@ if (!bufferSlice) {
 module.exports = bufferClone;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"113":113,"94":94}],65:[function(require,module,exports){
-var isObject = require(96);
+},{"170":170,"189":189}],141:[function(require,module,exports){
+var isObject = require(172);
 
 /**
  * Checks if `value` is in `cache` mimicking the return signature of
@@ -3931,8 +7860,8 @@ function cacheIndexOf(cache, value) {
 
 module.exports = cacheIndexOf;
 
-},{"96":96}],66:[function(require,module,exports){
-var isObject = require(96);
+},{"172":172}],142:[function(require,module,exports){
+var isObject = require(172);
 
 /**
  * Adds `value` to the cache.
@@ -3953,8 +7882,8 @@ function cachePush(value) {
 
 module.exports = cachePush;
 
-},{"96":96}],67:[function(require,module,exports){
-var baseCompareAscending = require(37);
+},{"172":172}],143:[function(require,module,exports){
+var baseCompareAscending = require(113);
 
 /**
  * Used by `_.sortBy` to compare transformed elements of a collection and stable
@@ -3971,9 +7900,9 @@ function compareAscending(object, other) {
 
 module.exports = compareAscending;
 
-},{"37":37}],68:[function(require,module,exports){
-var bindCallback = require(63),
-    isIterateeCall = require(83);
+},{"113":113}],144:[function(require,module,exports){
+var bindCallback = require(139),
+    isIterateeCall = require(159);
 
 /**
  * Creates a function that assigns properties of source object(s) to a given
@@ -4022,9 +7951,9 @@ function createAssigner(assigner) {
 
 module.exports = createAssigner;
 
-},{"63":63,"83":83}],69:[function(require,module,exports){
-var isLength = require(84),
-    toObject = require(90);
+},{"139":139,"159":159}],145:[function(require,module,exports){
+var isLength = require(160),
+    toObject = require(166);
 
 /**
  * Creates a `baseEach` or `baseEachRight` function.
@@ -4054,8 +7983,8 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"84":84,"90":90}],70:[function(require,module,exports){
-var toObject = require(90);
+},{"160":160,"166":166}],146:[function(require,module,exports){
+var toObject = require(166);
 
 /**
  * Creates a base function for `_.forIn` or `_.forInRight`.
@@ -4083,11 +8012,11 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{"90":90}],71:[function(require,module,exports){
+},{"166":166}],147:[function(require,module,exports){
 (function (global){
-var SetCache = require(27),
-    constant = require(113),
-    isNative = require(94);
+var SetCache = require(103),
+    constant = require(189),
+    isNative = require(170);
 
 /** Native method references. */
 var Set = isNative(Set = global.Set) && Set;
@@ -4109,11 +8038,11 @@ var createCache = !(nativeCreate && Set) ? constant(null) : function(values) {
 module.exports = createCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"113":113,"27":27,"94":94}],72:[function(require,module,exports){
-var baseCallback = require(35),
-    baseFind = require(42),
-    baseFindIndex = require(43),
-    isArray = require(92);
+},{"103":103,"170":170,"189":189}],148:[function(require,module,exports){
+var baseCallback = require(111),
+    baseFind = require(118),
+    baseFindIndex = require(119),
+    isArray = require(168);
 
 /**
  * Creates a `_.find` or `_.findLast` function.
@@ -4136,9 +8065,9 @@ function createFind(eachFunc, fromRight) {
 
 module.exports = createFind;
 
-},{"35":35,"42":42,"43":43,"92":92}],73:[function(require,module,exports){
-var baseCallback = require(35),
-    baseFind = require(42);
+},{"111":111,"118":118,"119":119,"168":168}],149:[function(require,module,exports){
+var baseCallback = require(111),
+    baseFind = require(118);
 
 /**
  * Creates a `_.findKey` or `_.findLastKey` function.
@@ -4156,9 +8085,9 @@ function createFindKey(objectFunc) {
 
 module.exports = createFindKey;
 
-},{"35":35,"42":42}],74:[function(require,module,exports){
-var bindCallback = require(63),
-    isArray = require(92);
+},{"111":111,"118":118}],150:[function(require,module,exports){
+var bindCallback = require(139),
+    isArray = require(168);
 
 /**
  * Creates a function for `_.forEach` or `_.forEachRight`.
@@ -4178,7 +8107,7 @@ function createForEach(arrayFunc, eachFunc) {
 
 module.exports = createForEach;
 
-},{"63":63,"92":92}],75:[function(require,module,exports){
+},{"139":139,"168":168}],151:[function(require,module,exports){
 /**
  * A specialized version of `baseIsEqualDeep` for arrays with support for
  * partial deep comparisons.
@@ -4234,7 +8163,7 @@ function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stack
 
 module.exports = equalArrays;
 
-},{}],76:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
     dateTag = '[object Date]',
@@ -4285,8 +8214,8 @@ function equalByTag(object, other, tag) {
 
 module.exports = equalByTag;
 
-},{}],77:[function(require,module,exports){
-var keys = require(106);
+},{}],153:[function(require,module,exports){
+var keys = require(182);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -4361,7 +8290,7 @@ function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, sta
 
 module.exports = equalObjects;
 
-},{"106":106}],78:[function(require,module,exports){
+},{"182":182}],154:[function(require,module,exports){
 /**
  * Gets the index at which the first occurrence of `NaN` is found in `array`.
  *
@@ -4386,7 +8315,7 @@ function indexOfNaN(array, fromIndex, fromRight) {
 
 module.exports = indexOfNaN;
 
-},{}],79:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -4414,8 +8343,8 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],80:[function(require,module,exports){
-var bufferClone = require(64);
+},{}],156:[function(require,module,exports){
+var bufferClone = require(140);
 
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
@@ -4480,7 +8409,7 @@ function initCloneByTag(object, tag, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"64":64}],81:[function(require,module,exports){
+},{"140":140}],157:[function(require,module,exports){
 /**
  * Initializes an object clone.
  *
@@ -4498,7 +8427,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{}],82:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 /**
  * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
  * of an array-like value.
@@ -4521,10 +8450,10 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],83:[function(require,module,exports){
-var isIndex = require(82),
-    isLength = require(84),
-    isObject = require(96);
+},{}],159:[function(require,module,exports){
+var isIndex = require(158),
+    isLength = require(160),
+    isObject = require(172);
 
 /**
  * Checks if the provided arguments are from an iteratee call.
@@ -4555,7 +8484,7 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"82":82,"84":84,"96":96}],84:[function(require,module,exports){
+},{"158":158,"160":160,"172":172}],160:[function(require,module,exports){
 /**
  * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
  * of an array-like value.
@@ -4577,7 +8506,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],85:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 /**
  * Checks if `value` is object-like.
  *
@@ -4591,8 +8520,8 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],86:[function(require,module,exports){
-var isObject = require(96);
+},{}],162:[function(require,module,exports){
+var isObject = require(172);
 
 /**
  * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
@@ -4608,8 +8537,8 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"96":96}],87:[function(require,module,exports){
-var toObject = require(90);
+},{"172":172}],163:[function(require,module,exports){
+var toObject = require(166);
 
 /**
  * A specialized version of `_.pick` that picks `object` properties specified
@@ -4638,8 +8567,8 @@ function pickByArray(object, props) {
 
 module.exports = pickByArray;
 
-},{"90":90}],88:[function(require,module,exports){
-var baseForIn = require(46);
+},{"166":166}],164:[function(require,module,exports){
+var baseForIn = require(122);
 
 /**
  * A specialized version of `_.pick` that picks `object` properties `predicate`
@@ -4662,13 +8591,13 @@ function pickByCallback(object, predicate) {
 
 module.exports = pickByCallback;
 
-},{"46":46}],89:[function(require,module,exports){
-var isArguments = require(91),
-    isArray = require(92),
-    isIndex = require(82),
-    isLength = require(84),
-    keysIn = require(107),
-    support = require(112);
+},{"122":122}],165:[function(require,module,exports){
+var isArguments = require(167),
+    isArray = require(168),
+    isIndex = require(158),
+    isLength = require(160),
+    keysIn = require(183),
+    support = require(188);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -4706,8 +8635,8 @@ function shimKeys(object) {
 
 module.exports = shimKeys;
 
-},{"107":107,"112":112,"82":82,"84":84,"91":91,"92":92}],90:[function(require,module,exports){
-var isObject = require(96);
+},{"158":158,"160":160,"167":167,"168":168,"183":183,"188":188}],166:[function(require,module,exports){
+var isObject = require(172);
 
 /**
  * Converts `value` to an object if it is not one.
@@ -4722,9 +8651,9 @@ function toObject(value) {
 
 module.exports = toObject;
 
-},{"96":96}],91:[function(require,module,exports){
-var isLength = require(84),
-    isObjectLike = require(85);
+},{"172":172}],167:[function(require,module,exports){
+var isLength = require(160),
+    isObjectLike = require(161);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]';
@@ -4761,10 +8690,10 @@ function isArguments(value) {
 
 module.exports = isArguments;
 
-},{"84":84,"85":85}],92:[function(require,module,exports){
-var isLength = require(84),
-    isNative = require(94),
-    isObjectLike = require(85);
+},{"160":160,"161":161}],168:[function(require,module,exports){
+var isLength = require(160),
+    isNative = require(170),
+    isObjectLike = require(161);
 
 /** `Object#toString` result references. */
 var arrayTag = '[object Array]';
@@ -4803,10 +8732,10 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"84":84,"85":85,"94":94}],93:[function(require,module,exports){
+},{"160":160,"161":161,"170":170}],169:[function(require,module,exports){
 (function (global){
-var baseIsFunction = require(52),
-    isNative = require(94);
+var baseIsFunction = require(128),
+    isNative = require(170);
 
 /** `Object#toString` result references. */
 var funcTag = '[object Function]';
@@ -4849,9 +8778,9 @@ var isFunction = !(baseIsFunction(/x/) || (Uint8Array && !baseIsFunction(Uint8Ar
 module.exports = isFunction;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"52":52,"94":94}],94:[function(require,module,exports){
-var escapeRegExp = require(111),
-    isObjectLike = require(85);
+},{"128":128,"170":170}],170:[function(require,module,exports){
+var escapeRegExp = require(187),
+    isObjectLike = require(161);
 
 /** `Object#toString` result references. */
 var funcTag = '[object Function]';
@@ -4905,7 +8834,7 @@ function isNative(value) {
 
 module.exports = isNative;
 
-},{"111":111,"85":85}],95:[function(require,module,exports){
+},{"161":161,"187":187}],171:[function(require,module,exports){
 /**
  * Checks if `value` is `null`.
  *
@@ -4928,7 +8857,7 @@ function isNull(value) {
 
 module.exports = isNull;
 
-},{}],96:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 /**
  * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
  * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
@@ -4958,8 +8887,8 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],97:[function(require,module,exports){
-var isObjectLike = require(85);
+},{}],173:[function(require,module,exports){
+var isObjectLike = require(161);
 
 /** `Object#toString` result references. */
 var stringTag = '[object String]';
@@ -4995,9 +8924,9 @@ function isString(value) {
 
 module.exports = isString;
 
-},{"85":85}],98:[function(require,module,exports){
-var isLength = require(84),
-    isObjectLike = require(85);
+},{"161":161}],174:[function(require,module,exports){
+var isLength = require(160),
+    isObjectLike = require(161);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -5071,7 +9000,7 @@ function isTypedArray(value) {
 
 module.exports = isTypedArray;
 
-},{"84":84,"85":85}],99:[function(require,module,exports){
+},{"160":160,"161":161}],175:[function(require,module,exports){
 /**
  * Checks if `value` is `undefined`.
  *
@@ -5094,10 +9023,10 @@ function isUndefined(value) {
 
 module.exports = isUndefined;
 
-},{}],100:[function(require,module,exports){
-var arrayCopy = require(28),
-    isLength = require(84),
-    values = require(110);
+},{}],176:[function(require,module,exports){
+var arrayCopy = require(104),
+    isLength = require(160),
+    values = require(186);
 
 /**
  * Converts `value` to an array.
@@ -5127,9 +9056,9 @@ function toArray(value) {
 
 module.exports = toArray;
 
-},{"110":110,"28":28,"84":84}],101:[function(require,module,exports){
-var baseAssign = require(34),
-    createAssigner = require(68);
+},{"104":104,"160":160,"186":186}],177:[function(require,module,exports){
+var baseAssign = require(110),
+    createAssigner = require(144);
 
 /**
  * Assigns own enumerable properties of source object(s) to the destination
@@ -5164,10 +9093,10 @@ var assign = createAssigner(baseAssign);
 
 module.exports = assign;
 
-},{"34":34,"68":68}],102:[function(require,module,exports){
-var assign = require(101),
-    assignDefaults = require(33),
-    restParam = require(26);
+},{"110":110,"144":144}],178:[function(require,module,exports){
+var assign = require(177),
+    assignDefaults = require(109),
+    restParam = require(102);
 
 /**
  * Assigns own enumerable properties of source object(s) to the destination
@@ -5196,9 +9125,9 @@ var defaults = restParam(function(args) {
 
 module.exports = defaults;
 
-},{"101":101,"26":26,"33":33}],103:[function(require,module,exports){
-var baseForOwn = require(47),
-    createFindKey = require(73);
+},{"102":102,"109":109,"177":177}],179:[function(require,module,exports){
+var baseForOwn = require(123),
+    createFindKey = require(149);
 
 /**
  * This method is like `_.find` except that it returns the key of the first
@@ -5252,9 +9181,9 @@ var findKey = createFindKey(baseForOwn);
 
 module.exports = findKey;
 
-},{"47":47,"73":73}],104:[function(require,module,exports){
-var baseFunctions = require(48),
-    keysIn = require(107);
+},{"123":123,"149":149}],180:[function(require,module,exports){
+var baseFunctions = require(124),
+    keysIn = require(183);
 
 /**
  * Creates an array of function property names from all enumerable properties,
@@ -5277,7 +9206,7 @@ function functions(object) {
 
 module.exports = functions;
 
-},{"107":107,"48":48}],105:[function(require,module,exports){
+},{"124":124,"183":183}],181:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -5307,11 +9236,11 @@ function has(object, key) {
 
 module.exports = has;
 
-},{}],106:[function(require,module,exports){
-var isLength = require(84),
-    isNative = require(94),
-    isObject = require(96),
-    shimKeys = require(89);
+},{}],182:[function(require,module,exports){
+var isLength = require(160),
+    isNative = require(170),
+    isObject = require(172),
+    shimKeys = require(165);
 
 /* Native method references for those with the same name as other `lodash` methods. */
 var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -5357,13 +9286,13 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"84":84,"89":89,"94":94,"96":96}],107:[function(require,module,exports){
-var isArguments = require(91),
-    isArray = require(92),
-    isIndex = require(82),
-    isLength = require(84),
-    isObject = require(96),
-    support = require(112);
+},{"160":160,"165":165,"170":170,"172":172}],183:[function(require,module,exports){
+var isArguments = require(167),
+    isArray = require(168),
+    isIndex = require(158),
+    isLength = require(160),
+    isObject = require(172),
+    support = require(188);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -5424,15 +9353,15 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"112":112,"82":82,"84":84,"91":91,"92":92,"96":96}],108:[function(require,module,exports){
-var arrayMap = require(31),
-    baseDifference = require(39),
-    baseFlatten = require(44),
-    bindCallback = require(63),
-    keysIn = require(107),
-    pickByArray = require(87),
-    pickByCallback = require(88),
-    restParam = require(26);
+},{"158":158,"160":160,"167":167,"168":168,"172":172,"188":188}],184:[function(require,module,exports){
+var arrayMap = require(107),
+    baseDifference = require(115),
+    baseFlatten = require(120),
+    bindCallback = require(139),
+    keysIn = require(183),
+    pickByArray = require(163),
+    pickByCallback = require(164),
+    restParam = require(102);
 
 /**
  * The opposite of `_.pick`; this method creates an object composed of the
@@ -5478,12 +9407,12 @@ var omit = restParam(function(object, props) {
 
 module.exports = omit;
 
-},{"107":107,"26":26,"31":31,"39":39,"44":44,"63":63,"87":87,"88":88}],109:[function(require,module,exports){
-var baseFlatten = require(44),
-    bindCallback = require(63),
-    pickByArray = require(87),
-    pickByCallback = require(88),
-    restParam = require(26);
+},{"102":102,"107":107,"115":115,"120":120,"139":139,"163":163,"164":164,"183":183}],185:[function(require,module,exports){
+var baseFlatten = require(120),
+    bindCallback = require(139),
+    pickByArray = require(163),
+    pickByCallback = require(164),
+    restParam = require(102);
 
 /**
  * Creates an object composed of the picked `object` properties. Property
@@ -5522,9 +9451,9 @@ var pick = restParam(function(object, props) {
 
 module.exports = pick;
 
-},{"26":26,"44":44,"63":63,"87":87,"88":88}],110:[function(require,module,exports){
-var baseValues = require(62),
-    keys = require(106);
+},{"102":102,"120":120,"139":139,"163":163,"164":164}],186:[function(require,module,exports){
+var baseValues = require(138),
+    keys = require(182);
 
 /**
  * Creates an array of the own enumerable property values of `object`.
@@ -5557,8 +9486,8 @@ function values(object) {
 
 module.exports = values;
 
-},{"106":106,"62":62}],111:[function(require,module,exports){
-var baseToString = require(60);
+},{"138":138,"182":182}],187:[function(require,module,exports){
+var baseToString = require(136);
 
 /**
  * Used to match `RegExp` [special characters](http://www.regular-expressions.info/characters.html#special).
@@ -5591,7 +9520,7 @@ function escapeRegExp(string) {
 
 module.exports = escapeRegExp;
 
-},{"60":60}],112:[function(require,module,exports){
+},{"136":136}],188:[function(require,module,exports){
 (function (global){
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -5665,7 +9594,7 @@ var support = {};
 module.exports = support;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],113:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 /**
  * Creates a function that returns `value`.
  *
@@ -5690,7 +9619,7 @@ function constant(value) {
 
 module.exports = constant;
 
-},{}],114:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 /**
  * This method returns the first argument provided to it.
  *
@@ -5712,9 +9641,9 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],115:[function(require,module,exports){
-var baseClone = require(36),
-    baseMatches = require(55);
+},{}],191:[function(require,module,exports){
+var baseClone = require(112),
+    baseMatches = require(131);
 
 /**
  * Creates a function which performs a deep comparison between a given object
@@ -5747,7 +9676,7 @@ function matches(source) {
 
 module.exports = matches;
 
-},{"36":36,"55":55}],116:[function(require,module,exports){
+},{"112":112,"131":131}],192:[function(require,module,exports){
 /**
  * A no-operation function which returns `undefined` regardless of the
  * arguments it receives.
@@ -5768,3798 +9697,7 @@ function noop() {
 
 module.exports = noop;
 
-},{}],117:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var DispatchCoordinator = require(131);
-
-var ActionCreators = (function (_DispatchCoordinator) {
-  function ActionCreators(options) {
-    _classCallCheck(this, ActionCreators);
-
-    _get(Object.getPrototypeOf(ActionCreators.prototype), 'constructor', this).call(this, 'ActionCreators', options);
-  }
-
-  _inherits(ActionCreators, _DispatchCoordinator);
-
-  return ActionCreators;
-})(DispatchCoordinator);
-
-module.exports = ActionCreators;
-
-},{"131":131}],118:[function(require,module,exports){
-'use strict';
-
-var _ = require(152);
-var createClass = require(128);
-var ActionCreators = require(117);
-var RESERVED_KEYWORDS = ['dispatch'];
-
-function createActionCreatorsClass(properties) {
-  _.extend.apply(_, [properties].concat(properties.mixins));
-  _.each(RESERVED_KEYWORDS, function (keyword) {
-    if (properties[keyword]) {
-      throw new Error('' + keyword + ' is a reserved keyword');
-    }
-  });
-
-  var classProperties = _.omit(properties, 'mixins', 'types');
-
-  return createClass(classProperties, properties, ActionCreators);
-}
-
-module.exports = createActionCreatorsClass;
-
-},{"117":117,"128":128,"152":152}],119:[function(require,module,exports){
-'use strict';
-
-var ActionCreators = require(117);
-var createActionCreatorsClass = require(118);
-
-module.exports = function (marty) {
-  marty.registerClass('ActionCreators', ActionCreators);
-  marty.register('createActionCreators', createActionCreators);
-
-  function createActionCreators(properties) {
-    var ActionCreatorsClass = createActionCreatorsClass(properties);
-    var defaultInstance = this.register(ActionCreatorsClass);
-
-    return defaultInstance;
-  }
-};
-
-},{"117":117,"118":118}],120:[function(require,module,exports){
-'use strict';
-
-var log = require(138);
-var _ = require(152);
-var warnings = require(156);
-
-function constants(obj) {
-  return toConstant(obj);
-
-  function toConstant(obj) {
-    if (!obj) {
-      return {};
-    }
-
-    if (_.isArray(obj)) {
-      return arrayToConstants(obj);
-    }
-
-    if (_.isObject(obj)) {
-      return objectToConstants(obj);
-    }
-  }
-
-  function objectToConstants(obj) {
-    return _.object(_.map(obj, valueToArray));
-
-    function valueToArray(value, actionType) {
-      return [actionType, toConstant(value)];
-    }
-  }
-
-  function arrayToConstants(array) {
-    var constants = {};
-
-    _.each(array, function (actionType) {
-      var types = [actionType, actionType + '_STARTING', actionType + '_DONE', actionType + '_FAILED'];
-
-      _.each(types, function (type) {
-        constants[type] = createActionCreator(type);
-      });
-    });
-
-    return constants;
-  }
-
-  function createActionCreator(actionType) {
-    var constantActionCreator = function constantActionCreator(actionCreator) {
-      if (warnings.invokeConstant) {
-        log.warn('Warning: Invoking constants has been depreciated. ' + 'Please migrate to new style of creating action creators ' + 'http://martyjs.org/guides/action-creators/migrating-from-v8.html');
-      }
-
-      if (!_.isFunction(actionCreator)) {
-        actionCreator = autoDispatch;
-      }
-
-      return function () {
-        var context = actionContext(this);
-
-        actionCreator.apply(context, arguments);
-
-        function actionContext(creators) {
-          return _.extend({}, creators, {
-            dispatch: function dispatch() {
-              var args = _.toArray(arguments);
-
-              args.unshift(actionType);
-
-              creators.dispatch.apply(creators, args);
-            }
-          });
-        }
-      };
-
-      function autoDispatch() {
-        this.dispatch.apply(this, arguments);
-      }
-    };
-
-    constantActionCreator.type = actionType;
-    constantActionCreator.isActionCreator = true;
-    constantActionCreator.toString = function () {
-      return actionType;
-    };
-
-    return constantActionCreator;
-  }
-}
-
-module.exports = constants;
-
-},{"138":138,"152":152,"156":156}],121:[function(require,module,exports){
-'use strict';
-
-var constants = require(120);
-
-module.exports = function (marty) {
-  marty.register('createConstants', createConstants);
-
-  function createConstants(obj) {
-    return constants(obj);
-  }
-};
-
-},{"120":120}],122:[function(require,module,exports){
-'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var log = require(138);
-var _ = require(152);
-var uuid = require(155);
-var StoreObserver = require(146);
-var getFetchResult = require(123);
-var getClassName = require(149);
-
-var RESERVED_FUNCTIONS = ['contextTypes', 'componentDidMount', 'onStoreChanged', 'componentWillUnmount', 'getInitialState', 'getState', 'render'];
-
-module.exports = function (React) {
-  return function createContainer(InnerComponent, config) {
-    config = config || {};
-
-    if (!InnerComponent) {
-      throw new Error('Must specify an inner component');
-    }
-
-    var id = uuid.type('Component');
-    var innerComponentDisplayName = InnerComponent.displayName || getClassName(InnerComponent);
-    var contextTypes = _.extend({
-      marty: React.PropTypes.object
-    }, config.contextTypes);
-
-    var Container = React.createClass(_.extend({
-      contextTypes: contextTypes,
-      componentDidMount: function componentDidMount() {
-        var component = {
-          id: id,
-          displayName: innerComponentDisplayName
-        };
-
-        this.observer = new StoreObserver({
-          component: component,
-          onStoreChanged: this.onStoreChanged,
-          stores: getStoresToListenTo(this.listenTo, component)
-        });
-
-        if (_.isFunction(config.componentDidMount)) {
-          config.componentDidMount.call(this);
-        }
-      },
-      componentWillMount: function componentWillMount() {
-        if (_.isFunction(config.componentWillMount)) {
-          config.componentWillMount.call(this);
-        }
-      },
-      componentWillReceiveProps: function componentWillReceiveProps(props) {
-        this.props = props;
-        this.setState(this.getState(props));
-
-        if (_.isFunction(config.componentWillReceiveProps)) {
-          config.componentWillReceiveProps.call(this, props);
-        }
-      },
-      componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-        if (_.isFunction(config.componentWillUpdate)) {
-          config.componentWillUpdate.call(this, nextProps, nextState);
-        }
-      },
-      componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
-        if (_.isFunction(config.componentDidUpdate)) {
-          config.componentDidUpdate.call(this, prevProps, prevState);
-        }
-      },
-      onStoreChanged: function onStoreChanged() {
-        this.setState(this.getState());
-      },
-      componentWillUnmount: function componentWillUnmount() {
-        if (this.observer) {
-          this.observer.dispose();
-        }
-
-        if (_.isFunction(config.componentWillUnmount)) {
-          config.componentWillUnmount.call(this);
-        }
-      },
-      getInitialState: function getInitialState() {
-        return this.getState();
-      },
-      getState: function getState() {
-        return {
-          result: getFetchResult(this)
-        };
-      },
-      done: function done(results) {
-        return React.createElement(InnerComponent, _extends({ ref: 'innerComponent' }, this.props, results));
-      },
-      getInnerComponent: function getInnerComponent() {
-        return this.refs.innerComponent;
-      },
-      render: function render() {
-        var container = this;
-
-        return this.state.result.when({
-          done: function done(results) {
-            if (_.isFunction(container.done)) {
-              return container.done(results);
-            }
-
-            throw new Error('The `done` handler must be a function');
-          },
-          pending: function pending() {
-            if (_.isFunction(container.pending)) {
-              return container.pending();
-            }
-
-            return React.createElement('div', null);
-          },
-          failed: function failed(error) {
-            if (_.isFunction(container.failed)) {
-              return container.failed(error);
-            }
-
-            throw error;
-          }
-        });
-      }
-    }, _.omit(config, RESERVED_FUNCTIONS)));
-
-    Container.InnerComponent = InnerComponent;
-    Container.displayName = innerComponentDisplayName + 'Container';
-
-    return Container;
-  };
-
-  function getStoresToListenTo(stores, component) {
-    if (!stores) {
-      return [];
-    }
-
-    if (!_.isArray(stores)) {
-      stores = [stores];
-    }
-
-    return _.filter(stores, function (store) {
-      var isStore = store.constructor.type === 'Store';
-
-      if (!isStore) {
-        log.warn('Warning: Trying to listen to something that isn\'t a store', store, component.displayName);
-      }
-
-      return isStore;
-    });
-  }
-};
-
-},{"123":123,"138":138,"146":146,"149":149,"152":152,"155":155}],123:[function(require,module,exports){
-'use strict';
-
-var log = require(138);
-var _ = require(152);
-var fetch = require(184);
-
-function getFetchResult(component) {
-  var errors = {};
-  var results = {};
-  var isPending = false;
-  var hasFailed = false;
-  var fetches = invokeFetches(component);
-
-  _.each(fetches, function (fetch, key) {
-    if (fetch.done) {
-      results[key] = fetch.result;
-    } else if (fetch.pending) {
-      isPending = true;
-    } else if (fetch.failed) {
-      hasFailed = true;
-      errors[key] = fetch.error;
-    }
-  });
-
-  if (hasFailed) {
-    return fetch.failed(errors);
-  }
-
-  if (isPending) {
-    return fetch.pending();
-  }
-
-  return fetch.done(results);
-}
-
-function invokeFetches(component) {
-  var fetches = {};
-
-  if (_.isFunction(component.fetch)) {
-    var result = component.fetch.call(component);
-
-    if (result._isFetchResult) {
-      throw new Error('Cannot return a single fetch result. You must return an object ' + 'literal where the keys map to props and the values can be fetch results');
-    }
-
-    _.each(result, function (result, key) {
-      if (!result || !result._isFetchResult) {
-        result = fetch.done(result);
-      }
-
-      fetches[key] = result;
-    });
-  } else {
-    _.each(component.fetch, function (getResult, key) {
-      if (!_.isFunction(getResult)) {
-        log.warn('The fetch ' + key + ' was not a function and so ignoring');
-      } else {
-        var result = getResult.call(component);
-
-        if (!result || !result._isFetchResult) {
-          result = fetch.done(result);
-        }
-
-        fetches[key] = result;
-      }
-    });
-  }
-
-  return fetches;
-}
-
-module.exports = getFetchResult;
-
-},{"138":138,"152":152,"184":184}],124:[function(require,module,exports){
-'use strict';
-
-module.exports = function (marty, React) {
-  marty.register('createContainer', require(122)(React));
-};
-
-},{"122":122}],125:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var cookieFactory = defaultCookieFactory;
-var StateSource = require(144);
-
-var CookieStateSource = (function (_StateSource) {
-  function CookieStateSource(options) {
-    _classCallCheck(this, CookieStateSource);
-
-    _get(Object.getPrototypeOf(CookieStateSource.prototype), 'constructor', this).call(this, options);
-    this._isCookieStateSource = true;
-    this._cookies = cookieFactory(this.context);
-  }
-
-  _inherits(CookieStateSource, _StateSource);
-
-  _createClass(CookieStateSource, [{
-    key: 'get',
-    value: function get(key) {
-      return this._cookies.get(key);
-    }
-  }, {
-    key: 'set',
-    value: function set(key, value, options) {
-      return this._cookies.set(key, value, options);
-    }
-  }, {
-    key: 'expire',
-    value: function expire(key) {
-      return this._cookies.expire(key);
-    }
-  }], [{
-    key: 'setCookieFactory',
-    value: function setCookieFactory(value) {
-      cookieFactory = value;
-    }
-  }]);
-
-  return CookieStateSource;
-})(StateSource);
-
-function defaultCookieFactory() {
-  return require(2);
-}
-
-module.exports = CookieStateSource;
-
-},{"144":144,"2":2}],126:[function(require,module,exports){
-'use strict';
-
-var CookieStateSource = require(125);
-
-module.exports = function (marty) {
-  marty.registerStateSource('CookieStateSource', 'cookie', CookieStateSource);
-};
-
-},{"125":125}],127:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-var uuid = require(155);
-
-function ActionPayload(options) {
-  options || (options = {});
-
-  var stores = [];
-  var components = [];
-  var rollbackHandlers = [];
-  var actionHandledCallbacks = {};
-
-  _.extend(this, options);
-
-  this.id = options.id || uuid.small();
-  this.type = actionType(options.type);
-  this.arguments = _.toArray(options.arguments);
-
-  this.toJSON = toJSON;
-  this.handled = handled;
-  this.toString = toString;
-  this.rollback = rollback;
-  this.addStoreHandler = addStoreHandler;
-  this.onActionHandled = onActionHandled;
-  this.addRollbackHandler = addRollbackHandler;
-  this.addComponentHandler = addComponentHandler;
-  this.timestamp = options.timestamp || new Date();
-
-  Object.defineProperty(this, 'stores', {
-    get: function get() {
-      return stores;
-    }
-  });
-
-  Object.defineProperty(this, 'components', {
-    get: function get() {
-      return components;
-    }
-  });
-
-  function actionType(type) {
-    if (_.isFunction(type)) {
-      return type.toString();
-    }
-
-    return type;
-  }
-
-  function toString() {
-    return JSON.stringify(this.toJSON(), null, 2);
-  }
-
-  function toJSON() {
-    var json = _.pick(this, 'id', 'type', 'stores', 'arguments', 'timestamp', 'components');
-
-    return json;
-  }
-
-  function rollback() {
-    var _this = this;
-
-    _.each(rollbackHandlers, function (rollback) {
-      return rollback(_this.error);
-    });
-  }
-
-  function handled() {
-    _.each(actionHandledCallbacks, function (callback) {
-      return callback();
-    });
-  }
-
-  function onActionHandled(id, cb) {
-    actionHandledCallbacks[id] = cb;
-  }
-
-  function addComponentHandler(component, store) {
-    components.push(_.extend({
-      id: uuid.small(),
-      store: store.id || store.displayName
-    }, component));
-  }
-
-  function addStoreHandler(store, handlerName) {
-    stores.push({
-      id: uuid.small(),
-      handler: handlerName,
-      store: store.id || store.displayName
-    });
-  }
-
-  function addRollbackHandler(rollbackHandler, context) {
-    if (_.isFunction(rollbackHandler)) {
-      if (context) {
-        rollbackHandler = _.bind(rollbackHandler, context);
-      }
-
-      rollbackHandlers.push(rollbackHandler);
-    }
-  }
-}
-
-module.exports = ActionPayload;
-
-},{"141":141,"155":155}],128:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-
-function createClass(properties, defaultOptions, BaseType) {
-  function Class(options) {
-    classCallCheck(this, Class);
-    this.id = properties.id;
-    this.displayName = properties.displayName;
-
-    var base = get(Object.getPrototypeOf(Class.prototype), 'constructor', this);
-    var baseOptions = _.extend({}, defaultOptions, options, properties);
-
-    if (defaultOptions.dispatcher) {
-      baseOptions.dispatcher = defaultOptions.dispatcher;
-    }
-
-    base.call(this, baseOptions);
-  }
-
-  if (BaseType) {
-    inherits(Class, BaseType);
-  }
-
-  _.extend(Class.prototype, properties);
-
-  Class.id = properties.id;
-  Class.displayName = properties.displayName;
-
-  return Class;
-}
-
-function get(_x, _x2, _x3) {
-  var _again = true;
-
-  _function: while (_again) {
-    desc = parent = getter = undefined;
-    _again = false;
-    var object = _x,
-        property = _x2,
-        receiver = _x3;
-
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-      if (parent === null) {
-        return undefined;
-      } else {
-        _x = parent;
-        _x2 = property;
-        _x3 = receiver;
-        _again = true;
-        continue _function;
-      }
-    } else if ('value' in desc && desc.writable) {
-      return desc.value;
-    } else {
-      var getter = desc.get;
-      if (getter === undefined) {
-        return undefined;
-      }
-      return getter.call(receiver);
-    }
-  }
-}
-
-function inherits(subClass, superClass) {
-  if (typeof superClass !== 'function' && superClass !== null) {
-    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-
-  if (superClass) {
-    subClass.__proto__ = superClass;
-  }
-}
-
-function classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError('Cannot call a class as a function');
-  }
-}
-
-module.exports = createClass;
-
-},{"141":141}],129:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-var uuid = require(155);
-var Dispatcher = require(4).Dispatcher;
-var ActionPayload = require(127);
-var EventEmitter = require(194);
-
-var ACTION_DISPATCHED = 'ACTION_DISPATCHED';
-
-function createDispatcher() {
-  var emitter = new EventEmitter();
-  var dispatcher = new Dispatcher();
-
-  dispatcher.id = uuid.generate();
-  dispatcher.isDefault = false;
-  dispatcher.dispatchAction = function (options) {
-    var action = new ActionPayload(options);
-
-    this.dispatch(action);
-
-    action.handled();
-    emitter.emit(ACTION_DISPATCHED, action);
-
-    return action;
-  };
-
-  dispatcher.onActionDispatched = function (callback, context) {
-    if (context) {
-      callback = _.bind(callback, context);
-    }
-
-    emitter.on(ACTION_DISPATCHED, callback);
-
-    return {
-      dispose: function dispose() {
-        emitter.removeListener(ACTION_DISPATCHED, callback);
-      }
-    };
-  };
-
-  return dispatcher;
-}
-
-module.exports = createDispatcher;
-
-},{"127":127,"141":141,"155":155,"194":194,"4":4}],130:[function(require,module,exports){
-"use strict";
-
-var diagnostics = {
-  trace: trace,
-  enabled: false,
-  devtoolsEnabled: false };
-
-module.exports = diagnostics;
-
-function trace() {
-  if (diagnostics.enabled) {
-    console && console.log.apply(console, arguments);
-  }
-}
-
-},{}],131:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var log = require(138);
-var uuid = require(155);
-var warnings = require(156);
-var resolve = require(153);
-var Environment = require(132);
-
-var DispatchCoordinator = (function () {
-  function DispatchCoordinator(type, options) {
-    _classCallCheck(this, DispatchCoordinator);
-
-    if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
-      log.warn('Warning: Options were not passed into an action creators\' constructor');
-    }
-
-    options = options || {};
-
-    this.__type = type;
-    this.__context = options.context;
-    this.__id = uuid.type(this.__type);
-    this.__dispatcher = options.dispatcher;
-  }
-
-  _createClass(DispatchCoordinator, [{
-    key: 'dispatch',
-    value: function dispatch(type) {
-      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
-      }
-
-      return this.__dispatcher.dispatchAction({
-        type: type,
-        arguments: args
-      });
-    }
-  }, {
-    key: 'for',
-    value: function _for(obj) {
-      return resolve(this, obj);
-    }
-  }, {
-    key: 'context',
-    get: function () {
-      return this.__context;
-    }
-  }]);
-
-  return DispatchCoordinator;
-})();
-
-module.exports = DispatchCoordinator;
-
-},{"132":132,"138":138,"153":153,"155":155,"156":156}],132:[function(require,module,exports){
-'use strict';
-
-var windowDefined = typeof window !== 'undefined';
-var environment = windowDefined ? 'browser' : 'server';
-
-module.exports = {
-  environment: environment,
-  isServer: environment === 'server',
-  isBrowser: environment === 'browser'
-};
-
-},{}],133:[function(require,module,exports){
-'use strict';
-
-function ActionHandlerNotFoundError(actionHandler, store) {
-  this.name = 'Action handler not found';
-  this.message = 'The action handler "' + actionHandler + '" could not be found';
-
-  if (store) {
-    var displayName = store.displayName || store.id;
-    this.message += ' in the ' + displayName + ' store';
-  }
-}
-
-ActionHandlerNotFoundError.prototype = Error.prototype;
-
-module.exports = ActionHandlerNotFoundError;
-
-},{}],134:[function(require,module,exports){
-'use strict';
-
-function ActionPredicateUndefinedError(actionHandler, store) {
-  this.name = 'Action predicate undefined';
-  this.message = 'The action predicate for "' + actionHandler + '" was undefined';
-
-  if (store) {
-    var displayName = store.displayName || store.id;
-    this.message += ' in the ' + displayName + ' store';
-  }
-}
-
-ActionPredicateUndefinedError.prototype = Error.prototype;
-
-module.exports = ActionPredicateUndefinedError;
-
-},{}],135:[function(require,module,exports){
-'use strict';
-
-function CompoundError(errors) {
-  this.errors = errors;
-  this.name = 'Compound error';
-}
-
-CompoundError.prototype = Error.prototype;
-
-module.exports = CompoundError;
-
-},{}],136:[function(require,module,exports){
-'use strict';
-
-function NotFoundError(message) {
-  this.name = 'Not found';
-  this.message = message || 'Not found';
-  this.status = 404;
-}
-
-NotFoundError.prototype = Error.prototype;
-
-module.exports = NotFoundError;
-
-},{}],137:[function(require,module,exports){
-'use strict';
-
-function UnkownStoreError(store) {
-  this.name = 'Unknown store';
-  this.message = 'Unknown store ' + store;
-}
-
-UnkownStoreError.prototype = Error.prototype;
-
-module.exports = UnkownStoreError;
-
-},{}],138:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-var Diagnostics = require(130);
-
-if (console) {
-  module.exports = console;
-  module.exports.trace = function trace() {
-    if (Diagnostics.enabled) {
-      console.log.apply(console, arguments);
-    }
-  };
-} else {
-  module.exports = {
-    log: _.noop,
-    warn: _.noop,
-    error: _.noop
-  };
-}
-
-},{"130":130,"141":141}],139:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _ = require(141);
-var Registry = require(142);
-var MartyBuilder = require(140);
-var createDispatcher = require(129);
-
-var Marty = function Marty(version, react) {
-  _classCallCheck(this, Marty);
-
-  var builder = new MartyBuilder(this);
-
-  this.version = version;
-  this.dispatcher = createDispatcher();
-  this.registry = new Registry({
-    defaultDispatcher: this.dispatcher
-  });
-
-  this.use = function use(cb) {
-    if (!_.isFunction(cb)) {
-      throw new Error('Must pass in a function');
-    }
-
-    cb(builder, react);
-  };
-};
-
-module.exports = Marty;
-
-},{"129":129,"140":140,"141":141,"142":142}],140:[function(require,module,exports){
-"use strict";
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var MartyBuilder = (function () {
-  function MartyBuilder(marty) {
-    _classCallCheck(this, MartyBuilder);
-
-    this._marty = marty;
-    this.stateSources = {};
-  }
-
-  _createClass(MartyBuilder, [{
-    key: "registerStateSource",
-    value: function registerStateSource(id, stateSourceId, clazz) {
-      this.registerClass(id, clazz);
-      this.stateSources[stateSourceId] = clazz;
-    }
-  }, {
-    key: "registerClass",
-    value: function registerClass(id, clazz) {
-      this._marty[id] = clazz;
-      this._marty.registry.addClass(id, clazz);
-    }
-  }, {
-    key: "register",
-    value: function register(id, value) {
-      this._marty[id] = value;
-    }
-  }]);
-
-  return MartyBuilder;
-})();
-
-module.exports = MartyBuilder;
-
-},{}],141:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  any: require(32),
-  bind: require(63),
-  defaults: require(102),
-  each: require(20),
-  extend: require(101),
-  find: require(19),
-  findKey: require(103),
-  first: require(12),
-  rest: require(15),
-  has: require(105),
-  initial: require(13),
-  isArray: require(92),
-  isFunction: require(52),
-  isNull: require(95),
-  isObject: require(96),
-  isString: require(97),
-  isUndefined: require(99),
-  last: require(14),
-  map: require(22),
-  matches: require(115),
-  noop: require(116),
-  object: require(17),
-  omit: require(108),
-  pick: require(109),
-  toArray: require(100),
-  union: require(16),
-  values: require(110),
-  once: require(25),
-  filter: require(18),
-  invoke: require(21),
-  sortBy: require(23),
-  functions: require(104),
-  difference: require(9) };
-
-},{"100":100,"101":101,"102":102,"103":103,"104":104,"105":105,"108":108,"109":109,"110":110,"115":115,"116":116,"12":12,"13":13,"14":14,"15":15,"16":16,"17":17,"18":18,"19":19,"20":20,"21":21,"22":22,"23":23,"25":25,"32":32,"52":52,"63":63,"9":9,"92":92,"95":95,"96":96,"97":97,"99":99}],142:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _ = require(141);
-var log = require(138);
-var warnings = require(156);
-var classId = require(147);
-var Environment = require(132);
-var humanStrings = require(151);
-
-var FUNCTIONS_TO_NOT_WRAP = ['fetch'];
-
-var Registry = (function () {
-  function Registry(options) {
-    _classCallCheck(this, Registry);
-
-    this.types = {};
-    this.classes = {};
-    this.defaults = {};
-    this.defaultDispatcher = options.defaultDispatcher;
-  }
-
-  _createClass(Registry, [{
-    key: 'addClass',
-    value: function addClass(id, clazz) {
-      this.classes[id] = clazz;
-      addClassHelper(this, id);
-    }
-  }, {
-    key: 'getClassId',
-    value: function getClassId(obj) {
-      var id = _.findKey(this.classes, function (type) {
-        return obj instanceof type;
-      });
-
-      if (!id) {
-        throw new Error('Unknown type');
-      }
-
-      return id;
-    }
-  }, {
-    key: 'dispose',
-    value: function dispose() {
-      this.types = {};
-    }
-  }, {
-    key: 'get',
-    value: function get(type, id) {
-      return (this.types[type] || {})[id];
-    }
-  }, {
-    key: 'getAll',
-    value: function getAll(type) {
-      return _.values(this.types[type] || {});
-    }
-  }, {
-    key: 'getDefault',
-    value: function getDefault(type, id) {
-      return this.defaults[type][id];
-    }
-  }, {
-    key: 'getAllDefaults',
-    value: function getAllDefaults(type) {
-      return _.values(this.defaults[type]);
-    }
-  }, {
-    key: 'register',
-    value: function register(clazz) {
-      var defaultInstance = new clazz({
-        dispatcher: this.defaultDispatcher
-      });
-      var type = this.getClassId(defaultInstance);
-
-      defaultInstance.__isDefaultInstance = true;
-
-      if (!this.types[type]) {
-        this.types[type] = {};
-      }
-
-      if (!this.defaults[type]) {
-        this.defaults[type] = {};
-      }
-
-      var id = classId(clazz, type);
-
-      if (!id) {
-        throw CannotRegisterClassError(clazz, type);
-      }
-
-      if (this.types[type][id]) {
-        throw ClassAlreadyRegisteredWithId(clazz, type);
-      }
-
-      clazz.id = id;
-      defaultInstance.id = defaultInstance.id || id;
-      defaultInstance.type = clazz.type = type;
-
-      this.types[type][id] = clazz;
-
-      if (Environment.isServer) {
-        _.each(_.functions(defaultInstance), wrapResolverFunctions, defaultInstance);
-      }
-
-      this.defaults[type][id] = defaultInstance;
-
-      return defaultInstance;
-    }
-  }, {
-    key: 'resolve',
-    value: function resolve(type, id, options) {
-      var clazz = (this.types[type] || {})[id];
-
-      if (!clazz) {
-        throw CannotFindTypeWithId(type, id);
-      }
-
-      return new clazz(options);
-    }
-  }]);
-
-  return Registry;
-})();
-
-module.exports = Registry;
-
-function wrapResolverFunctions(functionName) {
-  if (FUNCTIONS_TO_NOT_WRAP.indexOf(functionName) !== -1) {
-    return;
-  }
-
-  var instance = this;
-  var originalFunc = instance[functionName];
-
-  instance[functionName] = function () {
-    if (warnings.callingResolverOnServer && Environment.isServer) {
-      var type = instance.__type;
-      var displayName = instance.displayName || instance.id;
-      var warningMessage = 'Warning: You are calling `' + functionName + '` on the static instance of the ' + type + ' ' + ('\'' + displayName + '\'. You should resolve the instance for the current context');
-
-      log.warn(warningMessage);
-    }
-
-    return originalFunc.apply(instance, arguments);
-  };
-}
-
-function addClassHelper(registry, classId) {
-  var pluralClassId = classId;
-
-  if (pluralClassId[pluralClassId.length - 1] !== 's') {
-    pluralClassId += 's';
-  }
-
-  registry['get' + classId] = partial(registry.get, classId);
-  registry['resolve' + classId] = partial(registry.resolve, classId);
-  registry['getAll' + pluralClassId] = partial(registry.getAll, classId);
-  registry['getDefault' + classId] = partial(registry.getDefault, classId);
-  registry['getAllDefault' + pluralClassId] = partial(registry.getAllDefaults, classId);
-
-  function partial(func, type) {
-    return function () {
-      var args = _.toArray(arguments);
-      args.unshift(type);
-      return func.apply(this, args);
-    };
-  }
-}
-
-function CannotFindTypeWithId(type, id) {
-  return new Error('Could not find ' + type + ' with Id ' + id);
-}
-
-function CannotRegisterClassError(clazz, type) {
-  var displayName = clazz.displayName || clazz.id;
-  var typeDisplayName = humanStrings[type] || type;
-  var warningPrefix = 'Cannot register the ' + typeDisplayName;
-
-  if (displayName) {
-    warningPrefix += ' \'' + displayName + '\'';
-  }
-
-  return new Error('' + warningPrefix + ' because it does not have an Id');
-}
-
-function ClassAlreadyRegisteredWithId(clazz, type) {
-  var displayName = clazz.displayName || clazz.id;
-  var typeDisplayName = humanStrings[type] || type;
-  var warningPrefix = 'Cannot register the ' + typeDisplayName;
-
-  if (displayName) {
-    warningPrefix += ' \'' + displayName + '\'';
-  }
-
-  return new Error('' + warningPrefix + ' because there is already a class with that Id.');
-}
-
-},{"132":132,"138":138,"141":141,"147":147,"151":151,"156":156}],143:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-var createClass = require(128);
-
-function createStateSourceClass(properties, baseType) {
-  properties = properties || {};
-
-  var merge = [{}, properties].concat(properties.mixins || []);
-
-  properties = _.extend.apply(_, merge);
-
-  return createClass(properties, properties, baseType);
-}
-
-module.exports = createStateSourceClass;
-
-},{"128":128,"141":141}],144:[function(require,module,exports){
-'use strict';
-
-module.exports = require(145);
-
-},{"145":145}],145:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var log = require(138);
-var uuid = require(155);
-var warnings = require(156);
-var resolve = require(153);
-var Environment = require(132);
-
-var StateSource = (function () {
-  function StateSource(options) {
-    _classCallCheck(this, StateSource);
-
-    if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
-      log.warn('Warning: Options were not passed into a state source\'s constructor');
-    }
-
-    options = options || {};
-
-    this.__type = 'StateSource';
-    this.__context = options.context;
-    this.__id = uuid.type(this.__type);
-  }
-
-  _createClass(StateSource, [{
-    key: 'context',
-    get: function () {
-      return this.__context;
-    }
-  }, {
-    key: 'for',
-    value: function _for(obj) {
-      return resolve(this, obj);
-    }
-  }, {
-    key: 'dispose',
-    value: function dispose() {}
-  }]);
-
-  return StateSource;
-})();
-
-module.exports = StateSource;
-
-},{"132":132,"138":138,"153":153,"155":155,"156":156}],146:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var log = require(138);
-var _ = require(141);
-
-var StoreObserver = (function () {
-  function StoreObserver(options) {
-    var _this = this;
-
-    _classCallCheck(this, StoreObserver);
-
-    options = options || {};
-
-    this.component = options.component;
-    this.onStoreChanged = options.onStoreChanged || _.noop;
-
-    this.listeners = _.map(options.stores, function (store) {
-      return _this.listenToStore(store);
-    });
-  }
-
-  _createClass(StoreObserver, [{
-    key: 'dispose',
-    value: function dispose() {
-      _.invoke(this.listeners, 'dispose');
-    }
-  }, {
-    key: 'listenToStore',
-    value: function listenToStore(store) {
-      var _this2 = this;
-
-      var component = this.component;
-      var storeDisplayName = store.displayName || store.id;
-
-      log.trace('The ' + component.displayName + ' component  (' + component.id + ') is listening to the ' + storeDisplayName + ' store');
-
-      return store['for'](component).addChangeListener(function (state, store) {
-        var storeDisplayName = store.displayName || store.id;
-
-        log.trace('' + storeDisplayName + ' store has changed. ' + ('The ' + _this2.component.displayName + ' component (' + _this2.component.id + ') is updating'));
-
-        if (store && store.action) {
-          store.action.addComponentHandler({
-            displayName: _this2.component.displayName
-          }, store);
-        }
-
-        _this2.onStoreChanged(store);
-      });
-    }
-  }]);
-
-  return StoreObserver;
-})();
-
-module.exports = StoreObserver;
-
-},{"138":138,"141":141}],147:[function(require,module,exports){
-'use strict';
-
-var uuid = require(155);
-var log = require(138);
-var warnings = require(156);
-var humanStrings = require(151);
-
-function classId(clazz, type) {
-  if (clazz.id) {
-    return clazz.id;
-  }
-
-  var displayName = '';
-
-  if (clazz.displayName) {
-    displayName = '\'' + clazz.displayName + '\' ';
-  }
-
-  var typeDisplayName = humanStrings[type] || type;
-
-  if (warnings.classDoesNotHaveAnId) {
-    log.warn('Warning: The ' + typeDisplayName + ' ' + displayName + 'does not have an Id');
-  }
-
-  return clazz.displayName || uuid.generate();
-}
-
-module.exports = classId;
-
-},{"138":138,"151":151,"155":155,"156":156}],148:[function(require,module,exports){
-"use strict";
-
-function deferred() {
-  var result = {};
-  result.promise = new Promise(function (resolve, reject) {
-    result.resolve = resolve;
-    result.reject = reject;
-  });
-  return result;
-}
-
-module.exports = deferred;
-
-},{}],149:[function(require,module,exports){
-'use strict';
-
-var DEFAULT_CLASS_NAME = 'Class';
-
-function getClassName(clazz) {
-  var className = clazz.name || clazz.constructor && clazz.constructor.name;
-
-  if (!className) {
-    var funcNameRegex = /function (.{1,})\(/;
-    var results = funcNameRegex.exec(clazz.toString());
-    className = results && results.length > 1 ? results[1] : '';
-  }
-
-  return className === DEFAULT_CLASS_NAME ? null : className;
-}
-
-module.exports = getClassName;
-
-},{}],150:[function(require,module,exports){
-"use strict";
-
-function getContext(obj) {
-  if (!obj) {
-    return;
-  }
-
-  if (isContext(obj)) {
-    return obj;
-  }
-
-  if (isContext(obj.context)) {
-    return obj.context;
-  }
-
-  if (obj.context && isContext(obj.context.marty)) {
-    return obj.context.marty;
-  }
-
-  function isContext(obj) {
-    return obj && obj.__isContext;
-  }
-}
-
-module.exports = getContext;
-
-},{}],151:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  Store: 'store',
-  StateSource: 'state source',
-  ActionCreators: 'action creators'
-};
-
-},{}],152:[function(require,module,exports){
-'use strict';
-
-module.exports = require(141);
-
-},{"141":141}],153:[function(require,module,exports){
-'use strict';
-
-var log = require(138);
-var warnings = require(156);
-var getContext = require(150);
-
-function resolve(obj, subject) {
-  var context = getContext(subject);
-
-  if (context) {
-    return context.resolve(obj);
-  }
-
-  if (!obj.__isDefaultInstance && warnings.cannotFindContext) {
-    log.warn('Warning: Could not find context in object', obj);
-  }
-
-  return obj;
-}
-
-module.exports = resolve;
-
-},{"138":138,"150":150,"156":156}],154:[function(require,module,exports){
-"use strict";
-
-function timeout(time) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, time);
-  });
-}
-
-module.exports = timeout;
-
-},{}],155:[function(require,module,exports){
-'use strict';
-
-function generate() {
-  return [s4(), s4(), '-', s4(), s4(), s4(), '-', s4(), s4(), s4()].join('');
-}
-
-function small() {
-  return s4() + s4() + s4() + s4();
-}
-
-function type(instanceType) {
-  return [instanceType, '-', s4(), s4(), s4(), s4()].join('');
-}
-
-function s4() {
-  return Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
-}
-
-module.exports = {
-  type: type,
-  small: small,
-  generate: generate
-};
-
-},{}],156:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-
-var warnings = {
-  without: without,
-  invokeConstant: true,
-  reservedFunction: true,
-  cannotFindContext: true,
-  classDoesNotHaveAnId: true,
-  stateIsNullOrUndefined: true,
-  callingResolverOnServer: true,
-  stateSourceAlreadyExists: true,
-  superNotCalledWithOptions: true,
-  promiseNotReturnedFromRemotely: true,
-  contextNotPassedInToConstructor: true
-};
-
-module.exports = warnings;
-
-function without(warningsToDisable, cb, context) {
-  if (!_.isArray(warningsToDisable)) {
-    warningsToDisable = [warningsToDisable];
-  }
-
-  if (context) {
-    cb = _.bind(cb, context);
-  }
-
-  try {
-    _.each(warningsToDisable, function (warning) {
-      warnings[warning] = false;
-    });
-
-    cb();
-  } finally {
-    _.each(warningsToDisable, function (warning) {
-      warnings[warning] = true;
-    });
-  }
-}
-
-},{"141":141}],157:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-var logger = require(138);
-var warnings = require(156);
-var diagnostics = require(130);
-var environment = require(132);
-var StateSource = require(144);
-var getClassName = require(149);
-var createStateSourceClass = require(143);
-
-module.exports = function (marty) {
-  marty.registerClass('StateSource', StateSource);
-
-  marty.register('logger', logger);
-  marty.register('dispose', dispose);
-  marty.register('warnings', warnings);
-  marty.register('register', register);
-  marty.register('diagnostics', diagnostics);
-  marty.register('createStateSource', createStateSource);
-
-  _.each(environment, function (value, key) {
-    marty.register(key, value);
-  });
-
-  function dispose() {
-    this.registry.dispose();
-    this.dispatcher.dispose();
-  }
-
-  function createStateSource(properties) {
-    var BaseType = properties.type ? marty.stateSources[properties.type] : StateSource;
-
-    if (!BaseType) {
-      throw new Error('Unknown state source ' + properties.type);
-    }
-
-    var StateSourceClass = createStateSourceClass(properties, BaseType);
-    var defaultInstance = this.register(StateSourceClass);
-
-    return defaultInstance;
-  }
-
-  function register(clazz, id) {
-    var className = getClassName(clazz);
-
-    if (!clazz.id) {
-      clazz.id = id || className;
-    }
-
-    if (!clazz.displayName) {
-      clazz.displayName = clazz.id;
-    }
-
-    return this.registry.register(clazz);
-  }
-};
-
-},{"130":130,"132":132,"138":138,"141":141,"143":143,"144":144,"149":149,"156":156}],158:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  id: 'includeCredentials',
-  before: function before(req) {
-    // Enable sending Cookies for authentication.
-    // Ref: https://fetch.spec.whatwg.org/#concept-request-credentials-mode
-    req.credentials = 'same-origin';
-  }
-};
-
-},{}],159:[function(require,module,exports){
-'use strict';
-
-var CONTENT_TYPE = 'Content-Type';
-var JSON_CONTENT_TYPE = 'application/json';
-var _ = require(141);
-
-module.exports = {
-  id: 'parseJSON',
-  after: function after(res) {
-    if (isJson(res)) {
-      return res.json().then(function (body) {
-        res.body = body;
-
-        return res;
-      });
-    }
-
-    return res;
-  }
-};
-
-function isJson(res) {
-  var contentTypes = res.headers.get(CONTENT_TYPE);
-
-  if (!_.isArray(contentTypes)) {
-    if (contentTypes === undefined || contentTypes === null) {
-      contentTypes = [];
-    } else {
-      contentTypes = [contentTypes];
-    }
-  }
-
-  return _.any(contentTypes, function (contentType) {
-    return contentType.indexOf(JSON_CONTENT_TYPE) !== -1;
-  });
-}
-
-},{"141":141}],160:[function(require,module,exports){
-'use strict';
-
-var CONTENT_TYPE = 'Content-Type';
-var JSON_CONTENT_TYPE = 'application/json';
-var _ = require(141);
-
-module.exports = {
-  id: 'stringifyJSON',
-  before: function before(req) {
-    var contentType = req.headers[CONTENT_TYPE] || JSON_CONTENT_TYPE;
-
-    if (typeof FormData !== 'undefined' && req.body instanceof FormData) {
-      return;
-    }
-
-    if (contentType === JSON_CONTENT_TYPE && _.isObject(req.body)) {
-      req.body = JSON.stringify(req.body);
-      req.headers[CONTENT_TYPE] = JSON_CONTENT_TYPE;
-    }
-  }
-};
-
-},{"141":141}],161:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var hooks = {};
-var log = require(138);
-var _ = require(141);
-var StateSource = require(144);
-var accepts = {
-  html: 'text/html',
-  text: 'text/plain',
-  json: 'application/json',
-  xml: 'application/xml, text/xml',
-  script: 'text/javascript, application/javascript, application/x-javascript' };
-
-var HttpStateSource = (function (_StateSource) {
-  function HttpStateSource(options) {
-    _classCallCheck(this, HttpStateSource);
-
-    _get(Object.getPrototypeOf(HttpStateSource.prototype), 'constructor', this).call(this, options);
-    this._isHttpStateSource = true;
-  }
-
-  _inherits(HttpStateSource, _StateSource);
-
-  _createClass(HttpStateSource, [{
-    key: 'request',
-    value: function request(req) {
-      var _this = this;
-
-      if (!req.headers) {
-        req.headers = {};
-      }
-
-      beforeRequest(this, req);
-
-      return fetch(req.url, req).then(function (res) {
-        return afterRequest(_this, res);
-      });
-    }
-  }, {
-    key: 'get',
-    value: function get(options) {
-      return this.request(requestOptions('GET', this, options));
-    }
-  }, {
-    key: 'put',
-    value: function put(options) {
-      return this.request(requestOptions('PUT', this, options));
-    }
-  }, {
-    key: 'post',
-    value: function post(options) {
-      return this.request(requestOptions('POST', this, options));
-    }
-  }, {
-    key: 'delete',
-    value: function _delete(options) {
-      return this.request(requestOptions('DELETE', this, options));
-    }
-  }, {
-    key: 'patch',
-    value: function patch(options) {
-      return this.request(requestOptions('PATCH', this, options));
-    }
-  }], [{
-    key: 'addHook',
-    value: function addHook(hook) {
-      if (hook) {
-        if (_.isUndefined(hook.priority)) {
-          hook.priority = Object.keys(hooks).length;
-        }
-
-        hooks[hook.id] = hook;
-      }
-    }
-  }, {
-    key: 'removeHook',
-    value: function removeHook(hook) {
-      if (hook) {
-        delete hooks[hook.id];
-      }
-    }
-  }, {
-    key: 'defaultBaseUrl',
-    get: function () {
-      return '';
-    }
-  }]);
-
-  return HttpStateSource;
-})(StateSource);
-
-HttpStateSource.addHook(require(159));
-HttpStateSource.addHook(require(160));
-HttpStateSource.addHook(require(158));
-
-module.exports = HttpStateSource;
-
-function requestOptions(method, source, options) {
-  var baseUrl = source.baseUrl || HttpStateSource.defaultBaseUrl;
-
-  if (_.isString(options)) {
-    options = _.extend({
-      url: options
-    });
-  }
-
-  _.defaults(options, {
-    headers: {}
-  });
-
-  options.method = method.toLowerCase();
-
-  if (baseUrl) {
-    var separator = '';
-    var firstCharOfUrl = options.url[0];
-    var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
-
-    // Do some text wrangling to make sure concatenation of base url
-    // stupid people (i.e. me)
-    if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
-      separator = '/';
-    } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
-      options.url = options.url.substring(1);
-    }
-
-    options.url = baseUrl + separator + options.url;
-  }
-
-  if (options.contentType) {
-    options.headers['Content-Type'] = options.contentType;
-  }
-
-  if (options.dataType) {
-    var contentType = accepts[options.dataType];
-
-    if (!contentType) {
-      log.warn('Unknown data type ' + options.dataType);
-    } else {
-      options.headers.Accept = contentType;
-    }
-  }
-
-  return options;
-}
-
-function beforeRequest(source, req) {
-  _.each(getHooks('before'), function (hook) {
-    try {
-      hook.before.call(source, req);
-    } catch (e) {
-      log.error('Failed to execute hook before http request', e, hook);
-      throw e;
-    }
-  });
-}
-
-function afterRequest(source, res) {
-  var current;
-
-  _.each(getHooks('after'), function (hook) {
-    var execute = function execute(res) {
-      try {
-        return hook.after.call(source, res);
-      } catch (e) {
-        log.error('Failed to execute hook after http response', e, hook);
-        throw e;
-      }
-    };
-
-    if (current) {
-      current = current.then(function (res) {
-        return execute(res);
-      });
-    } else {
-      current = execute(res);
-
-      if (current && !_.isFunction(current.then)) {
-        current = Promise.resolve(current);
-      }
-    }
-  });
-
-  return current || res;
-}
-
-function getHooks(func) {
-  return _.sortBy(_.filter(hooks, has(func)), priority);
-
-  function priority(hook) {
-    return hook.priority;
-  }
-
-  function has(func) {
-    return function (hook) {
-      return hook && _.isFunction(hook[func]);
-    };
-  }
-}
-
-},{"138":138,"141":141,"144":144,"158":158,"159":159,"160":160}],162:[function(require,module,exports){
-'use strict';
-
-var HttpStateSource = require(161);
-
-module.exports = function (marty) {
-  marty.registerStateSource('HttpStateSource', 'http', HttpStateSource);
-};
-
-},{"161":161}],163:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _ = require(141);
-var uuid = require(155);
-var timeout = require(154);
-var deferred = require(148);
-var FetchDiagnostics = require(164);
-var createDispatcher = require(129);
-
-var DEFAULT_TIMEOUT = 1000;
-
-var Context = (function () {
-  function Context(registry) {
-    var _this = this;
-
-    _classCallCheck(this, Context);
-
-    this.instances = {};
-    this.__isContext = true;
-    this.id = uuid.type('Context');
-    this.dispatcher = createDispatcher();
-
-    _.each((registry || {}).types, function (classes, type) {
-      var options = {
-        context: _this,
-        dispatcher: _this.dispatcher
-      };
-
-      _this.instances[type] = {};
-
-      _.each(classes, function (clazz) {
-        _this.instances[type][clazz.id] = registry.resolve(type, clazz.id, options);
-      });
-    });
-  }
-
-  _createClass(Context, [{
-    key: 'fetch',
-    value: function fetch(cb, options) {
-      var _this2 = this;
-
-      var fetchDone;
-
-      options = _.defaults(options || {}, {
-        timeout: DEFAULT_TIMEOUT
-      });
-
-      this.__deferredFetchDone = deferred();
-      this.__diagnostics = new FetchDiagnostics();
-      fetchDone = this.__deferredFetchDone.promise;
-
-      try {
-        cb.call(this);
-      } catch (e) {
-        this.__deferredFetchDone.reject(e);
-
-        return fetchDone;
-      }
-
-      if (!this.__diagnostics.hasPendingFetches) {
-        this.__deferredFetchDone.resolve();
-      }
-
-      return Promise.race([fetchDone, timeout(options.timeout)]).then(function () {
-        return _this2.__diagnostics.toJSON();
-      });
-    }
-  }, {
-    key: 'fetchStarted',
-    value: function fetchStarted(storeId, fetchId) {
-      var diagnostics = this.__diagnostics;
-
-      diagnostics.fetchStarted(storeId, fetchId);
-    }
-  }, {
-    key: 'fetchDone',
-    value: function fetchDone(storeId, fetchId, status, options) {
-      var diagnostics = this.__diagnostics;
-
-      diagnostics.fetchDone(storeId, fetchId, status, options);
-
-      if (!diagnostics.hasPendingFetches) {
-        this.__deferredFetchDone.resolve();
-      }
-    }
-  }, {
-    key: 'dispose',
-    value: function dispose() {
-      _.each(this.instances, function (instances) {
-        _.each(instances, function (instance) {
-          if (_.isFunction(instance.dispose)) {
-            instance.dispose();
-          }
-        });
-      });
-
-      this.instances = null;
-      this.dispatcher = null;
-    }
-  }, {
-    key: 'resolve',
-    value: function resolve(obj) {
-      if (!obj.constructor) {
-        throw new Error('Cannot resolve object');
-      }
-
-      var id = obj.constructor.id;
-      var type = obj.constructor.type;
-
-      if (!this.instances[type]) {
-        throw new Error('Context does not have any instances of ' + type);
-      }
-
-      if (!this.instances[type][id]) {
-        throw new Error('Context does not have an instance of the ' + type + ' id');
-      }
-
-      return this.instances[type][id];
-    }
-  }, {
-    key: 'getAll',
-    value: function getAll(type) {
-      return _.values(this.instances[type]);
-    }
-  }, {
-    key: 'getAllStores',
-    value: function getAllStores() {
-      return this.getAll('Store');
-    }
-  }, {
-    key: 'getAllStateSources',
-    value: function getAllStateSources() {
-      return this.getAll('StateSource');
-    }
-  }, {
-    key: 'getAllActionCreators',
-    value: function getAllActionCreators() {
-      return this.getAll('ActionCreators');
-    }
-  }, {
-    key: 'getAllQueries',
-    value: function getAllQueries() {
-      return this.getAll('Queries');
-    }
-  }]);
-
-  return Context;
-})();
-
-module.exports = Context;
-
-},{"129":129,"141":141,"148":148,"154":154,"155":155,"164":164}],164:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _ = require(141);
-
-var FetchDiagnostics = (function () {
-  function FetchDiagnostics() {
-    _classCallCheck(this, FetchDiagnostics);
-
-    this.numberOfPendingFetches = 0;
-    this.fetches = [];
-  }
-
-  _createClass(FetchDiagnostics, [{
-    key: 'fetchStarted',
-    value: function fetchStarted(storeId, fetchId) {
-      this.numberOfPendingFetches++;
-      this.fetches.push({
-        status: 'PENDING',
-        storeId: storeId,
-        fetchId: fetchId,
-        startTime: new Date()
-      });
-    }
-  }, {
-    key: 'fetchDone',
-    value: function fetchDone(storeId, fetchId, status, options) {
-      var fetch = _.find(this.fetches, {
-        storeId: storeId,
-        fetchId: fetchId
-      });
-
-      if (fetch) {
-        _.extend(fetch, {
-          status: status,
-          time: new Date() - fetch.startTime
-        }, options);
-
-        this.numberOfPendingFetches--;
-      }
-    }
-  }, {
-    key: 'hasPendingFetches',
-    get: function () {
-      return this.numberOfPendingFetches > 0;
-    }
-  }, {
-    key: 'toJSON',
-    value: function toJSON() {
-      return _.map(this.fetches, fetchWithTime);
-
-      function fetchWithTime(fetch) {
-        if (_.isUndefined(fetch.time)) {
-          fetch.time = new Date() - fetch.startTime;
-        }
-
-        delete fetch.startTime;
-
-        return fetch;
-      }
-    }
-  }]);
-
-  return FetchDiagnostics;
-})();
-
-module.exports = FetchDiagnostics;
-
-},{"141":141}],165:[function(require,module,exports){
-'use strict';
-
-var Context = require(163);
-var _ = require(141);
-
-// React is passed down to us so we can't require it in
-module.exports = function (React) {
-  return function renderToString(options) {
-    options = options || {};
-
-    var Marty = this;
-    var context = options.context;
-    var fetchOptions = { timeout: options.timeout };
-
-    return new Promise(function (resolve, reject) {
-      if (!options.type) {
-        reject(new Error('Must pass in a React component type'));
-        return;
-      }
-
-      if (!context) {
-        reject(new Error('Must pass in a context'));
-        return;
-      }
-
-      if (!context instanceof Context) {
-        reject(new Error('context must be an instance of Context'));
-        return;
-      }
-
-      startFetches().then(dehydrateAndRenderHtml);
-
-      function dehydrateAndRenderHtml(diagnostics) {
-        context.fetch(function () {
-          try {
-            var element = createElement();
-
-            if (!element) {
-              reject(new Error('createElement must return an element'));
-              return;
-            }
-
-            var html = React.renderToString(element);
-            html += dehydratedState(context);
-            resolve({
-              html: html,
-              diagnostics: diagnostics
-            });
-          } catch (e) {
-            reject(e);
-          } finally {
-            context.dispose();
-          }
-        }, fetchOptions);
-      }
-
-      function startFetches() {
-        return context.fetch(function () {
-          try {
-            var element = createElement();
-
-            if (!element) {
-              reject(new Error('createElement must return an element'));
-              return;
-            }
-
-            React.renderToString(element);
-          } catch (e) {
-            reject(e);
-          }
-        }, fetchOptions);
-      }
-
-      function createElement() {
-        var ContextContainer = React.createClass({
-          displayName: 'ContextContainer',
-
-          childContextTypes: {
-            marty: React.PropTypes.object.isRequired
-          },
-          getChildContext: function getChildContext() {
-            return {
-              marty: context
-            };
-          },
-          render: function render() {
-            var props = _.extend({}, options.props, { ref: 'subject' });
-
-            return React.createElement(options.type, props);
-          }
-        });
-
-        return React.createElement(ContextContainer);
-      }
-
-      function dehydratedState(context) {
-        var state = Marty.dehydrate(context);
-
-        return '<script id="__marty-state">' + state + '</script>';
-      }
-    });
-  };
-};
-
-},{"141":141,"163":163}],166:[function(require,module,exports){
-'use strict';
-
-var Context = require(163);
-var renderToString = require(165);
-
-module.exports = function (marty, React) {
-  marty.register('createContext', createContext);
-  marty.register('renderToString', renderToString(React));
-
-  function createContext() {
-    return new Context(this.registry);
-  }
-};
-
-},{"163":163,"165":165}],167:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var noopStorage = require(168);
-var StateSource = require(144);
-
-var JSONStorageStateSource = (function (_StateSource) {
-  function JSONStorageStateSource(options) {
-    _classCallCheck(this, JSONStorageStateSource);
-
-    _get(Object.getPrototypeOf(JSONStorageStateSource.prototype), 'constructor', this).call(this, options);
-    this._isJSONStorageStateSource = true;
-
-    if (!this.storage) {
-      this.storage = JSONStorageStateSource.defaultStorage;
-    }
-  }
-
-  _inherits(JSONStorageStateSource, _StateSource);
-
-  _createClass(JSONStorageStateSource, [{
-    key: 'get',
-    value: function get(key) {
-      var raw = getStorage(this).getItem(getNamespacedKey(this, key));
-
-      if (!raw) {
-        return raw;
-      }
-
-      try {
-        var payload = JSON.parse(raw);
-        return payload.value;
-      } catch (e) {
-        throw new Error('Unable to parse JSON from storage');
-      }
-    }
-  }, {
-    key: 'set',
-    value: function set(key, value) {
-      // Wrap the value in an object so as to preserve it's type
-      // during serialization.
-      var payload = {
-        value: value
-      };
-      var raw = JSON.stringify(payload);
-      getStorage(this).setItem(getNamespacedKey(this, key), raw);
-    }
-  }], [{
-    key: 'defaultNamespace',
-    get: function () {
-      return '';
-    }
-  }, {
-    key: 'defaultStorage',
-    get: function () {
-      return typeof window === 'undefined' ? noopStorage : window.localStorage;
-    }
-  }]);
-
-  return JSONStorageStateSource;
-})(StateSource);
-
-function getNamespacedKey(source, key) {
-  return getNamespace(source) + key;
-}
-
-function getNamespace(source) {
-  return source.namespace || JSONStorageStateSource.defaultNamespace;
-}
-
-function getStorage(source) {
-  return source.storage || JSONStorageStateSource.defaultStorage || noopStorage;
-}
-
-module.exports = JSONStorageStateSource;
-
-},{"144":144,"168":168}],168:[function(require,module,exports){
-'use strict';
-
-var _ = require(152);
-
-module.exports = {
-  getItem: _.noop,
-  setItem: _.noop
-};
-
-},{"152":152}],169:[function(require,module,exports){
-'use strict';
-
-var JSONStorageStateSource = require(167);
-
-module.exports = function (marty) {
-  marty.registerStateSource('JSONStorageStateSource', 'jsonStorage', JSONStorageStateSource);
-};
-
-},{"167":167}],170:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var noopStorage = require(171);
-var StateSource = require(144);
-
-var LocalStorageStateSource = (function (_StateSource) {
-  function LocalStorageStateSource(options) {
-    _classCallCheck(this, LocalStorageStateSource);
-
-    _get(Object.getPrototypeOf(LocalStorageStateSource.prototype), 'constructor', this).call(this, options);
-    this._isLocalStorageStateSource = true;
-    this.storage = typeof window === 'undefined' ? noopStorage : window.localStorage;
-  }
-
-  _inherits(LocalStorageStateSource, _StateSource);
-
-  _createClass(LocalStorageStateSource, [{
-    key: 'get',
-    value: function get(key) {
-      return this.storage.getItem(getNamespacedKey(this, key));
-    }
-  }, {
-    key: 'set',
-    value: function set(key, value) {
-      return this.storage.setItem(getNamespacedKey(this, key), value);
-    }
-  }], [{
-    key: 'defaultNamespace',
-    get: function () {
-      return '';
-    }
-  }]);
-
-  return LocalStorageStateSource;
-})(StateSource);
-
-function getNamespacedKey(source, key) {
-  return getNamespace(source) + key;
-}
-
-function getNamespace(source) {
-  return source.namespace || LocalStorageStateSource.defaultNamespace;
-}
-
-module.exports = LocalStorageStateSource;
-
-},{"144":144,"171":171}],171:[function(require,module,exports){
-'use strict';
-
-var _ = require(152);
-
-module.exports = {
-  getItem: _.noop,
-  setItem: _.noop
-};
-
-},{"152":152}],172:[function(require,module,exports){
-'use strict';
-
-var LocalStorageStateSource = require(170);
-
-module.exports = function (marty) {
-  marty.registerStateSource('LocalStorageStateSource', 'localStorage', LocalStorageStateSource);
-};
-
-},{"170":170}],173:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var _ = require(141);
-var StateSource = require(144);
-var locationFactory = defaultLocationFactory;
-
-var LocationStateSource = (function (_StateSource) {
-  function LocationStateSource(options) {
-    _classCallCheck(this, LocationStateSource);
-
-    _get(Object.getPrototypeOf(LocationStateSource.prototype), 'constructor', this).call(this, options);
-    this._isLocationStateSource = true;
-  }
-
-  _inherits(LocationStateSource, _StateSource);
-
-  _createClass(LocationStateSource, [{
-    key: 'getLocation',
-    value: function getLocation(location) {
-      return locationFactory(this.context, location);
-    }
-  }], [{
-    key: 'setLocationFactory',
-    value: function setLocationFactory(value) {
-      locationFactory = value;
-    }
-  }]);
-
-  return LocationStateSource;
-})(StateSource);
-
-module.exports = LocationStateSource;
-
-function defaultLocationFactory(context, location) {
-  var l = location || window.location;
-
-  return {
-    url: l.url,
-    path: l.pathname,
-    hostname: l.hostname,
-    query: query(l.search),
-    protocol: l.protocol.replace(':', '')
-  };
-
-  function query(search) {
-    var result = {};
-
-    _.each(search.substr(1).split('&'), function (part) {
-      var item = part.split('=');
-      result[item[0]] = decodeURIComponent(item[1]);
-    });
-
-    return result;
-  }
-}
-
-},{"141":141,"144":144}],174:[function(require,module,exports){
-'use strict';
-
-var LocationStateSource = require(173);
-
-module.exports = function (marty) {
-  marty.registerStateSource('LocationStateSource', 'location', LocationStateSource);
-};
-
-},{"173":173}],175:[function(require,module,exports){
-'use strict';
-
-var Queries = require(176);
-var _ = require(141);
-var createClass = require(128);
-
-var RESERVED_KEYWORDS = ['dispatch'];
-
-function createQueriesClass(properties) {
-  _.extend.apply(_, [properties].concat(properties.mixins));
-  _.each(RESERVED_KEYWORDS, function (keyword) {
-    if (properties[keyword]) {
-      throw new Error('' + keyword + ' is a reserved keyword');
-    }
-  });
-
-  var classProperties = _.omit(properties, 'mixins', 'types');
-
-  return createClass(classProperties, properties, Queries);
-}
-
-module.exports = createQueriesClass;
-
-},{"128":128,"141":141,"176":176}],176:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var DispatchCoordinator = require(131);
-
-var Queries = (function (_DispatchCoordinator) {
-  function Queries(options) {
-    _classCallCheck(this, Queries);
-
-    _get(Object.getPrototypeOf(Queries.prototype), 'constructor', this).call(this, 'Queries', options);
-  }
-
-  _inherits(Queries, _DispatchCoordinator);
-
-  return Queries;
-})(DispatchCoordinator);
-
-module.exports = Queries;
-
-},{"131":131}],177:[function(require,module,exports){
-'use strict';
-
-var Queries = require(176);
-var createQueriesClass = require(175);
-
-module.exports = function (marty) {
-  marty.registerClass('Queries', Queries);
-  marty.register('createQueries', createQueries);
-
-  function createQueries(properties) {
-    var QueriesClass = createQueriesClass(properties);
-    var defaultInstance = this.register(QueriesClass);
-
-    return defaultInstance;
-  }
-};
-
-},{"175":175,"176":176}],178:[function(require,module,exports){
-'use strict';
-
-var _ = require(152);
-
-module.exports = {
-  getItem: _.noop,
-  setItem: _.noop
-};
-
-},{"152":152}],179:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var noopStorage = require(178);
-var StateSource = require(144);
-
-var SessionStorageStateSource = (function (_StateSource) {
-  function SessionStorageStateSource(options) {
-    _classCallCheck(this, SessionStorageStateSource);
-
-    _get(Object.getPrototypeOf(SessionStorageStateSource.prototype), 'constructor', this).call(this, options);
-    this._isSessionStorageStateSource = true;
-    this.storage = typeof window === 'undefined' ? noopStorage : window.sessionStorage;
-  }
-
-  _inherits(SessionStorageStateSource, _StateSource);
-
-  _createClass(SessionStorageStateSource, [{
-    key: 'get',
-    value: function get(key) {
-      return this.storage.getItem(getNamespacedKey(this, key));
-    }
-  }, {
-    key: 'set',
-    value: function set(key, value) {
-      return this.storage.setItem(getNamespacedKey(this, key), value);
-    }
-  }], [{
-    key: 'defaultNamespace',
-    get: function () {
-      return '';
-    }
-  }]);
-
-  return SessionStorageStateSource;
-})(StateSource);
-
-function getNamespacedKey(source, key) {
-  return getNamespace(source) + key;
-}
-
-function getNamespace(source) {
-  return source.namespace || SessionStorageStateSource.defaultNamespace;
-}
-
-module.exports = SessionStorageStateSource;
-
-},{"144":144,"178":178}],180:[function(require,module,exports){
-'use strict';
-
-var SessionStorageStateSource = require(179);
-
-module.exports = function (marty) {
-  marty.registerStateSource('SessionStorageStateSource', 'sessionStorage', SessionStorageStateSource);
-};
-
-},{"179":179}],181:[function(require,module,exports){
-'use strict';
-
-var _ = require(152);
-var uuid = require(155);
-var StoreObserver = require(146);
-var reservedKeys = ['listenTo', 'getState', 'getInitialState'];
-
-function StateMixin(options) {
-  var config, instanceMethods;
-
-  if (!options) {
-    throw new Error('The state mixin is expecting some options');
-  }
-
-  var React = options.React;
-
-  if (isStore(options)) {
-    config = storeMixinConfig(options);
-  } else {
-    config = simpleMixinConfig(options);
-    instanceMethods = _.omit(options, reservedKeys);
-  }
-
-  var mixin = _.extend({
-    contextTypes: {
-      marty: React.PropTypes.object
-    },
-    componentDidMount: function componentDidMount() {
-      var component = {
-        id: this.__id,
-        displayName: this.displayName || this.constructor.displayName };
-
-      this.__observer = new StoreObserver({
-        component: component,
-        stores: config.stores,
-        onStoreChanged: this.onStoreChanged
-      });
-    },
-    onStoreChanged: function onStoreChanged() {
-      this.setState(this.getState());
-    },
-    componentWillUnmount: function componentWillUnmount() {
-      if (this.__observer) {
-        this.__observer.dispose();
-      }
-    },
-    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-      var oldProps = this.props;
-      this.props = nextProps;
-
-      var newState = this.getState();
-
-      this.props = oldProps;
-      this.setState(newState);
-    },
-    getState: function getState() {
-      return config.getState(this);
-    },
-    getInitialState: function getInitialState() {
-      var el = this._currentElement;
-
-      if (!this.displayName && el && el.type) {
-        this.displayName = el.type.displayName;
-      }
-
-      this.state = {};
-      this.__id = uuid.type('Component');
-
-      if (options.getInitialState) {
-        this.state = options.getInitialState();
-      }
-
-      this.state = _.extend(this.state, this.getState());
-
-      return this.state;
-    }
-  }, instanceMethods);
-
-  return mixin;
-
-  function storeMixinConfig(store) {
-    return {
-      stores: [store],
-      getState: function getState() {
-        return store.getState();
-      }
-    };
-  }
-
-  function simpleMixinConfig(options) {
-    var stores = options.listenTo || [];
-    var storesToGetStateFrom = findStoresToGetStateFrom(options);
-
-    if (!_.isArray(stores)) {
-      stores = [stores];
-    }
-
-    if (!areStores(stores)) {
-      throw new Error('Can only listen to stores');
-    }
-
-    stores = stores.concat(_.values(storesToGetStateFrom));
-
-    return {
-      stores: stores,
-      getState: getState
-    };
-
-    function getState(view) {
-      var state = _.object(_.map(storesToGetStateFrom, getStateFromStore));
-
-      if (options.getState) {
-        state = _.extend(state, options.getState.call(view));
-      }
-
-      return state;
-
-      function getStateFromStore(store, name) {
-        return [name, store.getState()];
-      }
-    }
-
-    function findStoresToGetStateFrom(options) {
-      var storesToGetStateFrom = {};
-      _.each(options, function (value, key) {
-        if (reservedKeys.indexOf(key) === -1 && isStore(value)) {
-          storesToGetStateFrom[key] = value;
-        }
-      });
-
-      return storesToGetStateFrom;
-    }
-  }
-
-  function areStores(stores) {
-    for (var i = stores.length - 1; i >= 0; i--) {
-      if (!isStore(stores[i])) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  function isStore(store) {
-    return store.getState && store.addChangeListener;
-  }
-}
-
-module.exports = StateMixin;
-
-},{"146":146,"152":152,"155":155}],182:[function(require,module,exports){
-'use strict';
-
-var _ = require(141);
-var StateMixin = require(181);
-
-module.exports = function (marty, React) {
-  marty.register('createStateMixin', createStateMixin);
-
-  function createStateMixin(options) {
-    return new StateMixin(_.defaults(options, {
-      React: React
-    }));
-  }
-};
-
-},{"141":141,"181":181}],183:[function(require,module,exports){
-'use strict';
-
-var log = require(138);
-var Store = require(188);
-var _ = require(152);
-var warnings = require(156);
-var createClass = require(128);
-
-var RESERVED_FUNCTIONS = ['getState'];
-var VIRTUAL_FUNCTIONS = ['clear', 'dispose'];
-
-function createStoreClass(properties) {
-  validateStoreOptions(properties);
-  addMixins(properties);
-
-  var overrideFunctions = getOverrideFunctions(properties);
-  var functionsToOmit = _.union(VIRTUAL_FUNCTIONS, RESERVED_FUNCTIONS);
-  var classProperties = _.extend(_.omit(properties, functionsToOmit), overrideFunctions);
-
-  return createClass(classProperties, classProperties, Store);
-}
-
-function getOverrideFunctions(properties) {
-  var overrideFunctions = _.pick(properties, VIRTUAL_FUNCTIONS);
-
-  _.each(_.functions(overrideFunctions), function (name) {
-    var override = overrideFunctions[name];
-
-    overrideFunctions[name] = function () {
-      Store.prototype[name].call(this);
-      override.call(this);
-    };
-  });
-
-  return overrideFunctions;
-}
-
-function addMixins(properties) {
-  var handlers = _.map(properties.mixins, function (mixin) {
-    return mixin.handlers;
-  });
-
-  var mixins = _.map(properties.mixins, function (mixin) {
-    return _.omit(mixin, 'handlers');
-  });
-
-  _.extend.apply(_, [properties].concat(mixins));
-  _.extend.apply(_, [properties.handlers].concat(handlers));
-}
-
-function validateStoreOptions(properties) {
-  var displayName = properties.displayName;
-
-  _.each(RESERVED_FUNCTIONS, function (functionName) {
-    if (properties[functionName]) {
-      if (displayName) {
-        functionName += ' in ' + displayName;
-      }
-
-      if (warnings.reservedFunction) {
-        log.warn('Warning: ' + functionName + ' is reserved for use by Marty. Please use a different name');
-      }
-    }
-  });
-}
-
-module.exports = createStoreClass;
-
-},{"128":128,"138":138,"152":152,"156":156,"188":188}],184:[function(require,module,exports){
-'use strict';
-
-var when = require(192);
-var NotFoundError = require(136);
-
-module.exports = {
-  done: done,
-  failed: failed,
-  pending: pending,
-  notFound: notFound
-};
-
-function pending(id, store) {
-  return fetchResult({
-    id: id,
-    pending: true,
-    status: 'PENDING'
-  }, store);
-}
-
-function failed(error, id, store) {
-  return fetchResult({
-    id: id,
-    error: error,
-    failed: true,
-    status: 'FAILED'
-  }, store);
-}
-
-function done(result, id, store) {
-  return fetchResult({
-    id: id,
-    done: true,
-    status: 'DONE',
-    result: result
-  }, store);
-}
-
-function notFound(id, store) {
-  return failed(new NotFoundError(), id, store);
-}
-
-function fetchResult(initialResult, store) {
-  initialResult.when = when;
-  initialResult.toPromise = toPromise;
-  initialResult._isFetchResult = true;
-
-  if (store) {
-    initialResult.store = store.displayName || store.id;
-  }
-
-  return initialResult;
-
-  function toPromise() {
-    return new Promise(function (resolve, reject) {
-      var listener;
-
-      if (!tryResolveFetch(initialResult) && store) {
-        listener = store.addFetchChangedListener(tryResolveFetch);
-      }
-
-      function tryResolveFetch(latestResult) {
-        if (latestResult.id !== initialResult.id) {
-          return;
-        }
-
-        if (latestResult.done) {
-          initialResult.done = true;
-          initialResult.pending = false;
-          initialResult.status = 'DONE';
-          initialResult.result = latestResult.result;
-
-          resolve(latestResult.result);
-        } else if (latestResult.failed) {
-          initialResult.failed = true;
-          initialResult.pending = false;
-          initialResult.status = 'FAILED';
-          initialResult.error = latestResult.error;
-
-          reject(latestResult.error);
-        } else {
-          return false;
-        }
-
-        if (listener) {
-          listener.dispose();
-        }
-
-        return true;
-      }
-    });
-  }
-}
-
-},{"136":136,"192":192}],185:[function(require,module,exports){
-'use strict';
-
-var constants = require(120);
-
-module.exports = constants(['PENDING', 'FAILED', 'DONE', 'FETCH_FAILED']);
-
-},{"120":120}],186:[function(require,module,exports){
-'use strict';
-
-var _ = require(152);
-
-function handleAction(action) {
-  this.__validateHandlers();
-
-  var store = this;
-  var handlers = _.object(_.map(store.handlers, getHandlerWithPredicates));
-
-  _.each(handlers, function (predicates, handlerName) {
-    _.each(predicates, function (predicate) {
-      if (predicate(action)) {
-        var rollbackHandler;
-
-        try {
-          store.action = action;
-          action.addStoreHandler(store, handlerName, predicate.toJSON());
-          rollbackHandler = store[handlerName].apply(store, action.arguments);
-        } finally {
-          action.addRollbackHandler(rollbackHandler, store);
-        }
-      }
-    });
-  });
-}
-
-function getHandlerWithPredicates(actionPredicates, handler) {
-  _.isArray(actionPredicates) || (actionPredicates = [actionPredicates]);
-
-  var predicates = _.map(actionPredicates, toFunc);
-
-  return [handler, predicates];
-
-  function toFunc(actionPredicate) {
-    if (actionPredicate.isActionCreator) {
-      actionPredicate = {
-        type: actionPredicate.toString()
-      };
-    } else if (_.isString(actionPredicate)) {
-      actionPredicate = {
-        type: actionPredicate
-      };
-    }
-
-    var func = _.matches(actionPredicate);
-
-    func.toJSON = function () {
-      return actionPredicate;
-    };
-
-    return func;
-  }
-}
-
-module.exports = handleAction;
-
-},{"152":152}],187:[function(require,module,exports){
-'use strict';
-
-var log = require(138);
-var _ = require(141);
-var UnknownStoreError = require(137);
-
-var SERIALIZED_WINDOW_OBJECT = '__marty';
-
-module.exports = {
-  rehydrate: rehydrate,
-  dehydrate: dehydrate,
-  clearState: clearState,
-  replaceState: replaceState
-};
-
-function getDefaultStores(context) {
-  return context.registry.getAllDefaultStores();
-}
-
-function clearState() {
-  _.each(getDefaultStores(this), function (store) {
-    store.clear();
-  });
-}
-
-function replaceState(states) {
-  _.each(getDefaultStores(this), function (store) {
-    var id = storeId(store);
-
-    if (states[id]) {
-      store.replaceState(states[id]);
-    }
-  });
-}
-
-function rehydrate(storeStates) {
-  var stores = indexById(getDefaultStores(this));
-  storeStates = storeStates || getStoreStatesFromWindow();
-
-  _.each(storeStates, function (dehydratedStore, storeName) {
-    var store = stores[storeName];
-    var state = dehydratedStore.state;
-
-    if (!store) {
-      throw new UnknownStoreError(storeName);
-    }
-
-    store.__fetchHistory = dehydratedStore.fetchHistory;
-
-    if (_.isFunction(store.rehydrate)) {
-      store.rehydrate(state);
-    } else {
-      try {
-        store.replaceState(state);
-      } catch (e) {
-        log.error('Failed to rehydrate the state of ' + storeName + '. You might be able ' + 'to solve this problem by implementing Store#rehydrate()');
-
-        throw e;
-      }
-    }
-  });
-
-  function indexById(stores) {
-    return _.object(_.map(stores, function (store) {
-      return storeId(store);
-    }), stores);
-  }
-
-  function getStoreStatesFromWindow() {
-    if (!window || !window[SERIALIZED_WINDOW_OBJECT]) {
-      return;
-    }
-
-    return window[SERIALIZED_WINDOW_OBJECT].stores;
-  }
-}
-
-function dehydrate(context) {
-  var dehydratedStores = {};
-  var stores = context ? context.getAllStores() : getDefaultStores(this);
-
-  _.each(stores, function (store) {
-    var id = storeId(store);
-
-    if (id) {
-      dehydratedStores[id] = {
-        fetchHistory: store.__fetchHistory,
-        state: (store.dehydrate || store.getState).call(store)
-      };
-    }
-  });
-
-  dehydratedStores.toString = function () {
-    return '(window.__marty||(window.__marty={})).stores=' + JSON.stringify(dehydratedStores);
-  };
-
-  dehydratedStores.toJSON = function () {
-    return _.omit(dehydratedStores, 'toString', 'toJSON');
-  };
-
-  return dehydratedStores;
-}
-
-function storeId(store) {
-  return store.constructor.id;
-}
-
-},{"137":137,"138":138,"141":141}],188:[function(require,module,exports){
-'use strict';
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var log = require(138);
-var fetch = require(190);
-var _ = require(152);
-var uuid = require(155);
-var warnings = require(156);
-var resolve = require(153);
-var StoreEvents = require(189);
-var Environment = require(132);
-var handleAction = require(186);
-var EventEmitter = require(194);
-var validateHandlers = require(191);
-
-var Store = (function () {
-  function Store(options) {
-    var _this = this;
-
-    _classCallCheck(this, Store);
-
-    if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
-      log.warn('Warning: Options were not passed into a store\'s constructor');
-    }
-
-    options = options || {};
-
-    this.__type = 'Store';
-    this.__id = uuid.type(this.__type);
-    this.__state = {};
-    this.__fetchHistory = {};
-    this.__failedFetches = {};
-    this.__fetchInProgress = {};
-    this.__context = options.context;
-    this.__emitter = new EventEmitter();
-    this.__dispatcher = options.dispatcher;
-    this.__validateHandlers = _.once(function () {
-      return validateHandlers(_this);
-    });
-
-    var initialState = this.getInitialState();
-
-    if (_.isUndefined(initialState)) {
-      initialState = {};
-    }
-
-    this.replaceState(initialState);
-
-    this.dispatchToken = this.__dispatcher.register(_.bind(this.handleAction, this));
-  }
-
-  _createClass(Store, [{
-    key: 'for',
-    value: function _for(obj) {
-      return resolve(this, obj);
-    }
-  }, {
-    key: 'context',
-    get: function () {
-      return this.__context;
-    }
-  }, {
-    key: 'state',
-    get: function () {
-      return this.getState();
-    },
-    set: function (newState) {
-      this.replaceState(newState);
-    }
-  }, {
-    key: 'getInitialState',
-    value: function getInitialState() {
-      return {};
-    }
-  }, {
-    key: 'getState',
-    value: function getState() {
-      return this.__state;
-    }
-  }, {
-    key: 'setState',
-    value: function setState(state) {
-      var newState = _.extend({}, this.state, state);
-
-      this.replaceState(newState);
-    }
-  }, {
-    key: 'replaceState',
-    value: function replaceState(newState) {
-      var currentState = this.__state;
-
-      if (_.isUndefined(newState) || _.isNull(newState)) {
-        if (warnings.stateIsNullOrUndefined) {
-          var displayName = this.displayName || this.id;
-
-          log.warn('Warning: Trying to replace the state of the store ' + displayName + ' with null or undefined');
-        }
-      }
-
-      if (newState !== currentState) {
-        this.__state = newState;
-        this.hasChanged();
-      }
-    }
-  }, {
-    key: 'clear',
-    value: function clear(newState) {
-      this.__fetchHistory = {};
-      this.__failedFetches = {};
-      this.__fetchInProgress = {};
-
-      if (!newState && _.isFunction(this.getInitialState)) {
-        newState = this.getInitialState();
-      }
-
-      this.state = newState || {};
-    }
-  }, {
-    key: 'dispose',
-    value: function dispose() {
-      var emitter = this.__emitter;
-      var dispatchToken = this.dispatchToken;
-
-      emitter.removeAllListeners(StoreEvents.CHANGE_EVENT);
-      emitter.removeAllListeners(StoreEvents.FETCH_CHANGE_EVENT);
-      this.clear();
-
-      if (dispatchToken) {
-        this.__dispatcher.unregister(dispatchToken);
-        this.dispatchToken = undefined;
-      }
-    }
-  }, {
-    key: 'hasChanged',
-    value: function hasChanged(eventArgs) {
-      var _this2 = this;
-
-      var emitChange = function emitChange() {
-        var emitter = _this2.__emitter;
-
-        emitter.emit.call(emitter, StoreEvents.CHANGE_EVENT, _this2.state, _this2, eventArgs);
-
-        // Clear the action once the component has seen it
-        _this2.action = null;
-      };
-
-      if (this.action) {
-        this.action.onActionHandled(this.id, emitChange);
-      } else {
-        emitChange();
-      }
-    }
-  }, {
-    key: 'hasAlreadyFetched',
-    value: function hasAlreadyFetched(fetchId) {
-      return !!this.__fetchHistory[fetchId];
-    }
-  }, {
-    key: 'addChangeListener',
-    value: function addChangeListener(callback, context) {
-      var _this3 = this;
-
-      var emitter = this.__emitter;
-
-      if (context) {
-        callback = _.bind(callback, context);
-      }
-
-      log.trace('The ' + this.displayName + ' store (' + this.id + ') is adding a change listener');
-
-      emitter.on(StoreEvents.CHANGE_EVENT, callback);
-
-      return {
-        dispose: function dispose() {
-          log.trace('The ' + _this3.displayName + ' store (' + _this3.id + ') is disposing of a change listener');
-
-          emitter.removeListener(StoreEvents.CHANGE_EVENT, callback);
-        }
-      };
-    }
-  }, {
-    key: 'addFetchChangedListener',
-    value: function addFetchChangedListener(callback, context) {
-      var emitter = this.__emitter;
-
-      if (context) {
-        callback = _.bind(callback, context);
-      }
-
-      emitter.on(StoreEvents.FETCH_CHANGE_EVENT, callback);
-
-      return {
-        dispose: function dispose() {
-          emitter.removeListener(StoreEvents.FETCH_CHANGE_EVENT, callback);
-        }
-      };
-    }
-  }, {
-    key: 'waitFor',
-    value: function waitFor(stores) {
-      var dispatcher = this.__dispatcher;
-
-      if (!_.isArray(stores)) {
-        stores = _.toArray(arguments);
-      }
-
-      dispatcher.waitFor(dispatchTokens(stores));
-
-      function dispatchTokens(stores) {
-        var tokens = [];
-
-        _.each(stores, function (store) {
-          if (store.dispatchToken) {
-            tokens.push(store.dispatchToken);
-          }
-
-          if (_.isString(store)) {
-            tokens.push(store);
-          }
-        });
-
-        return tokens;
-      }
-    }
-  }]);
-
-  return Store;
-})();
-
-Store.prototype.fetch = fetch;
-Store.prototype.handleAction = handleAction;
-
-module.exports = Store;
-
-},{"132":132,"138":138,"152":152,"153":153,"155":155,"156":156,"186":186,"189":189,"190":190,"191":191,"194":194}],189:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  CHANGE_EVENT: 'changed',
-  FETCH_CHANGE_EVENT: 'fetch-changed'
-};
-
-},{}],190:[function(require,module,exports){
-'use strict';
-
-var log = require(138);
-var _ = require(152);
-var warnings = require(156);
-var fetchResult = require(184);
-var StoreEvents = require(189);
-var CompoundError = require(135);
-var NotFoundError = require(136);
-var FetchConstants = require(185);
-
-function fetch(id, local, remote) {
-  var store = this;
-  var options,
-      result,
-      error,
-      cacheError,
-      context = this.context;
-
-  if (_.isObject(id)) {
-    options = id;
-  } else {
-    options = {
-      id: id,
-      locally: local,
-      remotely: remote
-    };
-  }
-
-  _.defaults(options, {
-    locally: _.noop,
-    remotely: _.noop
-  });
-
-  if (!options || _.isUndefined(options.id)) {
-    throw new Error('must specify an id');
-  }
-
-  result = dependencyResult(this, options);
-
-  if (result) {
-    return result;
-  }
-
-  cacheError = _.isUndefined(options.cacheError) || options.cacheError;
-
-  if (cacheError) {
-    error = store.__failedFetches[options.id];
-
-    if (error) {
-      return fetchFailed(error);
-    }
-  }
-
-  if (store.__fetchInProgress[options.id]) {
-    return fetchResult.pending(options.id, store);
-  }
-
-  if (context) {
-    context.fetchStarted(store.id, options.id);
-  }
-
-  return tryAndGetLocally() || tryAndGetRemotely();
-
-  function tryAndGetLocally(remoteCalled) {
-    var result = options.locally.call(store);
-
-    if (_.isUndefined(result)) {
-      return;
-    }
-
-    if (_.isNull(result)) {
-      return fetchNotFound();
-    }
-
-    if (!remoteCalled) {
-      finished();
-    }
-
-    return fetchDone(result);
-  }
-
-  function tryAndGetRemotely() {
-    result = options.remotely.call(store);
-
-    if (result) {
-      if (_.isFunction(result.then)) {
-        store.__fetchInProgress[options.id] = true;
-
-        result.then(function () {
-          store.__fetchHistory[options.id] = true;
-          result = tryAndGetLocally(true);
-
-          if (result) {
-            fetchDone();
-            store.hasChanged();
-          } else {
-            fetchNotFound();
-            store.hasChanged();
-          }
-        })['catch'](function (error) {
-          fetchFailed(error);
-          store.hasChanged();
-
-          store.__dispatcher.dispatchAction({
-            type: FetchConstants.FETCH_FAILED,
-            arguments: [error, options.id, store]
-          });
-        });
-
-        return fetchPending();
-      } else {
-        store.__fetchHistory[options.id] = true;
-        result = tryAndGetLocally(true);
-
-        if (result) {
-          return result;
-        }
-      }
-    }
-
-    if (warnings.promiseNotReturnedFromRemotely) {
-      log.warn(promiseNotReturnedWarning());
-    }
-
-    return fetchNotFound();
-  }
-
-  function promiseNotReturnedWarning() {
-    var inStore = '';
-    if (store.displayName) {
-      inStore = ' in ' + store.displayName;
-    }
-
-    return 'The remote fetch for \'' + options.id + '\' ' + inStore + ' ' + 'did not return a promise and the state was ' + 'not present after remotely finished executing. ' + 'This might be because you forgot to return a promise.';
-  }
-
-  function finished() {
-    store.__fetchHistory[options.id] = true;
-
-    delete store.__fetchInProgress[options.id];
-  }
-
-  function fetchPending() {
-    return fetchResult.pending(options.id, store);
-  }
-
-  function fetchDone(result) {
-    finished();
-
-    if (context && result) {
-      context.fetchDone(store.id, options.id, 'DONE', {
-        result: result
-      });
-    }
-
-    return fetchChanged(fetchResult.done(result, options.id, store));
-  }
-
-  function fetchFailed(error) {
-    if (cacheError) {
-      store.__failedFetches[options.id] = error;
-    }
-
-    finished();
-
-    if (context) {
-      context.fetchDone(store.id, options.id, 'FAILED', {
-        error: error
-      });
-    }
-
-    return fetchChanged(fetchResult.failed(error, options.id, store));
-  }
-
-  function fetchNotFound() {
-    return fetchFailed(new NotFoundError(), options.id, store);
-  }
-
-  function fetchChanged(fetch) {
-    store.__emitter.emit(StoreEvents.FETCH_CHANGE_EVENT, fetch);
-    return fetch;
-  }
-}
-
-function dependencyResult(store, options) {
-  var pending = false;
-  var errors = [];
-  var dependencies = options.dependsOn;
-
-  if (!dependencies) {
-    return;
-  }
-
-  if (!_.isArray(dependencies)) {
-    dependencies = [dependencies];
-  }
-
-  _.each(dependencies, function (dependency) {
-    switch (dependency.status) {
-      case FetchConstants.PENDING.toString():
-        pending = true;
-        break;
-      case FetchConstants.FAILED.toString():
-        errors.push(dependency.error);
-        break;
-    }
-  });
-
-  if (errors.length) {
-    var error = errors.length === 1 ? errors[0] : new CompoundError(errors);
-
-    return fetchResult.failed(error, options.id, store);
-  }
-
-  if (pending) {
-    // Wait for all dependencies to be done and then notify listeners
-    Promise.all(_.invoke(dependencies, 'toPromise')).then(function () {
-      store.fetch(options);
-      store.hasChanged();
-    })['catch'](function () {
-      store.fetch(options);
-      store.hasChanged();
-    });
-
-    return fetchResult.pending(options.id, store);
-  }
-}
-
-fetch.done = fetchResult.done;
-fetch.failed = fetchResult.failed;
-fetch.pending = fetchResult.pending;
-fetch.notFound = fetchResult.notFound;
-
-module.exports = fetch;
-
-},{"135":135,"136":136,"138":138,"152":152,"156":156,"184":184,"185":185,"189":189}],191:[function(require,module,exports){
-'use strict';
-
-var _ = require(152);
-var ActionHandlerNotFoundError = require(133);
-var ActionPredicateUndefinedError = require(134);
-
-function validateHandlers(store) {
-  _.each(store.handlers, function (actionPredicate, handlerName) {
-    var actionHandler = store[handlerName];
-
-    if (_.isUndefined(actionHandler) || _.isNull(actionHandler)) {
-      throw new ActionHandlerNotFoundError(handlerName, store);
-    }
-
-    if (!actionPredicate) {
-      throw new ActionPredicateUndefinedError(handlerName, store);
-    }
-  });
-}
-
-module.exports = validateHandlers;
-
-},{"133":133,"134":134,"152":152}],192:[function(require,module,exports){
-'use strict';
-
-var log = require(138);
-var _ = require(152);
-var StatusConstants = require(185);
-
-when.all = all;
-when.join = join;
-
-function when(handlers, parentContext) {
-  handlers || (handlers = {});
-
-  var handler = handlers[this.status.toLowerCase()];
-
-  if (!handler) {
-    throw new Error('Could not find a ' + this.status + ' handler');
-  }
-
-  if (parentContext) {
-    WhenContext.prototype = parentContext;
-  }
-
-  try {
-    switch (this.status) {
-      case StatusConstants.PENDING.toString():
-        return handler.call(new WhenContext());
-      case StatusConstants.FAILED.toString():
-        return handler.call(new WhenContext(), this.error);
-      case StatusConstants.DONE.toString():
-        return handler.call(new WhenContext(), this.result);
-      default:
-        throw new Error('Unknown fetch result status');
-    }
-  } catch (e) {
-    var errorMessage = 'An error occured when handling the DONE state of ';
-
-    if (this.id) {
-      errorMessage += 'the fetch \'' + this.id + '\'';
-    } else {
-      errorMessage += 'a fetch';
-    }
-
-    if (this.store) {
-      errorMessage += ' from the store ' + this.store;
-    }
-
-    log.error(errorMessage, e);
-
-    throw e;
-  }
-
-  function WhenContext() {
-    _.extend(this, handlers);
-  }
-}
-
-function join() {
-  var parentContext;
-  var handlers = _.last(arguments);
-  var fetchResults = _.initial(arguments);
-
-  if (!areHandlers(handlers) && areHandlers(_.last(fetchResults))) {
-    parentContext = handlers;
-    handlers = fetchResults.pop();
-  }
-
-  return all(fetchResults, handlers, parentContext);
-}
-
-function all(fetchResults, handlers, parentContext) {
-  if (!fetchResults || !handlers) {
-    throw new Error('No fetch results or handlers specified');
-  }
-
-  if (!_.isArray(fetchResults) || _.any(fetchResults, notFetchResult)) {
-    throw new Error('Must specify a set of fetch results');
-  }
-
-  var context = {
-    result: results(fetchResults),
-    error: firstError(fetchResults),
-    status: aggregateStatus(fetchResults)
-  };
-
-  return when.call(context, handlers, parentContext);
-}
-
-function areHandlers(obj) {
-  return _.isFunction(obj.done);
-}
-
-function results(fetchResults) {
-  return fetchResults.map(function (result) {
-    return result.result;
-  });
-}
-
-function firstError(fetchResults) {
-  var failedResult = _.find(fetchResults, {
-    status: StatusConstants.FAILED.toString()
-  });
-
-  if (failedResult) {
-    return failedResult.error;
-  }
-}
-
-function notFetchResult(result) {
-  return !result._isFetchResult;
-}
-
-function aggregateStatus(fetchResults) {
-  for (var i = fetchResults.length - 1; i >= 0; i--) {
-    var status = fetchResults[i].status;
-
-    if (status === StatusConstants.FAILED.toString() || status === StatusConstants.PENDING.toString()) {
-      return status;
-    }
-  }
-
-  return StatusConstants.DONE.toString();
-}
-
-module.exports = when;
-/* fetchResults, handlers */
-
-},{"138":138,"152":152,"185":185}],193:[function(require,module,exports){
-'use strict';
-
-var Store = require(188);
-var state = require(187);
-var _ = require(141);
-var createStoreClass = require(183);
-
-module.exports = function (marty) {
-  marty.registerClass('Store', Store);
-  marty.register('createStore', createStore);
-
-  _.each(state, function (value, key) {
-    marty.register(key, value);
-  });
-
-  function createStore(properties) {
-    var StoreClass = createStoreClass(properties);
-    var defaultInstance = this.register(StoreClass);
-
-    return defaultInstance;
-  }
-};
-
-},{"141":141,"183":183,"187":187,"188":188}],194:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 /*!
  * EventEmitter v4.2.11 - git.io/ee
  * Unlicense - http://unlicense.org/
@@ -10034,30 +10172,40 @@ module.exports = function (marty) {
 }.call(this));
 
 },{}],"/marty.js":[function(require,module,exports){
-'use strict';
+"use strict";
 
-require(8);
-require(3).polyfill();
+require(4);
+require(2).polyfill();
 
-var Marty = require(139);
-var marty = new Marty('0.10.0-alpha', require('react'));
+var Marty = require(25).Marty;
+var marty = new Marty("0.10.0-alpha", react());
 
-marty.use(require(157));
-marty.use(require(121));
-marty.use(require(193));
-marty.use(require(119));
-marty.use(require(177));
-marty.use(require(182));
-marty.use(require(124));
-marty.use(require(166));
-marty.use(require(162));
-marty.use(require(126));
-marty.use(require(174));
-marty.use(require(180));
-marty.use(require(169));
-marty.use(require(172));
+marty.use(require(23));
+marty.use(require(10));
+marty.use(require(74));
+marty.use(require(8));
+marty.use(require(64));
+marty.use(require(68));
+marty.use(require(13));
+marty.use(require(54));
+marty.use(require(51));
+marty.use(require(15));
+marty.use(require(60));
+marty.use(require(66));
+marty.use(require(56));
+marty.use(require(58));
 
 module.exports = marty;
 
-},{"119":119,"121":121,"124":124,"126":126,"139":139,"157":157,"162":162,"166":166,"169":169,"172":172,"174":174,"177":177,"180":180,"182":182,"193":193,"3":3,"8":8,"undefined":undefined}]},{},[])("/marty.js")
+// Due to [NPM peer dependency issues](https://github.com/npm/npm/issues/5875)
+// we need to try resolving react from the parent if its not present locally
+function react() {
+  try {
+    return require("react");
+  } catch (e) {
+    return module.parent.require("react");
+  }
+}
+
+},{"10":10,"13":13,"15":15,"2":2,"23":23,"25":25,"4":4,"51":51,"54":54,"56":56,"58":58,"60":60,"64":64,"66":66,"68":68,"74":74,"8":8,"undefined":undefined}]},{},[])("/marty.js")
 });
