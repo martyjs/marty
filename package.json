@@ -1,9 +1,10 @@
 {
   "name": "marty",
-  "version": "0.10.0",
+  "version": "0.10.0-alpha",
   "description": "A Javascript library for state management in React applications",
   "main": "dist/node/marty.js",
-  "browser": "marty.js",
+  "browser": "dist/node/marty.js",
+  "webpack": "dist/node/marty.js",
   "directories": {
     "doc": "./doc",
     "lib": "./lib"
@@ -13,65 +14,38 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:jhollingworth/marty.git"
+    "url": "git@github.com:martyjs/marty.git"
   },
   "keywords": [
     "react",
     "flux"
   ],
   "dependencies": {
-    "cookies-js": "^1.2.1",
     "es6-promise": "^2.0.0",
-    "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",
-    "lodash": "^3.5.0",
-    "babelify": "^5.0.4"
+    "marty-lib": "git://github.com/martyjs/marty-lib#modules"
   },
   "devDependencies": {
-    "babel": "^4.7.1",
-    "bluebird": "^2.3.11",
-    "body-parser": "^1.9.3",
+    "babel": "^5.0.0",
+    "babelify": "^6.0.0",
     "browserify": "^9.0.0",
     "browserify-shim": "^3.7.0",
     "bundle-collapser": "^1.0.0",
-    "chai": "^2.0.0",
-    "chai-as-promised": "^4.1.1",
-    "cheerio": "^0.18.0",
-    "cookie-parser": "^1.3.3",
-    "esprima-fb": "^12001.1.0-dev-harmony-fb",
-    "express": "^4.10.2",
-    "jquery": "^2.1.1",
-    "js-yaml": "^3.2.3",
-    "jscs": "^1.11.3",
-    "jsxhint": "^0.12.0",
-    "karma": "^0.12.24",
-    "karma-bro": "^0.10.0",
-    "karma-chrome-launcher": "^0.1.5",
-    "karma-cli": "0.0.4",
-    "karma-firefox-launcher": "^0.1.3",
-    "karma-mocha": "^0.1.9",
-    "karma-sauce-launcher": "^0.2.10",
-    "karma-spec-reporter": "0.0.13",
-    "mocha": "^1.21.4",
-    "mocha-spec-cov": "0.0.3",
-    "react": "^0.13.0",
     "semver": "^4.2.0",
-    "sinon": "^1.10.3",
-    "sinon-chai": "^2.5.0",
-    "uglify-js": "^2.4.15"
+    "uglify-js": "^2.4.20"
   },
   "peerDependencies": {
-    "react": "^0.13.0"
+    "react": "0.13.x"
   },
   "author": "James Hollingworth",
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.github.com/jhollingworth/marty/master/LICENSE"
+      "url": "https://raw.github.com/martyjs/marty/master/LICENSE"
     }
   ],
   "bugs": {
-    "url": "https://github.com/jhollingworth/marty/issues"
+    "url": "https://github.com/martyjs/marty/issues"
   },
   "browserify": {
     "transform": [

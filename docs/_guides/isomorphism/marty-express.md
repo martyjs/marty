@@ -5,7 +5,7 @@ id: marty-express
 section: Isomorphism
 ---
 
-[marty-express](http://github.com/jhollingworth/marty-express) is an [express.js](http://expressjs.com/) middleware which makes it easier to build isomorphic applications using express and [react-router](https://github.com/rackt/react-router).
+[marty-express](http://github.com/martyjs/marty-express) is an [express.js](http://expressjs.com/) middleware which makes it easier to build isomorphic applications using express and [react-router](https://github.com/rackt/react-router).
 
 marty-express will take your react-router routes and automatically serve them as if they were in the browser meaning you have a single place to define your routes. If a user requests one of these routes, it will use [``Marty.renderToString``]({% url /api/top-level-api/index.html#renderToString %}) to render the component on the server and then pass the result to the view for rendering.
 

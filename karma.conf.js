@@ -106,18 +106,12 @@ module.exports = function (config) {
         'lib/*.js',
         'test/browser/**/*.js'
       ],
-      exclude: [
-        'test/browser/lib/mockServer.js'
-      ],
       preprocessors: {
         'lib/*': ['browserify'],
         'marty.js': ['browserify'],
         'test/browser/**/*.js': ['browserify']
       },
       port: 9876,
-      proxies: {
-        '/stub': 'http://localhost:8956/stub'
-      },
       logLevel: config.LOG_INFO,
     };
   }

@@ -19,8 +19,8 @@ var UserActionCreators = Marty.createActionCreators({
 ##Why was it depreciated?
 
 There were 3 reasons:
-1. Automatic error handling made debugging really difficult ([#127](https://github.com/jhollingworth/marty/issues/127)).
-2. Automatically dispatched actions were confusing and not that helpful ([#157](https://github.com/jhollingworth/marty/issues/157), [#152](https://github.com/jhollingworth/marty/issues/152)).
+1. Automatic error handling made debugging really difficult ([#127](https://github.com/martyjs/marty/issues/127)).
+2. Automatically dispatched actions were confusing and not that helpful ([#157](https://github.com/martyjs/marty/issues/157), [#152](https://github.com/martyjs/marty/issues/152)).
 3. It didn't play nicely with ES6 classes
 
 We decided this code wasn't adding any value so we should move towards a simpler more explicit approach.
