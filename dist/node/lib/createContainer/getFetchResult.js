@@ -27,7 +27,9 @@ function getFetchResult(component) {
   }
 
   if (isPending) {
-    return fetch.pending();
+    return _.extend(fetch.pending(), {
+      result: results
+    });
   }
 
   return fetch.done(results);

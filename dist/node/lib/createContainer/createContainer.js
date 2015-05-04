@@ -69,8 +69,9 @@ function createContainer(InnerComponent, config) {
     },
     render: function render() {
       var container = this;
+      var result = this.state.result;
 
-      return this.state.result.when({
+      return result.when({
         done: function done(results) {
           if (_.isFunction(container.done)) {
             return container.done(results);
@@ -80,7 +81,7 @@ function createContainer(InnerComponent, config) {
         },
         pending: function pending() {
           if (_.isFunction(container.pending)) {
-            return container.pending();
+            return container.pending(result.result);
           }
 
           return React.createElement("div", null);
