@@ -1,7 +1,6 @@
 {
   "name": "marty",
-  "main": "dist/marty.js",
-  "version": "0.10.0-alpha",
+  "main": "dist/browser/marty.js",
   "homepage": "martyjs.org",
   "authors": [
     "jhollingworth <jamiehollingworth@gmail.com>"
@@ -24,6 +23,6 @@
     "flux": "^2.0.1",
     "cookies-js": "^1.2.1",
     "isomorphic-fetch": "1.6.0",
-    "lodash": "^3.0.0"
+    "lodash": "^3.5.0"
   }
 }

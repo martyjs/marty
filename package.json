@@ -2,7 +2,9 @@
   "name": "marty",
   "version": "0.10.0-alpha",
   "description": "A Javascript library for state management in React applications",
-  "main": "marty.js",
+  "main": "dist/node/marty.js",
+  "browser": "dist/node/marty.js",
+  "webpack": "dist/node/marty.js",
   "directories": {
     "doc": "./doc",
     "lib": "./lib"
@@ -12,53 +14,38 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:jhollingworth/marty.git"
+    "url": "git@github.com:martyjs/marty.git"
   },
   "keywords": [
     "react",
     "flux"
   ],
   "dependencies": {
-    "babelify": "^6.0.0",
     "es6-promise": "^2.0.0",
-    "flux": "^2.0.1",
     "isomorphic-fetch": "1.6.0",
-    "marty-build": "^0.10.0",
-    "marty-core": "^0.10.0",
-    "marty-constants": "^0.10.0",
-    "marty-store": "^0.10.0",
-    "marty-action-creators": "^0.10.0",
-    "marty-queries": "^0.10.0",
-    "marty-state-mixin": "^0.10.0",
-    "marty-container": "^0.10.0",
-    "marty-isomorphism": "^0.10.0",
-    "marty-http-state-source": "^0.10.0",
-    "marty-cookie-state-source": "^0.10.0",
-    "marty-location-state-source": "^0.10.0",
-    "marty-session-storage-state-source": "^0.10.0",
-    "marty-json-storage-state-source": "^0.10.0",
-    "marty-local-storage-state-source": "^0.10.0"
+    "marty-lib": "git://github.com/martyjs/marty-lib#modules"
   },
   "devDependencies": {
-    "babel": "^4.7.1",
+    "babel": "^5.0.0",
+    "babelify": "^6.0.0",
     "browserify": "^9.0.0",
     "browserify-shim": "^3.7.0",
     "bundle-collapser": "^1.0.0",
     "semver": "^4.2.0",
-    "marty-build": "^0.10.0"
+    "uglify-js": "^2.4.20"
   },
   "peerDependencies": {
-    "react": "^0.13.0"
+    "react": "0.13.x"
   },
   "author": "James Hollingworth",
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.github.com/jhollingworth/marty/master/LICENSE"
+      "url": "https://raw.github.com/martyjs/marty/master/LICENSE"
     }
   ],
   "bugs": {
-    "url": "https://github.com/jhollingworth/marty/issues"
+    "url": "https://github.com/martyjs/marty/issues"
   },
   "browserify": {
     "transform": [

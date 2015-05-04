@@ -65,81 +65,84 @@ process.umask = function() { return 0; };
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   2.0.1
+ * @version   2.1.1
  */
 
 (function() {
     "use strict";
-
-    function $$utils$$objectOrFunction(x) {
+    function lib$es6$promise$utils$$objectOrFunction(x) {
       return typeof x === 'function' || (typeof x === 'object' && x !== null);
     }
 
-    function $$utils$$isFunction(x) {
+    function lib$es6$promise$utils$$isFunction(x) {
       return typeof x === 'function';
     }
 
-    function $$utils$$isMaybeThenable(x) {
+    function lib$es6$promise$utils$$isMaybeThenable(x) {
       return typeof x === 'object' && x !== null;
     }
 
-    var $$utils$$_isArray;
-
+    var lib$es6$promise$utils$$_isArray;
     if (!Array.isArray) {
-      $$utils$$_isArray = function (x) {
+      lib$es6$promise$utils$$_isArray = function (x) {
         return Object.prototype.toString.call(x) === '[object Array]';
       };
     } else {
-      $$utils$$_isArray = Array.isArray;
+      lib$es6$promise$utils$$_isArray = Array.isArray;
     }
 
-    var $$utils$$isArray = $$utils$$_isArray;
-    var $$utils$$now = Date.now || function() { return new Date().getTime(); };
-    function $$utils$$F() { }
-
-    var $$utils$$o_create = (Object.create || function (o) {
-      if (arguments.length > 1) {
-        throw new Error('Second argument not supported');
-      }
-      if (typeof o !== 'object') {
-        throw new TypeError('Argument must be an object');
-      }
-      $$utils$$F.prototype = o;
-      return new $$utils$$F();
-    });
-
-    var $$asap$$len = 0;
-
-    var $$asap$$default = function asap(callback, arg) {
-      $$asap$$queue[$$asap$$len] = callback;
-      $$asap$$queue[$$asap$$len + 1] = arg;
-      $$asap$$len += 2;
-      if ($$asap$$len === 2) {
-        // If len is 1, that means that we need to schedule an async flush.
+    var lib$es6$promise$utils$$isArray = lib$es6$promise$utils$$_isArray;
+    var lib$es6$promise$asap$$len = 0;
+    var lib$es6$promise$asap$$toString = {}.toString;
+    var lib$es6$promise$asap$$vertxNext;
+    function lib$es6$promise$asap$$asap(callback, arg) {
+      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
+      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
+      lib$es6$promise$asap$$len += 2;
+      if (lib$es6$promise$asap$$len === 2) {
+        // If len is 2, that means that we need to schedule an async flush.
         // If additional callbacks are queued before the queue is flushed, they
         // will be processed by this flush that we are scheduling.
-        $$asap$$scheduleFlush();
+        lib$es6$promise$asap$$scheduleFlush();
       }
-    };
+    }
 
-    var $$asap$$browserGlobal = (typeof window !== 'undefined') ? window : {};
-    var $$asap$$BrowserMutationObserver = $$asap$$browserGlobal.MutationObserver || $$asap$$browserGlobal.WebKitMutationObserver;
+    var lib$es6$promise$asap$$default = lib$es6$promise$asap$$asap;
+
+    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
+    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
+    var lib$es6$promise$asap$$BrowserMutationObserver = lib$es6$promise$asap$$browserGlobal.MutationObserver || lib$es6$promise$asap$$browserGlobal.WebKitMutationObserver;
+    var lib$es6$promise$asap$$isNode = typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
 
     // test for web worker but not in IE10
-    var $$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
+    var lib$es6$promise$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
       typeof importScripts !== 'undefined' &&
       typeof MessageChannel !== 'undefined';
 
     // node
-    function $$asap$$useNextTick() {
+    function lib$es6$promise$asap$$useNextTick() {
+      var nextTick = process.nextTick;
+      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+      // setImmediate should be used instead instead
+      var version = process.versions.node.match(/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/);
+      if (Array.isArray(version) && version[1] === '0' && version[2] === '10') {
+        nextTick = setImmediate;
+      }
       return function() {
-        process.nextTick($$asap$$flush);
+        nextTick(lib$es6$promise$asap$$flush);
       };
     }
 
-    function $$asap$$useMutationObserver() {
+    // vertx
+    function lib$es6$promise$asap$$useVertxTimer() {
+      return function() {
+        lib$es6$promise$asap$$vertxNext(lib$es6$promise$asap$$flush);
+      };
+    }
+
+    function lib$es6$promise$asap$$useMutationObserver() {
       var iterations = 0;
-      var observer = new $$asap$$BrowserMutationObserver($$asap$$flush);
+      var observer = new lib$es6$promise$asap$$BrowserMutationObserver(lib$es6$promise$asap$$flush);
       var node = document.createTextNode('');
       observer.observe(node, { characterData: true });
 
@@ -149,73 +152,86 @@ process.umask = function() { return 0; };
     }
 
     // web worker
-    function $$asap$$useMessageChannel() {
+    function lib$es6$promise$asap$$useMessageChannel() {
       var channel = new MessageChannel();
-      channel.port1.onmessage = $$asap$$flush;
+      channel.port1.onmessage = lib$es6$promise$asap$$flush;
       return function () {
         channel.port2.postMessage(0);
       };
     }
 
-    function $$asap$$useSetTimeout() {
+    function lib$es6$promise$asap$$useSetTimeout() {
       return function() {
-        setTimeout($$asap$$flush, 1);
+        setTimeout(lib$es6$promise$asap$$flush, 1);
       };
     }
 
-    var $$asap$$queue = new Array(1000);
-
-    function $$asap$$flush() {
-      for (var i = 0; i < $$asap$$len; i+=2) {
-        var callback = $$asap$$queue[i];
-        var arg = $$asap$$queue[i+1];
+    var lib$es6$promise$asap$$queue = new Array(1000);
+    function lib$es6$promise$asap$$flush() {
+      for (var i = 0; i < lib$es6$promise$asap$$len; i+=2) {
+        var callback = lib$es6$promise$asap$$queue[i];
+        var arg = lib$es6$promise$asap$$queue[i+1];
 
         callback(arg);
 
-        $$asap$$queue[i] = undefined;
-        $$asap$$queue[i+1] = undefined;
+        lib$es6$promise$asap$$queue[i] = undefined;
+        lib$es6$promise$asap$$queue[i+1] = undefined;
       }
 
-      $$asap$$len = 0;
+      lib$es6$promise$asap$$len = 0;
     }
 
-    var $$asap$$scheduleFlush;
+    function lib$es6$promise$asap$$attemptVertex() {
+      try {
+        var r = require;
+        var vertx = r('vertx');
+        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
+        return lib$es6$promise$asap$$useVertxTimer();
+      } catch(e) {
+        return lib$es6$promise$asap$$useSetTimeout();
+      }
+    }
 
+    var lib$es6$promise$asap$$scheduleFlush;
     // Decide what async method to use to triggering processing of queued callbacks:
-    if (typeof process !== 'undefined' && {}.toString.call(process) === '[object process]') {
-      $$asap$$scheduleFlush = $$asap$$useNextTick();
-    } else if ($$asap$$BrowserMutationObserver) {
-      $$asap$$scheduleFlush = $$asap$$useMutationObserver();
-    } else if ($$asap$$isWorker) {
-      $$asap$$scheduleFlush = $$asap$$useMessageChannel();
+    if (lib$es6$promise$asap$$isNode) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
+    } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
+    } else if (lib$es6$promise$asap$$isWorker) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
+    } else if (lib$es6$promise$asap$$browserWindow === undefined && typeof require === 'function') {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertex();
     } else {
-      $$asap$$scheduleFlush = $$asap$$useSetTimeout();
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
     }
 
-    function $$$internal$$noop() {}
-    var $$$internal$$PENDING   = void 0;
-    var $$$internal$$FULFILLED = 1;
-    var $$$internal$$REJECTED  = 2;
-    var $$$internal$$GET_THEN_ERROR = new $$$internal$$ErrorObject();
+    function lib$es6$promise$$internal$$noop() {}
 
-    function $$$internal$$selfFullfillment() {
+    var lib$es6$promise$$internal$$PENDING   = void 0;
+    var lib$es6$promise$$internal$$FULFILLED = 1;
+    var lib$es6$promise$$internal$$REJECTED  = 2;
+
+    var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+
+    function lib$es6$promise$$internal$$selfFullfillment() {
       return new TypeError("You cannot resolve a promise with itself");
     }
 
-    function $$$internal$$cannotReturnOwn() {
-      return new TypeError('A promises callback cannot return that same promise.')
+    function lib$es6$promise$$internal$$cannotReturnOwn() {
+      return new TypeError('A promises callback cannot return that same promise.');
     }
 
-    function $$$internal$$getThen(promise) {
+    function lib$es6$promise$$internal$$getThen(promise) {
       try {
         return promise.then;
       } catch(error) {
-        $$$internal$$GET_THEN_ERROR.error = error;
-        return $$$internal$$GET_THEN_ERROR;
+        lib$es6$promise$$internal$$GET_THEN_ERROR.error = error;
+        return lib$es6$promise$$internal$$GET_THEN_ERROR;
       }
     }
 
-    function $$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+    function lib$es6$promise$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
       try {
         then.call(value, fulfillmentHandler, rejectionHandler);
       } catch(e) {
@@ -223,117 +239,116 @@ process.umask = function() { return 0; };
       }
     }
 
-    function $$$internal$$handleForeignThenable(promise, thenable, then) {
-       $$asap$$default(function(promise) {
+    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
+       lib$es6$promise$asap$$default(function(promise) {
         var sealed = false;
-        var error = $$$internal$$tryThen(then, thenable, function(value) {
+        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
           if (sealed) { return; }
           sealed = true;
           if (thenable !== value) {
-            $$$internal$$resolve(promise, value);
+            lib$es6$promise$$internal$$resolve(promise, value);
           } else {
-            $$$internal$$fulfill(promise, value);
+            lib$es6$promise$$internal$$fulfill(promise, value);
           }
         }, function(reason) {
           if (sealed) { return; }
           sealed = true;
 
-          $$$internal$$reject(promise, reason);
+          lib$es6$promise$$internal$$reject(promise, reason);
         }, 'Settle: ' + (promise._label || ' unknown promise'));
 
         if (!sealed && error) {
           sealed = true;
-          $$$internal$$reject(promise, error);
+          lib$es6$promise$$internal$$reject(promise, error);
         }
       }, promise);
     }
 
-    function $$$internal$$handleOwnThenable(promise, thenable) {
-      if (thenable._state === $$$internal$$FULFILLED) {
-        $$$internal$$fulfill(promise, thenable._result);
-      } else if (promise._state === $$$internal$$REJECTED) {
-        $$$internal$$reject(promise, thenable._result);
+    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
+      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
+        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
+      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
+        lib$es6$promise$$internal$$reject(promise, thenable._result);
       } else {
-        $$$internal$$subscribe(thenable, undefined, function(value) {
-          $$$internal$$resolve(promise, value);
+        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
+          lib$es6$promise$$internal$$resolve(promise, value);
         }, function(reason) {
-          $$$internal$$reject(promise, reason);
+          lib$es6$promise$$internal$$reject(promise, reason);
         });
       }
     }
 
-    function $$$internal$$handleMaybeThenable(promise, maybeThenable) {
+    function lib$es6$promise$$internal$$handleMaybeThenable(promise, maybeThenable) {
       if (maybeThenable.constructor === promise.constructor) {
-        $$$internal$$handleOwnThenable(promise, maybeThenable);
+        lib$es6$promise$$internal$$handleOwnThenable(promise, maybeThenable);
       } else {
-        var then = $$$internal$$getThen(maybeThenable);
+        var then = lib$es6$promise$$internal$$getThen(maybeThenable);
 
-        if (then === $$$internal$$GET_THEN_ERROR) {
-          $$$internal$$reject(promise, $$$internal$$GET_THEN_ERROR.error);
+        if (then === lib$es6$promise$$internal$$GET_THEN_ERROR) {
+          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$GET_THEN_ERROR.error);
         } else if (then === undefined) {
-          $$$internal$$fulfill(promise, maybeThenable);
-        } else if ($$utils$$isFunction(then)) {
-          $$$internal$$handleForeignThenable(promise, maybeThenable, then);
+          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+        } else if (lib$es6$promise$utils$$isFunction(then)) {
+          lib$es6$promise$$internal$$handleForeignThenable(promise, maybeThenable, then);
         } else {
-          $$$internal$$fulfill(promise, maybeThenable);
+          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
         }
       }
     }
 
-    function $$$internal$$resolve(promise, value) {
+    function lib$es6$promise$$internal$$resolve(promise, value) {
       if (promise === value) {
-        $$$internal$$reject(promise, $$$internal$$selfFullfillment());
-      } else if ($$utils$$objectOrFunction(value)) {
-        $$$internal$$handleMaybeThenable(promise, value);
+        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFullfillment());
+      } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
+        lib$es6$promise$$internal$$handleMaybeThenable(promise, value);
       } else {
-        $$$internal$$fulfill(promise, value);
+        lib$es6$promise$$internal$$fulfill(promise, value);
       }
     }
 
-    function $$$internal$$publishRejection(promise) {
+    function lib$es6$promise$$internal$$publishRejection(promise) {
       if (promise._onerror) {
         promise._onerror(promise._result);
       }
 
-      $$$internal$$publish(promise);
+      lib$es6$promise$$internal$$publish(promise);
     }
 
-    function $$$internal$$fulfill(promise, value) {
-      if (promise._state !== $$$internal$$PENDING) { return; }
+    function lib$es6$promise$$internal$$fulfill(promise, value) {
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
 
       promise._result = value;
-      promise._state = $$$internal$$FULFILLED;
+      promise._state = lib$es6$promise$$internal$$FULFILLED;
 
-      if (promise._subscribers.length === 0) {
-      } else {
-        $$asap$$default($$$internal$$publish, promise);
+      if (promise._subscribers.length !== 0) {
+        lib$es6$promise$asap$$default(lib$es6$promise$$internal$$publish, promise);
       }
     }
 
-    function $$$internal$$reject(promise, reason) {
-      if (promise._state !== $$$internal$$PENDING) { return; }
-      promise._state = $$$internal$$REJECTED;
+    function lib$es6$promise$$internal$$reject(promise, reason) {
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+      promise._state = lib$es6$promise$$internal$$REJECTED;
       promise._result = reason;
 
-      $$asap$$default($$$internal$$publishRejection, promise);
+      lib$es6$promise$asap$$default(lib$es6$promise$$internal$$publishRejection, promise);
     }
 
-    function $$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
+    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
       var subscribers = parent._subscribers;
       var length = subscribers.length;
 
       parent._onerror = null;
 
       subscribers[length] = child;
-      subscribers[length + $$$internal$$FULFILLED] = onFulfillment;
-      subscribers[length + $$$internal$$REJECTED]  = onRejection;
+      subscribers[length + lib$es6$promise$$internal$$FULFILLED] = onFulfillment;
+      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
 
       if (length === 0 && parent._state) {
-        $$asap$$default($$$internal$$publish, parent);
+        lib$es6$promise$asap$$default(lib$es6$promise$$internal$$publish, parent);
       }
     }
 
-    function $$$internal$$publish(promise) {
+    function lib$es6$promise$$internal$$publish(promise) {
       var subscribers = promise._subscribers;
       var settled = promise._state;
 
@@ -346,7 +361,7 @@ process.umask = function() { return 0; };
         callback = subscribers[i + settled];
 
         if (child) {
-          $$$internal$$invokeCallback(settled, child, callback, detail);
+          lib$es6$promise$$internal$$invokeCallback(settled, child, callback, detail);
         } else {
           callback(detail);
         }
@@ -355,29 +370,29 @@ process.umask = function() { return 0; };
       promise._subscribers.length = 0;
     }
 
-    function $$$internal$$ErrorObject() {
+    function lib$es6$promise$$internal$$ErrorObject() {
       this.error = null;
     }
 
-    var $$$internal$$TRY_CATCH_ERROR = new $$$internal$$ErrorObject();
+    var lib$es6$promise$$internal$$TRY_CATCH_ERROR = new lib$es6$promise$$internal$$ErrorObject();
 
-    function $$$internal$$tryCatch(callback, detail) {
+    function lib$es6$promise$$internal$$tryCatch(callback, detail) {
       try {
         return callback(detail);
       } catch(e) {
-        $$$internal$$TRY_CATCH_ERROR.error = e;
-        return $$$internal$$TRY_CATCH_ERROR;
+        lib$es6$promise$$internal$$TRY_CATCH_ERROR.error = e;
+        return lib$es6$promise$$internal$$TRY_CATCH_ERROR;
       }
     }
 
-    function $$$internal$$invokeCallback(settled, promise, callback, detail) {
-      var hasCallback = $$utils$$isFunction(callback),
+    function lib$es6$promise$$internal$$invokeCallback(settled, promise, callback, detail) {
+      var hasCallback = lib$es6$promise$utils$$isFunction(callback),
           value, error, succeeded, failed;
 
       if (hasCallback) {
-        value = $$$internal$$tryCatch(callback, detail);
+        value = lib$es6$promise$$internal$$tryCatch(callback, detail);
 
-        if (value === $$$internal$$TRY_CATCH_ERROR) {
+        if (value === lib$es6$promise$$internal$$TRY_CATCH_ERROR) {
           failed = true;
           error = value.error;
           value = null;
@@ -386,7 +401,7 @@ process.umask = function() { return 0; };
         }
 
         if (promise === value) {
-          $$$internal$$reject(promise, $$$internal$$cannotReturnOwn());
+          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$cannotReturnOwn());
           return;
         }
 
@@ -395,175 +410,162 @@ process.umask = function() { return 0; };
         succeeded = true;
       }
 
-      if (promise._state !== $$$internal$$PENDING) {
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) {
         // noop
       } else if (hasCallback && succeeded) {
-        $$$internal$$resolve(promise, value);
+        lib$es6$promise$$internal$$resolve(promise, value);
       } else if (failed) {
-        $$$internal$$reject(promise, error);
-      } else if (settled === $$$internal$$FULFILLED) {
-        $$$internal$$fulfill(promise, value);
-      } else if (settled === $$$internal$$REJECTED) {
-        $$$internal$$reject(promise, value);
+        lib$es6$promise$$internal$$reject(promise, error);
+      } else if (settled === lib$es6$promise$$internal$$FULFILLED) {
+        lib$es6$promise$$internal$$fulfill(promise, value);
+      } else if (settled === lib$es6$promise$$internal$$REJECTED) {
+        lib$es6$promise$$internal$$reject(promise, value);
       }
     }
 
-    function $$$internal$$initializePromise(promise, resolver) {
+    function lib$es6$promise$$internal$$initializePromise(promise, resolver) {
       try {
         resolver(function resolvePromise(value){
-          $$$internal$$resolve(promise, value);
+          lib$es6$promise$$internal$$resolve(promise, value);
         }, function rejectPromise(reason) {
-          $$$internal$$reject(promise, reason);
+          lib$es6$promise$$internal$$reject(promise, reason);
         });
       } catch(e) {
-        $$$internal$$reject(promise, e);
+        lib$es6$promise$$internal$$reject(promise, e);
       }
     }
 
-    function $$$enumerator$$makeSettledResult(state, position, value) {
-      if (state === $$$internal$$FULFILLED) {
-        return {
-          state: 'fulfilled',
-          value: value
-        };
-      } else {
-        return {
-          state: 'rejected',
-          reason: value
-        };
-      }
-    }
+    function lib$es6$promise$enumerator$$Enumerator(Constructor, input) {
+      var enumerator = this;
 
-    function $$$enumerator$$Enumerator(Constructor, input, abortOnReject, label) {
-      this._instanceConstructor = Constructor;
-      this.promise = new Constructor($$$internal$$noop, label);
-      this._abortOnReject = abortOnReject;
+      enumerator._instanceConstructor = Constructor;
+      enumerator.promise = new Constructor(lib$es6$promise$$internal$$noop);
 
-      if (this._validateInput(input)) {
-        this._input     = input;
-        this.length     = input.length;
-        this._remaining = input.length;
+      if (enumerator._validateInput(input)) {
+        enumerator._input     = input;
+        enumerator.length     = input.length;
+        enumerator._remaining = input.length;
 
-        this._init();
+        enumerator._init();
 
-        if (this.length === 0) {
-          $$$internal$$fulfill(this.promise, this._result);
+        if (enumerator.length === 0) {
+          lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
         } else {
-          this.length = this.length || 0;
-          this._enumerate();
-          if (this._remaining === 0) {
-            $$$internal$$fulfill(this.promise, this._result);
+          enumerator.length = enumerator.length || 0;
+          enumerator._enumerate();
+          if (enumerator._remaining === 0) {
+            lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
           }
         }
       } else {
-        $$$internal$$reject(this.promise, this._validationError());
+        lib$es6$promise$$internal$$reject(enumerator.promise, enumerator._validationError());
       }
     }
 
-    $$$enumerator$$Enumerator.prototype._validateInput = function(input) {
-      return $$utils$$isArray(input);
+    lib$es6$promise$enumerator$$Enumerator.prototype._validateInput = function(input) {
+      return lib$es6$promise$utils$$isArray(input);
     };
 
-    $$$enumerator$$Enumerator.prototype._validationError = function() {
+    lib$es6$promise$enumerator$$Enumerator.prototype._validationError = function() {
       return new Error('Array Methods must be provided an Array');
     };
 
-    $$$enumerator$$Enumerator.prototype._init = function() {
+    lib$es6$promise$enumerator$$Enumerator.prototype._init = function() {
       this._result = new Array(this.length);
     };
 
-    var $$$enumerator$$default = $$$enumerator$$Enumerator;
+    var lib$es6$promise$enumerator$$default = lib$es6$promise$enumerator$$Enumerator;
 
-    $$$enumerator$$Enumerator.prototype._enumerate = function() {
-      var length  = this.length;
-      var promise = this.promise;
-      var input   = this._input;
-
-      for (var i = 0; promise._state === $$$internal$$PENDING && i < length; i++) {
-        this._eachEntry(input[i], i);
-      }
-    };
-
-    $$$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
-      var c = this._instanceConstructor;
-      if ($$utils$$isMaybeThenable(entry)) {
-        if (entry.constructor === c && entry._state !== $$$internal$$PENDING) {
-          entry._onerror = null;
-          this._settledAt(entry._state, i, entry._result);
-        } else {
-          this._willSettleAt(c.resolve(entry), i);
-        }
-      } else {
-        this._remaining--;
-        this._result[i] = this._makeResult($$$internal$$FULFILLED, i, entry);
-      }
-    };
-
-    $$$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
-      var promise = this.promise;
-
-      if (promise._state === $$$internal$$PENDING) {
-        this._remaining--;
-
-        if (this._abortOnReject && state === $$$internal$$REJECTED) {
-          $$$internal$$reject(promise, value);
-        } else {
-          this._result[i] = this._makeResult(state, i, value);
-        }
-      }
-
-      if (this._remaining === 0) {
-        $$$internal$$fulfill(promise, this._result);
-      }
-    };
-
-    $$$enumerator$$Enumerator.prototype._makeResult = function(state, i, value) {
-      return value;
-    };
-
-    $$$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
+    lib$es6$promise$enumerator$$Enumerator.prototype._enumerate = function() {
       var enumerator = this;
 
-      $$$internal$$subscribe(promise, undefined, function(value) {
-        enumerator._settledAt($$$internal$$FULFILLED, i, value);
+      var length  = enumerator.length;
+      var promise = enumerator.promise;
+      var input   = enumerator._input;
+
+      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+        enumerator._eachEntry(input[i], i);
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
+      var enumerator = this;
+      var c = enumerator._instanceConstructor;
+
+      if (lib$es6$promise$utils$$isMaybeThenable(entry)) {
+        if (entry.constructor === c && entry._state !== lib$es6$promise$$internal$$PENDING) {
+          entry._onerror = null;
+          enumerator._settledAt(entry._state, i, entry._result);
+        } else {
+          enumerator._willSettleAt(c.resolve(entry), i);
+        }
+      } else {
+        enumerator._remaining--;
+        enumerator._result[i] = entry;
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
+      var enumerator = this;
+      var promise = enumerator.promise;
+
+      if (promise._state === lib$es6$promise$$internal$$PENDING) {
+        enumerator._remaining--;
+
+        if (state === lib$es6$promise$$internal$$REJECTED) {
+          lib$es6$promise$$internal$$reject(promise, value);
+        } else {
+          enumerator._result[i] = value;
+        }
+      }
+
+      if (enumerator._remaining === 0) {
+        lib$es6$promise$$internal$$fulfill(promise, enumerator._result);
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
+      var enumerator = this;
+
+      lib$es6$promise$$internal$$subscribe(promise, undefined, function(value) {
+        enumerator._settledAt(lib$es6$promise$$internal$$FULFILLED, i, value);
       }, function(reason) {
-        enumerator._settledAt($$$internal$$REJECTED, i, reason);
+        enumerator._settledAt(lib$es6$promise$$internal$$REJECTED, i, reason);
       });
     };
-
-    var $$promise$all$$default = function all(entries, label) {
-      return new $$$enumerator$$default(this, entries, true /* abort on reject */, label).promise;
-    };
-
-    var $$promise$race$$default = function race(entries, label) {
+    function lib$es6$promise$promise$all$$all(entries) {
+      return new lib$es6$promise$enumerator$$default(this, entries).promise;
+    }
+    var lib$es6$promise$promise$all$$default = lib$es6$promise$promise$all$$all;
+    function lib$es6$promise$promise$race$$race(entries) {
       /*jshint validthis:true */
       var Constructor = this;
 
-      var promise = new Constructor($$$internal$$noop, label);
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
 
-      if (!$$utils$$isArray(entries)) {
-        $$$internal$$reject(promise, new TypeError('You must pass an array to race.'));
+      if (!lib$es6$promise$utils$$isArray(entries)) {
+        lib$es6$promise$$internal$$reject(promise, new TypeError('You must pass an array to race.'));
         return promise;
       }
 
       var length = entries.length;
 
       function onFulfillment(value) {
-        $$$internal$$resolve(promise, value);
+        lib$es6$promise$$internal$$resolve(promise, value);
       }
 
       function onRejection(reason) {
-        $$$internal$$reject(promise, reason);
+        lib$es6$promise$$internal$$reject(promise, reason);
       }
 
-      for (var i = 0; promise._state === $$$internal$$PENDING && i < length; i++) {
-        $$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
+      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+        lib$es6$promise$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
       }
 
       return promise;
-    };
-
-    var $$promise$resolve$$default = function resolve(object, label) {
+    }
+    var lib$es6$promise$promise$race$$default = lib$es6$promise$promise$race$$race;
+    function lib$es6$promise$promise$resolve$$resolve(object) {
       /*jshint validthis:true */
       var Constructor = this;
 
@@ -571,31 +573,31 @@ process.umask = function() { return 0; };
         return object;
       }
 
-      var promise = new Constructor($$$internal$$noop, label);
-      $$$internal$$resolve(promise, object);
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+      lib$es6$promise$$internal$$resolve(promise, object);
       return promise;
-    };
-
-    var $$promise$reject$$default = function reject(reason, label) {
+    }
+    var lib$es6$promise$promise$resolve$$default = lib$es6$promise$promise$resolve$$resolve;
+    function lib$es6$promise$promise$reject$$reject(reason) {
       /*jshint validthis:true */
       var Constructor = this;
-      var promise = new Constructor($$$internal$$noop, label);
-      $$$internal$$reject(promise, reason);
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+      lib$es6$promise$$internal$$reject(promise, reason);
       return promise;
-    };
+    }
+    var lib$es6$promise$promise$reject$$default = lib$es6$promise$promise$reject$$reject;
 
-    var $$es6$promise$promise$$counter = 0;
+    var lib$es6$promise$promise$$counter = 0;
 
-    function $$es6$promise$promise$$needsResolver() {
+    function lib$es6$promise$promise$$needsResolver() {
       throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
     }
 
-    function $$es6$promise$promise$$needsNew() {
+    function lib$es6$promise$promise$$needsNew() {
       throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
     }
 
-    var $$es6$promise$promise$$default = $$es6$promise$promise$$Promise;
-
+    var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
     /**
       Promise objects represent the eventual result of an asynchronous operation. The
       primary way of interacting with a promise is through its `then` method, which
@@ -699,32 +701,32 @@ process.umask = function() { return 0; };
       Useful for tooling.
       @constructor
     */
-    function $$es6$promise$promise$$Promise(resolver) {
-      this._id = $$es6$promise$promise$$counter++;
+    function lib$es6$promise$promise$$Promise(resolver) {
+      this._id = lib$es6$promise$promise$$counter++;
       this._state = undefined;
       this._result = undefined;
       this._subscribers = [];
 
-      if ($$$internal$$noop !== resolver) {
-        if (!$$utils$$isFunction(resolver)) {
-          $$es6$promise$promise$$needsResolver();
+      if (lib$es6$promise$$internal$$noop !== resolver) {
+        if (!lib$es6$promise$utils$$isFunction(resolver)) {
+          lib$es6$promise$promise$$needsResolver();
         }
 
-        if (!(this instanceof $$es6$promise$promise$$Promise)) {
-          $$es6$promise$promise$$needsNew();
+        if (!(this instanceof lib$es6$promise$promise$$Promise)) {
+          lib$es6$promise$promise$$needsNew();
         }
 
-        $$$internal$$initializePromise(this, resolver);
+        lib$es6$promise$$internal$$initializePromise(this, resolver);
       }
     }
 
-    $$es6$promise$promise$$Promise.all = $$promise$all$$default;
-    $$es6$promise$promise$$Promise.race = $$promise$race$$default;
-    $$es6$promise$promise$$Promise.resolve = $$promise$resolve$$default;
-    $$es6$promise$promise$$Promise.reject = $$promise$reject$$default;
+    lib$es6$promise$promise$$Promise.all = lib$es6$promise$promise$all$$default;
+    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
+    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
+    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
 
-    $$es6$promise$promise$$Promise.prototype = {
-      constructor: $$es6$promise$promise$$Promise,
+    lib$es6$promise$promise$$Promise.prototype = {
+      constructor: lib$es6$promise$promise$$Promise,
 
     /**
       The primary way of interacting with a promise is through its `then` method,
@@ -923,20 +925,20 @@ process.umask = function() { return 0; };
         var parent = this;
         var state = parent._state;
 
-        if (state === $$$internal$$FULFILLED && !onFulfillment || state === $$$internal$$REJECTED && !onRejection) {
+        if (state === lib$es6$promise$$internal$$FULFILLED && !onFulfillment || state === lib$es6$promise$$internal$$REJECTED && !onRejection) {
           return this;
         }
 
-        var child = new this.constructor($$$internal$$noop);
+        var child = new this.constructor(lib$es6$promise$$internal$$noop);
         var result = parent._result;
 
         if (state) {
           var callback = arguments[state - 1];
-          $$asap$$default(function(){
-            $$$internal$$invokeCallback(state, child, callback, result);
+          lib$es6$promise$asap$$default(function(){
+            lib$es6$promise$$internal$$invokeCallback(state, child, callback, result);
           });
         } else {
-          $$$internal$$subscribe(parent, child, onFulfillment, onRejection);
+          lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection);
         }
 
         return child;
@@ -973,53 +975,49 @@ process.umask = function() { return 0; };
         return this.then(null, onRejection);
       }
     };
-
-    var $$es6$promise$polyfill$$default = function polyfill() {
+    function lib$es6$promise$polyfill$$polyfill() {
       var local;
 
       if (typeof global !== 'undefined') {
-        local = global;
-      } else if (typeof window !== 'undefined' && window.document) {
-        local = window;
+          local = global;
+      } else if (typeof self !== 'undefined') {
+          local = self;
       } else {
-        local = self;
+          try {
+              local = Function('return this')();
+          } catch (e) {
+              throw new Error('polyfill failed because global object is unavailable in this environment');
+          }
       }
 
-      var es6PromiseSupport =
-        "Promise" in local &&
-        // Some of these methods are missing from
-        // Firefox/Chrome experimental implementations
-        "resolve" in local.Promise &&
-        "reject" in local.Promise &&
-        "all" in local.Promise &&
-        "race" in local.Promise &&
-        // Older version of the spec had a resolver object
-        // as the arg rather than a function
-        (function() {
-          var resolve;
-          new local.Promise(function(r) { resolve = r; });
-          return $$utils$$isFunction(resolve);
-        }());
+      var P = local.Promise;
 
-      if (!es6PromiseSupport) {
-        local.Promise = $$es6$promise$promise$$default;
+      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
+        return;
       }
-    };
 
-    var es6$promise$umd$$ES6Promise = {
-      'Promise': $$es6$promise$promise$$default,
-      'polyfill': $$es6$promise$polyfill$$default
+      local.Promise = lib$es6$promise$promise$$default;
+    }
+    var lib$es6$promise$polyfill$$default = lib$es6$promise$polyfill$$polyfill;
+
+    var lib$es6$promise$umd$$ES6Promise = {
+      'Promise': lib$es6$promise$promise$$default,
+      'polyfill': lib$es6$promise$polyfill$$default
     };
 
     /* global define:true module:true window: true */
     if (typeof define === 'function' && define['amd']) {
-      define(function() { return es6$promise$umd$$ES6Promise; });
+      define(function() { return lib$es6$promise$umd$$ES6Promise; });
     } else if (typeof module !== 'undefined' && module['exports']) {
-      module['exports'] = es6$promise$umd$$ES6Promise;
+      module['exports'] = lib$es6$promise$umd$$ES6Promise;
     } else if (typeof this !== 'undefined') {
-      this['ES6Promise'] = es6$promise$umd$$ES6Promise;
+      this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
     }
+
+    lib$es6$promise$polyfill$$default();
 }).call(this);
+
+
 }).call(this,require(1),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"1":1}],3:[function(require,module,exports){
 (function() {
@@ -1389,13 +1387,39 @@ process.umask = function() { return 0; };
 require(3);
 
 },{"3":3}],5:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var DispatchCoordinator = require(21);
 
@@ -1403,7 +1427,7 @@ var ActionCreators = (function (_DispatchCoordinator) {
   function ActionCreators(options) {
     _classCallCheck(this, ActionCreators);
 
-    _get(Object.getPrototypeOf(ActionCreators.prototype), "constructor", this).call(this, "ActionCreators", options);
+    _get(Object.getPrototypeOf(ActionCreators.prototype), 'constructor', this).call(this, 'ActionCreators', options);
   }
 
   _inherits(ActionCreators, _DispatchCoordinator);
@@ -1414,7 +1438,7 @@ var ActionCreators = (function (_DispatchCoordinator) {
 module.exports = ActionCreators;
 
 },{"21":21}],6:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 
@@ -1431,22 +1455,22 @@ function autoDispatch(constant) {
 module.exports = autoDispatch;
 
 },{"62":62}],7:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var createClass = require(18);
 var ActionCreators = require(5);
-var RESERVED_KEYWORDS = ["dispatch"];
+var RESERVED_KEYWORDS = ['dispatch'];
 
 function createActionCreatorsClass(properties) {
   _.extend.apply(_, [properties].concat(properties.mixins));
   _.each(RESERVED_KEYWORDS, function (keyword) {
     if (properties[keyword]) {
-      throw new Error("" + keyword + " is a reserved keyword");
+      throw new Error('' + keyword + ' is a reserved keyword');
     }
   });
 
-  var classProperties = _.omit(properties, "mixins", "types");
+  var classProperties = _.omit(properties, 'mixins', 'types');
 
   return createClass(classProperties, properties, ActionCreators);
 }
@@ -1454,16 +1478,16 @@ function createActionCreatorsClass(properties) {
 module.exports = createActionCreatorsClass;
 
 },{"18":18,"5":5,"62":62}],8:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var autoDispatch = require(6);
 var ActionCreators = require(5);
 var createActionCreatorsClass = require(7);
 
 module.exports = function (marty) {
-  marty.register("autoDispatch", autoDispatch);
-  marty.registerClass("ActionCreators", ActionCreators);
-  marty.register("createActionCreators", createActionCreators);
+  marty.register('autoDispatch', autoDispatch);
+  marty.registerClass('ActionCreators', ActionCreators);
+  marty.register('createActionCreators', createActionCreators);
 
   function createActionCreators(properties) {
     var ActionCreatorsClass = createActionCreatorsClass(properties);
@@ -1474,7 +1498,7 @@ module.exports = function (marty) {
 };
 
 },{"5":5,"6":6,"7":7}],9:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var log = require(24);
@@ -1509,7 +1533,7 @@ function constants(obj) {
     var constants = {};
 
     _.each(array, function (actionType) {
-      var types = [actionType, actionType + "_STARTING", actionType + "_DONE", actionType + "_FAILED"];
+      var types = [actionType, actionType + '_STARTING', actionType + '_DONE', actionType + '_FAILED'];
 
       _.each(types, function (type) {
         constants[type] = createActionCreator(type);
@@ -1522,7 +1546,7 @@ function constants(obj) {
   function createActionCreator(actionType) {
     var constantActionCreator = function constantActionCreator(actionCreator) {
       if (warnings.invokeConstant) {
-        log.warn("Warning: Invoking constants has been depreciated. " + "Please migrate to new style of creating action creators " + "http://martyjs.org/guides/action-creators/migrating-from-v8.html");
+        log.warn('Warning: Invoking constants has been depreciated. ' + 'Please migrate to new style of creating action creators ' + 'http://martyjs.org/guides/action-creators/migrating-from-v8.html');
       }
 
       if (!_.isFunction(actionCreator)) {
@@ -1565,45 +1589,51 @@ function constants(obj) {
 module.exports = constants;
 
 },{"24":24,"41":41,"62":62}],10:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var constants = require(9);
 
 module.exports = function (marty) {
-  marty.register("createConstants", createConstants);
+  marty.register('createConstants', createConstants);
 
   function createConstants(obj) {
     return constants(obj);
   }
 };
 
-module.exports.constants = constants;
-
 },{"9":9}],11:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }return target;
+};
 
-var log = require(24);
 var _ = require(62);
 var uuid = require(40);
 var StoreObserver = require(32);
 var getFetchResult = require(12);
 var getClassName = require(35);
 
-var RESERVED_FUNCTIONS = ["contextTypes", "componentDidMount", "onStoreChanged", "componentWillUnmount", "getInitialState", "getState", "render"];
+var RESERVED_FUNCTIONS = ['contextTypes', 'componentDidMount', 'onStoreChanged', 'componentWillUnmount', 'getInitialState', 'getState', 'render'];
 
 module.exports = function (React) {
   return function createContainer(InnerComponent, config) {
     config = config || {};
 
     if (!InnerComponent) {
-      throw new Error("Must specify an inner component");
+      throw new Error('Must specify an inner component');
     }
 
-    var id = uuid.type("Component");
+    var id = uuid.type('Component');
     var innerComponentDisplayName = InnerComponent.displayName || getClassName(InnerComponent);
     var contextTypes = _.extend({
+      app: React.PropTypes.object,
       marty: React.PropTypes.object
     }, config.contextTypes);
 
@@ -1616,9 +1646,10 @@ module.exports = function (React) {
         };
 
         this.observer = new StoreObserver({
+          app: this.app,
           component: component,
-          onStoreChanged: this.onStoreChanged,
-          stores: getStoresToListenTo(this.listenTo, component)
+          stores: this.listenTo,
+          onStoreChanged: this.onStoreChanged
         });
 
         if (_.isFunction(config.componentDidMount)) {
@@ -1661,6 +1692,16 @@ module.exports = function (React) {
         }
       },
       getInitialState: function getInitialState() {
+        var _this = this;
+
+        Object.defineProperty(this, 'app', {
+          get: function get() {
+            if (_this.context) {
+              return _this.context.app;
+            }
+          }
+        });
+
         return this.getState();
       },
       getState: function getState() {
@@ -1669,7 +1710,7 @@ module.exports = function (React) {
         };
       },
       done: function done(results) {
-        return React.createElement(InnerComponent, _extends({ ref: "innerComponent" }, this.props, results));
+        return React.createElement(InnerComponent, _extends({ ref: 'innerComponent' }, this.props, results));
       },
       getInnerComponent: function getInnerComponent() {
         return this.refs.innerComponent;
@@ -1683,14 +1724,14 @@ module.exports = function (React) {
               return container.done(results);
             }
 
-            throw new Error("The `done` handler must be a function");
+            throw new Error('The `done` handler must be a function');
           },
           pending: function pending() {
             if (_.isFunction(container.pending)) {
               return container.pending();
             }
 
-            return React.createElement("div", null);
+            return React.createElement('div', null);
           },
           failed: function failed(error) {
             if (_.isFunction(container.failed)) {
@@ -1704,34 +1745,14 @@ module.exports = function (React) {
     }, _.omit(config, RESERVED_FUNCTIONS)));
 
     Container.InnerComponent = InnerComponent;
-    Container.displayName = innerComponentDisplayName + "Container";
+    Container.displayName = innerComponentDisplayName + 'Container';
 
     return Container;
   };
-
-  function getStoresToListenTo(stores, component) {
-    if (!stores) {
-      return [];
-    }
-
-    if (!_.isArray(stores)) {
-      stores = [stores];
-    }
-
-    return _.filter(stores, function (store) {
-      var isStore = store.constructor.type === "Store";
-
-      if (!isStore) {
-        log.warn("Warning: Trying to listen to something that isn't a store", store, component.displayName);
-      }
-
-      return isStore;
-    });
-  }
 };
 
-},{"12":12,"24":24,"32":32,"35":35,"40":40,"62":62}],12:[function(require,module,exports){
-"use strict";
+},{"12":12,"32":32,"35":35,"40":40,"62":62}],12:[function(require,module,exports){
+'use strict';
 
 var log = require(24);
 var _ = require(62);
@@ -1773,7 +1794,7 @@ function invokeFetches(component) {
     var result = component.fetch.call(component);
 
     if (result._isFetchResult) {
-      throw new Error("Cannot return a single fetch result. You must return an object " + "literal where the keys map to props and the values can be fetch results");
+      throw new Error('Cannot return a single fetch result. You must return an object ' + 'literal where the keys map to props and the values can be fetch results');
     }
 
     _.each(result, function (result, key) {
@@ -1786,7 +1807,7 @@ function invokeFetches(component) {
   } else {
     _.each(component.fetch, function (getResult, key) {
       if (!_.isFunction(getResult)) {
-        log.warn("The fetch " + key + " was not a function and so ignoring");
+        log.warn('The fetch ' + key + ' was not a function and so ignoring');
       } else {
         var result = getResult.call(component);
 
@@ -1805,22 +1826,56 @@ function invokeFetches(component) {
 module.exports = getFetchResult;
 
 },{"24":24,"62":62,"71":71}],13:[function(require,module,exports){
-"use strict";
+'use strict';
 
 module.exports = function (marty, React) {
-  marty.register("createContainer", require(11)(React));
+  marty.register('createContainer', require(11)(React));
 };
 
 },{"11":11}],14:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var cookieFactory = defaultCookieFactory;
 var StateSource = require(30);
@@ -1829,36 +1884,34 @@ var CookieStateSource = (function (_StateSource) {
   function CookieStateSource(options) {
     _classCallCheck(this, CookieStateSource);
 
-    _get(Object.getPrototypeOf(CookieStateSource.prototype), "constructor", this).call(this, options);
+    _get(Object.getPrototypeOf(CookieStateSource.prototype), 'constructor', this).call(this, options);
     this._isCookieStateSource = true;
     this._cookies = cookieFactory(this.context);
   }
 
   _inherits(CookieStateSource, _StateSource);
 
-  _createClass(CookieStateSource, {
-    get: {
-      value: function get(key) {
-        return this._cookies.get(key);
-      }
-    },
-    set: {
-      value: function set(key, value, options) {
-        return this._cookies.set(key, value, options);
-      }
-    },
-    expire: {
-      value: function expire(key) {
-        return this._cookies.expire(key);
-      }
+  _createClass(CookieStateSource, [{
+    key: 'get',
+    value: function get(key) {
+      return this._cookies.get(key);
     }
   }, {
-    setCookieFactory: {
-      value: function setCookieFactory(value) {
-        cookieFactory = value;
-      }
+    key: 'set',
+    value: function set(key, value, options) {
+      return this._cookies.set(key, value, options);
     }
-  });
+  }, {
+    key: 'expire',
+    value: function expire(key) {
+      return this._cookies.expire(key);
+    }
+  }], [{
+    key: 'setCookieFactory',
+    value: function setCookieFactory(value) {
+      cookieFactory = value;
+    }
+  }]);
 
   return CookieStateSource;
 })(StateSource);
@@ -1870,20 +1923,32 @@ function defaultCookieFactory() {
 module.exports = CookieStateSource;
 
 },{"30":30,"81":81}],15:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var CookieStateSource = require(14);
 
 module.exports = function (marty) {
-  marty.registerStateSource("CookieStateSource", "cookie", CookieStateSource);
+  marty.registerStateSource('CookieStateSource', 'cookie', CookieStateSource);
 };
 
 },{"14":14}],16:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var log = require(24);
 var uuid = require(40);
@@ -1896,41 +1961,47 @@ var DispatchCoordinator = (function () {
     _classCallCheck(this, DispatchCoordinator);
 
     if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
-      log.warn("Warning: Options were not passed into an action creators' constructor");
+      log.warn('Warning: Options were not passed into an action creators\' constructor');
     }
 
     options = options || {};
 
     this.__type = type;
+    this.__isCoreType = true;
+    this.__app = options.app;
     this.__context = options.context;
     this.__id = uuid.type(this.__type);
     this.__dispatcher = options.dispatcher;
   }
 
-  _createClass(DispatchCoordinator, {
-    dispatch: {
-      value: function dispatch(type) {
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
+  _createClass(DispatchCoordinator, [{
+    key: 'dispatch',
+    value: function dispatch(type) {
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
 
-        return this.__dispatcher.dispatchAction({
-          type: type,
-          arguments: args
-        });
-      }
-    },
-    "for": {
-      value: function _for(obj) {
-        return resolve(this, obj);
-      }
-    },
-    context: {
-      get: function () {
-        return this.__context;
-      }
+      return this.__dispatcher.dispatchAction({
+        type: type,
+        arguments: args
+      });
     }
-  });
+  }, {
+    key: 'for',
+    value: function _for(obj) {
+      return resolve(this, obj);
+    }
+  }, {
+    key: 'app',
+    get: function get() {
+      return this.__app;
+    }
+  }, {
+    key: 'context',
+    get: function get() {
+      return this.__context;
+    }
+  }]);
 
   return DispatchCoordinator;
 })();
@@ -1938,7 +2009,7 @@ var DispatchCoordinator = (function () {
 module.exports = DispatchCoordinator;
 
 },{"22":22,"24":24,"38":38,"40":40,"41":41}],17:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var uuid = require(40);
@@ -1967,13 +2038,13 @@ function ActionPayload(options) {
   this.addComponentHandler = addComponentHandler;
   this.timestamp = options.timestamp || new Date();
 
-  Object.defineProperty(this, "stores", {
+  Object.defineProperty(this, 'stores', {
     get: function get() {
       return stores;
     }
   });
 
-  Object.defineProperty(this, "components", {
+  Object.defineProperty(this, 'components', {
     get: function get() {
       return components;
     }
@@ -1992,7 +2063,7 @@ function ActionPayload(options) {
   }
 
   function toJSON() {
-    var json = _.pick(this, "id", "type", "stores", "arguments", "timestamp", "components");
+    var json = _.pick(this, 'id', 'type', 'stores', 'arguments', 'timestamp', 'components');
 
     return json;
   }
@@ -2044,7 +2115,7 @@ function ActionPayload(options) {
 module.exports = ActionPayload;
 
 },{"40":40,"62":62}],18:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 
@@ -2054,7 +2125,7 @@ function createClass(properties, defaultOptions, BaseType) {
     this.id = properties.id;
     this.displayName = properties.displayName;
 
-    var base = get(Object.getPrototypeOf(Class.prototype), "constructor", this);
+    var base = get(Object.getPrototypeOf(Class.prototype), 'constructor', this);
     var baseOptions = _.extend({}, defaultOptions, options, properties);
 
     if (defaultOptions.dispatcher) {
@@ -2080,25 +2151,25 @@ function get(_x, _x2, _x3) {
   var _again = true;
 
   _function: while (_again) {
+    desc = _parent = getter = undefined;
     _again = false;
     var object = _x,
         property = _x2,
         receiver = _x3;
-    desc = parent = getter = undefined;
 
     var desc = Object.getOwnPropertyDescriptor(object, property);
     if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-      if (parent === null) {
+      var _parent = Object.getPrototypeOf(object);
+      if (_parent === null) {
         return undefined;
       } else {
-        _x = parent;
+        _x = _parent;
         _x2 = property;
         _x3 = receiver;
         _again = true;
         continue _function;
       }
-    } else if ("value" in desc && desc.writable) {
+    } else if ('value' in desc && desc.writable) {
       return desc.value;
     } else {
       var getter = desc.get;
@@ -2111,8 +2182,8 @@ function get(_x, _x2, _x3) {
 }
 
 function inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
   }
 
   subClass.prototype = Object.create(superClass && superClass.prototype, {
@@ -2131,22 +2202,22 @@ function inherits(subClass, superClass) {
 
 function classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
+    throw new TypeError('Cannot call a class as a function');
   }
 }
 
 module.exports = createClass;
 
 },{"62":62}],19:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var uuid = require(40);
 var Dispatcher = require(82).Dispatcher;
 var ActionPayload = require(17);
-var EventEmitter = require(193);
+var EventEmitter = require(203);
 
-var ACTION_DISPATCHED = "ACTION_DISPATCHED";
+var ACTION_DISPATCHED = 'ACTION_DISPATCHED';
 
 function createDispatcher() {
   var emitter = new EventEmitter();
@@ -2184,7 +2255,7 @@ function createDispatcher() {
 
 module.exports = createDispatcher;
 
-},{"17":17,"193":193,"40":40,"62":62,"82":82}],20:[function(require,module,exports){
+},{"17":17,"203":203,"40":40,"62":62,"82":82}],20:[function(require,module,exports){
 "use strict";
 
 var diagnostics = {
@@ -2201,11 +2272,23 @@ function trace() {
 }
 
 },{}],21:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var log = require(24);
 var uuid = require(40);
@@ -2218,41 +2301,47 @@ var DispatchCoordinator = (function () {
     _classCallCheck(this, DispatchCoordinator);
 
     if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
-      log.warn("Warning: Options were not passed into an action creators' constructor");
+      log.warn('Warning: Options were not passed into an action creators\' constructor');
     }
 
     options = options || {};
 
     this.__type = type;
+    this.__isCoreType = true;
+    this.__app = options.app;
     this.__context = options.context;
     this.__id = uuid.type(this.__type);
     this.__dispatcher = options.dispatcher;
   }
 
-  _createClass(DispatchCoordinator, {
-    dispatch: {
-      value: function dispatch(type) {
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
+  _createClass(DispatchCoordinator, [{
+    key: 'dispatch',
+    value: function dispatch(type) {
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
 
-        return this.__dispatcher.dispatchAction({
-          type: type,
-          arguments: args
-        });
-      }
-    },
-    "for": {
-      value: function _for(obj) {
-        return resolve(this, obj);
-      }
-    },
-    context: {
-      get: function () {
-        return this.__context;
-      }
+      return this.__dispatcher.dispatchAction({
+        type: type,
+        arguments: args
+      });
     }
-  });
+  }, {
+    key: 'for',
+    value: function _for(obj) {
+      return resolve(this, obj);
+    }
+  }, {
+    key: 'app',
+    get: function get() {
+      return this.__app;
+    }
+  }, {
+    key: 'context',
+    get: function get() {
+      return this.__context;
+    }
+  }]);
 
   return DispatchCoordinator;
 })();
@@ -2260,19 +2349,19 @@ var DispatchCoordinator = (function () {
 module.exports = DispatchCoordinator;
 
 },{"22":22,"24":24,"38":38,"40":40,"41":41}],22:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var windowDefined = typeof window !== "undefined";
-var environment = windowDefined ? "browser" : "server";
+var windowDefined = typeof window !== 'undefined';
+var environment = windowDefined ? 'browser' : 'server';
 
 module.exports = {
   environment: environment,
-  isServer: environment === "server",
-  isBrowser: environment === "browser"
+  isServer: environment === 'server',
+  isBrowser: environment === 'browser'
 };
 
 },{}],23:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var logger = require(24);
@@ -2284,23 +2373,25 @@ var getClassName = require(35);
 var createStateSourceClass = require(29);
 
 module.exports = function (marty) {
-  marty.registerClass("StateSource", StateSource);
+  marty.registerClass('StateSource', StateSource);
 
-  marty.register("logger", logger);
-  marty.register("dispose", dispose);
-  marty.register("warnings", warnings);
-  marty.register("register", register);
-  marty.register("diagnostics", diagnostics);
-  marty.register("createStateSource", createStateSource);
+  marty.register('logger', logger);
+  marty.register('dispose', dispose);
+  marty.register('warnings', warnings);
+  marty.register('register', register);
+  marty.register('diagnostics', diagnostics);
+  marty.register('createStateSource', createStateSource);
 
-  marty.registerProperty("isASingleton", {
+  marty.registerProperty('isASingleton', {
     get: function get() {
       return !!this.__isASingleton;
     },
     set: function set(value) {
-      if (this.warnings.martyIsASingleton) {
-        logger.warn("Warning: Marty will no longer be a singleton in future releases " + "http://martyjs.org/guides/marty-is-a-singelton.html")["this"].__isASingleton = value;
+      if (warnings.appIsTheFuture) {
+        logger.warn('Warning: Marty will no longer be a singleton in future releases. ' + 'Please use applications instead. ' + 'http://martyjs.org/depreciated/singelton.html');
       }
+
+      this.__isASingleton = value;
     }
   });
 
@@ -2317,7 +2408,7 @@ module.exports = function (marty) {
     var BaseType = properties.type ? marty.stateSources[properties.type] : StateSource;
 
     if (!BaseType) {
-      throw new Error("Unknown state source " + properties.type);
+      throw new Error('Unknown state source ' + properties.type);
     }
 
     var StateSourceClass = createStateSourceClass(properties, BaseType);
@@ -2327,6 +2418,14 @@ module.exports = function (marty) {
   }
 
   function register(clazz, id) {
+    if (!this.isASingleton) {
+      return clazz;
+    }
+
+    if (warnings.appIsTheFuture) {
+      logger.warn('Warning: Marty will no longer be a singleton in future releases. ' + 'Please use applications instead of registering in the global object. ' + 'http://martyjs.org/depreciated/singelton.html');
+    }
+
     var className = getClassName(clazz);
 
     if (!clazz.id) {
@@ -2342,7 +2441,7 @@ module.exports = function (marty) {
 };
 
 },{"20":20,"22":22,"24":24,"29":29,"30":30,"35":35,"41":41,"62":62}],24:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var Diagnostics = require(20);
@@ -2363,9 +2462,13 @@ if (console) {
 }
 
 },{"20":20,"62":62}],25:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var _ = require(62);
 var Registry = require(28);
@@ -2375,17 +2478,36 @@ var createDispatcher = require(19);
 var Marty = function Marty(version, react) {
   _classCallCheck(this, Marty);
 
+  var dispatcher = createDispatcher();
   var builder = new MartyBuilder(this);
+  var registry = new Registry({
+    defaultDispatcher: dispatcher
+  });
 
   this.version = version;
-  this.dispatcher = createDispatcher();
-  this.registry = new Registry({
-    defaultDispatcher: this.dispatcher
+  Object.defineProperty(this, 'registry', {
+    get: function get() {
+      if (this.warnings && this.warnings.appIsTheFuture) {
+        this.logger.warn('Warning: The global registry is being depreciated. ' + 'Please move to using application\'s instead. ' + 'http://martyjs.org/depreciated/singelton.html');
+      }
+
+      return dispatcher;
+    }
+  });
+
+  Object.defineProperty(this, 'dispatcher', {
+    get: function get() {
+      if (this.warnings && this.warnings.appIsTheFuture) {
+        this.logger.warn('Warning: The global dispatcher is being depreciated. ' + 'Please move to using application\'s instead. ' + 'http://martyjs.org/depreciated/singelton.html');
+      }
+
+      return dispatcher;
+    }
   });
 
   this.use = function use(cb) {
     if (!_.isFunction(cb)) {
-      throw new Error("Must pass in a function");
+      throw new Error('Must pass in a function');
     }
 
     cb(builder, react);
@@ -2397,9 +2519,21 @@ module.exports = Marty;
 },{"19":19,"26":26,"28":28,"62":62}],26:[function(require,module,exports){
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
 
 var MartyBuilder = (function () {
   function MartyBuilder(marty) {
@@ -2409,30 +2543,29 @@ var MartyBuilder = (function () {
     this.stateSources = {};
   }
 
-  _createClass(MartyBuilder, {
-    registerStateSource: {
-      value: function registerStateSource(id, stateSourceId, clazz) {
-        this.registerClass(id, clazz);
-        this.stateSources[stateSourceId] = clazz;
-      }
-    },
-    registerClass: {
-      value: function registerClass(id, clazz) {
-        this._marty[id] = clazz;
-        this._marty.registry.addClass(id, clazz);
-      }
-    },
-    registerProperty: {
-      value: function registerProperty(id, description) {
-        Object.defineProperty(this._marty, id, description);
-      }
-    },
-    register: {
-      value: function register(id, value) {
-        this._marty[id] = value;
-      }
+  _createClass(MartyBuilder, [{
+    key: "registerStateSource",
+    value: function registerStateSource(id, stateSourceId, clazz) {
+      this.registerClass(id, clazz);
+      this.stateSources[stateSourceId] = clazz;
     }
-  });
+  }, {
+    key: "registerClass",
+    value: function registerClass(id, clazz) {
+      this._marty[id] = clazz;
+      this._marty.registry.addClass(id, clazz);
+    }
+  }, {
+    key: "registerProperty",
+    value: function registerProperty(id, description) {
+      Object.defineProperty(this._marty, id, description);
+    }
+  }, {
+    key: "register",
+    value: function register(id, value) {
+      this._marty[id] = value;
+    }
+  }]);
 
   return MartyBuilder;
 })();
@@ -2440,7 +2573,7 @@ var MartyBuilder = (function () {
 module.exports = MartyBuilder;
 
 },{}],27:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 
@@ -2450,11 +2583,23 @@ module.exports = {
 };
 
 },{"62":62}],28:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var _ = require(62);
 var log = require(24);
@@ -2463,7 +2608,7 @@ var classId = require(33);
 var Environment = require(22);
 var humanStrings = require(37);
 
-var FUNCTIONS_TO_NOT_WRAP = ["fetch"];
+var FUNCTIONS_TO_NOT_WRAP = ['fetch'];
 
 var Registry = (function () {
   function Registry(options) {
@@ -2475,105 +2620,104 @@ var Registry = (function () {
     this.defaultDispatcher = options.defaultDispatcher;
   }
 
-  _createClass(Registry, {
-    addClass: {
-      value: function addClass(id, clazz) {
-        this.classes[id] = clazz;
-        addClassHelper(this, id);
-      }
-    },
-    getClassId: {
-      value: function getClassId(obj) {
-        var id = _.findKey(this.classes, function (type) {
-          return obj instanceof type;
-        });
-
-        if (!id) {
-          throw new Error("Unknown type");
-        }
-
-        return id;
-      }
-    },
-    dispose: {
-      value: function dispose() {
-        this.types = {};
-      }
-    },
-    get: {
-      value: function get(type, id) {
-        return (this.types[type] || {})[id];
-      }
-    },
-    getAll: {
-      value: function getAll(type) {
-        return _.values(this.types[type] || {});
-      }
-    },
-    getDefault: {
-      value: function getDefault(type, id) {
-        return this.defaults[type][id];
-      }
-    },
-    getAllDefaults: {
-      value: function getAllDefaults(type) {
-        return _.values(this.defaults[type]);
-      }
-    },
-    register: {
-      value: function register(clazz) {
-        var defaultInstance = new clazz({
-          dispatcher: this.defaultDispatcher
-        });
-        var type = this.getClassId(defaultInstance);
-
-        defaultInstance.__isDefaultInstance = true;
-
-        if (!this.types[type]) {
-          this.types[type] = {};
-        }
-
-        if (!this.defaults[type]) {
-          this.defaults[type] = {};
-        }
-
-        var id = classId(clazz, type);
-
-        if (!id) {
-          throw CannotRegisterClassError(clazz, type);
-        }
-
-        if (this.types[type][id]) {
-          throw ClassAlreadyRegisteredWithId(clazz, type);
-        }
-
-        clazz.id = id;
-        defaultInstance.id = defaultInstance.id || id;
-        defaultInstance.type = clazz.type = type;
-
-        this.types[type][id] = clazz;
-
-        if (Environment.isServer) {
-          _.each(_.functions(defaultInstance), wrapResolverFunctions, defaultInstance);
-        }
-
-        this.defaults[type][id] = defaultInstance;
-
-        return defaultInstance;
-      }
-    },
-    resolve: {
-      value: function resolve(type, id, options) {
-        var clazz = (this.types[type] || {})[id];
-
-        if (!clazz) {
-          throw CannotFindTypeWithId(type, id);
-        }
-
-        return new clazz(options);
-      }
+  _createClass(Registry, [{
+    key: 'addClass',
+    value: function addClass(id, clazz) {
+      this.classes[id] = clazz;
+      addClassHelper(this, id);
     }
-  });
+  }, {
+    key: 'getClassId',
+    value: function getClassId(obj) {
+      var id = _.findKey(this.classes, function (type) {
+        return obj instanceof type;
+      });
+
+      if (!id) {
+        throw new Error('Unknown type');
+      }
+
+      return id;
+    }
+  }, {
+    key: 'dispose',
+    value: function dispose() {
+      this.types = {};
+    }
+  }, {
+    key: 'get',
+    value: function get(type, id) {
+      return (this.types[type] || {})[id];
+    }
+  }, {
+    key: 'getAll',
+    value: function getAll(type) {
+      return _.values(this.types[type] || {});
+    }
+  }, {
+    key: 'getDefault',
+    value: function getDefault(type, id) {
+      return this.defaults[type][id];
+    }
+  }, {
+    key: 'getAllDefaults',
+    value: function getAllDefaults(type) {
+      return _.values(this.defaults[type]);
+    }
+  }, {
+    key: 'register',
+    value: function register(clazz) {
+      var defaultInstance = new clazz({
+        dispatcher: this.defaultDispatcher
+      });
+      var type = this.getClassId(defaultInstance);
+
+      defaultInstance.__isDefaultInstance = true;
+
+      if (!this.types[type]) {
+        this.types[type] = {};
+      }
+
+      if (!this.defaults[type]) {
+        this.defaults[type] = {};
+      }
+
+      var id = classId(clazz, type);
+
+      if (!id) {
+        throw CannotRegisterClassError(clazz, type);
+      }
+
+      if (this.types[type][id]) {
+        throw ClassAlreadyRegisteredWithId(clazz, type);
+      }
+
+      clazz.id = id;
+      defaultInstance.id = defaultInstance.id || id;
+      defaultInstance.type = clazz.type = type;
+
+      this.types[type][id] = clazz;
+
+      if (Environment.isServer) {
+        _.each(_.functions(defaultInstance), wrapResolverFunctions, defaultInstance);
+      }
+
+      this.defaults[type][id] = defaultInstance;
+
+      return defaultInstance;
+    }
+  }, {
+    key: 'resolve',
+    value: function resolve(type, id, options) {
+      var clazz = (this.types[type] || {})[id];
+
+      if (!clazz) {
+        throw CannotFindTypeWithId(type, id);
+      }
+
+      return new clazz(options);
+    }
+  }]);
 
   return Registry;
 })();
@@ -2592,7 +2736,7 @@ function wrapResolverFunctions(functionName) {
     if (warnings.callingResolverOnServer && Environment.isServer) {
       var type = instance.__type;
       var displayName = instance.displayName || instance.id;
-      var warningMessage = "Warning: You are calling `" + functionName + "` on the static instance of the " + type + " " + ("'" + displayName + "'. You should resolve the instance for the current context");
+      var warningMessage = 'Warning: You are calling `' + functionName + '` on the static instance of the ' + type + ' ' + ('\'' + displayName + '\'. You should resolve the instance for the current context');
 
       log.warn(warningMessage);
     }
@@ -2604,15 +2748,15 @@ function wrapResolverFunctions(functionName) {
 function addClassHelper(registry, classId) {
   var pluralClassId = classId;
 
-  if (pluralClassId[pluralClassId.length - 1] !== "s") {
-    pluralClassId += "s";
+  if (pluralClassId[pluralClassId.length - 1] !== 's') {
+    pluralClassId += 's';
   }
 
-  registry["get" + classId] = partial(registry.get, classId);
-  registry["resolve" + classId] = partial(registry.resolve, classId);
-  registry["getAll" + pluralClassId] = partial(registry.getAll, classId);
-  registry["getDefault" + classId] = partial(registry.getDefault, classId);
-  registry["getAllDefault" + pluralClassId] = partial(registry.getAllDefaults, classId);
+  registry['get' + classId] = partial(registry.get, classId);
+  registry['resolve' + classId] = partial(registry.resolve, classId);
+  registry['getAll' + pluralClassId] = partial(registry.getAll, classId);
+  registry['getDefault' + classId] = partial(registry.getDefault, classId);
+  registry['getAllDefault' + pluralClassId] = partial(registry.getAllDefaults, classId);
 
   function partial(func, type) {
     return function () {
@@ -2624,35 +2768,35 @@ function addClassHelper(registry, classId) {
 }
 
 function CannotFindTypeWithId(type, id) {
-  return new Error("Could not find " + type + " with Id " + id);
+  return new Error('Could not find ' + type + ' with Id ' + id);
 }
 
 function CannotRegisterClassError(clazz, type) {
   var displayName = clazz.displayName || clazz.id;
   var typeDisplayName = humanStrings[type] || type;
-  var warningPrefix = "Cannot register the " + typeDisplayName;
+  var warningPrefix = 'Cannot register the ' + typeDisplayName;
 
   if (displayName) {
-    warningPrefix += " '" + displayName + "'";
+    warningPrefix += ' \'' + displayName + '\'';
   }
 
-  return new Error("" + warningPrefix + " because it does not have an Id");
+  return new Error('' + warningPrefix + ' because it does not have an Id');
 }
 
 function ClassAlreadyRegisteredWithId(clazz, type) {
   var displayName = clazz.displayName || clazz.id;
   var typeDisplayName = humanStrings[type] || type;
-  var warningPrefix = "Cannot register the " + typeDisplayName;
+  var warningPrefix = 'Cannot register the ' + typeDisplayName;
 
   if (displayName) {
-    warningPrefix += " '" + displayName + "'";
+    warningPrefix += ' \'' + displayName + '\'';
   }
 
-  return new Error("" + warningPrefix + " because there is already a class with that Id.");
+  return new Error('' + warningPrefix + ' because there is already a class with that Id.');
 }
 
 },{"22":22,"24":24,"33":33,"37":37,"41":41,"62":62}],29:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var createClass = require(18);
@@ -2670,16 +2814,28 @@ function createStateSourceClass(properties, baseType) {
 module.exports = createStateSourceClass;
 
 },{"18":18,"62":62}],30:[function(require,module,exports){
-"use strict";
+'use strict';
 
 module.exports = require(31);
 
 },{"31":31}],31:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var log = require(24);
 var uuid = require(40);
@@ -2692,31 +2848,37 @@ var StateSource = (function () {
     _classCallCheck(this, StateSource);
 
     if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
-      log.warn("Warning: Options were not passed into a state source's constructor");
+      log.warn('Warning: Options were not passed into a state source\'s constructor');
     }
 
     options = options || {};
 
-    this.__type = "StateSource";
+    this.__isCoreType = true;
+    this.__type = 'StateSource';
+    this.__app = options.app;
     this.__context = options.context;
     this.__id = uuid.type(this.__type);
   }
 
-  _createClass(StateSource, {
-    context: {
-      get: function () {
-        return this.__context;
-      }
-    },
-    "for": {
-      value: function _for(obj) {
-        return resolve(this, obj);
-      }
-    },
-    dispose: {
-      value: function dispose() {}
+  _createClass(StateSource, [{
+    key: 'context',
+    get: function get() {
+      return this.__context;
     }
-  });
+  }, {
+    key: 'app',
+    get: function get() {
+      return this.__app;
+    }
+  }, {
+    key: 'for',
+    value: function _for(obj) {
+      return resolve(this, obj);
+    }
+  }, {
+    key: 'dispose',
+    value: function dispose() {}
+  }]);
 
   return StateSource;
 })();
@@ -2724,11 +2886,23 @@ var StateSource = (function () {
 module.exports = StateSource;
 
 },{"22":22,"24":24,"38":38,"40":40,"41":41}],32:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var log = require(24);
 var _ = require(62);
@@ -2741,53 +2915,88 @@ var StoreObserver = (function () {
 
     options = options || {};
 
+    this.app = options.app;
     this.component = options.component;
     this.onStoreChanged = options.onStoreChanged || _.noop;
 
-    this.listeners = _.map(options.stores, function (store) {
+    var stores = resolveStores(options);
+
+    this.listeners = _.map(stores, function (store) {
       return _this.listenToStore(store);
     });
   }
 
-  _createClass(StoreObserver, {
-    dispose: {
-      value: function dispose() {
-        _.invoke(this.listeners, "dispose");
-      }
-    },
-    listenToStore: {
-      value: function listenToStore(store) {
-        var _this = this;
+  _createClass(StoreObserver, [{
+    key: 'dispose',
+    value: function dispose() {
+      _.invoke(this.listeners, 'dispose');
+    }
+  }, {
+    key: 'listenToStore',
+    value: function listenToStore(store) {
+      var _this2 = this;
 
-        var component = this.component;
+      var component = this.component;
+      var storeDisplayName = store.displayName || store.id;
+
+      log.trace('The ' + component.displayName + ' component  (' + component.id + ') is listening to the ' + storeDisplayName + ' store');
+
+      if (!this.app) {
+        store = store['for'](component);
+      }
+
+      return store.addChangeListener(function (state, store) {
         var storeDisplayName = store.displayName || store.id;
 
-        log.trace("The " + component.displayName + " component  (" + component.id + ") is listening to the " + storeDisplayName + " store");
+        log.trace('' + storeDisplayName + ' store has changed. ' + ('The ' + _this2.component.displayName + ' component (' + _this2.component.id + ') is updating'));
 
-        return store["for"](component).addChangeListener(function (state, store) {
-          var storeDisplayName = store.displayName || store.id;
+        if (store && store.action) {
+          store.action.addComponentHandler({
+            displayName: _this2.component.displayName
+          }, store);
+        }
 
-          log.trace("" + storeDisplayName + " store has changed. " + ("The " + _this.component.displayName + " component (" + _this.component.id + ") is updating"));
-
-          if (store && store.action) {
-            store.action.addComponentHandler({
-              displayName: _this.component.displayName
-            }, store);
-          }
-
-          _this.onStoreChanged(store);
-        });
-      }
+        _this2.onStoreChanged(store);
+      });
     }
-  });
+  }]);
 
   return StoreObserver;
 })();
 
+function resolveStores(options) {
+  var stores = options.stores;
+  var appStores = options.app ? options.app.getAllStores() : {};
+
+  if (stores && !_.isArray(stores)) {
+    stores = [stores];
+  }
+
+  return _.map(stores, function (store) {
+    if (_.isString(store)) {
+      if (!options.app) {
+        throw new Error('You can only reference stores by string if you are using an application.');
+      }
+
+      if (!appStores[store]) {
+        throw new Error('Could not find the store ' + store);
+      }
+
+      return appStores[store];
+    }
+
+    if (!_.isFunction(store.addChangeListener)) {
+      throw new Error('Cannot listen to things that are not a store');
+    }
+
+    return store;
+  });
+}
+
 module.exports = StoreObserver;
 
 },{"24":24,"62":62}],33:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var uuid = require(40);
 var log = require(24);
@@ -2799,16 +3008,16 @@ function classId(clazz, type) {
     return clazz.id;
   }
 
-  var displayName = "";
+  var displayName = '';
 
   if (clazz.displayName) {
-    displayName = "'" + clazz.displayName + "' ";
+    displayName = '\'' + clazz.displayName + '\' ';
   }
 
   var typeDisplayName = humanStrings[type] || type;
 
   if (warnings.classDoesNotHaveAnId) {
-    log.warn("Warning: The " + typeDisplayName + " " + displayName + "does not have an Id");
+    log.warn('Warning: The ' + typeDisplayName + ' ' + displayName + 'does not have an Id');
   }
 
   return clazz.displayName || uuid.generate();
@@ -2831,9 +3040,9 @@ function deferred() {
 module.exports = deferred;
 
 },{}],35:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var DEFAULT_CLASS_NAME = "Class";
+var DEFAULT_CLASS_NAME = 'Class';
 
 function getClassName(clazz) {
   var className = clazz.name || clazz.constructor && clazz.constructor.name;
@@ -2841,7 +3050,7 @@ function getClassName(clazz) {
   if (!className) {
     var funcNameRegex = /function (.{1,})\(/;
     var results = funcNameRegex.exec(clazz.toString());
-    className = results && results.length > 1 ? results[1] : "";
+    className = results && results.length > 1 ? results[1] : '';
   }
 
   return className === DEFAULT_CLASS_NAME ? null : className;
@@ -2877,16 +3086,16 @@ function getContext(obj) {
 module.exports = getContext;
 
 },{}],37:[function(require,module,exports){
-"use strict";
+'use strict';
 
 module.exports = {
-  Store: "store",
-  StateSource: "state source",
-  ActionCreators: "action creators"
+  'Store': 'store',
+  'StateSource': 'state source',
+  'ActionCreators': 'action creators'
 };
 
 },{}],38:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var log = require(24);
 var warnings = require(41);
@@ -2900,7 +3109,7 @@ function resolve(obj, subject) {
   }
 
   if (!obj.__isDefaultInstance && warnings.cannotFindContext) {
-    log.warn("Warning: Could not find context in object", obj);
+    log.warn('Warning: Could not find context in object', obj);
   }
 
   return obj;
@@ -2920,10 +3129,10 @@ function timeout(time) {
 module.exports = timeout;
 
 },{}],40:[function(require,module,exports){
-"use strict";
+'use strict';
 
 function generate() {
-  return [s4(), s4(), "-", s4(), s4(), s4(), "-", s4(), s4(), s4()].join("");
+  return [s4(), s4(), '-', s4(), s4(), s4(), '-', s4(), s4(), s4()].join('');
 }
 
 function small() {
@@ -2931,7 +3140,7 @@ function small() {
 }
 
 function type(instanceType) {
-  return [instanceType, "-", s4(), s4(), s4(), s4()].join("");
+  return [instanceType, '-', s4(), s4(), s4(), s4()].join('');
 }
 
 function s4() {
@@ -2945,24 +3154,24 @@ module.exports = {
 };
 
 },{}],41:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 
 var warnings = {
   without: without,
   invokeConstant: true,
+  appIsTheFuture: true,
   reservedFunction: true,
   cannotFindContext: true,
-  martyIsASingelton: true,
   classDoesNotHaveAnId: true,
   stateIsNullOrUndefined: true,
   callingResolverOnServer: true,
   stateSourceAlreadyExists: true,
   superNotCalledWithOptions: true,
+  fetchDoneRenamedFetchFailed: true,
   promiseNotReturnedFromRemotely: true,
-  contextNotPassedInToConstructor: true
-};
+  contextNotPassedInToConstructor: true };
 
 module.exports = warnings;
 
@@ -2989,15 +3198,15 @@ function without(warningsToDisable, cb, context) {
 }
 
 },{"62":62}],42:[function(require,module,exports){
-"use strict";
+'use strict';
 
 function ActionHandlerNotFoundError(actionHandler, store) {
-  this.name = "Action handler not found";
-  this.message = "The action handler \"" + actionHandler + "\" could not be found";
+  this.name = 'Action handler not found';
+  this.message = 'The action handler "' + actionHandler + '" could not be found';
 
   if (store) {
     var displayName = store.displayName || store.id;
-    this.message += " in the " + displayName + " store";
+    this.message += ' in the ' + displayName + ' store';
   }
 }
 
@@ -3006,15 +3215,15 @@ ActionHandlerNotFoundError.prototype = Error.prototype;
 module.exports = ActionHandlerNotFoundError;
 
 },{}],43:[function(require,module,exports){
-"use strict";
+'use strict';
 
 function ActionPredicateUndefinedError(actionHandler, store) {
-  this.name = "Action predicate undefined";
-  this.message = "The action predicate for \"" + actionHandler + "\" was undefined";
+  this.name = 'Action predicate undefined';
+  this.message = 'The action predicate for "' + actionHandler + '" was undefined';
 
   if (store) {
     var displayName = store.displayName || store.id;
-    this.message += " in the " + displayName + " store";
+    this.message += ' in the ' + displayName + ' store';
   }
 }
 
@@ -3023,11 +3232,11 @@ ActionPredicateUndefinedError.prototype = Error.prototype;
 module.exports = ActionPredicateUndefinedError;
 
 },{}],44:[function(require,module,exports){
-"use strict";
+'use strict';
 
 function CompoundError(errors) {
   this.errors = errors;
-  this.name = "Compound error";
+  this.name = 'Compound error';
 }
 
 CompoundError.prototype = Error.prototype;
@@ -3035,11 +3244,11 @@ CompoundError.prototype = Error.prototype;
 module.exports = CompoundError;
 
 },{}],45:[function(require,module,exports){
-"use strict";
+'use strict';
 
 function NotFoundError(message) {
-  this.name = "Not found";
-  this.message = message || "Not found";
+  this.name = 'Not found';
+  this.message = message || 'Not found';
   this.status = 404;
 }
 
@@ -3048,11 +3257,11 @@ NotFoundError.prototype = Error.prototype;
 module.exports = NotFoundError;
 
 },{}],46:[function(require,module,exports){
-"use strict";
+'use strict';
 
 function UnkownStoreError(store) {
-  this.name = "Unknown store";
-  this.message = "Unknown store " + store;
+  this.name = 'Unknown store';
+  this.message = 'Unknown store ' + store;
 }
 
 UnkownStoreError.prototype = Error.prototype;
@@ -3060,26 +3269,26 @@ UnkownStoreError.prototype = Error.prototype;
 module.exports = UnkownStoreError;
 
 },{}],47:[function(require,module,exports){
-"use strict";
+'use strict';
 
 module.exports = {
-  id: "includeCredentials",
+  id: 'includeCredentials',
   before: function before(req) {
     // Enable sending Cookies for authentication.
     // Ref: https://fetch.spec.whatwg.org/#concept-request-credentials-mode
-    req.credentials = "same-origin";
+    req.credentials = 'same-origin';
   }
 };
 
 },{}],48:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var CONTENT_TYPE = "Content-Type";
-var JSON_CONTENT_TYPE = "application/json";
+var CONTENT_TYPE = 'Content-Type';
+var JSON_CONTENT_TYPE = 'application/json';
 var _ = require(62);
 
 module.exports = {
-  id: "parseJSON",
+  id: 'parseJSON',
   after: function after(res) {
     if (isJson(res)) {
       return res.json().then(function (body) {
@@ -3110,18 +3319,18 @@ function isJson(res) {
 }
 
 },{"62":62}],49:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var CONTENT_TYPE = "Content-Type";
-var JSON_CONTENT_TYPE = "application/json";
+var CONTENT_TYPE = 'Content-Type';
+var JSON_CONTENT_TYPE = 'application/json';
 var _ = require(62);
 
 module.exports = {
-  id: "stringifyJSON",
+  id: 'stringifyJSON',
   before: function before(req) {
     var contentType = req.headers[CONTENT_TYPE] || JSON_CONTENT_TYPE;
 
-    if (typeof FormData !== "undefined" && req.body instanceof FormData) {
+    if (typeof FormData !== 'undefined' && req.body instanceof FormData) {
       return;
     }
 
@@ -3133,103 +3342,135 @@ module.exports = {
 };
 
 },{"62":62}],50:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var hooks = {};
 var log = require(24);
 var _ = require(62);
 var StateSource = require(30);
 var accepts = {
-  html: "text/html",
-  text: "text/plain",
-  json: "application/json",
-  xml: "application/xml, text/xml",
-  script: "text/javascript, application/javascript, application/x-javascript" };
+  html: 'text/html',
+  text: 'text/plain',
+  json: 'application/json',
+  xml: 'application/xml, text/xml',
+  script: 'text/javascript, application/javascript, application/x-javascript' };
 
 var HttpStateSource = (function (_StateSource) {
   function HttpStateSource(options) {
     _classCallCheck(this, HttpStateSource);
 
-    _get(Object.getPrototypeOf(HttpStateSource.prototype), "constructor", this).call(this, options);
+    _get(Object.getPrototypeOf(HttpStateSource.prototype), 'constructor', this).call(this, options);
     this._isHttpStateSource = true;
   }
 
   _inherits(HttpStateSource, _StateSource);
 
-  _createClass(HttpStateSource, {
-    request: {
-      value: function request(req) {
-        var _this = this;
+  _createClass(HttpStateSource, [{
+    key: 'request',
+    value: function request(req) {
+      var _this2 = this;
 
-        if (!req.headers) {
-          req.headers = {};
+      if (!req.headers) {
+        req.headers = {};
+      }
+
+      beforeRequest(this, req);
+
+      return fetch(req.url, req).then(function (res) {
+        return afterRequest(_this2, res);
+      });
+    }
+  }, {
+    key: 'get',
+    value: function get(options) {
+      return this.request(requestOptions('GET', this, options));
+    }
+  }, {
+    key: 'put',
+    value: function put(options) {
+      return this.request(requestOptions('PUT', this, options));
+    }
+  }, {
+    key: 'post',
+    value: function post(options) {
+      return this.request(requestOptions('POST', this, options));
+    }
+  }, {
+    key: 'delete',
+    value: function _delete(options) {
+      return this.request(requestOptions('DELETE', this, options));
+    }
+  }, {
+    key: 'patch',
+    value: function patch(options) {
+      return this.request(requestOptions('PATCH', this, options));
+    }
+  }], [{
+    key: 'addHook',
+    value: function addHook(hook) {
+      if (hook) {
+        if (_.isUndefined(hook.priority)) {
+          hook.priority = Object.keys(hooks).length;
         }
 
-        beforeRequest(this, req);
-
-        return fetch(req.url, req).then(function (res) {
-          return afterRequest(_this, res);
-        });
-      }
-    },
-    get: {
-      value: function get(options) {
-        return this.request(requestOptions("GET", this, options));
-      }
-    },
-    put: {
-      value: function put(options) {
-        return this.request(requestOptions("PUT", this, options));
-      }
-    },
-    post: {
-      value: function post(options) {
-        return this.request(requestOptions("POST", this, options));
-      }
-    },
-    "delete": {
-      value: function _delete(options) {
-        return this.request(requestOptions("DELETE", this, options));
-      }
-    },
-    patch: {
-      value: function patch(options) {
-        return this.request(requestOptions("PATCH", this, options));
+        hooks[hook.id] = hook;
       }
     }
   }, {
-    addHook: {
-      value: function addHook(hook) {
-        if (hook) {
-          if (_.isUndefined(hook.priority)) {
-            hook.priority = Object.keys(hooks).length;
-          }
-
-          hooks[hook.id] = hook;
-        }
-      }
-    },
-    removeHook: {
-      value: function removeHook(hook) {
-        if (hook) {
-          delete hooks[hook.id];
-        }
-      }
-    },
-    defaultBaseUrl: {
-      get: function () {
-        return "";
+    key: 'removeHook',
+    value: function removeHook(hook) {
+      if (hook) {
+        delete hooks[hook.id];
       }
     }
-  });
+  }, {
+    key: 'defaultBaseUrl',
+    get: function get() {
+      return '';
+    }
+  }]);
 
   return HttpStateSource;
 })(StateSource);
@@ -3256,15 +3497,15 @@ function requestOptions(method, source, options) {
   options.method = method.toLowerCase();
 
   if (baseUrl) {
-    var separator = "";
+    var separator = '';
     var firstCharOfUrl = options.url[0];
     var lastCharOfBaseUrl = baseUrl[baseUrl.length - 1];
 
     // Do some text wrangling to make sure concatenation of base url
     // stupid people (i.e. me)
-    if (lastCharOfBaseUrl !== "/" && firstCharOfUrl !== "/") {
-      separator = "/";
-    } else if (lastCharOfBaseUrl === "/" && firstCharOfUrl === "/") {
+    if (lastCharOfBaseUrl !== '/' && firstCharOfUrl !== '/') {
+      separator = '/';
+    } else if (lastCharOfBaseUrl === '/' && firstCharOfUrl === '/') {
       options.url = options.url.substring(1);
     }
 
@@ -3272,16 +3513,16 @@ function requestOptions(method, source, options) {
   }
 
   if (options.contentType) {
-    options.headers["Content-Type"] = options.contentType;
+    options.headers['Content-Type'] = options.contentType;
   }
 
   if (options.dataType) {
     var contentType = accepts[options.dataType];
 
     if (!contentType) {
-      log.warn("Unknown data type " + options.dataType);
+      log.warn('Unknown data type ' + options.dataType);
     } else {
-      options.headers.Accept = contentType;
+      options.headers['Accept'] = contentType;
     }
   }
 
@@ -3289,25 +3530,25 @@ function requestOptions(method, source, options) {
 }
 
 function beforeRequest(source, req) {
-  _.each(getHooks("before"), function (hook) {
+  _.each(getHooks('before'), function (hook) {
     try {
       hook.before.call(source, req);
     } catch (e) {
-      log.error("Failed to execute hook before http request", e, hook);
+      log.error('Failed to execute hook before http request', e, hook);
       throw e;
     }
   });
 }
 
 function afterRequest(source, res) {
-  var current;
+  var current = undefined;
 
-  _.each(getHooks("after"), function (hook) {
+  _.each(getHooks('after'), function (hook) {
     var execute = function execute(res) {
       try {
         return hook.after.call(source, res);
       } catch (e) {
-        log.error("Failed to execute hook after http response", e, hook);
+        log.error('Failed to execute hook after http response', e, hook);
         throw e;
       }
     };
@@ -3343,23 +3584,37 @@ function getHooks(func) {
 }
 
 },{"24":24,"30":30,"47":47,"48":48,"49":49,"62":62}],51:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var HttpStateSource = require(50);
 
 module.exports = function (marty) {
-  marty.registerStateSource("HttpStateSource", "http", HttpStateSource);
+  marty.registerStateSource('HttpStateSource', 'http', HttpStateSource);
 };
 
 },{"50":50}],52:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var _ = require(62);
 var uuid = require(40);
+var logger = require(24);
+var warnings = require(41);
 var timeout = require(39);
 var deferred = require(34);
 var FetchDiagnostics = require(53);
@@ -3375,7 +3630,7 @@ var Context = (function () {
 
     this.instances = {};
     this.__isContext = true;
-    this.id = uuid.type("Context");
+    this.id = uuid.type('Context');
     this.dispatcher = createDispatcher();
 
     _.each((registry || {}).types, function (classes, type) {
@@ -3392,128 +3647,148 @@ var Context = (function () {
     });
   }
 
-  _createClass(Context, {
-    fetch: {
-      value: function fetch(cb, options) {
-        var _this = this;
+  _createClass(Context, [{
+    key: 'fetch',
+    value: function fetch(cb, options) {
+      var _this2 = this;
 
-        var fetchDone;
+      var fetchFinished = undefined;
 
-        options = _.defaults(options || {}, {
-          timeout: DEFAULT_TIMEOUT
-        });
+      options = _.defaults(options || {}, {
+        timeout: DEFAULT_TIMEOUT
+      });
 
-        this.__deferredFetchDone = deferred();
-        this.__diagnostics = new FetchDiagnostics();
-        fetchDone = this.__deferredFetchDone.promise;
+      this.__deferredFetchFinished = deferred();
+      this.__diagnostics = new FetchDiagnostics();
+      fetchFinished = this.__deferredFetchFinished.promise;
 
-        try {
-          cb.call(this);
-        } catch (e) {
-          this.__deferredFetchDone.reject(e);
+      try {
+        cb.call(this);
+      } catch (e) {
+        this.__deferredFetchFinished.reject(e);
 
-          return fetchDone;
-        }
-
-        if (!this.__diagnostics.hasPendingFetches) {
-          this.__deferredFetchDone.resolve();
-        }
-
-        return Promise.race([fetchDone, timeout(options.timeout)]).then(function () {
-          return _this.__diagnostics.toJSON();
-        });
+        return fetchFinished;
       }
-    },
-    fetchStarted: {
-      value: function fetchStarted(storeId, fetchId) {
-        var diagnostics = this.__diagnostics;
 
-        diagnostics.fetchStarted(storeId, fetchId);
+      if (!this.__diagnostics.hasPendingFetches) {
+        this.__deferredFetchFinished.resolve();
       }
-    },
-    fetchDone: {
-      value: function fetchDone(storeId, fetchId, status, options) {
-        var diagnostics = this.__diagnostics;
 
-        diagnostics.fetchDone(storeId, fetchId, status, options);
+      return Promise.race([fetchFinished, timeout(options.timeout)]).then(function () {
+        return _this2.__diagnostics.toJSON();
+      });
+    }
+  }, {
+    key: 'fetchStarted',
+    value: function fetchStarted(storeId, fetchId) {
+      var diagnostics = this.__diagnostics;
 
-        if (!diagnostics.hasPendingFetches) {
-          this.__deferredFetchDone.resolve();
-        }
+      diagnostics.fetchStarted(storeId, fetchId);
+    }
+  }, {
+    key: 'fetchDone',
+    value: function fetchDone(storeId, fetchId, status, options) {
+      if (warnings.fetchDoneRenamedFetchFailed) {
+        logger.warn('Warning: fetchDone has been renamed fetchFinished');
       }
-    },
-    dispose: {
-      value: function dispose() {
-        _.each(this.instances, function (instances) {
-          _.each(instances, function (instance) {
-            if (_.isFunction(instance.dispose)) {
-              instance.dispose();
-            }
-          });
-        });
 
-        this.instances = null;
-        this.dispatcher = null;
-      }
-    },
-    resolve: {
-      value: function resolve(obj) {
-        if (!obj.constructor) {
-          throw new Error("Cannot resolve object");
-        }
+      return this.fetchFinished(storeId, fetchId, status, options);
+    }
+  }, {
+    key: 'fetchFinished',
+    value: function fetchFinished(storeId, fetchId, status, options) {
+      var diagnostics = this.__diagnostics;
 
-        var id = obj.constructor.id;
-        var type = obj.constructor.type;
+      diagnostics.fetchFinished(storeId, fetchId, status, options);
 
-        if (!this.instances[type]) {
-          throw new Error("Context does not have any instances of " + type);
-        }
-
-        if (!this.instances[type][id]) {
-          throw new Error("Context does not have an instance of the " + type + " id");
-        }
-
-        return this.instances[type][id];
-      }
-    },
-    getAll: {
-      value: function getAll(type) {
-        return _.values(this.instances[type]);
-      }
-    },
-    getAllStores: {
-      value: function getAllStores() {
-        return this.getAll("Store");
-      }
-    },
-    getAllStateSources: {
-      value: function getAllStateSources() {
-        return this.getAll("StateSource");
-      }
-    },
-    getAllActionCreators: {
-      value: function getAllActionCreators() {
-        return this.getAll("ActionCreators");
-      }
-    },
-    getAllQueries: {
-      value: function getAllQueries() {
-        return this.getAll("Queries");
+      if (!diagnostics.hasPendingFetches) {
+        this.__deferredFetchFinished.resolve();
       }
     }
-  });
+  }, {
+    key: 'dispose',
+    value: function dispose() {
+      _.each(this.instances, function (instances) {
+        _.each(instances, function (instance) {
+          if (_.isFunction(instance.dispose)) {
+            instance.dispose();
+          }
+        });
+      });
+
+      this.instances = null;
+      this.dispatcher = null;
+    }
+  }, {
+    key: 'resolve',
+    value: function resolve(obj) {
+      if (!obj.constructor) {
+        throw new Error('Cannot resolve object');
+      }
+
+      var id = obj.constructor.id;
+      var type = obj.constructor.type;
+
+      if (!this.instances[type]) {
+        throw new Error('Context does not have any instances of ' + type);
+      }
+
+      if (!this.instances[type][id]) {
+        throw new Error('Context does not have an instance of the ' + type + ' id');
+      }
+
+      return this.instances[type][id];
+    }
+  }, {
+    key: 'getAll',
+    value: function getAll(type) {
+      return _.values(this.instances[type]);
+    }
+  }, {
+    key: 'getAllStores',
+    value: function getAllStores() {
+      return this.getAll('Store');
+    }
+  }, {
+    key: 'getAllStateSources',
+    value: function getAllStateSources() {
+      return this.getAll('StateSource');
+    }
+  }, {
+    key: 'getAllActionCreators',
+    value: function getAllActionCreators() {
+      return this.getAll('ActionCreators');
+    }
+  }, {
+    key: 'getAllQueries',
+    value: function getAllQueries() {
+      return this.getAll('Queries');
+    }
+  }]);
 
   return Context;
 })();
 
 module.exports = Context;
 
-},{"19":19,"34":34,"39":39,"40":40,"53":53,"62":62}],53:[function(require,module,exports){
-"use strict";
+},{"19":19,"24":24,"34":34,"39":39,"40":40,"41":41,"53":53,"62":62}],53:[function(require,module,exports){
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var _ = require(62);
 
@@ -3525,56 +3800,55 @@ var FetchDiagnostics = (function () {
     this.fetches = [];
   }
 
-  _createClass(FetchDiagnostics, {
-    fetchStarted: {
-      value: function fetchStarted(storeId, fetchId) {
-        this.numberOfPendingFetches++;
-        this.fetches.push({
-          status: "PENDING",
-          storeId: storeId,
-          fetchId: fetchId,
-          startTime: new Date()
-        });
-      }
-    },
-    fetchDone: {
-      value: function fetchDone(storeId, fetchId, status, options) {
-        var fetch = _.find(this.fetches, {
-          storeId: storeId,
-          fetchId: fetchId
-        });
+  _createClass(FetchDiagnostics, [{
+    key: 'fetchStarted',
+    value: function fetchStarted(storeId, fetchId) {
+      this.numberOfPendingFetches++;
+      this.fetches.push({
+        status: 'PENDING',
+        storeId: storeId,
+        fetchId: fetchId,
+        startTime: new Date()
+      });
+    }
+  }, {
+    key: 'fetchFinished',
+    value: function fetchFinished(storeId, fetchId, status, options) {
+      var fetch = _.find(this.fetches, {
+        storeId: storeId,
+        fetchId: fetchId
+      });
 
-        if (fetch) {
-          _.extend(fetch, {
-            status: status,
-            time: new Date() - fetch.startTime
-          }, options);
+      if (fetch) {
+        _.extend(fetch, {
+          status: status,
+          time: new Date() - fetch.startTime
+        }, options);
 
-          this.numberOfPendingFetches--;
-        }
-      }
-    },
-    hasPendingFetches: {
-      get: function () {
-        return this.numberOfPendingFetches > 0;
-      }
-    },
-    toJSON: {
-      value: function toJSON() {
-        return _.map(this.fetches, fetchWithTime);
-
-        function fetchWithTime(fetch) {
-          if (_.isUndefined(fetch.time)) {
-            fetch.time = new Date() - fetch.startTime;
-          }
-
-          delete fetch.startTime;
-
-          return fetch;
-        }
+        this.numberOfPendingFetches--;
       }
     }
-  });
+  }, {
+    key: 'hasPendingFetches',
+    get: function get() {
+      return this.numberOfPendingFetches > 0;
+    }
+  }, {
+    key: 'toJSON',
+    value: function toJSON() {
+      return _.map(this.fetches, fetchWithTime);
+
+      function fetchWithTime(fetch) {
+        if (_.isUndefined(fetch.time)) {
+          fetch.time = new Date() - fetch.startTime;
+        }
+
+        delete fetch.startTime;
+
+        return fetch;
+      }
+    }
+  }]);
 
   return FetchDiagnostics;
 })();
@@ -3582,22 +3856,28 @@ var FetchDiagnostics = (function () {
 module.exports = FetchDiagnostics;
 
 },{"62":62}],54:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var Context = require(52);
 var renderToString = require(55);
 
 module.exports = function (marty, React) {
-  marty.register("createContext", createContext);
-  marty.register("renderToString", renderToString(React));
+  marty.register('createContext', createContext);
+  marty.register('renderToString', renderToString(React));
 
   function createContext() {
+    if (this.warnings.appIsTheFuture) {
+      this.logger.warn('Warning: Contexts are being depreciated. ' + 'Please move to using application\'s instead. ' + 'http://martyjs.org/depreciated/contexts.html');
+    }
+
+    return dispatcher;
+
     return new Context(this.registry);
   }
 };
 
 },{"52":52,"55":55}],55:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var Context = require(52);
 var _ = require(62);
@@ -3613,17 +3893,17 @@ module.exports = function (React) {
 
     return new Promise(function (resolve, reject) {
       if (!options.type) {
-        reject(new Error("Must pass in a React component type"));
+        reject(new Error('Must pass in a React component type'));
         return;
       }
 
       if (!context) {
-        reject(new Error("Must pass in a context"));
+        reject(new Error('Must pass in a context'));
         return;
       }
 
       if (!context instanceof Context) {
-        reject(new Error("context must be an instance of Context"));
+        reject(new Error('context must be an instance of Context'));
         return;
       }
 
@@ -3635,7 +3915,7 @@ module.exports = function (React) {
             var element = createElement();
 
             if (!element) {
-              reject(new Error("createElement must return an element"));
+              reject(new Error('createElement must return an element'));
               return;
             }
 
@@ -3659,7 +3939,7 @@ module.exports = function (React) {
             var element = createElement();
 
             if (!element) {
-              reject(new Error("createElement must return an element"));
+              reject(new Error('createElement must return an element'));
               return;
             }
 
@@ -3672,7 +3952,7 @@ module.exports = function (React) {
 
       function createElement() {
         var ContextContainer = React.createClass({
-          displayName: "ContextContainer",
+          displayName: 'ContextContainer',
 
           childContextTypes: {
             marty: React.PropTypes.object.isRequired
@@ -3683,7 +3963,7 @@ module.exports = function (React) {
             };
           },
           render: function render() {
-            var props = _.extend({}, options.props, { ref: "subject" });
+            var props = _.extend({}, options.props, { ref: 'subject' });
 
             return React.createElement(options.type, props);
           }
@@ -3695,31 +3975,65 @@ module.exports = function (React) {
       function dehydratedState(context) {
         var state = Marty.dehydrate(context);
 
-        return "<script id=\"__marty-state\">" + state + "</script>";
+        return '<script id="__marty-state">' + state + '</script>';
       }
     });
   };
 };
 
 },{"52":52,"62":62}],56:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var JSONStorageStateSource = require(57);
 
 module.exports = function (marty) {
-  marty.registerStateSource("JSONStorageStateSource", "jsonStorage", JSONStorageStateSource);
+  marty.registerStateSource('JSONStorageStateSource', 'jsonStorage', JSONStorageStateSource);
 };
 
 },{"57":57}],57:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var noopStorage = require(27);
 var StateSource = require(30);
@@ -3728,7 +4042,7 @@ var JSONStorageStateSource = (function (_StateSource) {
   function JSONStorageStateSource(options) {
     _classCallCheck(this, JSONStorageStateSource);
 
-    _get(Object.getPrototypeOf(JSONStorageStateSource.prototype), "constructor", this).call(this, options);
+    _get(Object.getPrototypeOf(JSONStorageStateSource.prototype), 'constructor', this).call(this, options);
     this._isJSONStorageStateSource = true;
 
     if (!this.storage) {
@@ -3738,46 +4052,44 @@ var JSONStorageStateSource = (function (_StateSource) {
 
   _inherits(JSONStorageStateSource, _StateSource);
 
-  _createClass(JSONStorageStateSource, {
-    get: {
-      value: function get(key) {
-        var raw = getStorage(this).getItem(getNamespacedKey(this, key));
+  _createClass(JSONStorageStateSource, [{
+    key: 'get',
+    value: function get(key) {
+      var raw = getStorage(this).getItem(getNamespacedKey(this, key));
 
-        if (!raw) {
-          return raw;
-        }
-
-        try {
-          var payload = JSON.parse(raw);
-          return payload.value;
-        } catch (e) {
-          throw new Error("Unable to parse JSON from storage");
-        }
+      if (!raw) {
+        return raw;
       }
-    },
-    set: {
-      value: function set(key, value) {
-        // Wrap the value in an object so as to preserve it's type
-        // during serialization.
-        var payload = {
-          value: value
-        };
-        var raw = JSON.stringify(payload);
-        getStorage(this).setItem(getNamespacedKey(this, key), raw);
+
+      try {
+        var payload = JSON.parse(raw);
+        return payload.value;
+      } catch (e) {
+        throw new Error('Unable to parse JSON from storage');
       }
     }
   }, {
-    defaultNamespace: {
-      get: function () {
-        return "";
-      }
-    },
-    defaultStorage: {
-      get: function () {
-        return typeof window === "undefined" ? noopStorage : window.localStorage;
-      }
+    key: 'set',
+    value: function set(key, value) {
+      // Wrap the value in an object so as to preserve it's type
+      // during serialization.
+      var payload = {
+        value: value
+      };
+      var raw = JSON.stringify(payload);
+      getStorage(this).setItem(getNamespacedKey(this, key), raw);
     }
-  });
+  }], [{
+    key: 'defaultNamespace',
+    get: function get() {
+      return '';
+    }
+  }, {
+    key: 'defaultStorage',
+    get: function get() {
+      return typeof window === 'undefined' ? noopStorage : window.localStorage;
+    }
+  }]);
 
   return JSONStorageStateSource;
 })(StateSource);
@@ -3797,24 +4109,58 @@ function getStorage(source) {
 module.exports = JSONStorageStateSource;
 
 },{"27":27,"30":30}],58:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var LocalStorageStateSource = require(59);
 
 module.exports = function (marty) {
-  marty.registerStateSource("LocalStorageStateSource", "localStorage", LocalStorageStateSource);
+  marty.registerStateSource('LocalStorageStateSource', 'localStorage', LocalStorageStateSource);
 };
 
 },{"59":59}],59:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var noopStorage = require(27);
 var StateSource = require(30);
@@ -3823,31 +4169,29 @@ var LocalStorageStateSource = (function (_StateSource) {
   function LocalStorageStateSource(options) {
     _classCallCheck(this, LocalStorageStateSource);
 
-    _get(Object.getPrototypeOf(LocalStorageStateSource.prototype), "constructor", this).call(this, options);
+    _get(Object.getPrototypeOf(LocalStorageStateSource.prototype), 'constructor', this).call(this, options);
     this._isLocalStorageStateSource = true;
-    this.storage = typeof window === "undefined" ? noopStorage : window.localStorage;
+    this.storage = typeof window === 'undefined' ? noopStorage : window.localStorage;
   }
 
   _inherits(LocalStorageStateSource, _StateSource);
 
-  _createClass(LocalStorageStateSource, {
-    get: {
-      value: function get(key) {
-        return this.storage.getItem(getNamespacedKey(this, key));
-      }
-    },
-    set: {
-      value: function set(key, value) {
-        return this.storage.setItem(getNamespacedKey(this, key), value);
-      }
+  _createClass(LocalStorageStateSource, [{
+    key: 'get',
+    value: function get(key) {
+      return this.storage.getItem(getNamespacedKey(this, key));
     }
   }, {
-    defaultNamespace: {
-      get: function () {
-        return "";
-      }
+    key: 'set',
+    value: function set(key, value) {
+      return this.storage.setItem(getNamespacedKey(this, key), value);
     }
-  });
+  }], [{
+    key: 'defaultNamespace',
+    get: function get() {
+      return '';
+    }
+  }]);
 
   return LocalStorageStateSource;
 })(StateSource);
@@ -3863,24 +4207,58 @@ function getNamespace(source) {
 module.exports = LocalStorageStateSource;
 
 },{"27":27,"30":30}],60:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var LocationStateSource = require(61);
 
 module.exports = function (marty) {
-  marty.registerStateSource("LocationStateSource", "location", LocationStateSource);
+  marty.registerStateSource('LocationStateSource', 'location', LocationStateSource);
 };
 
 },{"61":61}],61:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var _ = require(62);
 var StateSource = require(30);
@@ -3890,25 +4268,23 @@ var LocationStateSource = (function (_StateSource) {
   function LocationStateSource(options) {
     _classCallCheck(this, LocationStateSource);
 
-    _get(Object.getPrototypeOf(LocationStateSource.prototype), "constructor", this).call(this, options);
+    _get(Object.getPrototypeOf(LocationStateSource.prototype), 'constructor', this).call(this, options);
     this._isLocationStateSource = true;
   }
 
   _inherits(LocationStateSource, _StateSource);
 
-  _createClass(LocationStateSource, {
-    getLocation: {
-      value: function getLocation(location) {
-        return locationFactory(this.context, location);
-      }
+  _createClass(LocationStateSource, [{
+    key: 'getLocation',
+    value: function getLocation(location) {
+      return locationFactory(this.context, location);
     }
-  }, {
-    setLocationFactory: {
-      value: function setLocationFactory(value) {
-        locationFactory = value;
-      }
+  }], [{
+    key: 'setLocationFactory',
+    value: function setLocationFactory(value) {
+      locationFactory = value;
     }
-  });
+  }]);
 
   return LocationStateSource;
 })(StateSource);
@@ -3923,14 +4299,14 @@ function defaultLocationFactory(context, location) {
     path: l.pathname,
     hostname: l.hostname,
     query: query(l.search),
-    protocol: l.protocol.replace(":", "")
+    protocol: l.protocol.replace(':', '')
   };
 
   function query(search) {
     var result = {};
 
-    _.each(search.substr(1).split("&"), function (part) {
-      var item = part.split("=");
+    _.each(search.substr(1).split('&'), function (part) {
+      var item = part.split('=');
       result[item[0]] = decodeURIComponent(item[1]);
     });
 
@@ -3939,61 +4315,62 @@ function defaultLocationFactory(context, location) {
 }
 
 },{"30":30,"62":62}],62:[function(require,module,exports){
-"use strict";
+'use strict';
 
 module.exports = {
   any: require(108),
-  bind: require(139),
-  defaults: require(178),
+  bind: require(142),
+  defaults: require(187),
   each: require(96),
-  extend: require(177),
+  extend: require(186),
   find: require(95),
-  findKey: require(179),
+  findKey: require(188),
   first: require(88),
   rest: require(91),
-  has: require(181),
+  has: require(190),
   initial: require(89),
-  isArray: require(168),
-  isFunction: require(128),
-  isNull: require(171),
-  isObject: require(172),
-  isString: require(173),
-  isUndefined: require(175),
+  isArray: require(177),
+  isFunction: require(130),
+  isNull: require(180),
+  isObject: require(181),
+  isString: require(182),
+  isUndefined: require(184),
   last: require(90),
   map: require(98),
-  matches: require(191),
-  noop: require(192),
+  matches: require(200),
+  noop: require(201),
   object: require(93),
-  omit: require(184),
-  pick: require(185),
-  toArray: require(176),
+  omit: require(193),
+  pick: require(194),
+  toArray: require(185),
   union: require(92),
-  values: require(186),
+  values: require(195),
   once: require(101),
   filter: require(94),
   invoke: require(97),
   sortBy: require(99),
-  functions: require(180),
+  functions: require(189),
   difference: require(85) };
 
-},{"101":101,"108":108,"128":128,"139":139,"168":168,"171":171,"172":172,"173":173,"175":175,"176":176,"177":177,"178":178,"179":179,"180":180,"181":181,"184":184,"185":185,"186":186,"191":191,"192":192,"85":85,"88":88,"89":89,"90":90,"91":91,"92":92,"93":93,"94":94,"95":95,"96":96,"97":97,"98":98,"99":99}],63:[function(require,module,exports){
-"use strict";
+},{"101":101,"108":108,"130":130,"142":142,"177":177,"180":180,"181":181,"182":182,"184":184,"185":185,"186":186,"187":187,"188":188,"189":189,"190":190,"193":193,"194":194,"195":195,"200":200,"201":201,"85":85,"88":88,"89":89,"90":90,"91":91,"92":92,"93":93,"94":94,"95":95,"96":96,"97":97,"98":98,"99":99}],63:[function(require,module,exports){
+'use strict';
 
 var Queries = require(65);
 var _ = require(62);
 var createClass = require(18);
 
-var RESERVED_KEYWORDS = ["dispatch"];
+var RESERVED_KEYWORDS = ['dispatch'];
 
 function createQueriesClass(properties) {
+  properties = properties || {};
   _.extend.apply(_, [properties].concat(properties.mixins));
   _.each(RESERVED_KEYWORDS, function (keyword) {
     if (properties[keyword]) {
-      throw new Error("" + keyword + " is a reserved keyword");
+      throw new Error('' + keyword + ' is a reserved keyword');
     }
   });
 
-  var classProperties = _.omit(properties, "mixins", "types");
+  var classProperties = _.omit(properties, 'mixins', 'types');
 
   return createClass(classProperties, properties, Queries);
 }
@@ -4001,14 +4378,14 @@ function createQueriesClass(properties) {
 module.exports = createQueriesClass;
 
 },{"18":18,"62":62,"65":65}],64:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var Queries = require(65);
 var createQueriesClass = require(63);
 
 module.exports = function (marty) {
-  marty.registerClass("Queries", Queries);
-  marty.register("createQueries", createQueries);
+  marty.registerClass('Queries', Queries);
+  marty.register('createQueries', createQueries);
 
   function createQueries(properties) {
     var QueriesClass = createQueriesClass(properties);
@@ -4019,13 +4396,39 @@ module.exports = function (marty) {
 };
 
 },{"63":63,"65":65}],65:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var DispatchCoordinator = require(16);
 
@@ -4033,7 +4436,7 @@ var Queries = (function (_DispatchCoordinator) {
   function Queries(options) {
     _classCallCheck(this, Queries);
 
-    _get(Object.getPrototypeOf(Queries.prototype), "constructor", this).call(this, "Queries", options);
+    _get(Object.getPrototypeOf(Queries.prototype), 'constructor', this).call(this, 'Queries', options);
   }
 
   _inherits(Queries, _DispatchCoordinator);
@@ -4044,24 +4447,58 @@ var Queries = (function (_DispatchCoordinator) {
 module.exports = Queries;
 
 },{"16":16}],66:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var SessionStorageStateSource = require(67);
 
 module.exports = function (marty) {
-  marty.registerStateSource("SessionStorageStateSource", "sessionStorage", SessionStorageStateSource);
+  marty.registerStateSource('SessionStorageStateSource', 'sessionStorage', SessionStorageStateSource);
 };
 
 },{"67":67}],67:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x, _x2, _x3) {
+  var _again = true;_function: while (_again) {
+    desc = parent = getter = undefined;_again = false;var object = _x,
+        property = _x2,
+        receiver = _x3;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
+      }
+    } else if ('value' in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;if (getter === undefined) {
+        return undefined;
+      }return getter.call(receiver);
+    }
+  }
+};
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+}
 
 var noopStorage = require(27);
 var StateSource = require(30);
@@ -4070,31 +4507,29 @@ var SessionStorageStateSource = (function (_StateSource) {
   function SessionStorageStateSource(options) {
     _classCallCheck(this, SessionStorageStateSource);
 
-    _get(Object.getPrototypeOf(SessionStorageStateSource.prototype), "constructor", this).call(this, options);
+    _get(Object.getPrototypeOf(SessionStorageStateSource.prototype), 'constructor', this).call(this, options);
     this._isSessionStorageStateSource = true;
-    this.storage = typeof window === "undefined" ? noopStorage : window.sessionStorage;
+    this.storage = typeof window === 'undefined' ? noopStorage : window.sessionStorage;
   }
 
   _inherits(SessionStorageStateSource, _StateSource);
 
-  _createClass(SessionStorageStateSource, {
-    get: {
-      value: function get(key) {
-        return this.storage.getItem(getNamespacedKey(this, key));
-      }
-    },
-    set: {
-      value: function set(key, value) {
-        return this.storage.setItem(getNamespacedKey(this, key), value);
-      }
+  _createClass(SessionStorageStateSource, [{
+    key: 'get',
+    value: function get(key) {
+      return this.storage.getItem(getNamespacedKey(this, key));
     }
   }, {
-    defaultNamespace: {
-      get: function () {
-        return "";
-      }
+    key: 'set',
+    value: function set(key, value) {
+      return this.storage.setItem(getNamespacedKey(this, key), value);
     }
-  });
+  }], [{
+    key: 'defaultNamespace',
+    get: function get() {
+      return '';
+    }
+  }]);
 
   return SessionStorageStateSource;
 })(StateSource);
@@ -4110,13 +4545,13 @@ function getNamespace(source) {
 module.exports = SessionStorageStateSource;
 
 },{"27":27,"30":30}],68:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var StateMixin = require(69);
 
 module.exports = function (marty, React) {
-  marty.register("createStateMixin", createStateMixin);
+  marty.register('createStateMixin', createStateMixin);
 
   function createStateMixin(options) {
     return new StateMixin(_.defaults(options, {
@@ -4126,18 +4561,19 @@ module.exports = function (marty, React) {
 };
 
 },{"62":62,"69":69}],69:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var uuid = require(40);
 var StoreObserver = require(32);
-var reservedKeys = ["listenTo", "getState", "getInitialState"];
+var reservedKeys = ['listenTo', 'getState', 'getInitialState'];
 
 function StateMixin(options) {
-  var config, instanceMethods;
+  var config = undefined,
+      instanceMethods = undefined;
 
   if (!options) {
-    throw new Error("The state mixin is expecting some options");
+    throw new Error('The state mixin is expecting some options');
   }
 
   var React = options.React;
@@ -4151,6 +4587,7 @@ function StateMixin(options) {
 
   var mixin = _.extend({
     contextTypes: {
+      app: React.PropTypes.object,
       marty: React.PropTypes.object
     },
     componentDidMount: function componentDidMount() {
@@ -4161,6 +4598,7 @@ function StateMixin(options) {
       this.__observer = new StoreObserver({
         component: component,
         stores: config.stores,
+        app: this.context.app,
         onStoreChanged: this.onStoreChanged
       });
     },
@@ -4185,6 +4623,16 @@ function StateMixin(options) {
       return config.getState(this);
     },
     getInitialState: function getInitialState() {
+      var _this = this;
+
+      Object.defineProperty(this, 'app', {
+        get: function get() {
+          if (_this.context) {
+            return _this.context.app;
+          }
+        }
+      });
+
       var el = this._currentElement;
 
       if (!this.displayName && el && el.type) {
@@ -4192,7 +4640,7 @@ function StateMixin(options) {
       }
 
       this.state = {};
-      this.__id = uuid.type("Component");
+      this.__id = uuid.type('Component');
 
       if (options.getInitialState) {
         this.state = options.getInitialState();
@@ -4221,10 +4669,6 @@ function StateMixin(options) {
 
     if (!_.isArray(stores)) {
       stores = [stores];
-    }
-
-    if (!areStores(stores)) {
-      throw new Error("Can only listen to stores");
     }
 
     stores = stores.concat(_.values(storesToGetStateFrom));
@@ -4260,24 +4704,15 @@ function StateMixin(options) {
     }
   }
 
-  function areStores(stores) {
-    for (var i = stores.length - 1; i >= 0; i--) {
-      if (!isStore(stores[i])) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   function isStore(store) {
-    return store.getState && store.addChangeListener;
+    return store && store.__isStore;
   }
 }
 
 module.exports = StateMixin;
 
 },{"32":32,"40":40,"62":62}],70:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var log = require(24);
 var Store = require(76);
@@ -4285,10 +4720,11 @@ var _ = require(62);
 var warnings = require(41);
 var createClass = require(18);
 
-var RESERVED_FUNCTIONS = ["getState"];
-var VIRTUAL_FUNCTIONS = ["clear", "dispose"];
+var RESERVED_FUNCTIONS = ['getState'];
+var VIRTUAL_FUNCTIONS = ['clear', 'dispose'];
 
 function createStoreClass(properties) {
+  properties = properties || {};
   validateStoreOptions(properties);
   addMixins(properties);
 
@@ -4320,7 +4756,7 @@ function addMixins(properties) {
   });
 
   var mixins = _.map(properties.mixins, function (mixin) {
-    return _.omit(mixin, "handlers");
+    return _.omit(mixin, 'handlers');
   });
 
   _.extend.apply(_, [properties].concat(mixins));
@@ -4333,11 +4769,11 @@ function validateStoreOptions(properties) {
   _.each(RESERVED_FUNCTIONS, function (functionName) {
     if (properties[functionName]) {
       if (displayName) {
-        functionName += " in " + displayName;
+        functionName += ' in ' + displayName;
       }
 
       if (warnings.reservedFunction) {
-        log.warn("Warning: " + functionName + " is reserved for use by Marty. Please use a different name");
+        log.warn('Warning: ' + functionName + ' is reserved for use by Marty. Please use a different name');
       }
     }
   });
@@ -4346,7 +4782,7 @@ function validateStoreOptions(properties) {
 module.exports = createStoreClass;
 
 },{"18":18,"24":24,"41":41,"62":62,"76":76}],71:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var when = require(80);
 var NotFoundError = require(45);
@@ -4362,7 +4798,7 @@ function pending(id, store) {
   return fetchResult({
     id: id,
     pending: true,
-    status: "PENDING"
+    status: 'PENDING'
   }, store);
 }
 
@@ -4371,7 +4807,7 @@ function failed(error, id, store) {
     id: id,
     error: error,
     failed: true,
-    status: "FAILED"
+    status: 'FAILED'
   }, store);
 }
 
@@ -4379,7 +4815,7 @@ function done(result, id, store) {
   return fetchResult({
     id: id,
     done: true,
-    status: "DONE",
+    status: 'DONE',
     result: result
   }, store);
 }
@@ -4401,7 +4837,7 @@ function fetchResult(initialResult, store) {
 
   function toPromise() {
     return new Promise(function (resolve, reject) {
-      var listener;
+      var listener = undefined;
 
       if (!tryResolveFetch(initialResult) && store) {
         listener = store.addFetchChangedListener(tryResolveFetch);
@@ -4415,14 +4851,14 @@ function fetchResult(initialResult, store) {
         if (latestResult.done) {
           initialResult.done = true;
           initialResult.pending = false;
-          initialResult.status = "DONE";
+          initialResult.status = 'DONE';
           initialResult.result = latestResult.result;
 
           resolve(latestResult.result);
         } else if (latestResult.failed) {
           initialResult.failed = true;
           initialResult.pending = false;
-          initialResult.status = "FAILED";
+          initialResult.status = 'FAILED';
           initialResult.error = latestResult.error;
 
           reject(latestResult.error);
@@ -4441,14 +4877,14 @@ function fetchResult(initialResult, store) {
 }
 
 },{"45":45,"80":80}],72:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var constants = require(9);
 
-module.exports = constants(["PENDING", "FAILED", "DONE", "FETCH_FAILED"]);
+module.exports = constants(['PENDING', 'FAILED', 'DONE', 'FETCH_FAILED']);
 
 },{"9":9}],73:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 
@@ -4461,7 +4897,7 @@ function handleAction(action) {
   _.each(handlers, function (predicates, handlerName) {
     _.each(predicates, function (predicate) {
       if (predicate(action)) {
-        var rollbackHandler;
+        var rollbackHandler = undefined;
 
         try {
           store.action = action;
@@ -4506,7 +4942,7 @@ function getHandlerWithPredicates(actionPredicates, handler) {
 module.exports = handleAction;
 
 },{"62":62}],74:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var when = require(80);
@@ -4517,8 +4953,8 @@ var fetchConstants = require(72);
 var createStoreClass = require(70);
 
 module.exports = function (marty) {
-  marty.registerClass("Store", Store);
-  marty.register("createStore", createStore);
+  marty.registerClass('Store', Store);
+  marty.register('createStore', createStore);
 
   _.each(state, function (value, key) {
     marty.register(key, value);
@@ -4538,13 +4974,13 @@ module.exports.Store = Store;
 module.exports.fetchConstants = fetchConstants;
 
 },{"62":62,"70":70,"71":71,"72":72,"75":75,"76":76,"80":80}],75:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var log = require(24);
 var _ = require(62);
 var UnknownStoreError = require(46);
 
-var SERIALIZED_WINDOW_OBJECT = "__marty";
+var SERIALIZED_WINDOW_OBJECT = '__marty';
 
 module.exports = {
   rehydrate: rehydrate,
@@ -4593,7 +5029,7 @@ function rehydrate(storeStates) {
       try {
         store.replaceState(state);
       } catch (e) {
-        log.error("Failed to rehydrate the state of " + storeName + ". You might be able " + "to solve this problem by implementing Store#rehydrate()");
+        log.error('Failed to rehydrate the state of ' + storeName + '. You might be able ' + 'to solve this problem by implementing Store#rehydrate()');
 
         throw e;
       }
@@ -4631,11 +5067,11 @@ function dehydrate(context) {
   });
 
   dehydratedStores.toString = function () {
-    return "(window.__marty||(window.__marty={})).stores=" + JSON.stringify(dehydratedStores);
+    return '(window.__marty||(window.__marty={})).stores=' + JSON.stringify(dehydratedStores);
   };
 
   dehydratedStores.toJSON = function () {
-    return _.omit(dehydratedStores, "toString", "toJSON");
+    return _.omit(dehydratedStores, 'toString', 'toJSON');
   };
 
   return dehydratedStores;
@@ -4646,11 +5082,23 @@ function storeId(store) {
 }
 
 },{"24":24,"46":46,"62":62}],76:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+  };
+})();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
 var log = require(24);
 var fetch = require(78);
@@ -4661,7 +5109,7 @@ var resolve = require(38);
 var StoreEvents = require(77);
 var Environment = require(22);
 var handleAction = require(73);
-var EventEmitter = require(193);
+var EventEmitter = require(203);
 var validateHandlers = require(79);
 
 var Store = (function () {
@@ -4671,23 +5119,26 @@ var Store = (function () {
     _classCallCheck(this, Store);
 
     if (!options && warnings.superNotCalledWithOptions && Environment.isServer) {
-      log.warn("Warning: Options were not passed into a store's constructor");
+      log.warn('Warning: Options were not passed into a store\'s constructor');
     }
 
     options = options || {};
 
-    this.__type = "Store";
+    this.__type = 'Store';
     this.__id = uuid.type(this.__type);
     this.__state = {};
+    this.__isStore = true;
+    this.__app = options.app;
+    this.__isCoreType = true;
     this.__fetchHistory = {};
     this.__failedFetches = {};
     this.__fetchInProgress = {};
     this.__context = options.context;
     this.__emitter = new EventEmitter();
-    this.__dispatcher = options.dispatcher;
     this.__validateHandlers = _.once(function () {
       return validateHandlers(_this);
     });
+    this.__dispatcher = this.__app ? this.__app.dispatcher : options.dispatcher;
 
     var initialState = this.getInitialState();
 
@@ -4700,181 +5151,189 @@ var Store = (function () {
     this.dispatchToken = this.__dispatcher.register(_.bind(this.handleAction, this));
   }
 
-  _createClass(Store, {
-    "for": {
-      value: function _for(obj) {
-        return resolve(this, obj);
+  _createClass(Store, [{
+    key: 'for',
+    value: function _for(obj) {
+      if (warnings.appIsTheFuture) {
+        log.warn('Warning: Contexts are depreciated. ' + 'Use application\'s instead http://martyjs.org/depreciated/contexts.html');
       }
-    },
-    context: {
-      get: function () {
-        return this.__context;
-      }
-    },
-    state: {
-      get: function () {
-        return this.getState();
-      },
-      set: function (newState) {
-        this.replaceState(newState);
-      }
-    },
-    getInitialState: {
-      value: function getInitialState() {
-        return {};
-      }
-    },
-    getState: {
-      value: function getState() {
-        return this.__state;
-      }
-    },
-    setState: {
-      value: function setState(state) {
-        var newState = _.extend({}, this.state, state);
 
-        this.replaceState(newState);
-      }
+      return resolve(this, obj);
+    }
+  }, {
+    key: 'app',
+    get: function get() {
+      return this.__app;
+    }
+  }, {
+    key: 'context',
+    get: function get() {
+      return this.__context;
+    }
+  }, {
+    key: 'state',
+    get: function get() {
+      return this.getState();
     },
-    replaceState: {
-      value: function replaceState(newState) {
-        var currentState = this.__state;
+    set: function set(newState) {
+      this.replaceState(newState);
+    }
+  }, {
+    key: 'getInitialState',
+    value: function getInitialState() {
+      return {};
+    }
+  }, {
+    key: 'getState',
+    value: function getState() {
+      return this.__state;
+    }
+  }, {
+    key: 'setState',
+    value: function setState(state) {
+      var newState = _.extend({}, this.state, state);
 
-        if (_.isUndefined(newState) || _.isNull(newState)) {
-          if (warnings.stateIsNullOrUndefined) {
-            var displayName = this.displayName || this.id;
+      this.replaceState(newState);
+    }
+  }, {
+    key: 'replaceState',
+    value: function replaceState(newState) {
+      var currentState = this.__state;
 
-            log.warn("Warning: Trying to replace the state of the store " + displayName + " with null or undefined");
-          }
-        }
+      if (_.isUndefined(newState) || _.isNull(newState)) {
+        if (warnings.stateIsNullOrUndefined) {
+          var displayName = this.displayName || this.id;
 
-        if (newState !== currentState) {
-          this.__state = newState;
-          this.hasChanged();
-        }
-      }
-    },
-    clear: {
-      value: function clear(newState) {
-        this.__fetchHistory = {};
-        this.__failedFetches = {};
-        this.__fetchInProgress = {};
-
-        if (!newState && _.isFunction(this.getInitialState)) {
-          newState = this.getInitialState();
-        }
-
-        this.state = newState || {};
-      }
-    },
-    dispose: {
-      value: function dispose() {
-        var emitter = this.__emitter;
-        var dispatchToken = this.dispatchToken;
-
-        emitter.removeAllListeners(StoreEvents.CHANGE_EVENT);
-        emitter.removeAllListeners(StoreEvents.FETCH_CHANGE_EVENT);
-        this.clear();
-
-        if (dispatchToken) {
-          this.__dispatcher.unregister(dispatchToken);
-          this.dispatchToken = undefined;
+          log.warn('Warning: Trying to replace the state of the store ' + displayName + ' with null or undefined');
         }
       }
-    },
-    hasChanged: {
-      value: function hasChanged(eventArgs) {
-        var _this = this;
 
-        var emitChange = function () {
-          var emitter = _this.__emitter;
-
-          emitter.emit.call(emitter, StoreEvents.CHANGE_EVENT, _this.state, _this, eventArgs);
-
-          // Clear the action once the component has seen it
-          _this.action = null;
-        };
-
-        if (this.action) {
-          this.action.onActionHandled(this.id, emitChange);
-        } else {
-          emitChange();
-        }
-      }
-    },
-    hasAlreadyFetched: {
-      value: function hasAlreadyFetched(fetchId) {
-        return !!this.__fetchHistory[fetchId];
-      }
-    },
-    addChangeListener: {
-      value: function addChangeListener(callback, context) {
-        var _this = this;
-
-        var emitter = this.__emitter;
-
-        if (context) {
-          callback = _.bind(callback, context);
-        }
-
-        log.trace("The " + this.displayName + " store (" + this.id + ") is adding a change listener");
-
-        emitter.on(StoreEvents.CHANGE_EVENT, callback);
-
-        return {
-          dispose: function () {
-            log.trace("The " + _this.displayName + " store (" + _this.id + ") is disposing of a change listener");
-
-            emitter.removeListener(StoreEvents.CHANGE_EVENT, callback);
-          }
-        };
-      }
-    },
-    addFetchChangedListener: {
-      value: function addFetchChangedListener(callback, context) {
-        var emitter = this.__emitter;
-
-        if (context) {
-          callback = _.bind(callback, context);
-        }
-
-        emitter.on(StoreEvents.FETCH_CHANGE_EVENT, callback);
-
-        return {
-          dispose: function () {
-            emitter.removeListener(StoreEvents.FETCH_CHANGE_EVENT, callback);
-          }
-        };
-      }
-    },
-    waitFor: {
-      value: function waitFor(stores) {
-        var dispatcher = this.__dispatcher;
-
-        if (!_.isArray(stores)) {
-          stores = _.toArray(arguments);
-        }
-
-        dispatcher.waitFor(dispatchTokens(stores));
-
-        function dispatchTokens(stores) {
-          var tokens = [];
-
-          _.each(stores, function (store) {
-            if (store.dispatchToken) {
-              tokens.push(store.dispatchToken);
-            }
-
-            if (_.isString(store)) {
-              tokens.push(store);
-            }
-          });
-
-          return tokens;
-        }
+      if (newState !== currentState) {
+        this.__state = newState;
+        this.hasChanged();
       }
     }
-  });
+  }, {
+    key: 'clear',
+    value: function clear(newState) {
+      this.__fetchHistory = {};
+      this.__failedFetches = {};
+      this.__fetchInProgress = {};
+
+      if (!newState && _.isFunction(this.getInitialState)) {
+        newState = this.getInitialState();
+      }
+
+      this.state = newState || {};
+    }
+  }, {
+    key: 'dispose',
+    value: function dispose() {
+      var emitter = this.__emitter;
+      var dispatchToken = this.dispatchToken;
+
+      emitter.removeAllListeners(StoreEvents.CHANGE_EVENT);
+      emitter.removeAllListeners(StoreEvents.FETCH_CHANGE_EVENT);
+      this.clear();
+
+      if (dispatchToken) {
+        this.__dispatcher.unregister(dispatchToken);
+        this.dispatchToken = undefined;
+      }
+    }
+  }, {
+    key: 'hasChanged',
+    value: function hasChanged(eventArgs) {
+      var _this2 = this;
+
+      var emitChange = function emitChange() {
+        var emitter = _this2.__emitter;
+
+        emitter.emit.call(emitter, StoreEvents.CHANGE_EVENT, _this2.state, _this2, eventArgs);
+
+        // Clear the action once the component has seen it
+        _this2.action = null;
+      };
+
+      if (this.action) {
+        this.action.onActionHandled(this.id, emitChange);
+      } else {
+        emitChange();
+      }
+    }
+  }, {
+    key: 'hasAlreadyFetched',
+    value: function hasAlreadyFetched(fetchId) {
+      return !!this.__fetchHistory[fetchId];
+    }
+  }, {
+    key: 'addChangeListener',
+    value: function addChangeListener(callback, context) {
+      var _this3 = this;
+
+      var emitter = this.__emitter;
+
+      if (context) {
+        callback = _.bind(callback, context);
+      }
+
+      log.trace('The ' + this.displayName + ' store (' + this.id + ') is adding a change listener');
+
+      emitter.on(StoreEvents.CHANGE_EVENT, callback);
+
+      return {
+        dispose: function dispose() {
+          log.trace('The ' + _this3.displayName + ' store (' + _this3.id + ') is disposing of a change listener');
+
+          emitter.removeListener(StoreEvents.CHANGE_EVENT, callback);
+        }
+      };
+    }
+  }, {
+    key: 'addFetchChangedListener',
+    value: function addFetchChangedListener(callback, context) {
+      var emitter = this.__emitter;
+
+      if (context) {
+        callback = _.bind(callback, context);
+      }
+
+      emitter.on(StoreEvents.FETCH_CHANGE_EVENT, callback);
+
+      return {
+        dispose: function dispose() {
+          emitter.removeListener(StoreEvents.FETCH_CHANGE_EVENT, callback);
+        }
+      };
+    }
+  }, {
+    key: 'waitFor',
+    value: function waitFor(stores) {
+      var dispatcher = this.__dispatcher;
+
+      if (!_.isArray(stores)) {
+        stores = _.toArray(arguments);
+      }
+
+      dispatcher.waitFor(dispatchTokens(stores));
+
+      function dispatchTokens(stores) {
+        var tokens = [];
+
+        _.each(stores, function (store) {
+          if (store.dispatchToken) {
+            tokens.push(store.dispatchToken);
+          }
+
+          if (_.isString(store)) {
+            tokens.push(store);
+          }
+        });
+
+        return tokens;
+      }
+    }
+  }]);
 
   return Store;
 })();
@@ -4884,16 +5343,16 @@ Store.prototype.handleAction = handleAction;
 
 module.exports = Store;
 
-},{"193":193,"22":22,"24":24,"38":38,"40":40,"41":41,"62":62,"73":73,"77":77,"78":78,"79":79}],77:[function(require,module,exports){
-"use strict";
+},{"203":203,"22":22,"24":24,"38":38,"40":40,"41":41,"62":62,"73":73,"77":77,"78":78,"79":79}],77:[function(require,module,exports){
+'use strict';
 
 module.exports = {
-  CHANGE_EVENT: "changed",
-  FETCH_CHANGE_EVENT: "fetch-changed"
+  CHANGE_EVENT: 'changed',
+  FETCH_CHANGE_EVENT: 'fetch-changed'
 };
 
 },{}],78:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var log = require(24);
 var _ = require(62);
@@ -4906,11 +5365,13 @@ var FetchConstants = require(72);
 
 function fetch(id, local, remote) {
   var store = this;
-  var options,
-      result,
-      error,
-      cacheError,
-      context = this.context;
+  var options = undefined,
+      result = undefined,
+      error = undefined,
+      cacheError = undefined;
+
+  // Context has the same fetch API as Application
+  var app = this.app || this.context;
 
   if (_.isObject(id)) {
     options = id;
@@ -4928,7 +5389,7 @@ function fetch(id, local, remote) {
   });
 
   if (!options || _.isUndefined(options.id)) {
-    throw new Error("must specify an id");
+    throw new Error('must specify an id');
   }
 
   result = dependencyResult(this, options);
@@ -4951,8 +5412,8 @@ function fetch(id, local, remote) {
     return fetchResult.pending(options.id, store);
   }
 
-  if (context) {
-    context.fetchStarted(store.id, options.id);
+  if (app) {
+    app.fetchStarted(store.id, options.id);
   }
 
   return tryAndGetLocally() || tryAndGetRemotely();
@@ -4972,7 +5433,7 @@ function fetch(id, local, remote) {
       finished();
     }
 
-    return fetchDone(result);
+    return fetchFinished(result);
   }
 
   function tryAndGetRemotely() {
@@ -4987,13 +5448,13 @@ function fetch(id, local, remote) {
           result = tryAndGetLocally(true);
 
           if (result) {
-            fetchDone();
+            fetchFinished();
             store.hasChanged();
           } else {
             fetchNotFound();
             store.hasChanged();
           }
-        })["catch"](function (error) {
+        })['catch'](function (error) {
           fetchFailed(error);
           store.hasChanged();
 
@@ -5022,12 +5483,12 @@ function fetch(id, local, remote) {
   }
 
   function promiseNotReturnedWarning() {
-    var inStore = "";
+    var inStore = '';
     if (store.displayName) {
-      inStore = " in " + store.displayName;
+      inStore = ' in ' + store.displayName;
     }
 
-    return "The remote fetch for '" + options.id + "' " + inStore + " " + "did not return a promise and the state was " + "not present after remotely finished executing. " + "This might be because you forgot to return a promise.";
+    return 'The remote fetch for \'' + options.id + '\' ' + inStore + ' ' + 'did not return a promise and the state was ' + 'not present after remotely finished executing. ' + 'This might be because you forgot to return a promise.';
   }
 
   function finished() {
@@ -5040,11 +5501,11 @@ function fetch(id, local, remote) {
     return fetchResult.pending(options.id, store);
   }
 
-  function fetchDone(result) {
+  function fetchFinished(result) {
     finished();
 
-    if (context && result) {
-      context.fetchDone(store.id, options.id, "DONE", {
+    if (app && result) {
+      app.fetchFinished(store.id, options.id, 'DONE', {
         result: result
       });
     }
@@ -5059,8 +5520,8 @@ function fetch(id, local, remote) {
 
     finished();
 
-    if (context) {
-      context.fetchDone(store.id, options.id, "FAILED", {
+    if (app) {
+      app.fetchFinished(store.id, options.id, 'FAILED', {
         error: error
       });
     }
@@ -5110,10 +5571,10 @@ function dependencyResult(store, options) {
 
   if (pending) {
     // Wait for all dependencies to be done and then notify listeners
-    Promise.all(_.invoke(dependencies, "toPromise")).then(function () {
+    Promise.all(_.invoke(dependencies, 'toPromise')).then(function () {
       store.fetch(options);
       store.hasChanged();
-    })["catch"](function () {
+    })['catch'](function () {
       store.fetch(options);
       store.hasChanged();
     });
@@ -5130,7 +5591,7 @@ fetch.notFound = fetchResult.notFound;
 module.exports = fetch;
 
 },{"24":24,"41":41,"44":44,"45":45,"62":62,"71":71,"72":72,"77":77}],79:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var _ = require(62);
 var ActionHandlerNotFoundError = require(42);
@@ -5153,7 +5614,7 @@ function validateHandlers(store) {
 module.exports = validateHandlers;
 
 },{"42":42,"43":43,"62":62}],80:[function(require,module,exports){
-"use strict";
+'use strict';
 
 var log = require(24);
 var _ = require(62);
@@ -5168,7 +5629,7 @@ function when(handlers, parentContext) {
   var handler = handlers[this.status.toLowerCase()];
 
   if (!handler) {
-    throw new Error("Could not find a " + this.status + " handler");
+    throw new Error('Could not find a ' + this.status + ' handler');
   }
 
   if (parentContext) {
@@ -5184,19 +5645,19 @@ function when(handlers, parentContext) {
       case StatusConstants.DONE.toString():
         return handler.call(new WhenContext(), this.result);
       default:
-        throw new Error("Unknown fetch result status");
+        throw new Error('Unknown fetch result status');
     }
   } catch (e) {
-    var errorMessage = "An error occured when handling the DONE state of ";
+    var errorMessage = 'An error occured when handling the DONE state of ';
 
     if (this.id) {
-      errorMessage += "the fetch '" + this.id + "'";
+      errorMessage += 'the fetch \'' + this.id + '\'';
     } else {
-      errorMessage += "a fetch";
+      errorMessage += 'a fetch';
     }
 
     if (this.store) {
-      errorMessage += " from the store " + this.store;
+      errorMessage += ' from the store ' + this.store;
     }
 
     log.error(errorMessage, e);
@@ -5210,7 +5671,7 @@ function when(handlers, parentContext) {
 }
 
 function join() {
-  var parentContext;
+  var parentContext = undefined;
   var handlers = _.last(arguments);
   var fetchResults = _.initial(arguments);
 
@@ -5224,11 +5685,11 @@ function join() {
 
 function all(fetchResults, handlers, parentContext) {
   if (!fetchResults || !handlers) {
-    throw new Error("No fetch results or handlers specified");
+    throw new Error('No fetch results or handlers specified');
   }
 
   if (!_.isArray(fetchResults) || _.any(fetchResults, notFetchResult)) {
-    throw new Error("Must specify a set of fetch results");
+    throw new Error('Must specify a set of fetch results');
   }
 
   var context = {
@@ -5266,10 +5727,10 @@ function notFetchResult(result) {
 
 function aggregateStatus(fetchResults) {
   for (var i = fetchResults.length - 1; i >= 0; i--) {
-    var status = fetchResults[i].status;
+    var _status = fetchResults[i].status;
 
-    if (status === StatusConstants.FAILED.toString() || status === StatusConstants.PENDING.toString()) {
-      return status;
+    if (_status === StatusConstants.FAILED.toString() || _status === StatusConstants.PENDING.toString()) {
+      return _status;
     }
   }
 
@@ -5443,7 +5904,7 @@ module.exports = when;
 })(typeof window === 'undefined' ? this : window);
 },{}],82:[function(require,module,exports){
 /**
- * Copyright (c) 2014, Facebook, Inc.
+ * Copyright (c) 2014-2015, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the BSD-style license found in the
@@ -5761,19 +6222,15 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 },{}],85:[function(require,module,exports){
-var baseDifference = require(115),
-    baseFlatten = require(120),
-    isArguments = require(167),
-    isArray = require(168),
+var baseDifference = require(116),
+    baseFlatten = require(121),
+    isArrayLike = require(164),
     restParam = require(102);
 
 /**
  * Creates an array excluding all values of the provided arrays using
- * `SameValueZero` for equality comparisons.
- *
- * **Note:** [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
- * comparisons are like strict equality comparisons, e.g. `===`, except that
- * `NaN` matches `NaN`.
+ * [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+ * for equality comparisons.
  *
  * @static
  * @memberOf _
@@ -5787,16 +6244,16 @@ var baseDifference = require(115),
  * // => [1, 3]
  */
 var difference = restParam(function(array, values) {
-  return (isArray(array) || isArguments(array))
+  return isArrayLike(array)
     ? baseDifference(array, baseFlatten(values, false, true))
     : [];
 });
 
 module.exports = difference;
 
-},{"102":102,"115":115,"120":120,"167":167,"168":168}],86:[function(require,module,exports){
-var baseSlice = require(134),
-    isIterateeCall = require(159);
+},{"102":102,"116":116,"121":121,"164":164}],86:[function(require,module,exports){
+var baseSlice = require(137),
+    isIterateeCall = require(166);
 
 /**
  * Creates a slice of `array` with `n` elements dropped from the beginning.
@@ -5835,9 +6292,9 @@ function drop(array, n, guard) {
 
 module.exports = drop;
 
-},{"134":134,"159":159}],87:[function(require,module,exports){
-var baseSlice = require(134),
-    isIterateeCall = require(159);
+},{"137":137,"166":166}],87:[function(require,module,exports){
+var baseSlice = require(137),
+    isIterateeCall = require(166);
 
 /**
  * Creates a slice of `array` with `n` elements dropped from the end.
@@ -5877,7 +6334,7 @@ function dropRight(array, n, guard) {
 
 module.exports = dropRight;
 
-},{"134":134,"159":159}],88:[function(require,module,exports){
+},{"137":137,"166":166}],88:[function(require,module,exports){
 /**
  * Gets the first element of `array`.
  *
@@ -5968,17 +6425,14 @@ function rest(array) {
 module.exports = rest;
 
 },{"86":86}],92:[function(require,module,exports){
-var baseFlatten = require(120),
-    baseUniq = require(137),
+var baseFlatten = require(121),
+    baseUniq = require(140),
     restParam = require(102);
 
 /**
  * Creates an array of unique values, in order, of the provided arrays using
- * `SameValueZero` for equality comparisons.
- *
- * **Note:** [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
- * comparisons are like strict equality comparisons, e.g. `===`, except that
- * `NaN` matches `NaN`.
+ * [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+ * for equality comparisons.
  *
  * @static
  * @memberOf _
@@ -5996,8 +6450,8 @@ var union = restParam(function(arrays) {
 
 module.exports = union;
 
-},{"102":102,"120":120,"137":137}],93:[function(require,module,exports){
-var isArray = require(168);
+},{"102":102,"121":121,"140":140}],93:[function(require,module,exports){
+var isArray = require(177);
 
 /**
  * The inverse of `_.pairs`; this method returns an object composed from arrays
@@ -6041,11 +6495,11 @@ function zipObject(props, values) {
 
 module.exports = zipObject;
 
-},{"168":168}],94:[function(require,module,exports){
+},{"177":177}],94:[function(require,module,exports){
 var arrayFilter = require(106),
-    baseCallback = require(111),
-    baseFilter = require(117),
-    isArray = require(168);
+    baseCallback = require(112),
+    baseFilter = require(118),
+    isArray = require(177);
 
 /**
  * Iterates over elements of `collection`, returning an array of all elements
@@ -6104,9 +6558,9 @@ function filter(collection, predicate, thisArg) {
 
 module.exports = filter;
 
-},{"106":106,"111":111,"117":117,"168":168}],95:[function(require,module,exports){
-var baseEach = require(116),
-    createFind = require(148);
+},{"106":106,"112":112,"118":118,"177":177}],95:[function(require,module,exports){
+var baseEach = require(117),
+    createFind = require(151);
 
 /**
  * Iterates over elements of `collection`, returning the first element
@@ -6162,18 +6616,18 @@ var find = createFind(baseEach);
 
 module.exports = find;
 
-},{"116":116,"148":148}],96:[function(require,module,exports){
+},{"117":117,"151":151}],96:[function(require,module,exports){
 var arrayEach = require(105),
-    baseEach = require(116),
-    createForEach = require(150);
+    baseEach = require(117),
+    createForEach = require(153);
 
 /**
  * Iterates over elements of `collection` invoking `iteratee` for each element.
  * The `iteratee` is bound to `thisArg` and invoked with three arguments:
- * (value, index|key, collection). Iterator functions may exit iteration early
+ * (value, index|key, collection). Iteratee functions may exit iteration early
  * by explicitly returning `false`.
  *
- * **Note:** As with other "Collections" methods, objects with a `length` property
+ * **Note:** As with other "Collections" methods, objects with a "length" property
  * are iterated like arrays. To avoid this behavior `_.forIn` or `_.forOwn`
  * may be used for object iteration.
  *
@@ -6201,22 +6655,24 @@ var forEach = createForEach(arrayEach, baseEach);
 
 module.exports = forEach;
 
-},{"105":105,"116":116,"150":150}],97:[function(require,module,exports){
-var baseEach = require(116),
-    isLength = require(160),
+},{"105":105,"117":117,"153":153}],97:[function(require,module,exports){
+var baseEach = require(117),
+    invokePath = require(163),
+    isArrayLike = require(164),
+    isKey = require(167),
     restParam = require(102);
 
 /**
- * Invokes the method named by `methodName` on each element in `collection`,
- * returning an array of the results of each invoked method. Any additional
- * arguments are provided to each invoked method. If `methodName` is a function
- * it is invoked for, and `this` bound to, each element in `collection`.
+ * Invokes the method at `path` on each element in `collection`, returning
+ * an array of the results of each invoked method. Any additional arguments
+ * are provided to each invoked method. If `methodName` is a function it is
+ * invoked for, and `this` bound to, each element in `collection`.
  *
  * @static
  * @memberOf _
  * @category Collection
  * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function|string} methodName The name of the method to invoke or
+ * @param {Array|Function|string} path The path of the method to invoke or
  *  the function invoked per iteration.
  * @param {...*} [args] The arguments to invoke the method with.
  * @returns {Array} Returns the array of results.
@@ -6228,26 +6684,26 @@ var baseEach = require(116),
  * _.invoke([123, 456], String.prototype.split, '');
  * // => [['1', '2', '3'], ['4', '5', '6']]
  */
-var invoke = restParam(function(collection, methodName, args) {
+var invoke = restParam(function(collection, path, args) {
   var index = -1,
-      isFunc = typeof methodName == 'function',
-      length = collection ? collection.length : 0,
-      result = isLength(length) ? Array(length) : [];
+      isFunc = typeof path == 'function',
+      isProp = isKey(path),
+      result = isArrayLike(collection) ? Array(collection.length) : [];
 
   baseEach(collection, function(value) {
-    var func = isFunc ? methodName : (value != null && value[methodName]);
-    result[++index] = func ? func.apply(value, args) : undefined;
+    var func = isFunc ? path : (isProp && value != null && value[path]);
+    result[++index] = func ? func.apply(value, args) : invokePath(value, path, args);
   });
   return result;
 });
 
 module.exports = invoke;
 
-},{"102":102,"116":116,"160":160}],98:[function(require,module,exports){
+},{"102":102,"117":117,"163":163,"164":164,"167":167}],98:[function(require,module,exports){
 var arrayMap = require(107),
-    baseCallback = require(111),
-    baseMap = require(130),
-    isArray = require(168);
+    baseCallback = require(112),
+    baseMap = require(132),
+    isArray = require(177);
 
 /**
  * Creates an array of values by running each element in `collection` through
@@ -6269,10 +6725,11 @@ var arrayMap = require(107),
  * `_.every`, `_.filter`, `_.map`, `_.mapValues`, `_.reject`, and `_.some`.
  *
  * The guarded methods are:
- * `ary`, `callback`, `chunk`, `clone`, `create`, `curry`, `curryRight`, `drop`,
- * `dropRight`, `every`, `fill`, `flatten`, `invert`, `max`, `min`, `parseInt`,
- * `slice`, `sortBy`, `take`, `takeRight`, `template`, `trim`, `trimLeft`,
- * `trimRight`, `trunc`, `random`, `range`, `sample`, `some`, `uniq`, and `words`
+ * `ary`, `callback`, `chunk`, `clone`, `create`, `curry`, `curryRight`,
+ * `drop`, `dropRight`, `every`, `fill`, `flatten`, `invert`, `max`, `min`,
+ * `parseInt`, `slice`, `sortBy`, `take`, `takeRight`, `template`, `trim`,
+ * `trimLeft`, `trimRight`, `trunc`, `random`, `range`, `sample`, `some`,
+ * `sum`, `uniq`, and `words`
  *
  * @static
  * @memberOf _
@@ -6281,7 +6738,6 @@ var arrayMap = require(107),
  * @param {Array|Object|string} collection The collection to iterate over.
  * @param {Function|Object|string} [iteratee=_.identity] The function invoked
  *  per iteration.
- *  create a `_.property` or `_.matches` style callback respectively.
  * @param {*} [thisArg] The `this` binding of `iteratee`.
  * @returns {Array} Returns the new mapped array.
  * @example
@@ -6313,13 +6769,12 @@ function map(collection, iteratee, thisArg) {
 
 module.exports = map;
 
-},{"107":107,"111":111,"130":130,"168":168}],99:[function(require,module,exports){
-var baseCallback = require(111),
-    baseEach = require(116),
-    baseSortBy = require(135),
-    compareAscending = require(143),
-    isIterateeCall = require(159),
-    isLength = require(160);
+},{"107":107,"112":112,"132":132,"177":177}],99:[function(require,module,exports){
+var baseCallback = require(112),
+    baseMap = require(132),
+    baseSortBy = require(138),
+    compareAscending = require(146),
+    isIterateeCall = require(166);
 
 /**
  * Creates an array of elements, sorted in ascending order by the results of
@@ -6343,9 +6798,8 @@ var baseCallback = require(111),
  * @memberOf _
  * @category Collection
  * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Array|Function|Object|string} [iteratee=_.identity] The function
- *  invoked per iteration. If a property name or an object is provided it is
- *  used to create a `_.property` or `_.matches` style callback respectively.
+ * @param {Function|Object|string} [iteratee=_.identity] The function invoked
+ *  per iteration.
  * @param {*} [thisArg] The `this` binding of `iteratee`.
  * @returns {Array} Returns the new sorted array.
  * @example
@@ -6374,23 +6828,21 @@ function sortBy(collection, iteratee, thisArg) {
   if (collection == null) {
     return [];
   }
-  var index = -1,
-      length = collection.length,
-      result = isLength(length) ? Array(length) : [];
-
   if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
     iteratee = null;
   }
+  var index = -1;
   iteratee = baseCallback(iteratee, thisArg, 3);
-  baseEach(collection, function(value, key, collection) {
-    result[++index] = { 'criteria': iteratee(value, key, collection), 'index': index, 'value': value };
+
+  var result = baseMap(collection, function(value, key, collection) {
+    return { 'criteria': iteratee(value, key, collection), 'index': ++index, 'value': value };
   });
   return baseSortBy(result, compareAscending);
 }
 
 module.exports = sortBy;
 
-},{"111":111,"116":116,"135":135,"143":143,"159":159,"160":160}],100:[function(require,module,exports){
+},{"112":112,"132":132,"138":138,"146":146,"166":166}],100:[function(require,module,exports){
 /** Used as the `TypeError` message for "Functions" methods. */
 var FUNC_ERROR_TEXT = 'Expected a function';
 
@@ -6424,7 +6876,8 @@ function before(n, func) {
   return function() {
     if (--n > 0) {
       result = func.apply(this, arguments);
-    } else {
+    }
+    if (n <= 1) {
       func = null;
     }
     return result;
@@ -6454,7 +6907,7 @@ var before = require(100);
  * // `initialize` invokes `createApplication` once
  */
 function once(func) {
-  return before(func, 2);
+  return before(2, func);
 }
 
 module.exports = once;
@@ -6492,7 +6945,7 @@ function restParam(func, start) {
   if (typeof func != 'function') {
     throw new TypeError(FUNC_ERROR_TEXT);
   }
-  start = nativeMax(typeof start == 'undefined' ? (func.length - 1) : (+start || 0), 0);
+  start = nativeMax(start === undefined ? (func.length - 1) : (+start || 0), 0);
   return function() {
     var args = arguments,
         index = -1,
@@ -6521,8 +6974,8 @@ module.exports = restParam;
 
 },{}],103:[function(require,module,exports){
 (function (global){
-var cachePush = require(142),
-    isNative = require(170);
+var cachePush = require(145),
+    isNative = require(179);
 
 /** Native method references. */
 var Set = isNative(Set = global.Set) && Set;
@@ -6552,7 +7005,7 @@ SetCache.prototype.push = cachePush;
 module.exports = SetCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"142":142,"170":170}],104:[function(require,module,exports){
+},{"145":145,"179":179}],104:[function(require,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -6683,30 +7136,36 @@ module.exports = arraySome;
  * @returns {*} Returns the value to assign to the destination object.
  */
 function assignDefaults(objectValue, sourceValue) {
-  return typeof objectValue == 'undefined' ? sourceValue : objectValue;
+  return objectValue === undefined ? sourceValue : objectValue;
 }
 
 module.exports = assignDefaults;
 
 },{}],110:[function(require,module,exports){
-var baseCopy = require(114),
-    keys = require(182);
+var getSymbols = require(158),
+    keys = require(191);
+
+/** Used for native method references. */
+var arrayProto = Array.prototype;
+
+/** Native method references. */
+var push = arrayProto.push;
 
 /**
- * The base implementation of `_.assign` without support for argument juggling,
- * multiple sources, and `this` binding `customizer` functions.
+ * A specialized version of `_.assign` for customizing assigned values without
+ * support for argument juggling, multiple sources, and `this` binding `customizer`
+ * functions.
  *
  * @private
  * @param {Object} object The destination object.
  * @param {Object} source The source object.
- * @param {Function} [customizer] The function to customize assigning values.
- * @returns {Object} Returns the destination object.
+ * @param {Function} customizer The function to customize assigned values.
+ * @returns {Object} Returns `object`.
  */
-function baseAssign(object, source, customizer) {
+function assignWith(object, source, customizer) {
   var props = keys(source);
-  if (!customizer) {
-    return baseCopy(source, object, props);
-  }
+  push.apply(props, getSymbols(source));
+
   var index = -1,
       length = props.length;
 
@@ -6716,21 +7175,70 @@ function baseAssign(object, source, customizer) {
         result = customizer(value, source[key], key, object, source);
 
     if ((result === result ? (result !== value) : (value === value)) ||
-        (typeof value == 'undefined' && !(key in object))) {
+        (value === undefined && !(key in object))) {
       object[key] = result;
     }
   }
   return object;
 }
 
+module.exports = assignWith;
+
+},{"158":158,"191":191}],111:[function(require,module,exports){
+var baseCopy = require(115),
+    getSymbols = require(158),
+    isNative = require(179),
+    keys = require(191);
+
+/** Native method references. */
+var preventExtensions = isNative(preventExtensions = Object.preventExtensions) && preventExtensions;
+
+/** Used as `baseAssign`. */
+var nativeAssign = (function() {
+  // Avoid `Object.assign` in Firefox 34-37 which have an early implementation
+  // with a now defunct try/catch behavior. See https://bugzilla.mozilla.org/show_bug.cgi?id=1103344
+  // for more details.
+  //
+  // Use `Object.preventExtensions` on a plain object instead of simply using
+  // `Object('x')` because Chrome and IE fail to throw an error when attempting
+  // to assign values to readonly indexes of strings.
+  var func = preventExtensions && isNative(func = Object.assign) && func;
+  try {
+    if (func) {
+      var object = preventExtensions({ '1': 0 });
+      object[0] = 1;
+    }
+  } catch(e) {
+    // Only attempt in strict mode.
+    try { func(object, 'xo'); } catch(e) {}
+    return !object[1] && func;
+  }
+  return false;
+}());
+
+/**
+ * The base implementation of `_.assign` without support for argument juggling,
+ * multiple sources, and `customizer` functions.
+ *
+ * @private
+ * @param {Object} object The destination object.
+ * @param {Object} source The source object.
+ * @returns {Object} Returns `object`.
+ */
+var baseAssign = nativeAssign || function(object, source) {
+  return source == null
+    ? object
+    : baseCopy(source, getSymbols(source), baseCopy(source, keys(source), object));
+};
+
 module.exports = baseAssign;
 
-},{"114":114,"182":182}],111:[function(require,module,exports){
-var baseMatches = require(131),
-    baseMatchesProperty = require(132),
-    baseProperty = require(133),
-    bindCallback = require(139),
-    identity = require(190);
+},{"115":115,"158":158,"179":179,"191":191}],112:[function(require,module,exports){
+var baseMatches = require(133),
+    baseMatchesProperty = require(134),
+    bindCallback = require(142),
+    identity = require(199),
+    property = require(202);
 
 /**
  * The base implementation of `_.callback` which supports specifying the
@@ -6745,7 +7253,7 @@ var baseMatches = require(131),
 function baseCallback(func, thisArg, argCount) {
   var type = typeof func;
   if (type == 'function') {
-    return typeof thisArg == 'undefined'
+    return thisArg === undefined
       ? func
       : bindCallback(func, thisArg, argCount);
   }
@@ -6755,24 +7263,23 @@ function baseCallback(func, thisArg, argCount) {
   if (type == 'object') {
     return baseMatches(func);
   }
-  return typeof thisArg == 'undefined'
-    ? baseProperty(func + '')
-    : baseMatchesProperty(func + '', thisArg);
+  return thisArg === undefined
+    ? property(func)
+    : baseMatchesProperty(func, thisArg);
 }
 
 module.exports = baseCallback;
 
-},{"131":131,"132":132,"133":133,"139":139,"190":190}],112:[function(require,module,exports){
+},{"133":133,"134":134,"142":142,"199":199,"202":202}],113:[function(require,module,exports){
 var arrayCopy = require(104),
     arrayEach = require(105),
-    baseCopy = require(114),
-    baseForOwn = require(123),
-    initCloneArray = require(155),
-    initCloneByTag = require(156),
-    initCloneObject = require(157),
-    isArray = require(168),
-    isObject = require(172),
-    keys = require(182);
+    baseAssign = require(111),
+    baseForOwn = require(124),
+    initCloneArray = require(160),
+    initCloneByTag = require(161),
+    initCloneObject = require(162),
+    isArray = require(177),
+    isObject = require(181);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -6843,7 +7350,7 @@ function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
   if (customizer) {
     result = object ? customizer(value, key, object) : customizer(value);
   }
-  if (typeof result != 'undefined') {
+  if (result !== undefined) {
     return result;
   }
   if (!isObject(value)) {
@@ -6862,7 +7369,7 @@ function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
     if (tag == objectTag || tag == argsTag || (isFunc && !object)) {
       result = initCloneObject(isFunc ? {} : value);
       if (!isDeep) {
-        return baseCopy(value, result, keys(value));
+        return baseAssign(result, value);
       }
     } else {
       return cloneableTags[tag]
@@ -6893,7 +7400,7 @@ function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
 
 module.exports = baseClone;
 
-},{"104":104,"105":105,"114":114,"123":123,"155":155,"156":156,"157":157,"168":168,"172":172,"182":182}],113:[function(require,module,exports){
+},{"104":104,"105":105,"111":111,"124":124,"160":160,"161":161,"162":162,"177":177,"181":181}],114:[function(require,module,exports){
 /**
  * The base implementation of `compareAscending` which compares values and
  * sorts them in ascending order without guaranteeing a stable sort.
@@ -6908,10 +7415,10 @@ function baseCompareAscending(value, other) {
     var valIsReflexive = value === value,
         othIsReflexive = other === other;
 
-    if (value > other || !valIsReflexive || (typeof value == 'undefined' && othIsReflexive)) {
+    if (value > other || !valIsReflexive || (value === undefined && othIsReflexive)) {
       return 1;
     }
-    if (value < other || !othIsReflexive || (typeof other == 'undefined' && valIsReflexive)) {
+    if (value < other || !othIsReflexive || (other === undefined && valIsReflexive)) {
       return -1;
     }
   }
@@ -6920,21 +7427,19 @@ function baseCompareAscending(value, other) {
 
 module.exports = baseCompareAscending;
 
-},{}],114:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 /**
- * Copies the properties of `source` to `object`.
+ * Copies properties of `source` to `object`.
  *
  * @private
  * @param {Object} source The object to copy properties from.
- * @param {Object} [object={}] The object to copy properties to.
  * @param {Array} props The property names to copy.
+ * @param {Object} [object={}] The object to copy properties to.
  * @returns {Object} Returns `object`.
  */
-function baseCopy(source, object, props) {
-  if (!props) {
-    props = object;
-    object = {};
-  }
+function baseCopy(source, props, object) {
+  object || (object = {});
+
   var index = -1,
       length = props.length;
 
@@ -6947,10 +7452,10 @@ function baseCopy(source, object, props) {
 
 module.exports = baseCopy;
 
-},{}],115:[function(require,module,exports){
-var baseIndexOf = require(125),
-    cacheIndexOf = require(141),
-    createCache = require(147);
+},{}],116:[function(require,module,exports){
+var baseIndexOf = require(127),
+    cacheIndexOf = require(144),
+    createCache = require(150);
 
 /**
  * The base implementation of `_.difference` which accepts a single array
@@ -7001,9 +7506,9 @@ function baseDifference(array, values) {
 
 module.exports = baseDifference;
 
-},{"125":125,"141":141,"147":147}],116:[function(require,module,exports){
-var baseForOwn = require(123),
-    createBaseEach = require(145);
+},{"127":127,"144":144,"150":150}],117:[function(require,module,exports){
+var baseForOwn = require(124),
+    createBaseEach = require(148);
 
 /**
  * The base implementation of `_.forEach` without support for callback
@@ -7018,8 +7523,8 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"123":123,"145":145}],117:[function(require,module,exports){
-var baseEach = require(116);
+},{"124":124,"148":148}],118:[function(require,module,exports){
+var baseEach = require(117);
 
 /**
  * The base implementation of `_.filter` without support for callback
@@ -7042,7 +7547,7 @@ function baseFilter(collection, predicate) {
 
 module.exports = baseFilter;
 
-},{"116":116}],118:[function(require,module,exports){
+},{"117":117}],119:[function(require,module,exports){
 /**
  * The base implementation of `_.find`, `_.findLast`, `_.findKey`, and `_.findLastKey`,
  * without support for callback shorthands and `this` binding, which iterates
@@ -7069,7 +7574,7 @@ function baseFind(collection, predicate, eachFunc, retKey) {
 
 module.exports = baseFind;
 
-},{}],119:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 /**
  * The base implementation of `_.findIndex` and `_.findLastIndex` without
  * support for callback shorthands and `this` binding.
@@ -7094,11 +7599,11 @@ function baseFindIndex(array, predicate, fromRight) {
 
 module.exports = baseFindIndex;
 
-},{}],120:[function(require,module,exports){
-var isArguments = require(167),
-    isArray = require(168),
-    isLength = require(160),
-    isObjectLike = require(161);
+},{}],121:[function(require,module,exports){
+var isArguments = require(176),
+    isArray = require(177),
+    isArrayLike = require(164),
+    isObjectLike = require(169);
 
 /**
  * The base implementation of `_.flatten` with added support for restricting
@@ -7106,8 +7611,8 @@ var isArguments = require(167),
  *
  * @private
  * @param {Array} array The array to flatten.
- * @param {boolean} isDeep Specify a deep flatten.
- * @param {boolean} isStrict Restrict flattening to arrays and `arguments` objects.
+ * @param {boolean} [isDeep] Specify a deep flatten.
+ * @param {boolean} [isStrict] Restrict flattening to arrays-like objects.
  * @returns {Array} Returns the new flattened array.
  */
 function baseFlatten(array, isDeep, isStrict) {
@@ -7118,8 +7623,8 @@ function baseFlatten(array, isDeep, isStrict) {
 
   while (++index < length) {
     var value = array[index];
-
-    if (isObjectLike(value) && isLength(value.length) && (isArray(value) || isArguments(value))) {
+    if (isObjectLike(value) && isArrayLike(value) &&
+        (isStrict || isArray(value) || isArguments(value))) {
       if (isDeep) {
         // Recursively flatten arrays (susceptible to call stack limits).
         value = baseFlatten(value, isDeep, isStrict);
@@ -7127,7 +7632,6 @@ function baseFlatten(array, isDeep, isStrict) {
       var valIndex = -1,
           valLength = value.length;
 
-      result.length += valLength;
       while (++valIndex < valLength) {
         result[++resIndex] = value[valIndex];
       }
@@ -7140,13 +7644,13 @@ function baseFlatten(array, isDeep, isStrict) {
 
 module.exports = baseFlatten;
 
-},{"160":160,"161":161,"167":167,"168":168}],121:[function(require,module,exports){
-var createBaseFor = require(146);
+},{"164":164,"169":169,"176":176,"177":177}],122:[function(require,module,exports){
+var createBaseFor = require(149);
 
 /**
  * The base implementation of `baseForIn` and `baseForOwn` which iterates
  * over `object` properties returned by `keysFunc` invoking `iteratee` for
- * each property. Iterator functions may exit iteration early by explicitly
+ * each property. Iteratee functions may exit iteration early by explicitly
  * returning `false`.
  *
  * @private
@@ -7159,9 +7663,9 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"146":146}],122:[function(require,module,exports){
-var baseFor = require(121),
-    keysIn = require(183);
+},{"149":149}],123:[function(require,module,exports){
+var baseFor = require(122),
+    keysIn = require(192);
 
 /**
  * The base implementation of `_.forIn` without support for callback
@@ -7178,9 +7682,9 @@ function baseForIn(object, iteratee) {
 
 module.exports = baseForIn;
 
-},{"121":121,"183":183}],123:[function(require,module,exports){
-var baseFor = require(121),
-    keys = require(182);
+},{"122":122,"192":192}],124:[function(require,module,exports){
+var baseFor = require(122),
+    keys = require(191);
 
 /**
  * The base implementation of `_.forOwn` without support for callback
@@ -7197,8 +7701,8 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"121":121,"182":182}],124:[function(require,module,exports){
-var isFunction = require(169);
+},{"122":122,"191":191}],125:[function(require,module,exports){
+var isFunction = require(178);
 
 /**
  * The base implementation of `_.functions` which creates an array of
@@ -7226,8 +7730,39 @@ function baseFunctions(object, props) {
 
 module.exports = baseFunctions;
 
-},{"169":169}],125:[function(require,module,exports){
-var indexOfNaN = require(154);
+},{"178":178}],126:[function(require,module,exports){
+var toObject = require(174);
+
+/**
+ * The base implementation of `get` without support for string paths
+ * and default values.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array} path The path of the property to get.
+ * @param {string} [pathKey] The key representation of path.
+ * @returns {*} Returns the resolved value.
+ */
+function baseGet(object, path, pathKey) {
+  if (object == null) {
+    return;
+  }
+  if (pathKey !== undefined && pathKey in toObject(object)) {
+    path = [pathKey];
+  }
+  var index = -1,
+      length = path.length;
+
+  while (object != null && ++index < length) {
+    object = object[path[index]];
+  }
+  return (index && index == length) ? object : undefined;
+}
+
+module.exports = baseGet;
+
+},{"174":174}],127:[function(require,module,exports){
+var indexOfNaN = require(159);
 
 /**
  * The base implementation of `_.indexOf` without support for binary searches.
@@ -7255,8 +7790,8 @@ function baseIndexOf(array, value, fromIndex) {
 
 module.exports = baseIndexOf;
 
-},{"154":154}],126:[function(require,module,exports){
-var baseIsEqualDeep = require(127);
+},{"159":159}],128:[function(require,module,exports){
+var baseIsEqualDeep = require(129);
 
 /**
  * The base implementation of `_.isEqual` without support for `this` binding
@@ -7274,8 +7809,7 @@ var baseIsEqualDeep = require(127);
 function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
   // Exit early for identical values.
   if (value === other) {
-    // Treat `+0` vs. `-0` as not equal.
-    return value !== 0 || (1 / value == 1 / other);
+    return true;
   }
   var valType = typeof value,
       othType = typeof other;
@@ -7291,17 +7825,16 @@ function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"127":127}],127:[function(require,module,exports){
-var equalArrays = require(151),
-    equalByTag = require(152),
-    equalObjects = require(153),
-    isArray = require(168),
-    isTypedArray = require(174);
+},{"129":129}],129:[function(require,module,exports){
+var equalArrays = require(154),
+    equalByTag = require(155),
+    equalObjects = require(156),
+    isArray = require(177),
+    isTypedArray = require(183);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
     arrayTag = '[object Array]',
-    funcTag = '[object Function]',
     objectTag = '[object Object]';
 
 /** Used for native method references. */
@@ -7353,27 +7886,23 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, 
       othIsArr = isTypedArray(other);
     }
   }
-  var objIsObj = (objTag == objectTag || (isLoose && objTag == funcTag)),
-      othIsObj = (othTag == objectTag || (isLoose && othTag == funcTag)),
+  var objIsObj = objTag == objectTag,
+      othIsObj = othTag == objectTag,
       isSameTag = objTag == othTag;
 
   if (isSameTag && !(objIsArr || objIsObj)) {
     return equalByTag(object, other, objTag);
   }
-  if (isLoose) {
-    if (!isSameTag && !(objIsObj && othIsObj)) {
-      return false;
-    }
-  } else {
+  if (!isLoose) {
     var valWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
         othWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
 
     if (valWrapped || othWrapped) {
       return equalFunc(valWrapped ? object.value() : object, othWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
     }
-    if (!isSameTag) {
-      return false;
-    }
+  }
+  if (!isSameTag) {
+    return false;
   }
   // Assume cyclic values are equal.
   // For more information on detecting circular references see https://es5.github.io/#JO.
@@ -7400,7 +7929,7 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, 
 
 module.exports = baseIsEqualDeep;
 
-},{"151":151,"152":152,"153":153,"168":168,"174":174}],128:[function(require,module,exports){
+},{"154":154,"155":155,"156":156,"177":177,"183":183}],130:[function(require,module,exports){
 /**
  * The base implementation of `_.isFunction` without support for environments
  * with incorrect `typeof` results.
@@ -7417,8 +7946,8 @@ function baseIsFunction(value) {
 
 module.exports = baseIsFunction;
 
-},{}],129:[function(require,module,exports){
-var baseIsEqual = require(126);
+},{}],131:[function(require,module,exports){
+var baseIsEqual = require(128);
 
 /**
  * The base implementation of `_.isMatch` without support for callback
@@ -7452,10 +7981,10 @@ function baseIsMatch(object, props, values, strictCompareFlags, customizer) {
         srcValue = values[index];
 
     if (noCustomizer && strictCompareFlags[index]) {
-      var result = typeof objValue != 'undefined' || (key in object);
+      var result = objValue !== undefined || (key in object);
     } else {
       result = customizer ? customizer(objValue, srcValue, key) : undefined;
-      if (typeof result == 'undefined') {
+      if (result === undefined) {
         result = baseIsEqual(srcValue, objValue, customizer, true);
       }
     }
@@ -7468,8 +7997,9 @@ function baseIsMatch(object, props, values, strictCompareFlags, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"126":126}],130:[function(require,module,exports){
-var baseEach = require(116);
+},{"128":128}],132:[function(require,module,exports){
+var baseEach = require(117),
+    isArrayLike = require(164);
 
 /**
  * The base implementation of `_.map` without support for callback shorthands
@@ -7481,21 +8011,23 @@ var baseEach = require(116);
  * @returns {Array} Returns the new mapped array.
  */
 function baseMap(collection, iteratee) {
-  var result = [];
+  var index = -1,
+      result = isArrayLike(collection) ? Array(collection.length) : [];
+
   baseEach(collection, function(value, key, collection) {
-    result.push(iteratee(value, key, collection));
+    result[++index] = iteratee(value, key, collection);
   });
   return result;
 }
 
 module.exports = baseMap;
 
-},{"116":116}],131:[function(require,module,exports){
-var baseIsMatch = require(129),
-    constant = require(189),
-    isStrictComparable = require(162),
-    keys = require(182),
-    toObject = require(166);
+},{"117":117,"164":164}],133:[function(require,module,exports){
+var baseIsMatch = require(131),
+    constant = require(198),
+    isStrictComparable = require(170),
+    keys = require(191),
+    toObject = require(174);
 
 /**
  * The base implementation of `_.matches` which does not clone `source`.
@@ -7517,8 +8049,10 @@ function baseMatches(source) {
 
     if (isStrictComparable(value)) {
       return function(object) {
-        return object != null && object[key] === value &&
-          (typeof value != 'undefined' || (key in toObject(object)));
+        if (object == null) {
+          return false;
+        }
+        return object[key] === value && (value !== undefined || (key in toObject(object)));
       };
     }
   }
@@ -7537,37 +8071,57 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"129":129,"162":162,"166":166,"182":182,"189":189}],132:[function(require,module,exports){
-var baseIsEqual = require(126),
-    isStrictComparable = require(162),
-    toObject = require(166);
+},{"131":131,"170":170,"174":174,"191":191,"198":198}],134:[function(require,module,exports){
+var baseGet = require(126),
+    baseIsEqual = require(128),
+    baseSlice = require(137),
+    isArray = require(177),
+    isKey = require(167),
+    isStrictComparable = require(170),
+    last = require(90),
+    toObject = require(174),
+    toPath = require(175);
 
 /**
- * The base implementation of `_.matchesProperty` which does not coerce `key`
- * to a string.
+ * The base implementation of `_.matchesProperty` which does not which does
+ * not clone `value`.
  *
  * @private
- * @param {string} key The key of the property to get.
+ * @param {string} path The path of the property to get.
  * @param {*} value The value to compare.
  * @returns {Function} Returns the new function.
  */
-function baseMatchesProperty(key, value) {
-  if (isStrictComparable(value)) {
-    return function(object) {
-      return object != null && object[key] === value &&
-        (typeof value != 'undefined' || (key in toObject(object)));
-    };
-  }
+function baseMatchesProperty(path, value) {
+  var isArr = isArray(path),
+      isCommon = isKey(path) && isStrictComparable(value),
+      pathKey = (path + '');
+
+  path = toPath(path);
   return function(object) {
-    return object != null && baseIsEqual(value, object[key], null, true);
+    if (object == null) {
+      return false;
+    }
+    var key = pathKey;
+    object = toObject(object);
+    if ((isArr || !isCommon) && !(key in object)) {
+      object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+      if (object == null) {
+        return false;
+      }
+      key = last(path);
+      object = toObject(object);
+    }
+    return object[key] === value
+      ? (value !== undefined || (key in object))
+      : baseIsEqual(value, object[key], null, true);
   };
 }
 
 module.exports = baseMatchesProperty;
 
-},{"126":126,"162":162,"166":166}],133:[function(require,module,exports){
+},{"126":126,"128":128,"137":137,"167":167,"170":170,"174":174,"175":175,"177":177,"90":90}],135:[function(require,module,exports){
 /**
- * The base implementation of `_.property` which does not coerce `key` to a string.
+ * The base implementation of `_.property` without support for deep paths.
  *
  * @private
  * @param {string} key The key of the property to get.
@@ -7581,7 +8135,28 @@ function baseProperty(key) {
 
 module.exports = baseProperty;
 
-},{}],134:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
+var baseGet = require(126),
+    toPath = require(175);
+
+/**
+ * A specialized version of `baseProperty` which supports deep paths.
+ *
+ * @private
+ * @param {Array|string} path The path of the property to get.
+ * @returns {Function} Returns the new function.
+ */
+function basePropertyDeep(path) {
+  var pathKey = (path + '');
+  path = toPath(path);
+  return function(object) {
+    return baseGet(object, path, pathKey);
+  };
+}
+
+module.exports = basePropertyDeep;
+
+},{"126":126,"175":175}],137:[function(require,module,exports){
 /**
  * The base implementation of `_.slice` without an iteratee call guard.
  *
@@ -7599,7 +8174,7 @@ function baseSlice(array, start, end) {
   if (start < 0) {
     start = -start > length ? 0 : (length + start);
   }
-  end = (typeof end == 'undefined' || end > length) ? length : (+end || 0);
+  end = (end === undefined || end > length) ? length : (+end || 0);
   if (end < 0) {
     end += length;
   }
@@ -7615,7 +8190,7 @@ function baseSlice(array, start, end) {
 
 module.exports = baseSlice;
 
-},{}],135:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 /**
  * The base implementation of `_.sortBy` which uses `comparer` to define
  * the sort order of `array` and replaces criteria objects with their
@@ -7638,7 +8213,7 @@ function baseSortBy(array, comparer) {
 
 module.exports = baseSortBy;
 
-},{}],136:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 /**
  * Converts `value` to a string if it is not one. An empty string is returned
  * for `null` or `undefined` values.
@@ -7656,10 +8231,10 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{}],137:[function(require,module,exports){
-var baseIndexOf = require(125),
-    cacheIndexOf = require(141),
-    createCache = require(147);
+},{}],140:[function(require,module,exports){
+var baseIndexOf = require(127),
+    cacheIndexOf = require(144),
+    createCache = require(150);
 
 /**
  * The base implementation of `_.uniq` without support for callback shorthands
@@ -7715,11 +8290,11 @@ function baseUniq(array, iteratee) {
 
 module.exports = baseUniq;
 
-},{"125":125,"141":141,"147":147}],138:[function(require,module,exports){
+},{"127":127,"144":144,"150":150}],141:[function(require,module,exports){
 /**
  * The base implementation of `_.values` and `_.valuesIn` which creates an
  * array of `object` property values corresponding to the property names
- * returned by `keysFunc`.
+ * of `props`.
  *
  * @private
  * @param {Object} object The object to query.
@@ -7739,8 +8314,8 @@ function baseValues(object, props) {
 
 module.exports = baseValues;
 
-},{}],139:[function(require,module,exports){
-var identity = require(190);
+},{}],142:[function(require,module,exports){
+var identity = require(199);
 
 /**
  * A specialized version of `baseCallback` which only supports `this` binding
@@ -7756,7 +8331,7 @@ function bindCallback(func, thisArg, argCount) {
   if (typeof func != 'function') {
     return identity;
   }
-  if (typeof thisArg == 'undefined') {
+  if (thisArg === undefined) {
     return func;
   }
   switch (argCount) {
@@ -7780,10 +8355,10 @@ function bindCallback(func, thisArg, argCount) {
 
 module.exports = bindCallback;
 
-},{"190":190}],140:[function(require,module,exports){
+},{"199":199}],143:[function(require,module,exports){
 (function (global){
-var constant = require(189),
-    isNative = require(170);
+var constant = require(198),
+    isNative = require(179);
 
 /** Native method references. */
 var ArrayBuffer = isNative(ArrayBuffer = global.ArrayBuffer) && ArrayBuffer,
@@ -7839,8 +8414,8 @@ if (!bufferSlice) {
 module.exports = bufferClone;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"170":170,"189":189}],141:[function(require,module,exports){
-var isObject = require(172);
+},{"179":179,"198":198}],144:[function(require,module,exports){
+var isObject = require(181);
 
 /**
  * Checks if `value` is in `cache` mimicking the return signature of
@@ -7860,8 +8435,8 @@ function cacheIndexOf(cache, value) {
 
 module.exports = cacheIndexOf;
 
-},{"172":172}],142:[function(require,module,exports){
-var isObject = require(172);
+},{"181":181}],145:[function(require,module,exports){
+var isObject = require(181);
 
 /**
  * Adds `value` to the cache.
@@ -7882,8 +8457,8 @@ function cachePush(value) {
 
 module.exports = cachePush;
 
-},{"172":172}],143:[function(require,module,exports){
-var baseCompareAscending = require(113);
+},{"181":181}],146:[function(require,module,exports){
+var baseCompareAscending = require(114);
 
 /**
  * Used by `_.sortBy` to compare transformed elements of a collection and stable
@@ -7900,9 +8475,10 @@ function compareAscending(object, other) {
 
 module.exports = compareAscending;
 
-},{"113":113}],144:[function(require,module,exports){
-var bindCallback = require(139),
-    isIterateeCall = require(159);
+},{"114":114}],147:[function(require,module,exports){
+var bindCallback = require(142),
+    isIterateeCall = require(166),
+    restParam = require(102);
 
 /**
  * Creates a function that assigns properties of source object(s) to a given
@@ -7915,45 +8491,40 @@ var bindCallback = require(139),
  * @returns {Function} Returns the new assigner function.
  */
 function createAssigner(assigner) {
-  return function() {
-    var args = arguments,
-        length = args.length,
-        object = args[0];
+  return restParam(function(object, sources) {
+    var index = -1,
+        length = object == null ? 0 : sources.length,
+        customizer = length > 2 && sources[length - 2],
+        guard = length > 2 && sources[2],
+        thisArg = length > 1 && sources[length - 1];
 
-    if (length < 2 || object == null) {
-      return object;
-    }
-    var customizer = args[length - 2],
-        thisArg = args[length - 1],
-        guard = args[3];
-
-    if (length > 3 && typeof customizer == 'function') {
+    if (typeof customizer == 'function') {
       customizer = bindCallback(customizer, thisArg, 5);
       length -= 2;
     } else {
-      customizer = (length > 2 && typeof thisArg == 'function') ? thisArg : null;
+      customizer = typeof thisArg == 'function' ? thisArg : null;
       length -= (customizer ? 1 : 0);
     }
-    if (guard && isIterateeCall(args[1], args[2], guard)) {
-      customizer = length == 3 ? null : customizer;
-      length = 2;
+    if (guard && isIterateeCall(sources[0], sources[1], guard)) {
+      customizer = length < 3 ? null : customizer;
+      length = 1;
     }
-    var index = 0;
     while (++index < length) {
-      var source = args[index];
+      var source = sources[index];
       if (source) {
         assigner(object, source, customizer);
       }
     }
     return object;
-  };
+  });
 }
 
 module.exports = createAssigner;
 
-},{"139":139,"159":159}],145:[function(require,module,exports){
-var isLength = require(160),
-    toObject = require(166);
+},{"102":102,"142":142,"166":166}],148:[function(require,module,exports){
+var getLength = require(157),
+    isLength = require(168),
+    toObject = require(174);
 
 /**
  * Creates a `baseEach` or `baseEachRight` function.
@@ -7965,7 +8536,7 @@ var isLength = require(160),
  */
 function createBaseEach(eachFunc, fromRight) {
   return function(collection, iteratee) {
-    var length = collection ? collection.length : 0;
+    var length = collection ? getLength(collection) : 0;
     if (!isLength(length)) {
       return eachFunc(collection, iteratee);
     }
@@ -7983,8 +8554,8 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"160":160,"166":166}],146:[function(require,module,exports){
-var toObject = require(166);
+},{"157":157,"168":168,"174":174}],149:[function(require,module,exports){
+var toObject = require(174);
 
 /**
  * Creates a base function for `_.forIn` or `_.forInRight`.
@@ -8012,11 +8583,11 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{"166":166}],147:[function(require,module,exports){
+},{"174":174}],150:[function(require,module,exports){
 (function (global){
 var SetCache = require(103),
-    constant = require(189),
-    isNative = require(170);
+    constant = require(198),
+    isNative = require(179);
 
 /** Native method references. */
 var Set = isNative(Set = global.Set) && Set;
@@ -8038,11 +8609,11 @@ var createCache = !(nativeCreate && Set) ? constant(null) : function(values) {
 module.exports = createCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"103":103,"170":170,"189":189}],148:[function(require,module,exports){
-var baseCallback = require(111),
-    baseFind = require(118),
-    baseFindIndex = require(119),
-    isArray = require(168);
+},{"103":103,"179":179,"198":198}],151:[function(require,module,exports){
+var baseCallback = require(112),
+    baseFind = require(119),
+    baseFindIndex = require(120),
+    isArray = require(177);
 
 /**
  * Creates a `_.find` or `_.findLast` function.
@@ -8060,14 +8631,14 @@ function createFind(eachFunc, fromRight) {
       return index > -1 ? collection[index] : undefined;
     }
     return baseFind(collection, predicate, eachFunc);
-  }
+  };
 }
 
 module.exports = createFind;
 
-},{"111":111,"118":118,"119":119,"168":168}],149:[function(require,module,exports){
-var baseCallback = require(111),
-    baseFind = require(118);
+},{"112":112,"119":119,"120":120,"177":177}],152:[function(require,module,exports){
+var baseCallback = require(112),
+    baseFind = require(119);
 
 /**
  * Creates a `_.findKey` or `_.findLastKey` function.
@@ -8085,9 +8656,9 @@ function createFindKey(objectFunc) {
 
 module.exports = createFindKey;
 
-},{"111":111,"118":118}],150:[function(require,module,exports){
-var bindCallback = require(139),
-    isArray = require(168);
+},{"112":112,"119":119}],153:[function(require,module,exports){
+var bindCallback = require(142),
+    isArray = require(177);
 
 /**
  * Creates a function for `_.forEach` or `_.forEachRight`.
@@ -8099,7 +8670,7 @@ var bindCallback = require(139),
  */
 function createForEach(arrayFunc, eachFunc) {
   return function(collection, iteratee, thisArg) {
-    return (typeof iteratee == 'function' && typeof thisArg == 'undefined' && isArray(collection))
+    return (typeof iteratee == 'function' && thisArg === undefined && isArray(collection))
       ? arrayFunc(collection, iteratee)
       : eachFunc(collection, bindCallback(iteratee, thisArg, 3));
   };
@@ -8107,7 +8678,7 @@ function createForEach(arrayFunc, eachFunc) {
 
 module.exports = createForEach;
 
-},{"139":139,"168":168}],151:[function(require,module,exports){
+},{"142":142,"177":177}],154:[function(require,module,exports){
 /**
  * A specialized version of `baseIsEqualDeep` for arrays with support for
  * partial deep comparisons.
@@ -8142,7 +8713,7 @@ function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stack
         ? customizer(othValue, arrValue, index)
         : customizer(arrValue, othValue, index);
     }
-    if (typeof result == 'undefined') {
+    if (result === undefined) {
       // Recursively compare arrays (susceptible to call stack limits).
       if (isLoose) {
         var othIndex = othLength;
@@ -8163,7 +8734,7 @@ function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stack
 
 module.exports = equalArrays;
 
-},{}],152:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
     dateTag = '[object Date]',
@@ -8200,8 +8771,7 @@ function equalByTag(object, other, tag) {
       // Treat `NaN` vs. `NaN` as equal.
       return (object != +object)
         ? other != +other
-        // But, treat `-0` vs. `+0` as not equal.
-        : (object == 0 ? ((1 / object) == (1 / other)) : object == +other);
+        : object == +other;
 
     case regexpTag:
     case stringTag:
@@ -8214,8 +8784,8 @@ function equalByTag(object, other, tag) {
 
 module.exports = equalByTag;
 
-},{}],153:[function(require,module,exports){
-var keys = require(182);
+},{}],156:[function(require,module,exports){
+var keys = require(191);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -8263,7 +8833,7 @@ function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, sta
           ? customizer(othValue, objValue, key)
           : customizer(objValue, othValue, key);
       }
-      if (typeof result == 'undefined') {
+      if (result === undefined) {
         // Recursively compare objects (susceptible to call stack limits).
         result = (objValue && objValue === othValue) || equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB);
       }
@@ -8290,7 +8860,45 @@ function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, sta
 
 module.exports = equalObjects;
 
-},{"182":182}],154:[function(require,module,exports){
+},{"191":191}],157:[function(require,module,exports){
+var baseProperty = require(135);
+
+/**
+ * Gets the "length" property value of `object`.
+ *
+ * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
+ * that affects Safari on at least iOS 8.1-8.3 ARM64.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {*} Returns the "length" value.
+ */
+var getLength = baseProperty('length');
+
+module.exports = getLength;
+
+},{"135":135}],158:[function(require,module,exports){
+var constant = require(198),
+    isNative = require(179),
+    toObject = require(174);
+
+/** Native method references. */
+var getOwnPropertySymbols = isNative(getOwnPropertySymbols = Object.getOwnPropertySymbols) && getOwnPropertySymbols;
+
+/**
+ * Creates an array of the own symbols of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of symbols.
+ */
+var getSymbols = !getOwnPropertySymbols ? constant([]) : function(object) {
+  return getOwnPropertySymbols(toObject(object));
+};
+
+module.exports = getSymbols;
+
+},{"174":174,"179":179,"198":198}],159:[function(require,module,exports){
 /**
  * Gets the index at which the first occurrence of `NaN` is found in `array`.
  *
@@ -8315,7 +8923,7 @@ function indexOfNaN(array, fromIndex, fromRight) {
 
 module.exports = indexOfNaN;
 
-},{}],155:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -8343,8 +8951,8 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],156:[function(require,module,exports){
-var bufferClone = require(140);
+},{}],161:[function(require,module,exports){
+var bufferClone = require(143);
 
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
@@ -8372,7 +8980,6 @@ var reFlags = /\w*$/;
  *
  * **Note:** This function only supports cloning values with tags of
  * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
- *
  *
  * @private
  * @param {Object} object The object to clone.
@@ -8409,7 +9016,7 @@ function initCloneByTag(object, tag, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"140":140}],157:[function(require,module,exports){
+},{"143":143}],162:[function(require,module,exports){
 /**
  * Initializes an object clone.
  *
@@ -8427,7 +9034,52 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{}],158:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
+var baseGet = require(126),
+    baseSlice = require(137),
+    isKey = require(167),
+    last = require(90),
+    toPath = require(175);
+
+/**
+ * Invokes the method at `path` on `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path of the method to invoke.
+ * @param {Array} args The arguments to invoke the method with.
+ * @returns {*} Returns the result of the invoked method.
+ */
+function invokePath(object, path, args) {
+  if (object != null && !isKey(path, object)) {
+    path = toPath(path);
+    object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+    path = last(path);
+  }
+  var func = object == null ? object : object[path];
+  return func == null ? undefined : func.apply(object, args);
+}
+
+module.exports = invokePath;
+
+},{"126":126,"137":137,"167":167,"175":175,"90":90}],164:[function(require,module,exports){
+var getLength = require(157),
+    isLength = require(168);
+
+/**
+ * Checks if `value` is array-like.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+ */
+function isArrayLike(value) {
+  return value != null && isLength(getLength(value));
+}
+
+module.exports = isArrayLike;
+
+},{"157":157,"168":168}],165:[function(require,module,exports){
 /**
  * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
  * of an array-like value.
@@ -8450,10 +9102,10 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],159:[function(require,module,exports){
-var isIndex = require(158),
-    isLength = require(160),
-    isObject = require(172);
+},{}],166:[function(require,module,exports){
+var isArrayLike = require(164),
+    isIndex = require(165),
+    isObject = require(181);
 
 /**
  * Checks if the provided arguments are from an iteratee call.
@@ -8469,13 +9121,9 @@ function isIterateeCall(value, index, object) {
     return false;
   }
   var type = typeof index;
-  if (type == 'number') {
-    var length = object.length,
-        prereq = isLength(length) && isIndex(index, length);
-  } else {
-    prereq = type == 'string' && index in object;
-  }
-  if (prereq) {
+  if (type == 'number'
+      ? (isArrayLike(object) && isIndex(index, object.length))
+      : (type == 'string' && index in object)) {
     var other = object[index];
     return value === value ? (value === other) : (other !== other);
   }
@@ -8484,7 +9132,37 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"158":158,"160":160,"172":172}],160:[function(require,module,exports){
+},{"164":164,"165":165,"181":181}],167:[function(require,module,exports){
+var isArray = require(177),
+    toObject = require(174);
+
+/** Used to match property names within property paths. */
+var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\n\\]|\\.)*?\1)\]/,
+    reIsPlainProp = /^\w*$/;
+
+/**
+ * Checks if `value` is a property name and not a property path.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {Object} [object] The object to query keys on.
+ * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
+ */
+function isKey(value, object) {
+  var type = typeof value;
+  if ((type == 'string' && reIsPlainProp.test(value)) || type == 'number') {
+    return true;
+  }
+  if (isArray(value)) {
+    return false;
+  }
+  var result = !reIsDeepProp.test(value);
+  return result || (object != null && value in toObject(object));
+}
+
+module.exports = isKey;
+
+},{"174":174,"177":177}],168:[function(require,module,exports){
 /**
  * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
  * of an array-like value.
@@ -8506,7 +9184,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],161:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 /**
  * Checks if `value` is object-like.
  *
@@ -8520,8 +9198,8 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],162:[function(require,module,exports){
-var isObject = require(172);
+},{}],170:[function(require,module,exports){
+var isObject = require(181);
 
 /**
  * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
@@ -8532,17 +9210,17 @@ var isObject = require(172);
  *  equality comparisons, else `false`.
  */
 function isStrictComparable(value) {
-  return value === value && (value === 0 ? ((1 / value) > 0) : !isObject(value));
+  return value === value && !isObject(value);
 }
 
 module.exports = isStrictComparable;
 
-},{"172":172}],163:[function(require,module,exports){
-var toObject = require(166);
+},{"181":181}],171:[function(require,module,exports){
+var toObject = require(174);
 
 /**
- * A specialized version of `_.pick` that picks `object` properties specified
- * by the `props` array.
+ * A specialized version of `_.pick` which picks `object` properties specified
+ * by `props`.
  *
  * @private
  * @param {Object} object The source object.
@@ -8567,11 +9245,11 @@ function pickByArray(object, props) {
 
 module.exports = pickByArray;
 
-},{"166":166}],164:[function(require,module,exports){
-var baseForIn = require(122);
+},{"174":174}],172:[function(require,module,exports){
+var baseForIn = require(123);
 
 /**
- * A specialized version of `_.pick` that picks `object` properties `predicate`
+ * A specialized version of `_.pick` which picks `object` properties `predicate`
  * returns truthy for.
  *
  * @private
@@ -8591,13 +9269,13 @@ function pickByCallback(object, predicate) {
 
 module.exports = pickByCallback;
 
-},{"122":122}],165:[function(require,module,exports){
-var isArguments = require(167),
-    isArray = require(168),
-    isIndex = require(158),
-    isLength = require(160),
-    keysIn = require(183),
-    support = require(188);
+},{"123":123}],173:[function(require,module,exports){
+var isArguments = require(176),
+    isArray = require(177),
+    isIndex = require(165),
+    isLength = require(168),
+    keysIn = require(192),
+    support = require(197);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -8610,7 +9288,7 @@ var hasOwnProperty = objectProto.hasOwnProperty;
  * own enumerable property names of `object`.
  *
  * @private
- * @param {Object} object The object to inspect.
+ * @param {Object} object The object to query.
  * @returns {Array} Returns the array of property names.
  */
 function shimKeys(object) {
@@ -8635,8 +9313,8 @@ function shimKeys(object) {
 
 module.exports = shimKeys;
 
-},{"158":158,"160":160,"167":167,"168":168,"183":183,"188":188}],166:[function(require,module,exports){
-var isObject = require(172);
+},{"165":165,"168":168,"176":176,"177":177,"192":192,"197":197}],174:[function(require,module,exports){
+var isObject = require(181);
 
 /**
  * Converts `value` to an object if it is not one.
@@ -8651,9 +9329,39 @@ function toObject(value) {
 
 module.exports = toObject;
 
-},{"172":172}],167:[function(require,module,exports){
-var isLength = require(160),
-    isObjectLike = require(161);
+},{"181":181}],175:[function(require,module,exports){
+var baseToString = require(139),
+    isArray = require(177);
+
+/** Used to match property names within property paths. */
+var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\n\\]|\\.)*?)\2)\]/g;
+
+/** Used to match backslashes in property paths. */
+var reEscapeChar = /\\(\\)?/g;
+
+/**
+ * Converts `value` to property path array if it is not one.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {Array} Returns the property path array.
+ */
+function toPath(value) {
+  if (isArray(value)) {
+    return value;
+  }
+  var result = [];
+  baseToString(value).replace(rePropName, function(match, number, quote, string) {
+    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+  });
+  return result;
+}
+
+module.exports = toPath;
+
+},{"139":139,"177":177}],176:[function(require,module,exports){
+var isArrayLike = require(164),
+    isObjectLike = require(169);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]';
@@ -8684,16 +9392,15 @@ var objToString = objectProto.toString;
  * // => false
  */
 function isArguments(value) {
-  var length = isObjectLike(value) ? value.length : undefined;
-  return isLength(length) && objToString.call(value) == argsTag;
+  return isObjectLike(value) && isArrayLike(value) && objToString.call(value) == argsTag;
 }
 
 module.exports = isArguments;
 
-},{"160":160,"161":161}],168:[function(require,module,exports){
-var isLength = require(160),
-    isNative = require(170),
-    isObjectLike = require(161);
+},{"164":164,"169":169}],177:[function(require,module,exports){
+var isLength = require(168),
+    isNative = require(179),
+    isObjectLike = require(169);
 
 /** `Object#toString` result references. */
 var arrayTag = '[object Array]';
@@ -8732,10 +9439,10 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"160":160,"161":161,"170":170}],169:[function(require,module,exports){
+},{"168":168,"169":169,"179":179}],178:[function(require,module,exports){
 (function (global){
-var baseIsFunction = require(128),
-    isNative = require(170);
+var baseIsFunction = require(130),
+    isNative = require(179);
 
 /** `Object#toString` result references. */
 var funcTag = '[object Function]';
@@ -8778,15 +9485,15 @@ var isFunction = !(baseIsFunction(/x/) || (Uint8Array && !baseIsFunction(Uint8Ar
 module.exports = isFunction;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"128":128,"170":170}],170:[function(require,module,exports){
-var escapeRegExp = require(187),
-    isObjectLike = require(161);
+},{"130":130,"179":179}],179:[function(require,module,exports){
+var escapeRegExp = require(196),
+    isObjectLike = require(169);
 
 /** `Object#toString` result references. */
 var funcTag = '[object Function]';
 
 /** Used to detect host constructors (Safari > 5). */
-var reHostCtor = /^\[object .+?Constructor\]$/;
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -8801,7 +9508,7 @@ var fnToString = Function.prototype.toString;
 var objToString = objectProto.toString;
 
 /** Used to detect if a method is native. */
-var reNative = RegExp('^' +
+var reIsNative = RegExp('^' +
   escapeRegExp(objToString)
   .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
 );
@@ -8827,14 +9534,14 @@ function isNative(value) {
     return false;
   }
   if (objToString.call(value) == funcTag) {
-    return reNative.test(fnToString.call(value));
+    return reIsNative.test(fnToString.call(value));
   }
-  return isObjectLike(value) && reHostCtor.test(value);
+  return isObjectLike(value) && reIsHostCtor.test(value);
 }
 
 module.exports = isNative;
 
-},{"161":161,"187":187}],171:[function(require,module,exports){
+},{"169":169,"196":196}],180:[function(require,module,exports){
 /**
  * Checks if `value` is `null`.
  *
@@ -8857,7 +9564,7 @@ function isNull(value) {
 
 module.exports = isNull;
 
-},{}],172:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 /**
  * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
  * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
@@ -8887,8 +9594,8 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],173:[function(require,module,exports){
-var isObjectLike = require(161);
+},{}],182:[function(require,module,exports){
+var isObjectLike = require(169);
 
 /** `Object#toString` result references. */
 var stringTag = '[object String]';
@@ -8924,9 +9631,9 @@ function isString(value) {
 
 module.exports = isString;
 
-},{"161":161}],174:[function(require,module,exports){
-var isLength = require(160),
-    isObjectLike = require(161);
+},{"169":169}],183:[function(require,module,exports){
+var isLength = require(168),
+    isObjectLike = require(169);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -9000,7 +9707,7 @@ function isTypedArray(value) {
 
 module.exports = isTypedArray;
 
-},{"160":160,"161":161}],175:[function(require,module,exports){
+},{"168":168,"169":169}],184:[function(require,module,exports){
 /**
  * Checks if `value` is `undefined`.
  *
@@ -9018,15 +9725,16 @@ module.exports = isTypedArray;
  * // => false
  */
 function isUndefined(value) {
-  return typeof value == 'undefined';
+  return value === undefined;
 }
 
 module.exports = isUndefined;
 
-},{}],176:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 var arrayCopy = require(104),
-    isLength = require(160),
-    values = require(186);
+    getLength = require(157),
+    isLength = require(168),
+    values = require(195);
 
 /**
  * Converts `value` to an array.
@@ -9044,7 +9752,7 @@ var arrayCopy = require(104),
  * // => [2, 3]
  */
 function toArray(value) {
-  var length = value ? value.length : 0;
+  var length = value ? getLength(value) : 0;
   if (!isLength(length)) {
     return values(value);
   }
@@ -9056,9 +9764,10 @@ function toArray(value) {
 
 module.exports = toArray;
 
-},{"104":104,"160":160,"186":186}],177:[function(require,module,exports){
-var baseAssign = require(110),
-    createAssigner = require(144);
+},{"104":104,"157":157,"168":168,"195":195}],186:[function(require,module,exports){
+var assignWith = require(110),
+    baseAssign = require(111),
+    createAssigner = require(147);
 
 /**
  * Assigns own enumerable properties of source object(s) to the destination
@@ -9067,13 +9776,16 @@ var baseAssign = require(110),
  * The `customizer` is bound to `thisArg` and invoked with five arguments:
  * (objectValue, sourceValue, key, object, source).
  *
+ * **Note:** This method mutates `object` and is based on
+ * [`Object.assign`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.assign).
+ *
  * @static
  * @memberOf _
  * @alias extend
  * @category Object
  * @param {Object} object The destination object.
  * @param {...Object} [sources] The source objects.
- * @param {Function} [customizer] The function to customize assigning values.
+ * @param {Function} [customizer] The function to customize assigned values.
  * @param {*} [thisArg] The `this` binding of `customizer`.
  * @returns {Object} Returns `object`.
  * @example
@@ -9083,18 +9795,22 @@ var baseAssign = require(110),
  *
  * // using a customizer callback
  * var defaults = _.partialRight(_.assign, function(value, other) {
- *   return typeof value == 'undefined' ? other : value;
+ *   return _.isUndefined(value) ? other : value;
  * });
  *
  * defaults({ 'user': 'barney' }, { 'age': 36 }, { 'user': 'fred' });
  * // => { 'user': 'barney', 'age': 36 }
  */
-var assign = createAssigner(baseAssign);
+var assign = createAssigner(function(object, source, customizer) {
+  return customizer
+    ? assignWith(object, source, customizer)
+    : baseAssign(object, source);
+});
 
 module.exports = assign;
 
-},{"110":110,"144":144}],178:[function(require,module,exports){
-var assign = require(177),
+},{"110":110,"111":111,"147":147}],187:[function(require,module,exports){
+var assign = require(186),
     assignDefaults = require(109),
     restParam = require(102);
 
@@ -9102,6 +9818,8 @@ var assign = require(177),
  * Assigns own enumerable properties of source object(s) to the destination
  * object for all destination properties that resolve to `undefined`. Once a
  * property is set, additional values of the same property are ignored.
+ *
+ * **Note:** This method mutates `object`.
  *
  * @static
  * @memberOf _
@@ -9125,9 +9843,9 @@ var defaults = restParam(function(args) {
 
 module.exports = defaults;
 
-},{"102":102,"109":109,"177":177}],179:[function(require,module,exports){
-var baseForOwn = require(123),
-    createFindKey = require(149);
+},{"102":102,"109":109,"186":186}],188:[function(require,module,exports){
+var baseForOwn = require(124),
+    createFindKey = require(152);
 
 /**
  * This method is like `_.find` except that it returns the key of the first
@@ -9181,9 +9899,9 @@ var findKey = createFindKey(baseForOwn);
 
 module.exports = findKey;
 
-},{"123":123,"149":149}],180:[function(require,module,exports){
-var baseFunctions = require(124),
-    keysIn = require(183);
+},{"124":124,"152":152}],189:[function(require,module,exports){
+var baseFunctions = require(125),
+    keysIn = require(192);
 
 /**
  * Creates an array of function property names from all enumerable properties,
@@ -9206,7 +9924,13 @@ function functions(object) {
 
 module.exports = functions;
 
-},{"124":124,"183":183}],181:[function(require,module,exports){
+},{"125":125,"192":192}],190:[function(require,module,exports){
+var baseGet = require(126),
+    baseSlice = require(137),
+    isKey = require(167),
+    last = require(90),
+    toPath = require(175);
+
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -9214,33 +9938,48 @@ var objectProto = Object.prototype;
 var hasOwnProperty = objectProto.hasOwnProperty;
 
 /**
- * Checks if `key` exists as a direct property of `object` instead of an
- * inherited property.
+ * Checks if `path` is a direct property.
  *
  * @static
  * @memberOf _
  * @category Object
- * @param {Object} object The object to inspect.
- * @param {string} key The key to check.
- * @returns {boolean} Returns `true` if `key` is a direct property, else `false`.
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path to check.
+ * @returns {boolean} Returns `true` if `path` is a direct property, else `false`.
  * @example
  *
- * var object = { 'a': 1, 'b': 2, 'c': 3 };
+ * var object = { 'a': { 'b': { 'c': 3 } } };
  *
- * _.has(object, 'b');
+ * _.has(object, 'a');
+ * // => true
+ *
+ * _.has(object, 'a.b.c');
+ * // => true
+ *
+ * _.has(object, ['a', 'b', 'c']);
  * // => true
  */
-function has(object, key) {
-  return object ? hasOwnProperty.call(object, key) : false;
+function has(object, path) {
+  if (object == null) {
+    return false;
+  }
+  var result = hasOwnProperty.call(object, path);
+  if (!result && !isKey(path)) {
+    path = toPath(path);
+    object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+    path = last(path);
+    result = object != null && hasOwnProperty.call(object, path);
+  }
+  return result;
 }
 
 module.exports = has;
 
-},{}],182:[function(require,module,exports){
-var isLength = require(160),
-    isNative = require(170),
-    isObject = require(172),
-    shimKeys = require(165);
+},{"126":126,"137":137,"167":167,"175":175,"90":90}],191:[function(require,module,exports){
+var isArrayLike = require(164),
+    isNative = require(179),
+    isObject = require(181),
+    shimKeys = require(173);
 
 /* Native method references for those with the same name as other `lodash` methods. */
 var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
@@ -9255,7 +9994,7 @@ var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
  * @static
  * @memberOf _
  * @category Object
- * @param {Object} object The object to inspect.
+ * @param {Object} object The object to query.
  * @returns {Array} Returns the array of property names.
  * @example
  *
@@ -9273,12 +10012,9 @@ var nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys;
  * // => ['0', '1']
  */
 var keys = !nativeKeys ? shimKeys : function(object) {
-  if (object) {
-    var Ctor = object.constructor,
-        length = object.length;
-  }
+  var Ctor = object != null && object.constructor;
   if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
-      (typeof object != 'function' && (length && isLength(length)))) {
+      (typeof object != 'function' && isArrayLike(object))) {
     return shimKeys(object);
   }
   return isObject(object) ? nativeKeys(object) : [];
@@ -9286,13 +10022,13 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"160":160,"165":165,"170":170,"172":172}],183:[function(require,module,exports){
-var isArguments = require(167),
-    isArray = require(168),
-    isIndex = require(158),
-    isLength = require(160),
-    isObject = require(172),
-    support = require(188);
+},{"164":164,"173":173,"179":179,"181":181}],192:[function(require,module,exports){
+var isArguments = require(176),
+    isArray = require(177),
+    isIndex = require(165),
+    isLength = require(168),
+    isObject = require(181),
+    support = require(197);
 
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -9308,7 +10044,7 @@ var hasOwnProperty = objectProto.hasOwnProperty;
  * @static
  * @memberOf _
  * @category Object
- * @param {Object} object The object to inspect.
+ * @param {Object} object The object to query.
  * @returns {Array} Returns the array of property names.
  * @example
  *
@@ -9353,24 +10089,19 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"158":158,"160":160,"167":167,"168":168,"172":172,"188":188}],184:[function(require,module,exports){
+},{"165":165,"168":168,"176":176,"177":177,"181":181,"197":197}],193:[function(require,module,exports){
 var arrayMap = require(107),
-    baseDifference = require(115),
-    baseFlatten = require(120),
-    bindCallback = require(139),
-    keysIn = require(183),
-    pickByArray = require(163),
-    pickByCallback = require(164),
+    baseDifference = require(116),
+    baseFlatten = require(121),
+    bindCallback = require(142),
+    keysIn = require(192),
+    pickByArray = require(171),
+    pickByCallback = require(172),
     restParam = require(102);
 
 /**
  * The opposite of `_.pick`; this method creates an object composed of the
  * own and inherited enumerable properties of `object` that are not omitted.
- * Property names may be specified as individual arguments or as arrays of
- * property names. If `predicate` is provided it is invoked for each property
- * of `object` omitting the properties `predicate` returns truthy for. The
- * predicate is bound to `thisArg` and invoked with three arguments:
- * (value, key, object).
  *
  * @static
  * @memberOf _
@@ -9407,11 +10138,11 @@ var omit = restParam(function(object, props) {
 
 module.exports = omit;
 
-},{"102":102,"107":107,"115":115,"120":120,"139":139,"163":163,"164":164,"183":183}],185:[function(require,module,exports){
-var baseFlatten = require(120),
-    bindCallback = require(139),
-    pickByArray = require(163),
-    pickByCallback = require(164),
+},{"102":102,"107":107,"116":116,"121":121,"142":142,"171":171,"172":172,"192":192}],194:[function(require,module,exports){
+var baseFlatten = require(121),
+    bindCallback = require(142),
+    pickByArray = require(171),
+    pickByCallback = require(172),
     restParam = require(102);
 
 /**
@@ -9451,9 +10182,9 @@ var pick = restParam(function(object, props) {
 
 module.exports = pick;
 
-},{"102":102,"120":120,"139":139,"163":163,"164":164}],186:[function(require,module,exports){
-var baseValues = require(138),
-    keys = require(182);
+},{"102":102,"121":121,"142":142,"171":171,"172":172}],195:[function(require,module,exports){
+var baseValues = require(141),
+    keys = require(191);
 
 /**
  * Creates an array of the own enumerable property values of `object`.
@@ -9486,8 +10217,8 @@ function values(object) {
 
 module.exports = values;
 
-},{"138":138,"182":182}],187:[function(require,module,exports){
-var baseToString = require(136);
+},{"141":141,"191":191}],196:[function(require,module,exports){
+var baseToString = require(139);
 
 /**
  * Used to match `RegExp` [special characters](http://www.regular-expressions.info/characters.html#special).
@@ -9520,7 +10251,7 @@ function escapeRegExp(string) {
 
 module.exports = escapeRegExp;
 
-},{"136":136}],188:[function(require,module,exports){
+},{"139":139}],197:[function(require,module,exports){
 (function (global){
 /** Used for native method references. */
 var objectProto = Object.prototype;
@@ -9541,6 +10272,13 @@ var propertyIsEnumerable = objectProto.propertyIsEnumerable;
 var support = {};
 
 (function(x) {
+  var Ctor = function() { this.x = x; },
+      args = arguments,
+      object = { '0': x, 'length': x },
+      props = [];
+
+  Ctor.prototype = { 'valueOf': x, 'y': x };
+  for (var key in new Ctor) { props.push(key); }
 
   /**
    * Detect if functions can be decompiled by `Function#toString`
@@ -9578,23 +10316,23 @@ var support = {};
    * In Firefox < 4, IE < 9, PhantomJS, and Safari < 5.1 `arguments` object
    * indexes are non-enumerable. Chrome < 25 and Node.js < 0.11.0 treat
    * `arguments` object indexes as non-enumerable and fail `hasOwnProperty`
-   * checks for indexes that exceed their function's formal parameters with
-   * associated values of `0`.
+   * checks for indexes that exceed the number of function parameters and
+   * whose associated argument values are `0`.
    *
    * @memberOf _.support
    * @type boolean
    */
   try {
-    support.nonEnumArgs = !propertyIsEnumerable.call(arguments, 1);
+    support.nonEnumArgs = !propertyIsEnumerable.call(args, 1);
   } catch(e) {
     support.nonEnumArgs = true;
   }
-}(0, 0));
+}(1, 0));
 
 module.exports = support;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],189:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 /**
  * Creates a function that returns `value`.
  *
@@ -9619,7 +10357,7 @@ function constant(value) {
 
 module.exports = constant;
 
-},{}],190:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 /**
  * This method returns the first argument provided to it.
  *
@@ -9641,9 +10379,9 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],191:[function(require,module,exports){
-var baseClone = require(112),
-    baseMatches = require(131);
+},{}],200:[function(require,module,exports){
+var baseClone = require(113),
+    baseMatches = require(133);
 
 /**
  * Creates a function which performs a deep comparison between a given object
@@ -9676,7 +10414,7 @@ function matches(source) {
 
 module.exports = matches;
 
-},{"112":112,"131":131}],192:[function(require,module,exports){
+},{"113":113,"133":133}],201:[function(require,module,exports){
 /**
  * A no-operation function which returns `undefined` regardless of the
  * arguments it receives.
@@ -9697,7 +10435,40 @@ function noop() {
 
 module.exports = noop;
 
-},{}],193:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
+var baseProperty = require(135),
+    basePropertyDeep = require(136),
+    isKey = require(167);
+
+/**
+ * Creates a function which returns the property value at `path` on a
+ * given object.
+ *
+ * @static
+ * @memberOf _
+ * @category Utility
+ * @param {Array|string} path The path of the property to get.
+ * @returns {Function} Returns the new function.
+ * @example
+ *
+ * var objects = [
+ *   { 'a': { 'b': { 'c': 2 } } },
+ *   { 'a': { 'b': { 'c': 1 } } }
+ * ];
+ *
+ * _.map(objects, _.property('a.b.c'));
+ * // => [2, 1]
+ *
+ * _.pluck(_.sortBy(objects, _.property(['a', 'b', 'c'])), 'a.b.c');
+ * // => [1, 2]
+ */
+function property(path) {
+  return isKey(path) ? baseProperty(path) : basePropertyDeep(path);
+}
+
+module.exports = property;
+
+},{"135":135,"136":136,"167":167}],203:[function(require,module,exports){
 /*!
  * EventEmitter v4.2.11 - git.io/ee
  * Unlicense - http://unlicense.org/
@@ -10172,13 +10943,13 @@ module.exports = noop;
 }.call(this));
 
 },{}],"/marty.js":[function(require,module,exports){
-"use strict";
+'use strict';
 
 require(4);
 require(2).polyfill();
 
 var Marty = require(25).Marty;
-var marty = new Marty("0.10.0-alpha", react());
+var marty = new Marty('0.10.0-alpha', react());
 
 marty.use(require(23));
 marty.use(require(10));
@@ -10201,9 +10972,9 @@ module.exports = marty;
 // we need to try resolving react from the parent if its not present locally
 function react() {
   try {
-    return require("react");
+    return require('react');
   } catch (e) {
-    return module.parent.require("react");
+    return module.parent.require('react');
   }
 }
 

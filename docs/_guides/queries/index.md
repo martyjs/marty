@@ -14,15 +14,18 @@ var UserQueries = Marty.createQueries({
   id: 'UserQueries',
   getUser: function (id) {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, id);
-    UserAPI.getUser(id).then(function (res) {
-      if (res.status === 200) {
-        this.dispatch(UserConstants.RECEIVE_USER, res.body, id);
-      } else {
-        this.dispatch(UserConstants.RECEIVE_USER_FAILED, id);
-      }
-    }.bind(this)).catch(function (err) {
-      this.dispatch(UserConstants.RECEIVE_USER_FAILED, id, err);
-    }.bind(this))
+    UserAPI.getUser(id).then(
+      function (res) {
+        if (res.status === 200) {
+          this.dispatch(UserConstants.RECEIVE_USER, res.body, id);
+        } else {
+          this.dispatch(UserConstants.RECEIVE_USER_FAILED, id);
+        }
+      }.bind(this),
+      function (err) {
+        this.dispatch(UserConstants.RECEIVE_USER_FAILED, id, err);
+      }.bind(this)
+    );
   }
 });
 
@@ -31,13 +34,16 @@ es6
 class UserQueries extends Marty.Queries {
   getUser(id) {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, id);
-    UserAPI.getUser(id).then((res) => {
-      if (res.status === 200) {
-        this.dispatch(UserConstants.RECEIVE_USER, res.body, id);
-      } else {
-        this.dispatch(UserConstants.RECEIVE_USER_FAILED, id);
-      }
-    }).catch((err) => this.dispatch(UserConstants.RECEIVE_USER_FAILED, id, err));
+    UserAPI.getUser(id).then(
+      res => {
+        if (res.status === 200) {
+          this.dispatch(UserConstants.RECEIVE_USER, res.body, id);
+        } else {
+          this.dispatch(UserConstants.RECEIVE_USER_FAILED, id);
+        }
+      },
+      err => this.dispatch(UserConstants.RECEIVE_USER_FAILED, id, err)
+    );
   }
 }
 
