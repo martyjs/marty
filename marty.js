@@ -1,7 +1,7 @@
 require('isomorphic-fetch');
 require('es6-promise').polyfill();
 
-var Marty = require('marty-lib/modules/core/marty').Marty;
+var Marty = require('marty-lib/modules/core/marty');
 var marty = new Marty('0.10.0-alpha', react());
 
 marty.use(require('marty-lib/modules/core'));
