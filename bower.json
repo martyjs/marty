@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "main": "dist/browser/marty.js",
+  "main": "dist/marty.js",
   "homepage": "martyjs.org",
   "authors": [
     "jhollingworth <jamiehollingworth@gmail.com>"
