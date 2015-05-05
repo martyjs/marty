@@ -11,7 +11,6 @@ Provides a simple way of storing JSON objects in local or session storage.
 classic
 =======
 var UserStorage = Marty.createStateSource({
-  id: 'UserStorage',
   namespace: 'users',
   type: 'jsonStorage',
   createUser: function (user) {

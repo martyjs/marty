@@ -11,7 +11,6 @@ Provides a simple way of accessing your cookies. Useful when creating [isomorphi
 classic
 =======
 var UserCookies = Marty.createStateSource({
-  id: 'UserCookies',
   type: 'cookie',
   login: function (user) {
     this.set(user.id, true)

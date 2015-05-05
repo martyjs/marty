@@ -43,7 +43,7 @@ var UserStore = Marty.createStore({
                 return this.state[id];
             },
             remotely() {
-                return UserQueries.getUser(id);
+                return this.app.userQueries.getUser(id);
             }
         });
     }
@@ -57,10 +57,10 @@ var User = React.createClass({
 });
 
 module.exports = Marty.createContainer(User, {
-    listenTo: UserStore,
+    listenTo: 'userStore',
     fetch: {
         user() {
-            return UserStore.getUser(this.props.id)
+            return this.app.userStore.getUser(this.props.id)
         }
     },
     failed(errors) {
@@ -69,13 +69,12 @@ module.exports = Marty.createContainer(User, {
 })
 
 // renderToString.js
-Marty.renderToString({
-    type: User,
-    props: { id: 123 },
-    context: Marty.createContext()
-}).then(function (render) {
-    res.send(render.html).end();
-});
+
+var User = app.bindTo(require('./components/user'));
+
+app.renderToString(<User id={123} />)
+   .then(render => res.send(render.html).end());
+
 {% endhighlight %}
 
 Rendering the HTML is only half the battle, we need a way of synchronizing the state of the stores between the server and browser. To solve this, Marty introduces the concept of dehydrating and rehydrating your application. When you call [``Marty.dehydrate()``]({% url /api/top-level-api/#dehydrate %}), it will iterate through all the stores, serializing their state to a JSON object (Use [``Store#dehyrdate``]({% url /api/stores/index.html#dehydrate %}) to control how a store is dehydrated). [``Marty.renderToString``]({% url /api/top-level-api/index.html#renderToString %}) automatically does this for you, adding the dehydrated state to the window object (``window.__marty``). When the application loads in the browser you should call [``Marty.rehydrate()``]({% url /api/top-level-api/#rehydrate %}) which will use the dehydrated state to return the stores to its state on the server (Use [``Store#rehydrate``]({% url /api/stores/index.html#rehydrate %}) to control how a store is rehydrated).
@@ -122,7 +121,7 @@ This tends to get a little verbose so all stores, action creators, queries and s
 {% highlight js %}
 var User = React.createClass({
     render() {
-        var user = UserStore.for(this).getUser(123);
+        var user = this.app.userStore.getUser(123);
         ...
     }
 });
@@ -139,7 +138,7 @@ var UserStore = Marty.createStore({
                 return this.state[id];
             },
             remotely() {
-                return UserQueries.for(this).getUser(id);
+                return this.app.userQueries.getUser(id);
             }
         });
     }

@@ -11,10 +11,9 @@ Queries are responsible for coordinating getting new state from outside of the a
 classic
 =======
 var UserQueries = Marty.createQueries({
-  id: 'UserQueries',
   getUser: function (id) {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, id);
-    UserAPI.getUser(id).then(
+    this.app.userAPI.getUser(id).then(
       function (res) {
         if (res.status === 200) {
           this.dispatch(UserConstants.RECEIVE_USER, res.body, id);
@@ -34,7 +33,7 @@ es6
 class UserQueries extends Marty.Queries {
   getUser(id) {
     this.dispatch(UserConstants.RECEIVE_USER_STARTING, id);
-    UserAPI.getUser(id).then(
+    this.app.userAPI.getUser(id).then(
       res => {
         if (res.status === 200) {
           this.dispatch(UserConstants.RECEIVE_USER, res.body, id);
@@ -52,5 +51,5 @@ export default Marty.register(UserQueries);
 
 ##Why have Queries at all?
 
-One practical reason for queries is that you get a circular dependency if your store tries to call an action creator from inside itself. Splitting reads from writes was an easy way of resolving this situation. You could just as easily use action creators, but we've found having separate types for them makes the codebase easier to navigate and understand.
+One practical reason for queries is that you get a circular dependency if your store tries to call an action creator from inside itself. Splitting reads from writes was an easy way of resolving this situation. You could just as easily use action creators, but we've found having separate types for them makes the code base easier to navigate and understand.
 

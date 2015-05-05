@@ -1,5 +1,6 @@
 - Getting Started
 - Flux
+- Application
 - Stores
 - Fetching state
 - Action Creators
@@ -8,9 +9,7 @@
 - State Mixin
 - State Sources
 - Isomorphism
-- ES6
 - Developer Tools
 - Constants
-- Dispatcher
 - Upgrading
 - Further reading

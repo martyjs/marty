@@ -11,7 +11,6 @@ Provides a simple way of storing state in session storage.
 classic
 =======
 var FooStorage = Marty.createStateSource({
-  id: 'FooStorage',
   namespace: 'foos',
   type: 'sessionStorage',
   saveFoo: function (foo) {

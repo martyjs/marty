@@ -12,19 +12,25 @@ class User extends React.Component {
 }
 
 module.exports = Marty.createContainer(User, {
-  listenTo: UserStore,
+  listenTo: 'userStore',
   fetch: {
     user() {
-      return UserStore.for(this).getUser(this.props.id);
+      return this.app.userStore.getUser(this.props.id);
+    },
+    friends() {
+      return this.app.userStore.getFriends(this.props.id);
     }
   },
   failed(errors) {
     return <div className="User User-failedToLoad">{errors}</div>;
   },
-  pending() {
-    return this.done({
-      user: {}
+  pending(results) {
+    _.defaults(results, {
+      user: DEFAULT_USER,
+      friends: []
     });
+
+    return this.done(results);
   }
 });
 {% endhighlight %}
@@ -43,7 +49,7 @@ Must be either a [store]({% url /api/stores/index.html %}) or an array of [store
 module.exports = Marty.createContainer(User, {
   fetch() {
     return {
-      user: UserStore.for(this).getUser(this.props.id);
+      user: this.app.userStore.getUser(this.props.id);
     }
   }
 });
@@ -55,9 +61,11 @@ If any of the values within the object hash are [fetch results]({% url /api/stor
 
 Creates the inner components, passing through the result of the [fetch](#fetch) via props. Override if you want more control about how the inner component is created. You should ensure the component should have the ref ``innerComponent``.
 
-<h3 id="pending">pending()</h3>
+<h3 id="pending">pending(results)</h3>
 
 Invoked when any of the fetches are pending. Default is to return an empty ``div``.
+
+Any fetch results that have finished are passed in.
 
 <h3 id="failed">failed(errors)</h3>
 
@@ -67,7 +75,7 @@ Invoked when any of the fetches have failed. An object hash is passed in where t
 module.exports = Marty.createContainer(User, {
   fetch() {
     return {
-      user: UserStore.for(this).getUser(this.props.id);
+      user: this.app.userStore.getUser(this.props.id);
     }
   },
   failed(errors) {
@@ -79,3 +87,7 @@ module.exports = Marty.createContainer(User, {
 <h3 id="getInnerComponent">getInnerComponent()</h3>
 
 Returns the inner component.
+
+<h3 id="app">app</h3>
+
+Returns the instances application.

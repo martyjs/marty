@@ -11,7 +11,6 @@ Provides a simple way of storing state in local storage.
 classic
 =======
 var FooStorage = Marty.createStateSource({
-  id: 'FooStorage',
   namespace: 'foos',
   type: 'localStorage',
   saveFoo: function (foo) {

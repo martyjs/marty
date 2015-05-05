@@ -21,13 +21,15 @@ classic
 var UserConstants = Marty.createConstants(["UPDATE_USER_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
-  id: 'UserActionCreators',
   updateUserEmail: function (userId, email) {
     this.dispatch(UserConstants.UPDATE_USER_EMAIL, userId, email);
   }
 });
 
-UserActionCreators.updateUserEmail(122, "foo@bar.com");
+var app = new Marty.Application();
+
+app.register('userActionCreators', UserActionCreators);
+app.userActionCreators.updateUserEmail(122, "foo@bar.com");
 
 es6
 ===
@@ -39,9 +41,11 @@ class UserActionCreators extends Marty.ActionCreators {
   }
 }
 
-userActionCreators = Marty.register(UserActionCreators);
+var app = new Marty.Application();
 
-userActionCreators.updateUserEmail(122, "foo@bar.com");
+app.register('userActionCreators', UserActionCreators);
+app.userActionCreators.updateUserEmail(122, "foo@bar.com");
+
 {% endsample %}
 
 In the above scenario, ``UserConstants.UPDATE_USER_EMAIL`` creates an action creator which, when invoked, will create an action with type `UPDATE_USER_EMAIL`.
@@ -49,13 +53,13 @@ In the above scenario, ``UserConstants.UPDATE_USER_EMAIL`` creates an action cre
 If an action is making a change to your local state then it can pass its type data along to something called a dispatcher. The dispatcher is a just a big registry of callbacks (similar to an event emitter). Anyone interested can register to be notified when an action is dispatched.
 
 {% highlight js %}
-var Dispatcher = require('marty').dispatcher.getDefault();
+var app = new Marty.Application();
 
-Dispatcher.register(function (action) {
+app.dispatcher.register(function (action) {
   console.log('action with type', action.type, 'has been dispatched') ;
 });
 
-Dispatcher.dispatch({
+app.dispatcher.dispatchAction({
   type: 'foo'
 });
 {% endhighlight %}
@@ -66,7 +70,6 @@ Normally you don't manually register callbacks with the dispatcher, instead you 
 classic
 =======
 var UserStore = Marty.createStore({
-  id: 'UserStore',
   handlers: {
     updateEmail: UserConstants.UPDATE_USER_EMAIL
   },
@@ -100,8 +103,6 @@ class UserStore extends Marty.Store {
     this.hasChanged();
   }
 }
-
-export default Marty.register(UserStore);
 {% endsample %}
 
 When your application starts, each store automatically starts listening to the dispatcher. When an action is dispatched, each store checks its [``handlers`` hash]({% url /api/stores/index.html#handlers %}) to see if the store has a handler for the actions type. If it does it will call that handler, passing in the actions data. The action handler then updates its internal state (all stored in ``this.state``).
@@ -109,7 +110,7 @@ When your application starts, each store automatically starts listening to the d
 The next (and final) step is to notify views about the new data. Like the dispatcher, you can register to be notified of any changes to a store.
 
 {% highlight js %}
-UserStore.addChangeListener(function (state) {
+this.app.userStore.addChangeListener(function (state) {
   console.log('User store has changed', state);
 });
 {% endhighlight %}
@@ -120,6 +121,7 @@ If you have a view that's interested in a domain, it can ask the store to notify
 classic
 =======
 var User = React.createClass({
+  contextTypes: Marty.contextTypes,
   render: function () {
     return (
       <div className="user">
@@ -131,22 +133,30 @@ var User = React.createClass({
   },
   updateEmail: function (e) {
     var email = e.target.value;
-    UserActionCreators.updateUserEmail(this.props.userId, email);
+    var userActions = this.context.app.userActionCreators;
+
+    userActions.updateUserEmail(this.props.userId, email);
   }
   getInitialState: function () {
+    var userStore = this.context.app.userStore;
+
     return {
-      user: UserStore.getUser(this.props.userId)
+      user: userStore.getUser(this.props.userId)
     };
   },
   componentDidMount: function () {
-    this.userStoreListener = UserStore.addChangeListener(this.onUserStoreChanged);
+    var userStore = this.context.app.userStore;
+
+    this.userStoreListener = userStore.addChangeListener(this.onUserStoreChanged);
   },
   componentWillUnmount: function (nextProps) {
     this.userStoreListener.dispose();
   },
   onUserStoreChanged: function () {
+    var userStore = this.context.app.userStore;
+
     this.setState({
-      user: UserStore.getUser(this.props.userId)
+      user: userStore.getUser(this.props.userId)
     });
   }
 });
@@ -165,20 +175,28 @@ class User extends React.Component {
   }
   updateEmail(e) {
     var email = e.target.value;
-    userActionCreators.updateUserEmail(this.props.userId, email);
+    var userActions = this.context.app.userActionCreators;
+
+    userActions.updateUserEmail(this.props.userId, email);
   }
   getInitialState() {
+    var userStore = this.context.app.userStore;
+
     return {
       user: userStore.getUser(this.props.userId)
     };
   }
   componentDidMount() {
+    var userStore = this.context.app.userStore;
+
     this.userStoreListener = userStore.addChangeListener(this.onUserStoreChanged);
   }
   componentWillUnmount(nextProps) {
     this.userStoreListener.dispose();
   }
   onUserStoreChanged() {
+    var userStore = this.context.app.userStore;
+
     this.setState({
       user: userStore.getUser(this.props.userId)
     });
@@ -186,7 +204,7 @@ class User extends React.Component {
 }
 {% endsample %}
 
-As your application grows you start to find that there is a lot of boilerplate code to get views to listen to stores. [State mixins]({% url /guides/state-mixin/index.html %}) are our solution to this problem. State mixins manage listening to stores for you as well as providing a simpler API to implement:
+As your application grows you start to find that there is a lot of boilerplate code to get views to listen to stores. [Containers]({% url /guides/containers/index.html %}) are our solution to this problem. Containers manage listening to stores for you as well as providing a simpler API to implement:
 
 {% sample %}
 classic
@@ -203,15 +221,17 @@ var User = React.createClass({
   },
   updateEmail: function (e) {
     var email = e.target.value;
-    UserActionCreators.updateUserEmail(this.props.userId, email);
+    var userActions = this.context.app.userActionCreators;
+
+    userActions.updateUserEmail(this.props.userId, email);
   }
 });
 
 module.exports = Marty.createContainer(User, {
-  listenTo: UserStore,
+  listenTo: 'userStore',
   fetch: {
     user() {
-      return UserStore.getUser(this.props.userId)
+      return this.app.userStore.getUser(this.props.userId)
     }
   }
 });
@@ -229,15 +249,17 @@ class User extends React.Component {
   }
   updateEmail(e) {
     var email = e.target.value;
-    userActionCreators.updateUserEmail(this.props.userId, email);
+    var userActions = this.context.app.userActionCreators;
+
+    userActions.updateUserEmail(this.props.userId, email);
   }
 }
 
 module.exports = Marty.createContainer(User, {
-  listenTo: UserStore,
+  listenTo: 'userStore',
   fetch: {
     user() {
-      return userStore.getUser(this.props.userId)
+      return this.app.userStore.getUser(this.props.userId)
     }
   }
 });

@@ -45,8 +45,4 @@ collections:
   devtools:
     title: Developer Tools
     output: true
-<<<<<<< HEAD
 current_version: 0.10.0-alpha
-=======
-current_version: 0.9.11
->>>>>>> master

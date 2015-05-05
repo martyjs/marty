@@ -9,7 +9,6 @@ section: Stores
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UsersStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -40,21 +39,13 @@ class UsersStore extends Marty.Store {
 
 {% endsample %}
 
-<h2 id="id">id</h2>
-
-A unique identifier (*required*). Needed for and (de)hydration and by the [registry]({% url /api/registry/index.html %}) to uniquely identify the type.
-
 <h2 id="displayName">displayName</h2>
 
-An (optional) display name for the action creator. Used for richer debugging. We will use the Id if displayName hasn't been set. If you're using ES6 classes, displayName will automatically be the name of the class.
-
-<h2 id="for">for(obj)</h2>
-
-Resolves the instance of the object for the objects Marty context. The context can either be the object itself or available at ``obj.context`` or ``obj.context.marty``.
+An optional display name for the stores. Used for richer debugging.  If you're using ES6 classes, displayName will be the name of the class by default.
 
 <h2 id="handlers">handlers</h2>
 
-The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is an [action predicate](#action-predicates).
+The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is either a single constant or an array of constants.
 
 When invoked the handlers arguments are [the arguments passed to the dispatcher]({% url /api/action-creators/index.html#dispatch %}). The original action is available by calling <code>this.action</code>.
 
@@ -62,9 +53,9 @@ When invoked the handlers arguments are [the arguments passed to the dispatcher]
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UsersStore'
   handlers: {
-    addUser: Constants.RECEIVE_USER
+    addUser: [Constants.RECEIVE_USER, Constants.CREATE_USER],
+    removeUser: [Constants.REMOVE_USER]
   },
   getInitialState: function () {
     return {};
@@ -82,100 +73,13 @@ class UsersStore extends Marty.Store {
     super(options);
     this.state = {};
     this.handlers = {
-      addUser: Constants.RECEIVE_USER
+      addUser: [Constants.RECEIVE_USER, Constants.CREATE_USER],
+      removeUser: [Constants.REMOVE_USER]
     };
   }
   addUser: function (user) {
     console.log(this.action) // { type: 'RECEIVE_USER', arguments: [{ name: ...}] }
     ...
-  }
-}
-{% endsample %}
-
-<h3 id="action-predicates">Action predicates</h3>
-
-An action predicate can either be a single value or an array of either action types (i.e. a strong) or a <a href="http://underscorejs.org/#findWhere">where query</a>. Some examples of action predicates:
-
-{% sample %}
-classic
-=======
-var UsersStore = Marty.createStore({
-  id: 'UserStore',
-  handlers: {
-    foo: UserConstants.ADD_USER,
-    bar: [UserConstants.ADD_USER, 'UPDATE_USER']
-  },
-  // called when action.type == 'ADD_USER'
-  foo: function () { .. },
-
-  // called when action.type == 'ADD_USER' || action.type ==  'UPDATE_USER'
-  bar: function () { .. }
-});
-
-es6
-===
-class UsersStore extends Marty.Store {
-  constructor(options) {
-    super(options);
-    this.handlers = {
-      foo: UserConstants.ADD_USER,
-      bar: [UserConstants.ADD_USER, 'UPDATE_USER']
-    };
-  }
-  // called when action.type == 'ADD_USER'
-  foo() { .. },
-
-  // called when action.type == 'ADD_USER' || action.type ==  'UPDATE_USER'
-  bar() { .. }
-}
-{% endsample %}
-
-<h3 id="rollback">Rollback</h3>
-
-There are a number of cases where it would be useful to be able to rollback an action (e.g. if you've optimistically added an entity to your locally store but the associated request to the server failed).
-
-To provide a rollback to an action handler, simply return a function from the action handler. If an action is rolled back, the function you return will be called.
-
-{% sample %}
-classic
-=======
-var UsersStore = Marty.createStore({
-  id: 'UserStore',
-  handlers: {
-    addUser: Constants.RECEIVE_USER
-  },
-  getInitialState: function () {
-    return {};
-  },
-  addUser: function (user) {
-    this.state.push(user);
-    this.hasChanged();
-
-    return function rollback() {
-      this.state.splice(this.state.indexOf(user), 1);
-      this.hasChanged();
-    }
-  }
-});
-
-es6
-===
-class UsersStore extends Marty.Store {
-  constructor(options) {
-    super(options);
-    this.state = {};
-    this.handlers = {
-      addUser: Constants.RECEIVE_USER
-    };
-  },
-  addUser(user) {
-    this.state.push(user);
-    this.hasChanged();
-
-    return function rollback() {
-      this.state.splice(this.state.indexOf(user), 1);
-      this.hasChanged();
-    }
   }
 }
 {% endsample %}
@@ -186,6 +90,7 @@ class UsersStore extends Marty.Store {
 <code>getInitialState</code> (<i>required</i>) is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the [state](#state) property.
 
 <h3>ES6</h3>
+
 <code>getInitialState</code> is no longer necessary, instead you should set the state in the constructor.
 
 <h2 id="state">state</h2>
@@ -318,7 +223,7 @@ var UsersStore = Marty.createStore({
         return this.state[id];
       },
       remotely: function () {
-        return UserAPI.getUser(id);
+        return this.app.userQueries.getUser(id);
       }
     });
   }
@@ -346,7 +251,7 @@ class UsersStore extends Marty.Store {
         return this.state[id];
       },
       remotely() {
-        return UserAPI.getUser(id);
+        return this.app.userQueries.getUser(id);
       }
     });
   }
@@ -370,8 +275,8 @@ If you need to wait for multiple fetch results to be finished, you can use ``whe
 {% highlight js %}
 var when = require('marty/when');
 
-var foo = FooStore.getFoo(123);
-var bar = BarStore.getBar(456);
+var foo = app.fooStore.getFoo(123);
+var bar = app.barStore.getBar(456);
 
 when.all([foo, bar], {
   pending: function () {
@@ -445,7 +350,7 @@ var UsersStore = Marty.createStore({
         return this.state[id];
       },
       function () {
-        return UserQueries.getUser(id);
+        return this.app.userQueries.getUser(id);
       }
     });
   }
@@ -457,7 +362,7 @@ class UsersStore extends Marty.Store {
   getUser(id) {
     return this.fetch(id,
       () => return this.state[id],
-      () => return UserQueries.getUser(id)
+      () => return this.app.userQueries.getUser(id)
     );
   }
 });
@@ -472,7 +377,7 @@ A fetch result is <b>not a promise</b>. It is an object literal that represents 
 </div>
 
 {% highlight js %}
-var user = UserStore.getUser(id);
+var user = app.userStore.getUser(id);
 
 console.log(user.status) // => PENDING
 {% endhighlight %}
@@ -496,8 +401,8 @@ if (user.done) {
 If you start a new fetch then the store will notify any listeners when the fetch's status has changed.
 
 {% highlight js %}
-UserStore.addChangeListener(function () {
-  var user = UserStore.getUser(id);
+app.userStore.addChangeListener(function () {
+  var user = app.userStore.getUser(id);
 
   if (user.done) {
     console.log(user.result);
@@ -574,7 +479,7 @@ when.join(fetch.done("foo"), fetch.done("bar"), {
 Converts a fetch result into a promise. Useful when you want to use a store outside of a React component.
 
 {% highlight js %}
-var getUser = UserStore.getUser().toPromise();
+var getUser = app.userStore.getUser().toPromise();
 
 getUser
   .then((user) => console.log(user))
@@ -587,9 +492,6 @@ getUser
 Returns a pending fetch result
 
 {% highlight js %}
-var fetch = Store.fetch.pending();
-
-// or
 var fetch = require('marty/fetch').pending();
 
 console.log(fetch.status) // PENDING
@@ -600,9 +502,6 @@ console.log(fetch.status) // PENDING
 Returns a done fetch result
 
 {% highlight js %}
-var fetch = Store.fetch.done(result);
-
-// or
 var fetch = require('marty/fetch').done(result);
 
 console.log(fetch.status, fetch.result) // DONE, { ... }
@@ -613,9 +512,6 @@ console.log(fetch.status, fetch.result) // DONE, { ... }
 Returns a failed fetch result
 
 {% highlight js %}
-var fetch = Store.fetch.failed(error);
-
-// or
 var fetch = require('marty/fetch').failed(error);
 
 console.log(fetch.status, fetch.error) // FAILED, { ... }
@@ -626,14 +522,10 @@ console.log(fetch.status, fetch.error) // FAILED, { ... }
 Returns a failed fetch result with a NotFound error
 
 {% highlight js %}
-var fetch = Store.fetch.notFound();
-
-// or
 var fetch = require('marty/fetch').notFound();
 
 console.log(fetch.failed, fetch.error) // FAILED, { status: 404 }
 {% endhighlight %}
-
 
 <h2 id="hasAlreadyFetched">hasAlreadyFetched(fetchId)</h2>
 
@@ -653,7 +545,7 @@ var UsersStore = Marty.createStore({
         }
       },
       remotely: function () {
-        return UsersHttpAPI.getAll()
+        return this.app.userQueries.getAll()
       }
     })
   }
@@ -671,7 +563,7 @@ class UsersStore extends Marty.Store {
         }
       },
       remotely() {
-        return UsersHttpAPI.getAll()
+        return this.app.userQueries.getAll()
       }
     });
   }
@@ -688,7 +580,7 @@ Expects the store to deserialize the dehydrated state and initialise the store. 
 
 <h2 id="waitFor">waitFor(*stores)</h2>
 
-If an action handler is dependant on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.
+If an action handler is dependent on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.
 
 You can also pass an array of dispatch tokens to waitFor.
 
@@ -701,7 +593,7 @@ var UsersStore = Marty.createStore({
     addUser: Constants.RECEIVE_USER
   },
   addUser: function (user) {
-    this.waitFor(FooStore, BarStore);
+    this.waitFor(this.app.fooStore, this.app.barStore);
     this.state.push(user);
     this.hasChanged();
   }
@@ -717,7 +609,7 @@ class UsersStore extends Marty.Store {
     };
   }
   addUser(user) {
-    this.waitFor(FooStore, BarStore);
+    this.waitFor(this.app.fooStore, this.app.barStore);
     this.state.push(user);
     this.hasChanged();
   }
@@ -727,3 +619,7 @@ class UsersStore extends Marty.Store {
 <h2 id="#dispatchToken">dispatchToken</h2>
 
 Dispatch token that is returned from [<code>Dispatcher.register()</code>](http://facebook.github.io/flux/docs/dispatcher.html#api). Used by [<code>waitFor()</code>](#waitFor).
+
+<h2 id="app">app</h2>
+
+Returns the instance's [application]({% url /api/application/index.html %}).

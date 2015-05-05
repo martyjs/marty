@@ -14,25 +14,26 @@ To create an action, you should pass its type followed by any arguments to the [
 {% sample %}
 classic
 =======
-var Dispatcher = require('marty').dispatcher.getDefault();
 var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
 
 var UserActionCreators = Marty.createActionCreators({
-  id: 'UserActionCreators',
   updateEmail: function (userId, email) {
     this.dispatch(UserConstants.UPDATE_EMAIL, userId, email)
   }
 });
 
-UserActionCreators.updateEmail(123, "foo@bar.com");
+var app = new Marty.Application();
 
-Dispatcher.register(function (action) {
+app.register('userActionCreators', UserActionCreators);
+app.dispatcher.register(function (action) {
   console.log(action.type) // => "UPDATE_EMAIL"
   console.log(action.arguments) // => [123, "foo@bar.com"];
 });
+
+app.userActionCreators.updateEmail(123, "foo@bar.com");
+
 es6
 ===
-var Dispatcher = require('marty').dispatcher.getDefault();
 var UserConstants = Marty.createConstants(["UPDATE_EMAIL"]);
 
 class UserActionCreators extends Marty.ActionCreators {
@@ -41,12 +42,14 @@ class UserActionCreators extends Marty.ActionCreators {
   }
 }
 
-userActionCreators = Marty.register(UserActionCreators);
+var app = new Marty.Application();
 
-userActionCreators.updateEmail(123, "foo@bar.com");
-
-Dispatcher.register(function (action) {
+app.register('userActionCreators', UserActionCreators);
+app.dispatcher.register(function (action) {
   console.log(action.type) // => "UPDATE_EMAIL"
   console.log(action.arguments) // => [123, "foo@bar.com"];
 });
+
+app.userActionCreators.updateEmail(123, "foo@bar.com");
+
 {% endsample %}

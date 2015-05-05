@@ -25,7 +25,6 @@ Whilst immutable data collections are not required, we try to make it as easy to
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UsersStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -51,6 +50,4 @@ class UsersStore extends Marty.Store {
     this.state = this.state.push(user);
   }
 }
-
-export default Marty.register(UsersStore);
 {% endsample %}

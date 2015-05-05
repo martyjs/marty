@@ -11,21 +11,12 @@ Provides a simple way of accessing your current location. Useful when creating [
 classic
 =======
 var Location = Marty.createStateSource({
-  id: 'Location',
   type: 'location'
 });
-
-var location = Location.getLocation();
-
-console.log(location.url, location.query.foo);
 es6
 ===
 class Location extends Marty.LocationStateSource {
 }
-
-var location = Location.getLocation();
-
-console.log(location.url, location.query.foo);
 {% endsample %}
 
 <h2 id="get">getLocation()</h2>

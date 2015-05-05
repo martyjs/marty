@@ -12,12 +12,8 @@ classic
 =======
 var UsersAPI = Marty.createStateSource({
   type: 'http',
-  id: 'UsersAPI',
   createUser: function (user) {
-    this.post({ url: '/users', body: user })
-        .then(function (res) {
-          UserSourceActionCreators.receiveUser(res.body);
-        });
+    return this.post({ url: '/users', body: user });
   }
 });
 
@@ -25,8 +21,7 @@ es6
 ===
 class UsersAPI extends Marty.HttpStateSource {
   createUser(user) {
-    this.post({ url: '/users', body: user })
-        .then((res) => UserSourceActionCreators.receiveUser(res.body));
+    return this.post({ url: '/users', body: user });
   }
 }
 {% endsample %}
@@ -44,9 +39,8 @@ classic
 =======
 var UsersAPI = Marty.createStateSource({
   type: 'http',
-  id: 'UsersAPI',
   createUser: function (user) {
-    this.request({
+    return this.request({
       url: '/users',
       method: 'POST',
       body: { name: 'foo' },
@@ -59,7 +53,7 @@ es6
 ===
 class UsersAPI extends Marty.HttpStateSource {
   createUser(user) {
-    this.request({
+    return this.request({
       url: '/users',
       method: 'POST',
       body: { name: 'foo' }
@@ -199,4 +193,3 @@ var ParseJSON = require('marty/http/hooks/parseJSON');
 
 Marty.HttpStateSource.removeHook(ParseJSON);
 {% endhighlight %}
-

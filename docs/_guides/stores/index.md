@@ -9,13 +9,12 @@ The store is where your state should live. It is also the only place that your s
 
 All of a store's state should live within ``Store#state``. If you want to update the state you should use ``Store#setState`` which will update ``this.state`` and then notify any listeners that the store has changed. Or if you prefer you can update ``this.state`` and then manually call ``this.hasChanged()``
 
-When you create a store it will automatically start listening to the dispatcher. To determine which actions to handle you define the [handlers]({% url /api/stores/#handlers %}) hash. The keys in handlers are the functions you wish to call when an action comes in and the values are [action predicates]({% url /api/stores/#action-predicates %}) (Normally the constant of the action's type). If your store does handle the action, then the arguments you passed to [ActionCreator#dispatch]({% url /api/action-creators/index.html#dispatch %}) are the arguments for the handler.
+When you create a store it will automatically start listening to the dispatcher. To determine which actions to handle you define the [handlers]({% url /api/stores/#handlers %}) hash. The keys in handlers are the functions you wish to call when an action comes in and the value is either a constant or an array of constants which match the actions type. If your store does handle the action, then the arguments you passed to [ActionCreator#dispatch]({% url /api/action-creators/index.html#dispatch %}) are the arguments for the handler.
 
 {% sample %}
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UserStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -28,7 +27,11 @@ var UsersStore = Marty.createStore({
   }
 });
 
-var listener = UsersStore.addChangeListener(function () {
+var app = new Marty.Application();
+
+app.register('userStore', UserStore);
+
+var listener = app.userStore.addChangeListener(function () {
   console.log('Users store changed');
   listener.dispose();
 });
@@ -49,48 +52,13 @@ class UsersStore extends Marty.Store {
   }
 }
 
-var usersStore = Marty.register(UsersStore);
+var app = new Marty.Application();
 
-var listener = usersStore.addChangeListener(function () {
+app.register('userStore', UserStore);
+
+var listener = app.userStore..addChangeListener(function () {
   console.log('Users store changed');
   listener.dispose();
 });
 
-{% endsample %}
-
-Often action creators optimistically dispatch an action before connecting to a state source. So what should you do if that action fails? Action creators will emit actions of  type ``ACTION_FAILED`` and ``{Action Type}_FAILED`` which your store can handle. Alternatively you can return a function from an action handler which will be called if the action fails or if the [action rolled back]({% url /api/stores/index.html#rollback %}).
-
-{% sample %}
-classic
-=======
-var UsersStore = Marty.createStore({
-  id: 'UsersStore',
-  addUser: function (user) {
-    this.state[user.id] = user;
-    this.hasChanged();
-
-    return function (error) {
-      this.state.errors[user.id] = error;
-      delete this.state[user.id];
-      this.hasChanged();
-    }
-  }
-});
-
-es6
-===
-class UsersStore extends Marty.Store {
-  addUser(user) {
-    this.state[user.id] = user;
-    this.hasChanged();
-
-    return function (error) {
-      this.state.errors[user.id] = error;
-      delete this.state[user.id];
-      this.hasChanged();
-    }
-  }
-}
-
-export default Marty.register(UsersStore);
 {% endsample %}

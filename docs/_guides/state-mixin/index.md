@@ -17,10 +17,11 @@ It also introduces a new function [<code>getState</code>](#getState), which retu
 
 {% highlight js %}
 var UserState = Marty.createStateMixin({
-  listenTo: UserStore,
+  listenTo: ['userStore', 'friendsStore'],
   getState: function () {
     return {
-      users: UserStore.getAll()
+      users: this.app.userStore.getUser(this.props.userId),
+      friends: this.app.friendsStores.getFriends(this.props.userId)
     };
   }
 });

@@ -17,10 +17,10 @@ var User = React.createClass({
 });
 
 module.exports = Marty.createContainer(User, {
-  listenTo: UserStore,
+  listenTo: 'userStore',
   fetch: {
     user: function() {
-      return UserStore.for(this).getUser(this.props.id);
+      return this.app.userStore.getUser(this.props.id);
     }
   },
   failed(errors) {
@@ -42,10 +42,10 @@ class User extends React.Component {
 }
 
 module.exports = Marty.createContainer(User, {
-  listenTo: UserStore,
+  listenTo: 'userStore',
   fetch: {
     user() {
-      return UserStore.for(this).getUser(this.props.id);
+      return this.app.userStore.getUser(this.props.id);
     }
   },
   failed(errors) {
@@ -59,7 +59,7 @@ module.exports = Marty.createContainer(User, {
 });
 {% endsample %}
 
-To create a container, pass your component to [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) with an object hash that contains the container configuration. [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) will return a new component which knows how to fetch state from stores as well as rendering it. 
+To create a container, pass your component to [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) with an object hash that contains the container configuration. [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) will return a new component which knows how to fetch state from stores as well as rendering it.
 
 The most important configuration option is [``fetch``]({% url /api/containers/index.html#fetch %}). [``fetch``]({% url /api/containers/index.html#fetch %}) is an object where the values are functions which are invoked and the result is passed to the inner component as a prop. The prop key is determined by the key. The container component will do this when first created and any time any store you specify in [``listenTo``]({% url /api/containers/index.html#listenTo %}) changes.
 
