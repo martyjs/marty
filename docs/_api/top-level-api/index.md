@@ -29,7 +29,7 @@ Register [queries]({% url /api/queries/index.html %}) defined with the ES5 synta
 
 <h3 id="createStateSource">Marty.createStateSource(options)</h3>
 
-Register a [state source]({% url /api/state-source/index.html %}) defined with the ES5 syntact into the [registry](#registry). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
+Register a [state source]({% url /api/state-sources/index.html %}) defined with the ES5 syntact into the [registry](#registry). Instantiates an instance with the [dispatcher]({% url /api/dispatcher/index.html#default %}) and returns it.
 
 <h3 id="createActionCreators">Marty.createActionCreators(options)</h3>
 
