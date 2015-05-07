@@ -2,13 +2,12 @@
 
 [![Join the chat at https://gitter.im/martyjs/marty](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/martyjs/marty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build Status](https://travis-ci.org/martyjs/marty.svg?branch=master)](https://travis-ci.org/martyjs/marty)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/jhollingworth.svg)](https://saucelabs.com/u/jhollingworth)
 
 ## Quick start
 
 ```
 make build        # rebuild source
-make test         # lint & run tests
 make docs         # show documentation on http://localhost:4000
 ```
 
@@ -43,10 +42,6 @@ make release-docs      # builds documentation and copies into ../marty-gh-pages
     * :arrow_down: `:arrow_down:` when downgrading dependencies
 
 (From [atom](https://atom.io/docs/latest/contributing#git-commit-messages))
-
-##Browser Support
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/jhollingworth.svg)](https://saucelabs.com/u/jhollingworth)
 
 ## Maintainers
 
