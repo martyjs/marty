@@ -21,7 +21,7 @@
   "dependencies": {
     "es6-promise": "^2.0.0",
     "isomorphic-fetch": "1.6.0",
-    "marty-lib": "git://github.com/martyjs/marty-lib#modules"
+    "marty-lib": "^0.10.0"
   },
   "devDependencies": {
     "babel": "^5.0.0",
