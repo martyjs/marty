@@ -190,33 +190,6 @@ describeStyles('HttpStateSource', function (styles) {
     }
   });
 
-  describe('when a request fails', function () {
-    var server, actualError;
-
-    beforeEach(function () {
-      server = sinon.fakeServer.create();
-
-      server.respondWith('GET', '/foo', [404, {}, '']);
-
-      var res = httpStateSource().get('/foo');
-
-      server.respond();
-
-      return res.catch(function (error) {
-        actualError = error;
-      });
-    });
-
-    afterEach(function () {
-      server.restore();
-    });
-
-    it('should reject with the response object', function () {
-      expect(actualError.status).to.eql(404);
-      expect(actualError.ok).to.eql(false);
-    });
-  });
-
   describe('#get()', function () {
     describe('when you pass in a url', function () {
       beforeEach(function () {
