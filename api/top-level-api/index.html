@@ -12,6 +12,7 @@
   <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css">
   <link rel="stylesheet" type="text/css" href="/css/docs.css">
 
   <script type="text/javascript" src="/js/codemirror.js"></script>
@@ -778,7 +779,7 @@
 
 <h3 id="createStateSource">Marty.createStateSource(options)</h3>
 
-<p>Register a <a href="/api/state-source/index.html">state source</a> defined with the ES5 syntact into the <a href="#registry">registry</a>. Instantiates an instance with the <a href="/api/dispatcher/index.html#default">dispatcher</a> and returns it.</p>
+<p>Register a <a href="/api/state-sources/index.html">state source</a> defined with the ES5 syntact into the <a href="#registry">registry</a>. Instantiates an instance with the <a href="/api/dispatcher/index.html#default">dispatcher</a> and returns it.</p>
 
 <h3 id="createActionCreators">Marty.createActionCreators(options)</h3>
 
@@ -834,7 +835,7 @@
 
 <h3 id="renderToString">Marty.renderToString(options)</h3>
 
-<p><a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">Renders</a> the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occured. <code>timeout</code> allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default <strong>1000ms</strong>). It uses React contexts to pass the Marty context to child components (context key is <code>marty</code>).</p>
+<p><a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">Renders</a> the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. <code>timeout</code> allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default <strong>1000ms</strong>). It uses React contexts to pass the Marty context to child components (context key is <code>marty</code>).</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">type</span><span class="p">:</span> <span class="nx">Foo</span><span class="p">,</span>
@@ -909,7 +910,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.11</li>
+        <li>v0.9.13</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>

@@ -12,6 +12,7 @@
   <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css">
   <link rel="stylesheet" type="text/css" href="/css/docs.css">
 
   <script type="text/javascript" src="/js/codemirror.js"></script>
@@ -797,15 +798,15 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
-<p>If any of the values within the object hash are <a href="/api/stores.html#fetch-result">fetch results</a> then Marty will wait for the fetches to complete before rendering the inner component. Marty will call the <a href="#pending">pending</a> handler if any of the fetches are pending and the <a href="#failed">failed</a> handler if any have failed.</p>
+<p>If any of the values within the object hash are <a href="/api/stores/index.html#fetch-result">fetch results</a> then Marty will wait for the fetches to complete before rendering the inner component. Marty will call the <a href="#pending">pending</a> handler if any of the fetches are pending and the <a href="#failed">failed</a> handler if any have failed.</p>
 
 <h3 id="done">done(props)</h3>
 
 <p>Creates the inner components, passing through the result of the <a href="#fetch">fetch</a> via props. Override if you want more control about how the inner component is created. You should ensure the component should have the ref <code>innerComponent</code>.</p>
 
-<h3 id="pending">pending()</h3>
+<h3 id="pending">pending(finishedFetches)</h3>
 
-<p>Invoked when any of the fetches are pending. Default is to return an empty <code>div</code>.</p>
+<p>Invoked when any of the fetches are pending. Default is to return an empty <code>div</code>. Any fetches that are done are passed into the <code>pending</code> handler as an object hash.</p>
 
 <h3 id="failed">failed(errors)</h3>
 
@@ -834,7 +835,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.11</li>
+        <li>v0.9.13</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>

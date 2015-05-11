@@ -12,6 +12,7 @@
   <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/css/syntax.css">
   <link rel="stylesheet" type="text/css" href="/css/docs.css">
 
   <script type="text/javascript" src="/js/codemirror.js"></script>
@@ -1197,11 +1198,14 @@
   <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
 
-    <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
-    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
-    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+    <span class="k">return</span> <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+      <span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+      <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)),</span>
+      <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
+      <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+    <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 
@@ -1246,8 +1250,10 @@
     <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
 
     <span class="k">return</span> <span class="nx">userAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">userId</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">))</span>
-      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">err</span><span class="p">));</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(</span>
+        <span class="nx">res</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">),</span>
+        <span class="nx">err</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+      <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
@@ -1318,7 +1324,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.11</li>
+        <li>v0.9.13</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>
