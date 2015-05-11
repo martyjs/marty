@@ -55,9 +55,9 @@ If any of the values within the object hash are [fetch results]({% url /api/stor
 
 Creates the inner components, passing through the result of the [fetch](#fetch) via props. Override if you want more control about how the inner component is created. You should ensure the component should have the ref ``innerComponent``.
 
-<h3 id="pending">pending()</h3>
+<h3 id="pending">pending(finishedFetches)</h3>
 
-Invoked when any of the fetches are pending. Default is to return an empty ``div``.
+Invoked when any of the fetches are pending. Default is to return an empty ``div``. Any fetches that are done are passed into the `pending` handler as an object hash.
 
 <h3 id="failed">failed(errors)</h3>
 
