@@ -180,7 +180,6 @@ Calls any [registered callbacks](#addChangeListener). To improve performance lis
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UserStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },
@@ -215,7 +214,6 @@ When requesting data from a store we should assume that it might require an asyn
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UserStore',
   getUser: function (id) {
     return this.fetch({
       id: api-id,
@@ -343,7 +341,6 @@ Often you're only concerned with fetching locally and remotely so you use the se
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UserStore',
   getUser: function (id) {
     return this.fetch(id,
       function () {
@@ -535,10 +532,9 @@ For when you want to know if you have already tried fetching something. Given a 
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UsersStores',
   getUsers: function () {
     return this.fetch(
-      id: 'users',
+  
       locally: function () {
         if (this.hasAlreadyFetched('users')) {
           return this.state;
@@ -556,7 +552,7 @@ es6
 class UsersStore extends Marty.Store {
   getUsers() {
     return this.fetch(
-      id: 'users',
+  
       locally() {
         if (this.hasAlreadyFetched('users')) {
           return this.state;
@@ -588,7 +584,6 @@ You can also pass an array of dispatch tokens to waitFor.
 classic
 =======
 var UsersStore = Marty.createStore({
-  id: 'UsersStore',
   handlers: {
     addUser: Constants.RECEIVE_USER
   },

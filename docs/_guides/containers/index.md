@@ -73,6 +73,27 @@ listenTo: ['bars.baz', 'bam']
 
 If you're using the [fetch API]({% url /api/stores/index.html#fetch %}) then containers provide an easy way of dealing with the different states a fetch can be in. If any of your fetches are pending then the container will render whatever you return from the [``pending`` handler]({% url /api/containers/index.html#pending %}). The same will happen if any of the fetches have failed however the container will pass in an object containing all the errors to the [``failed`` handler]({% url /api/containers/index.html#failed %}).
 
+If you want to render the component before all fetches are done, you can call the `done` handler from the `pending` handler. Any fetches that are done are passed into the `pending` handler allowing you to provide defaults for the missing values:
+
+{% highlight js %}
+module.exports = Marty.createContainer(User, {
+  fetch: {
+    user() {
+      return this.app.userStore.getUser(this.props.id);
+    },
+    friends() {
+      return this.app.userStore.getFriends(this.props.id);
+    }
+  },
+  pending(fetches) {
+    return this.done(_.defaults(fetches, {
+      users: DEFAULT_USER,
+      friends: []
+    });
+  }
+});
+{% endhighlight %}
+
 ##Further reading
 
 * [Separating components and containers in different files]({% url /guides/containers/separating-components-and-containers-in-different-files.html %}).
