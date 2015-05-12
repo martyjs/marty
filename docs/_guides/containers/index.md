@@ -59,9 +59,17 @@ module.exports = Marty.createContainer(User, {
 });
 {% endsample %}
 
-To create a container, pass your component to [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) with an object hash that contains the container configuration. [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) will return a new component which knows how to fetch state from stores as well as rendering it.
+To create a container, pass your component to [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) with an object hash that contains the container configuration. [``Marty.createContainer``]({% url /api/top-level-api/index.html#createContainer %}) will return a new component which knows how to fetch state from stores as well as rendering it. The two most important configuration option are [``fetch``]({% url /api/containers/index.html#fetch %}) and  [``listenTo``]({% url /api/containers/index.html#listenTo %}).
 
-The most important configuration option is [``fetch``]({% url /api/containers/index.html#fetch %}). [``fetch``]({% url /api/containers/index.html#fetch %}) is an object where the values are functions which are invoked and the result is passed to the inner component as a prop. The prop key is determined by the key. The container component will do this when first created and any time any store you specify in [``listenTo``]({% url /api/containers/index.html#listenTo %}) changes.
+[``fetch``]({% url /api/containers/index.html#fetch %}) is an object where the values are functions which are invoked and the result is passed to the inner component as a prop. The prop key is determined by the key.
+
+Stores might not immediately have all the data immediately and so we need to re-invoke the `fetches` whenever any store changes. [``listenTo``]({% url /api/containers/index.html#listenTo %}) allows you to specify either a single id or an array of Ids (This is the Id of the store in the application).
+
+{% highlight js %}
+listenTo: 'foos'
+// or
+listenTo: ['bars.baz', 'bam']
+{% endhighlight %}
 
 If you're using the [fetch API]({% url /api/stores/index.html#fetch %}) then containers provide an easy way of dealing with the different states a fetch can be in. If any of your fetches are pending then the container will render whatever you return from the [``pending`` handler]({% url /api/containers/index.html#pending %}). The same will happen if any of the fetches have failed however the container will pass in an object containing all the errors to the [``failed`` handler]({% url /api/containers/index.html#failed %}).
 

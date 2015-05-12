@@ -4,62 +4,123 @@ title: Application API
 id: api-application
 section: Application
 ---
-<h3 id="replaceState">Marty.replaceState(stores, [context])</h3>
 
-Replaces ([Store#replaceState]({% url /api/stores/index.html#replaceState %})) the state of all stores with the values passed in. If a [context](#createContext) is passed in then we will replace the context's stores state. The key within the ``stores`` object literal must be the Id of the store.
+<h3 id="dispatcher">dispatcher</h3>
+
+The application will create an instance of [dispatcher]({% url /guides/dispatcher/index.html %}) when first created.
+
+<h3 id="register">register(id, type)</h3>
+
+Creates an instance of the given type, passing the id and application into the types constructor. The instance will then be accessible on the application object with the given Id.
 
 {% highlight js %}
-Marty.replaceState({
-  UserStore: {
+function Foo(options) {
+  console.log(options.id, options.app); // foo, Application(...)
+}
+
+var app = new Marty.Application();
+
+app.register('foo', Foo);
+{% endhighlight %}
+
+<h3 id="registerObject">register(registrations)</h3>
+
+Same as [register](#register) except you pass in an object literal where the keys are the Ids and the value is the type. If the value is an object literal when the instance will be accessible on the app within a child object.
+
+{% highlight js %}
+var app = new Marty.Application();
+
+app.register({
+  foo: Foo,
+  bar: {
+    baz: Baz
+  }
+});
+
+console.log(app.bar.baz);
+{% endhighlight %}
+
+<h3 id="bindTo">bindTo(Component)</h3>
+
+Makes the application available to the component and child components via contexts. To do this it wraps the component with a component.
+
+{% highlight js %}
+class User extends React.Component {
+  contextTypes: { app: React.PropTypes.object.isRequired } // or Marty.contextTypes
+  saveUser() {
+    this.context.app.userActions.saveUser();
+  }
+}
+
+var UserWithApp = app.bindTo(User);
+...
+{% endhighlight %}
+
+<h3 id="replaceState">replaceState(stores)</h3>
+
+Replaces ([Store#replaceState]({% url /api/stores/index.html#replaceState %})) the state of all stores with the values passed in. The key within the ``stores`` object literal must be the Id of the store.
+
+{% highlight js %}
+var app = new Marty.Application();
+
+app.register('fooStore', require('./stores/fooStore'));
+app.register('barStore', require('./stores/barStore'));
+
+app.replaceState({
+  fooStore: {
     state: {
       [123]: { id: 123, name: 'Foo' }
+    }
+  },
+  barStore: {
+    state: {
+      [456]: { id: 456, name: 'Foo' }
     }
   }
 });
 
-UserStore.getUser(123) // { id: 123, name: 'Foo' }
+app.fooStore.getFoo(123) // { id: 123, name: 'Foo' }
 {% endhighlight %}
 
-<h3 id="clearState">Marty.clearState([context])</h3>
-Calls [Store#clear]({% url /api/stores/index.html#clear %}) on all registered stores. If a [context](#createContext) is passed in then we will call  [Store#clear]({% url /api/stores/index.html#clear %})) on all stores within the context.
+<h3 id="clearState">clearState()</h3>
 
-<h3 id="dehydrate">Marty.dehydrate([context])</h3>
+Calls [Store#clear]({% url /api/stores/index.html#clear %}) on all registered stores.
 
-Calls [Store#dehydrate]({% url /api/stores/index.html#dehydrate %}) if present or [Store#getState]({% url /api/stores/index.html#getState %}) on all registered stores. Returning all states as a serializable object literal where they key is the Id of the store. If a [context](#createContext) is passed in then we will dehyrdate all stores within the context.
+<h3 id="dehydrate">dehydrate()</h3>
 
-<h3 id="rehydrate">Marty.rehydrate([states], [context])</h3>
+Calls [Store#dehydrate]({% url /api/stores/index.html#dehydrate %}) if present or [Store#getState]({% url /api/stores/index.html#getState %}) on all registered stores. Returning all states as a serializable object literal where they key is the Id of the store.
 
-Given some dehyrdated state, it will call [Store#rehydrate]({% url /api/stores/index.html#rehydrate %}) if present or [Store#replaceState]({% url /api/stores/index.html#replaceState %}) on all registered stores passing in the dehyrdated state. The key of the states must match the Id of the store. If you don't pass in states then it will look at the ``window.__marty.state``. If a [context](#createContext) is passed in then we will rehyrdate all stores within the context.
+<h3 id="rehydrate">rehydrate([states])</h3>
 
-<h3 id="createContext">Marty.createContext([values])</h3>
+Given some dehyrdated state, it will call [Store#rehydrate]({% url /api/stores/index.html#rehydrate %}) if present or [Store#replaceState]({% url /api/stores/index.html#replaceState %}) on all registered stores passing in the dehyrdated state. The key of the states must match the Id of the store. If you don't pass in states then it will look at the ``window.__marty.state``.
 
-Creates a [context]({% url /api/context/index.html %}) which contains a dispatcher and instances of all types currently registered within [Marty.registry](#registry). Optionally will be extended with ``values`` object.
+<h3 id="renderToString">renderToString(Component, options)</h3>
 
-<h3 id="renderToString">Marty.renderToString(options)</h3>
-
-[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**). It uses React contexts to pass the Marty context to child components (context key is ``marty``).
+[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**).
 
 {% highlight js %}
-var options = {
-  type: Foo,
-  context: context,
-  props: { bar: 'bar' },
-  timeout: 1000
-};
+var app = new Application();
+var User = app.bindTo(require('./views/user'));
 
-var Foo = React.createClass({
-  contextTypes {
-    marty: React.PropTypes.object
-  },
-  render: function () {
-    var store = this.context.marty.getStore('foo');
-
-    return <div />
-  }
-});
-
-Marty.renderToString(options).then(function (res) {
+app.renderToString(<User id={123} />, { timeout: 2000}).then(function (res) {
   console.log('Rendered html', res.html);
   console.log('Diagnostics', res.diagnostics);
 });
+{% endhighlight %}
+
+<h3 id="renderToStaticMarkup">renderToStaticMarkup(Component, options)</h3>
+
+Same as [renderToString](#renderToString) except using [React.renderToStaticMarkup](https://facebook.github.io/react/docs/top-level-api.html#react.rendertostaticmarkup).
+
+<h3 id="getAll">getAll(type)</h3>
+
+Get all instances of the given type. Result is an object literal where the keys is the instance id and the value is the instance.
+
+{% highlight js %}
+app.register({
+  fooStore: FooStore,
+  barStore: { store: BarStore }
+})
+
+app.getAll('Store') // => { 'fooStore': ..., 'bar.store': ...  }
 {% endhighlight %}

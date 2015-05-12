@@ -221,7 +221,7 @@ var User = React.createClass({
   },
   updateEmail: function (e) {
     var email = e.target.value;
-    var userActions = this.context.app.userActionCreators;
+    var userActions = this.props.app.userActionCreators;
 
     userActions.updateUserEmail(this.props.userId, email);
   }
@@ -249,7 +249,7 @@ class User extends React.Component {
   }
   updateEmail(e) {
     var email = e.target.value;
-    var userActions = this.context.app.userActionCreators;
+    var userActions = this.props.app.userActionCreators;
 
     userActions.updateUserEmail(this.props.userId, email);
   }

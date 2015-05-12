@@ -5,6 +5,10 @@ id: top-level
 section: Top-Level API
 ---
 
+<h3 id="createApplication">Marty.createApplication(constructor)</h3>
+
+Creates a [application]({% url /api/application/index.html %}) class with the given constructor.
+
 <h3 id="createStore">Marty.createStore(properties)</h3>
 
 Creates a [store]({% url /api/stores/index.html %}) class with the given properties.
@@ -46,7 +50,7 @@ True if the current process is being executed within a browser.
 Configurable list of warnings that Marty emits. Setting the key to false will stop the warning from happening. We will warn you when a feature is being depreciated so disabling warnings can make upgrading difficult in the future.
 
 {% highlight js %}
-Marty.warnings.invokeConstant = false;
+Marty.warnings.reservedFunction = false;
 {% endhighlight %}
 
 <h4 id="withoutWarning">Marty.warnings.without(warningsToDisable*, callback, [context])</h4>
