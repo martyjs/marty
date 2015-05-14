@@ -750,6 +750,14 @@
           
         </li>
       
+
+      <li class="job-ad">
+        <a href="https://qubit.com" onclick="trackOutboundLink('http://qubit.com')">Qubit</a> are hiring
+        <a href="https://qubit.workable.com/jobs/6746?utm_source=martyjs&utm_campaign=martyjs" onclick="trackOutboundLink('https://qubit.workable.com/jobs/6746?utm_source=martyjs&utm_campaign=martyjs')">
+        Full stack JavaScript engineers</a> to help solve fun challenges with React & Marty
+      </li>
+
+
     </ul>
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
@@ -893,11 +901,12 @@
 
 <p>Hooks allows you to make changes to requests before they are sent and as well as when responses are received. This can be useful when you want to do things like automatically converting all JSON responses to immutable objects.</p>
 
-<p>Hooks are object literals which have 3 optional keys: <code>before</code>, <code>after</code> and <code>priority</code>. If <code>before</code> is present then it will be called with the request as its argument. If <code>after</code> is present then it will be called after the response is received with the response as its argument. Setting a priority allows you to alter in what order the hook is executed (The smaller the number, the earlier it will be executed).</p>
+<p>Hooks are object literals which have 4 optional keys: <code>id</code>, <code>before</code>, <code>after</code> and <code>priority</code>. <code>id</code> is required if you wish to have multiple hooks registered. If <code>before</code> is present then it will be called with the request as its argument. If <code>after</code> is present then it will be called after the response is received with the response as its argument. Setting a priority allows you to alter in what order the hook is executed (The smaller the number, the earlier it will be executed).</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Marty</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
 
 <span class="nx">Marty</span><span class="p">.</span><span class="nx">HttpStateSource</span><span class="p">.</span><span class="nx">addHook</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'SomeHook'</span><span class="p">,</span>
   <span class="na">priority</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
   <span class="nx">before</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">'Foo'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'bar'</span><span class="p">;</span>
@@ -914,6 +923,7 @@
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Marty</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
 
 <span class="nx">Marty</span><span class="p">.</span><span class="nx">HttpStateSource</span><span class="p">.</span><span class="nx">addHook</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'AnotherHook'</span><span class="p">,</span>
   <span class="na">priority</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
   <span class="na">before</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">req</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">'Foo'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'bar'</span><span class="p">;</span>
@@ -940,7 +950,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.13</li>
+        <li>v0.9.14</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>
@@ -959,6 +969,13 @@
     ga('create', 'UA-56575082-1', 'auto');
     ga('send', 'pageview');
 
+    function trackOutboundLink(url) {
+      ga('send', 'event', 'outbound', 'click', url, {
+        'hitCallback': function () {
+          document.location = url;
+        }
+      });
+    }
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="/js/style.js"></script>

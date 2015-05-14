@@ -750,6 +750,14 @@
           
         </li>
       
+
+      <li class="job-ad">
+        <a href="https://qubit.com" onclick="trackOutboundLink('http://qubit.com')">Qubit</a> are hiring
+        <a href="https://qubit.workable.com/jobs/6746?utm_source=martyjs&utm_campaign=martyjs" onclick="trackOutboundLink('https://qubit.workable.com/jobs/6746?utm_source=martyjs&utm_campaign=martyjs')">
+        Full stack JavaScript engineers</a> to help solve fun challenges with React & Marty
+      </li>
+
+
     </ul>
   </div>
   <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
@@ -807,7 +815,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.13</li>
+        <li>v0.9.14</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>
@@ -826,6 +834,13 @@
     ga('create', 'UA-56575082-1', 'auto');
     ga('send', 'pageview');
 
+    function trackOutboundLink(url) {
+      ga('send', 'event', 'outbound', 'click', url, {
+        'hitCallback': function () {
+          document.location = url;
+        }
+      });
+    }
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="/js/style.js"></script>
