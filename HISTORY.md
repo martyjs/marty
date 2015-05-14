@@ -1,3 +1,7 @@
+0.9.14 / 2015-05-14
+===================
+- Updated isomorphic-fetch to v2.0.0
+
 0.9.13 / 2015-05-11
 ===================
 - Add optional `throwError` hook that replicates Marty v0.8 behavior of throwing an error if http response is not OK
