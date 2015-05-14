@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "es6-promise": "^2.0.0",
-    "isomorphic-fetch": "1.6.0",
+    "isomorphic-fetch": "^2.0.0",
     "marty-lib": "^0.10.0"
   },
   "devDependencies": {

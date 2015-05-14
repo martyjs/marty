@@ -1,3 +1,15 @@
+0.9.14 / 2015-05-14
+===================
+- Updated isomorphic-fetch to v2.0.0
+
+0.9.13 / 2015-05-11
+===================
+- Add optional `throwError` hook that replicates Marty v0.8 behavior of throwing an error if http response is not OK
+
+0.9.12 / 2015-05-04
+===================
+- Pass finished fetches into a containers `pending` handler to resolve [#300](https://github.com/martyjs/marty/issues/276)
+
 0.9.11 / 2015-04-16
 ===================
 - Allow you to extend contexts to resolve [#276](https://github.com/martyjs/marty/issues/276)
@@ -80,7 +92,6 @@
 - dependsOn doesn't update when dependent store updates [#113](https://github.com/jhollingworth/marty/issues/113)
 - Don't auto set content-type if using FormData [#140](https://github.com/jhollingworth/marty/issues/140)
 - Fetch API compatibility [#133](https://github.com/jhollingworth/marty/issues/133)
-
 
 0.8.15 / 2015-03-06
 ===================
