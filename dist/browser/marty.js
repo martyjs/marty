@@ -6367,7 +6367,15 @@ module.exports = invariant;
         })
       })
 
-      xhr.send(typeof self._bodyInit === 'undefined' ? null : self._bodyInit)
+      var send = xhr.send.bind(xhr, typeof self._bodyInit === 'undefined' ? null : self._bodyInit)
+      if (legacyCors) {
+        xhr.onprogress = xhr.onprogress || function () {}
+        setTimeout(function () {
+          send()
+        })
+      } else {
+        send()
+      }
     })
   }
 
@@ -6401,7 +6409,12 @@ module.exports = invariant;
 })();
 
 },{}],78:[function(require,module,exports){
+// the whatwg-fetch polyfill installs the fetch() function
+// on the global object (window or self)
+//
+// Return that as the export for use in Webpack, Browserify etc.
 require(77);
+module.exports = self.fetch;
 
 },{"77":77}],79:[function(require,module,exports){
 var baseDifference = require(107),
@@ -10509,7 +10522,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.13",
+    version: "0.9.14",
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
