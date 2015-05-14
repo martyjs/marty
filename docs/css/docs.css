@@ -23,6 +23,19 @@ body {
   font-family: 'PT Serif', Cambria, Georgia, serif;
 }
 
+.sections-nav .job-ad {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: solid 1px #CCC;
+}
+
+ul.sections-nav > li.job-ad > a {
+  display: inline;
+  padding: 0;
+  color: #428bca;
+  font-weight: bold;
+}
+
 .devtools img {
   width: 100%;
   margin: 20px 0;

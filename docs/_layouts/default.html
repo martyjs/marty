@@ -110,6 +110,13 @@
     ga('create', 'UA-56575082-1', 'auto');
     ga('send', 'pageview');
 
+    function trackOutboundLink(url) {
+      ga('send', 'event', 'outbound', 'click', url, {
+        'hitCallback': function () {
+          document.location = url;
+        }
+      });
+    }
   </script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="{% url /js/style.js %}"></script>
