@@ -21,12 +21,12 @@
     "flux"
   ],
   "dependencies": {
+    "babelify": "^5.0.4",
     "cookies-js": "^1.2.1",
     "es6-promise": "^2.0.0",
     "flux": "^2.0.1",
-    "isomorphic-fetch": "1.6.0",
-    "lodash": "^3.5.0",
-    "babelify": "^5.0.4"
+    "isomorphic-fetch": "^2.0.2",
+    "lodash": "^3.5.0"
   },
   "devDependencies": {
     "babel": "^4.7.1",
