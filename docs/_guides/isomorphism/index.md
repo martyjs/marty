@@ -60,7 +60,7 @@ module.exports = Marty.createContainer(User, {
     listenTo: 'userStore',
     fetch: {
         user() {
-            return this.app.userStore.getUser(this.props.id)
+            return this.userStore.getUser(this.props.id)
         }
     },
     failed(errors) {

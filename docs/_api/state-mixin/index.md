@@ -34,6 +34,28 @@ var UserState = Marty.createStateMixin({
 });
 {% endhighlight %}
 
+<h2 id="inject">inject</h2>
+
+Accepts an array of application dependency Ids (or a single dependency Id) and makes the dependency available in the mixin and component. Anything you [listenTo](#listenTo) is automatically injected in.
+
+{% highlight js %}
+var UserState = Marty.createStateMixin({
+    inject: ['userActions', 'barActions'],
+    listenTo: 'userStore',
+    getState() {
+        return this.userStore.getUser();
+    }
+});
+
+var User = React.createClass({
+    mixins: [UserState],
+    ...
+    saveUser() {
+        this.userActions.saveUser(this.state.user);
+    }
+});
+{% endhighlight %}
+
 <h2 id="app">app</h2>
 
 Returns the instance's [application]({% url /api/application/index.html %}).

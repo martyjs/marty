@@ -2982,31 +2982,27 @@ var StoreObserver = (function () {
 })();
 
 function resolveStores(options) {
+  var app = options.app;
   var stores = options.stores;
-  var appStores = options.app ? options.app.getAllStores() : {};
 
   if (stores && !_.isArray(stores)) {
     stores = [stores];
   }
 
-  return _.map(stores, function (store) {
-    if (_.isString(store)) {
-      if (!options.app) {
-        throw new Error('You can only reference stores by string if you are using an application.');
-      }
-
-      if (!appStores[store]) {
-        throw new Error('Could not find the store ' + store);
-      }
-
-      return appStores[store];
+  return _.map(stores, function (storeId) {
+    if (!_.isString(storeId)) {
+      throw new Error('Store Id\'s must be strings. If you\'re migrating to v0.10 ' + 'you have probably forgotten to update listenTo');
     }
 
-    if (!_.isFunction(store.addChangeListener)) {
-      throw new Error('Cannot listen to things that are not a store');
+    if (!app) {
+      throw new Error('Component not bound to an application');
     }
 
-    return store;
+    if (!app[storeId]) {
+      throw new Error('Could not find the store ' + storeId);
+    }
+
+    return app[storeId];
   });
 }
 
@@ -4426,11 +4422,13 @@ module.exports = handleAction;
 'use strict';
 
 module.exports = function (marty) {
+  marty.when = require(75);
+  marty.fetch = require(67);
   marty.Store = require(71);
   marty.createStore = require(66);
 };
 
-},{"66":66,"71":71}],71:[function(require,module,exports){
+},{"66":66,"67":67,"71":71,"75":75}],71:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () {
@@ -9986,13 +9984,13 @@ module.exports = property;
 }.call(this));
 
 },{}],"/marty.js":[function(require,module,exports){
-'use strict';
+"use strict";
 
 require(3);
 require(1).polyfill();
 
 var Marty = require(28);
-var marty = new Marty('0.10.0-beta', react());
+var marty = new Marty("0.10.0-beta", react());
 
 marty.use(require(26));
 marty.use(require(14));
@@ -10015,9 +10013,9 @@ module.exports = marty;
 // we need to try resolving react from the parent if its not present locally
 function react() {
   try {
-    return require('react');
+    return require("react");
   } catch (e) {
-    return module.parent.require('react');
+    return module.parent.require("react");
   }
 }
 

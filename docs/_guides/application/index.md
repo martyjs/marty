@@ -24,7 +24,7 @@ module.exports = Marty.createContainer(User, {
     listenTo: 'userStore',
     fetch: {
         user: function () {
-            return this.app.userStore.getUser();
+            return this.userStore.getUser();
         }
     }
 });
@@ -53,7 +53,7 @@ module.exports = Marty.createContainer(User, {
     listenTo: 'userStore',
     fetch: {
         user() {
-            return this.app.userStore.getUser();
+            return this.userStore.getUser();
         }
     }
 });
@@ -106,46 +106,47 @@ console.log(app.foo.bar.baz.id, 'foo.bar.baz');
 
 {% endsample %}
 
-`Application#bindTo(Component)` passes the application instance to the given component and any children it has. If you want to access the application from within a component you can wrap the component with a [container]({% url /guides/containers/index.html %}) which will pass the application down through the props (`this.props.app`). Alternatively you can set the components `contextTypes` to `Marty.contextTypes` which makes the application available in the context (`this.context.app`).
+`Application#bindTo(Component)` makes the application instance available to the given component and its children. It does this by wrapping your component with a component that adds the application to the [context](https://www.tildedave.com/2014/11/15/introduction-to-contexts-in-react-js.html). While contexts are the easiest way of making the application instance available to components, making use of the application tends to be quite verbose. To solve this you can inject dependencies in to your component using [containers]({% url /api/containers/index.html#inject %}), [state mixins]({% url /api/state-mixin/index.html#inject %}) and the [inject mixin]({% url /api/inject-mixin/index.html %}).
 
 {% sample %}
 classic
 =======
+//views/user.js
 var User = React.createClass({
-    ...
-    contextTypes: Marty.contextTypes,
     saveUser: function () {
-        // Using props
-        var userActions = this.props.app.userActions;
-
-        // Using contextTypes
-        var userActions = this.context.app.userActions;
-
-        userActions.saveUser({
+        this.userActions.saveUser({
             id: this.props.user.id
         });
     }
 })
 
-module.exports = Marty.createContainer(User);
+module.exports = Marty.createContainer(User, {
+    inject: 'userActions'
+});
 
+//main.js
+var app = new Application();
+var User = app.bindTo(require('./views/user'));
+
+React.render(<User />, document.getElementById('app'));
 es6
 ===
+//views/user.js
 class User extends React.Component {
     saveUser() {
-         // Using props
-        var { userActions } = this.props.app;
-
-        // Using contextTypes
-        var { userActions } = this.context.app;
-
-        this.props.app.saveUser({
+        this.userActions.saveUser({
             id: this.props.user.id
         });
     }
 }
 
-User.contextTypes = Marty.contextTypes;
+module.exportsdow = Marty.createContainer(User, {
+    inject: 'userActions'
+});
 
-module.exports = Marty.createContainer(User);
+//main.js
+var app = new Application();
+var User = app.bindTo(require('./views/user'));
+
+React.render(<User />, document.getElementById('app'));
 {% endsample %}

@@ -200,10 +200,10 @@ module.exports = Marty.createContainer(User, {
   listenTo: ['userStore', 'friendsStore'],
   fetch: {
     user: function() {
-      return this.app.userStore.getUser(this.props.userId)
+      return this.userStore.getUser(this.props.userId)
     },
     friends: function () {
-      return this.app.friendsStore.getFriends(this.props.userId);
+      return this.friendsStore.getFriends(this.props.userId);
     }
   },
   pending: function (fetches) {
@@ -240,10 +240,10 @@ module.exports = Marty.createContainer(User, {
   listenTo: ['userStore', 'friendsStore'],
   fetch: {
     user: function() {
-      return this.app.userStore.getUser(this.props.userId)
+      return this.userStore.getUser(this.props.userId)
     },
     friends: function () {
-      return this.app.friendsStore.getFriends(this.props.userId);
+      return this.friendsStore.getFriends(this.props.userId);
     }
   },
   pending: function (fetches) {
