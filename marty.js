@@ -11,6 +11,7 @@ marty.use(require('marty-lib/modules/store'));
 marty.use(require('marty-lib/modules/action-creators'));
 marty.use(require('marty-lib/modules/queries'));
 marty.use(require('marty-lib/modules/state-mixin'));
+marty.use(require('marty-lib/modules/inject-mixin'));
 marty.use(require('marty-lib/modules/container'));
 marty.use(require('marty-lib/modules/http-state-source'));
 marty.use(require('marty-lib/modules/cookie-state-source'));
