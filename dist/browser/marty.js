@@ -409,8 +409,8 @@ var Context = (function () {
         });
 
         instance.deferredFetchDone = deferred();
-        instance.diagnostics = new FetchDiagnostics();
         fetchDone = instance.deferredFetchDone.promise;
+        instance.diagnostics = new FetchDiagnostics(options.prevDiagnostics);
 
         try {
           cb.call(this);
@@ -425,7 +425,7 @@ var Context = (function () {
         }
 
         return Promise.race([fetchDone, timeout(options.timeout)]).then(function () {
-          return instance.diagnostics.toJSON();
+          return instance.diagnostics;
         });
       }
     },
@@ -1204,16 +1204,28 @@ var _classCallCheck = function _classCallCheck(instance, Constructor) {
 var _ = require(65);
 
 var FetchDiagnostics = (function () {
-  function FetchDiagnostics() {
+  function FetchDiagnostics(prevDiagnostics) {
     _classCallCheck(this, FetchDiagnostics);
 
-    this.numberOfPendingFetches = 0;
-    this.fetches = [];
+    prevDiagnostics = prevDiagnostics || {
+      fetches: [],
+      numberOfPendingFetches: 0
+    };
+
+    this.numberOfNewFetchesMade = 0;
+    this.fetches = prevDiagnostics.fetches;
+    this.numberOfPendingFetches = prevDiagnostics.numberOfPendingFetches;
   }
 
   _createClass(FetchDiagnostics, {
     fetchStarted: {
       value: function fetchStarted(storeId, fetchId) {
+        var fetch = this.getFetch(storeId, fetchId);
+
+        if (!fetch) {
+          this.numberOfNewFetchesMade++;
+        }
+
         this.numberOfPendingFetches++;
         this.fetches.push({
           status: "PENDING",
@@ -1223,12 +1235,17 @@ var FetchDiagnostics = (function () {
         });
       }
     },
-    fetchDone: {
-      value: function fetchDone(storeId, fetchId, status, options) {
-        var fetch = _.find(this.fetches, {
+    getFetch: {
+      value: function getFetch(storeId, fetchId) {
+        return _.find(this.fetches, {
           storeId: storeId,
           fetchId: fetchId
         });
+      }
+    },
+    fetchDone: {
+      value: function fetchDone(storeId, fetchId, status, options) {
+        var fetch = this.getFetch(storeId, fetchId);
 
         if (fetch) {
           _.extend(fetch, {
@@ -1664,11 +1681,16 @@ function ClassAlreadyRegisteredWithId(clazz, type) {
 "use strict";
 
 var React = require(32);
+var _ = require(65);
 var Context = require(10);
 var ContextComponent = require(6);
 
+var MAX_NUMBER_OF_ITERATIONS = 10;
+
 function renderToString(options) {
-  options = options || {};
+  options = _.defaults(options || {}, {
+    maxNumberOfIterations: MAX_NUMBER_OF_ITERATIONS
+  });
 
   var Marty = this;
   var context = options.context;
@@ -1690,7 +1712,43 @@ function renderToString(options) {
       return;
     }
 
-    startFetches().then(dehydrateAndRenderHtml);
+    var totalIterations = 0;
+
+    resolveFetches().then(dehydrateAndRenderHtml);
+
+    // Repeatedly re-render the component tree until
+    // we no longer make any new fetches
+    function resolveFetches(prevDiagnostics) {
+      return waitForFetches(prevDiagnostics).then(function (diagnostics) {
+        if (diagnostics.numberOfNewFetchesMade === 0 || totalIterations > options.maxNumberOfIterations) {
+          return diagnostics;
+        } else {
+          totalIterations++;
+          return resolveFetches(diagnostics);
+        }
+      });
+    }
+
+    function waitForFetches(prevDiagnostics) {
+      var options = _.extend({
+        prevDiagnostics: prevDiagnostics
+      }, fetchOptions);
+
+      return context.fetch(function () {
+        try {
+          var element = createElement();
+
+          if (!element) {
+            reject(new Error("createElement must return an element"));
+            return;
+          }
+
+          React.renderToString(element);
+        } catch (e) {
+          reject(e);
+        }
+      }, options);
+    }
 
     function dehydrateAndRenderHtml(diagnostics) {
       context.fetch(function () {
@@ -1706,29 +1764,12 @@ function renderToString(options) {
           html += dehydratedState(context);
           resolve({
             html: html,
-            diagnostics: diagnostics
+            diagnostics: diagnostics.toJSON()
           });
         } catch (e) {
           reject(e);
         } finally {
           context.dispose();
-        }
-      }, fetchOptions);
-    }
-
-    function startFetches() {
-      return context.fetch(function () {
-        try {
-          var element = createElement();
-
-          if (!element) {
-            reject(new Error("createElement must return an element"));
-            return;
-          }
-
-          React.renderToString(element);
-        } catch (e) {
-          reject(e);
         }
       }, fetchOptions);
     }
@@ -1755,7 +1796,7 @@ function renderToString(options) {
 
 module.exports = renderToString;
 
-},{"10":10,"32":32,"6":6}],35:[function(require,module,exports){
+},{"10":10,"32":32,"6":6,"65":65}],35:[function(require,module,exports){
 "use strict";
 
 var log = require(28);
@@ -10522,7 +10563,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.14",
+    version: "0.9.15",
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
