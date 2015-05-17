@@ -55,8 +55,8 @@ var Context = (function () {
         });
 
         instance.deferredFetchDone = deferred();
-        instance.diagnostics = new FetchDiagnostics();
         fetchDone = instance.deferredFetchDone.promise;
+        instance.diagnostics = new FetchDiagnostics(options.prevDiagnostics);
 
         try {
           cb.call(this);
@@ -71,7 +71,7 @@ var Context = (function () {
         }
 
         return Promise.race([fetchDone, timeout(options.timeout)]).then(function () {
-          return instance.diagnostics.toJSON();
+          return instance.diagnostics;
         });
       }
     },

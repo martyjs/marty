@@ -46,7 +46,7 @@ describe('context', function () {
 
       it('should return diagnostics about the fetches', function () {
         // Cannot reliably test time so just going to ignore
-        var diagnosticsWithoutTime = _.map(diagnostics, function (diagnostic) {
+        var diagnosticsWithoutTime = _.map(diagnostics.toJSON(), function (diagnostic) {
           return _.omit(diagnostic, 'time');
         });
 

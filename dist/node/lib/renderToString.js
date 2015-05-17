@@ -1,11 +1,16 @@
 "use strict";
 
 var React = require("./react");
+var _ = require("./utils/mindash");
 var Context = require("./context");
 var ContextComponent = require("./components/context");
 
+var MAX_NUMBER_OF_ITERATIONS = 10;
+
 function renderToString(options) {
-  options = options || {};
+  options = _.defaults(options || {}, {
+    maxNumberOfIterations: MAX_NUMBER_OF_ITERATIONS
+  });
 
   var Marty = this;
   var context = options.context;
@@ -27,7 +32,43 @@ function renderToString(options) {
       return;
     }
 
-    startFetches().then(dehydrateAndRenderHtml);
+    var totalIterations = 0;
+
+    resolveFetches().then(dehydrateAndRenderHtml);
+
+    // Repeatedly re-render the component tree until
+    // we no longer make any new fetches
+    function resolveFetches(prevDiagnostics) {
+      return waitForFetches(prevDiagnostics).then(function (diagnostics) {
+        if (diagnostics.numberOfNewFetchesMade === 0 || totalIterations > options.maxNumberOfIterations) {
+          return diagnostics;
+        } else {
+          totalIterations++;
+          return resolveFetches(diagnostics);
+        }
+      });
+    }
+
+    function waitForFetches(prevDiagnostics) {
+      var options = _.extend({
+        prevDiagnostics: prevDiagnostics
+      }, fetchOptions);
+
+      return context.fetch(function () {
+        try {
+          var element = createElement();
+
+          if (!element) {
+            reject(new Error("createElement must return an element"));
+            return;
+          }
+
+          React.renderToString(element);
+        } catch (e) {
+          reject(e);
+        }
+      }, options);
+    }
 
     function dehydrateAndRenderHtml(diagnostics) {
       context.fetch(function () {
@@ -43,29 +84,12 @@ function renderToString(options) {
           html += dehydratedState(context);
           resolve({
             html: html,
-            diagnostics: diagnostics
+            diagnostics: diagnostics.toJSON()
           });
         } catch (e) {
           reject(e);
         } finally {
           context.dispose();
-        }
-      }, fetchOptions);
-    }
-
-    function startFetches() {
-      return context.fetch(function () {
-        try {
-          var element = createElement();
-
-          if (!element) {
-            reject(new Error("createElement must return an element"));
-            return;
-          }
-
-          React.renderToString(element);
-        } catch (e) {
-          reject(e);
         }
       }, fetchOptions);
     }

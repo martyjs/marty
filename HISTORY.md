@@ -1,3 +1,7 @@
+0.9.15 / 2015-05-17
+===================
+- Update Marty.renderToString so that it will continue re-rendering until no new fetches are made. Resolves [#314](https://github.com/martyjs/marty/issues/314).
+
 0.9.14 / 2015-05-14
 ===================
 - Updated isomorphic-fetch to v2.0.0
