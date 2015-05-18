@@ -1,0 +1,1 @@
+module.exports = require('marty-lib/modules/test-utils');
