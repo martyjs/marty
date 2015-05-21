@@ -1,3 +1,8 @@
+0.9.16 / 2015-05-21
+===================
+- Remove try/catch around when to improve stack traces [#313](https://github.com/martyjs/marty/issues/313).
+- Make HTTP methods upper case to conform to Fetch spec [#318](https://github.com/martyjs/marty/issues/318)
+
 0.9.15 / 2015-05-17
 ===================
 - Update Marty.renderToString so that it will continue re-rendering until no new fetches are made. Resolves [#314](https://github.com/martyjs/marty/issues/314).
