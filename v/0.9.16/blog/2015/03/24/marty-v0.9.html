@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>marty.js v0.9</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/v/0.9.16/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="/v/0.9.16/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.16/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.16/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.16/css/syntax.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.9.16/css/docs.css">
+
+  <script type="text/javascript" src="/v/0.9.16/js/codemirror.js"></script>
+</head>
+<body>
+
+  
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/v/0.9.16/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="/v/0.9.16/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/flux/index.html">
+                    Flux
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/es6/index.html">
+                    ES6
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.9.16/api/top-level-api">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/context/index.html">
+                    Context
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/registry/index.html">
+                    Registry
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.9.16/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.9.16/support">Support</a>
+          </li>
+          <li>
+            <a href="/v/0.9.16/devtools">Developer Tools</a>
+          </li>
+          <li class="active">
+            
+
+            <a href="/v/0.9.16/blog/2015/03/24/marty-v0.9.html">Blog</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/martyjs/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+        <li class="nav-section">
+          <a  class="active" href="/v/0.9.16/blog/2015/03/24/marty-v0.9.html">marty.js v0.9</a>
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    <h1 class="page-title">
+      marty.js v0.9
+
+
+      <span class="meta">by <a href="http://github.com/jhollingworth">jhollingworth</a> <span class="hidden-xs">on March 24, 2015</span></span>
+
+      <div class="page-share">
+        <div class="hidden-xs" style="margin-top:3px">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-text="marty.js 0.9 - Isomorphism, ES6 classes and much more" data-size="large" data-count="none" data-hashtags="martyjs">Tweet</a>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          <a class="github-button" href="https://github.com/martyjs/marty" data-style="mega" data-count-href="/martyjs/marty/stargazers" data-count-api="/repos/martyjs/marty#stargazers_count">Star</a>
+        </div>
+        <div class="visible-xs-block" style="margin-top:40px">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-text="marty.js 0.9 - Isomorphism, ES6 classes and much more" data-count="none" data-hashtags="martyjs">Tweet</a>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+          <!-- Place this tag where you want the button to render. -->
+          <a class="github-button" href="https://github.com/martyjs/marty" data-count-href="/martyjs/marty/stargazers" data-count-api="/repos/martyjs/marty#stargazers_count">Star</a>
+        </div>
+      </div>
+    </h1>
+    <div class="content">
+      <p>It&#39;s been 2 months since we first publicly announced Marty. Since then we&#39;ve been working hard building new features and refining our API. Today I&#39;m happy to announce Marty v0.9!</p>
+
+<p>So what&#39;s new in this release?</p>
+
+<h2 id="isomorphisim">Isomorphisim</h2>
+
+<p>Being able to run your JS application on the server and in the browser has been one of the major reasons people have started using React. We&#39;ve found it&#39;s still challenging to build isomorphic applications and so we&#39;ve built a set of APIs that make it easier.</p>
+
+<p><a href="/v/0.9.16/api/top-level-api/index.html#renderToString"><code>Marty.renderToString</code></a> is a smarter version of <a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring"><code>React.renderToString</code></a> which knows what state each component needs, fetches it for you and then renders the component. It also gives you lots of diagnostic information to understand what Marty is doing on the server:</p>
+
+<p><a href="/v/0.9.16/img/renderToString-diagnostics.png"><img src="/v/0.9.16/img/renderToString-diagnostics.png" width="100%" alt="Marty Developer Tools"/></a></p>
+
+<p>For synchronizing state between the server and browser we have <a href="/v/0.9.16/api/top-level-api/#dehydrate"><code>Marty.dehydrate()</code></a> and <a href="/v/0.9.16/api/top-level-api/#rehydrate"><code>Marty.rehydrate()</code></a>. <a href="/v/0.9.16/api/top-level-api/#dehydrate"><code>Marty.dehydrate()</code></a> serializes the contents of your stores to a string which is sent down with the rendered HTML. When your application first loads in the browser you just need to call <a href="/v/0.9.16/api/top-level-api/#rehydrate"><code>Marty.rehydrate()</code></a> to have your stores return back to their state when on the server.</p>
+
+<p>We&#39;ve also created <a href="/v/0.9.16/guides/isomorphism/marty-express.html">marty-express</a>, a middleware for <a href="expressjs.com">express.js</a> which consumes <a href="https://github.com/rackt/react-router">react-router</a> routes so you don&#39;t have to have to duplicate your routing on the client and the server. It also modifies the <a href="/v/0.9.16/api/state-sources/http.html">HTTP state source</a> so HTTP requests made on the server will behave the same as they would in the browser.</p>
+
+<p>If you&#39;d like to learn more, we&#39;ve written a <a href="/v/0.9.16/guides/isomorphism/index.html">guide on how to get started</a>. Our <a href="https://github.com/martyjs/marty-chat-example">example chat app</a> has also been updated to be isomorphic.</p>
+
+<h2 id="es6-classes">ES6 Classes</h2>
+
+<p>To complement React ability to define components using ES6 classes we now support defining all types using classes as well. You can read our guide on <a href="/v/0.9.16/guides/es6/index.html">ES6</a> to find out how to make the switch. We have also created a new version of the <a href="https://github.com/martyjs/marty-chat-example-es6">example chat app which uses ES6 classes</a>.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'UsersStore'</span><span class="p">,</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[];</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+  <span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="containers">Containers</h2>
+
+<p>When defining components using ES6 classes you can no longer use mixins which means you won&#39;t be able to use the <a href="/v/0.9.16/guides/state-mixin/index.html">state mixin</a>. A new pattern emerging to solve this problem is <a href="https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750">to wrap your components in &quot;container&quot; components</a>. We&#39;re a big fan of this pattern and so we&#39;ve introduced <a href="/v/0.9.16/api/top-level-api/index.html#createContainer"><code>Marty.createContainer</code></a> which creates a container component that does the same job as the <a href="/v/0.9.16/guides/state-mixin/index.html">state mixin</a>. You can checkout our <a href="/v/0.9.16/guides/containers/index.html">containers guide</a> to learn more about them.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">User</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"User"</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">User</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">listenTo</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
+  <span class="na">fetch</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nx">user</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">UserStore</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">getUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="p">(</span><span class="nx">errors</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"User User-failedToLoad"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">errors</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">pending</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">done</span><span class="p">({</span>
+      <span class="na">user</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+
+<h2 id="queries">Queries</h2>
+
+<p>
+<a href="/v/0.9.16/guides/queries/index.html">Queries</a> are a new type we're introducing that is responsible for coordinating getting new state from outside of the application. They should help reduce some confusion about how to dispatch actions when fetching state. You can read <a href="/v/0.9.16/guides/queries/index.html">our guide</a> to learn why they've been introduced.
+</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UserQueries</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createQueries</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'UserQueries'</span><span class="p">,</span>
+  <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+    <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UserQueries</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Queries</span> <span class="p">{</span>
+  <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_STARTING</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+    <span class="nx">UserAPI</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}).</span><span class="k">catch</span><span class="p">((</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserActions</span><span class="p">.</span><span class="nx">RECEIVE_USER_FAILED</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">err</span><span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="action-creators">Action creators</h2>
+
+<p>Our approach to defining <a href="http://martyjs.org/v/0.8.15/guides/action-creators/index.html">action creators</a> was the source of lots of confusion and many bugs. We&#39;ve got a new, simplified approach which should resolve these issues.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_EMAIL"</span><span class="p">]);</span>
+
+<span class="kd">var</span> <span class="nx">UserActionCreators</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createActionCreators</span><span class="p">({</span>
+  <span class="na">id</span><span class="p">:</span> <span class="s1">'UserActionCreators'</span><span class="p">,</span>
+  <span class="na">updateEmail</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UserConstants</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createConstants</span><span class="p">([</span><span class="s2">"UPDATE_EMAIL"</span><span class="p">]);</span>
+
+<span class="kr">class</span> <span class="nx">UserActionCreators</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">ActionCreators</span> <span class="p">{</span>
+  <span class="nx">updateEmail</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">UserConstants</span><span class="p">.</span><span class="nx">UPDATE_EMAIL</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="nx">email</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="one-render-per-store">Components only re-rendered once per action</h2>
+
+<p>There was an <a href="https://www.youtube.com/watch?v=LTj4O7WJJ98&amp;list=PLb0IAmt7-GS1cbw4qonlQztYV1TAW0sCr#t=473">interesting discussion in the Flux panel at React Conf about batching store updates to improve performance</a>. Marty now does this automatically for you so no matter how many times your store changes your components will only be re-rendered once per action.</p>
+
+<h2 id="developer-tools">Developer Tools</h2>
+
+<p><a href="/v/0.9.16/guides/developer-tools/index.html">Marty Developer Tools</a> has been given an overhaul. It can now tell you things like what components re-rendered as a result of the action and which stores caused a component to re-render. It also gives you the ability to reset the applications state to a specific action (think <code>get reset --hard actionId</code>).</p>
+
+<p><a href="/v/0.9.16/img/devtools-data-flow.png"><img src="/v/0.9.16/img/devtools-data-flow.png" width="100%" alt="Marty Developer Tools"/></a></p>
+
+<h2 id="lodash">lodash</h2>
+
+<p>Thanks to <a href="https://github.com/jdalton">@jdalton</a> we&#39;ve moved from underscore.js to lodash (This is an internal change so wont effect you if you&#39;re using underscore in your application). This has resulted in a <strong>6KB drop</strong> in our gzipped file size. Unfortunately Marty has also grown by 6KB so Marty v0.9 is the same size as Marty v0.8 :(</p>
+
+<h2 id="changelog">Changelog</h2>
+
+<p>For those currently using Marty v0.8, we&#39;ve written a <a href="/v/0.9.16/guides/upgrading/08_09.html">guide for upgrading to v0.9</a>. <a href="https://github.com/dariocravero">@dariocravero</a> also has an <a href="https://gist.github.com/dariocravero/2ea4308946c15f2da1af">excellent guide on making the move to ES6</a>.</p>
+
+<h3>Breaking changes</h3>
+
+<p><code>Store#setState</code> has been renamed to <a href="/v/0.9.16/api/stores/index.html#replaceState"><code>Store#replaceState</code></a>. <a href="/v/0.9.16/api/stores/index.html#setState"><code>Store#setState</code></a> will now merge the existing state with the new state. This is to more closely follow the React API.</p>
+
+<h3>New features</h3>
+
+<ul>
+<li>Isomorphism (<a href="http://github.com/martyjs/marty/issues/13">#13</a>)</li>
+<li>CookieStateSource &amp; LocationStateSource (<a href="http://github.com/martyjs/marty/issues/205">#205</a>)</li>
+<li>ES6 Classes (<a href="http://github.com/martyjs/marty/issues/89">#89</a>)</li>
+<li>Add dataType option to http state source (<a href="http://github.com/martyjs/marty/issues/176">#176</a>)</li>
+<li>Lodash v3 instead of underscore (<a href="http://github.com/martyjs/marty/issues/170">#170</a>)</li>
+<li>HttpStateSource hooks (<a href="http://github.com/martyjs/marty/issues/118">#118</a>)</li>
+<li>FetchResult#toPromise (<a href="http://github.com/martyjs/marty/issues/180">#180</a>)</li>
+<li>Clear fetch history in Store#clear (<a href="http://github.com/martyjs/marty/issues/149">#149</a>)</li>
+<li>Batch store change events (<a href="http://github.com/martyjs/marty/issues/183">#183</a>)</li>
+<li>Allow you to specify when function context (<a href="http://github.com/martyjs/marty/issues/184">#184</a>)</li>
+<li>Marty.createContainer (<a href="http://github.com/martyjs/marty/issues/206">#206</a>)</li>
+<li>Set request credentials to &#39;same-origin&#39; (<a href="http://github.com/martyjs/marty/issues/209">#209</a>)</li>
+</ul>
+
+<p><strong>Bugs</strong></p>
+
+<ul>
+<li>dependsOn doesn&#39;t update when dependent store updates (<a href="http://github.com/martyjs/marty/issues/113">#113</a>)</li>
+<li>Don&#39;t auto set content-type if using FormData (<a href="http://github.com/martyjs/marty/issues/140">#140</a>)</li>
+<li>Fetch API compatibility (<a href="http://github.com/martyjs/marty/issues/133">#133</a>)</li>
+</ul>
+
+<h3>Deprecations</h3>
+
+<ul>
+<li><a href="/v/0.9.16/guides/action-creators/migrating-from-v8.html">Invokable action creators</a></li>
+<li><a href="/v/0.9.16/guides/state-mixin/index.html">State Mixin</a>, use <a href="/v/0.9.16/guides/containers/index.html">containers</a> instead.</li>
+</ul>
+
+    </div>
+
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES * * */
+        var disqus_shortname = 'martyjs';
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+  </div>
+</div>
+<!-- Place this tag right after the last button or just before your close body tag. -->
+<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+
+<script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES * * */
+  var disqus_shortname = 'martyjs';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+      var s = document.createElement('script'); s.async = true;
+      s.type = 'text/javascript';
+      s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+      (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+  }());
+</script>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.9.16</li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+    function trackOutboundLink(url) {
+      ga('send', 'event', 'outbound', 'click', url, {
+        'hitCallback': function () {
+          document.location = url;
+        }
+      });
+    }
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/v/0.9.16/js/style.js"></script>
+  <script type="text/javascript" src="/v/0.9.16/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>

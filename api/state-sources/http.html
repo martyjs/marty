@@ -771,15 +771,11 @@
   <span class="na">type</span><span class="p">:</span> <span class="s1">'http'</span><span class="p">,</span>
   <span class="na">id</span><span class="p">:</span> <span class="s1">'UsersAPI'</span><span class="p">,</span>
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">body</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
-        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">UserSourceActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
-        <span class="p">});</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">body</span><span class="p">:</span> <span class="nx">user</span> <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersAPI</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">HttpStateSource</span> <span class="p">{</span>
   <span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">body</span><span class="p">:</span> <span class="nx">user</span> <span class="p">})</span>
-        <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">UserSourceActionCreators</span><span class="p">.</span><span class="nx">receiveUser</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">));</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">post</span><span class="p">({</span> <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span> <span class="na">body</span><span class="p">:</span> <span class="nx">user</span> <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></div>
 </div>
@@ -796,7 +792,7 @@
   <span class="na">type</span><span class="p">:</span> <span class="s1">'http'</span><span class="p">,</span>
   <span class="na">id</span><span class="p">:</span> <span class="s1">'UsersAPI'</span><span class="p">,</span>
   <span class="na">createUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span>
       <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span>
       <span class="na">method</span><span class="p">:</span> <span class="s1">'POST'</span><span class="p">,</span>
       <span class="na">body</span><span class="p">:</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'foo'</span> <span class="p">},</span>
@@ -805,7 +801,7 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersAPI</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">HttpStateSource</span> <span class="p">{</span>
   <span class="nx">createUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span>
       <span class="na">url</span><span class="p">:</span> <span class="s1">'/users'</span><span class="p">,</span>
       <span class="na">method</span><span class="p">:</span> <span class="s1">'POST'</span><span class="p">,</span>
       <span class="na">body</span><span class="p">:</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'foo'</span> <span class="p">}</span>
@@ -950,7 +946,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.9.14</li>
+        <li>v0.9.16</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>
