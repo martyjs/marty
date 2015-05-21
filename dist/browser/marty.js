@@ -2461,7 +2461,7 @@ function requestOptions(method, source, options) {
     headers: {}
   });
 
-  options.method = method.toLowerCase();
+  options.method = method.toUpperCase();
 
   if (baseUrl) {
     var separator = "";
@@ -3839,7 +3839,6 @@ module.exports = validateHandlers;
 },{"21":21,"22":22,"65":65}],58:[function(require,module,exports){
 "use strict";
 
-var log = require(28);
 var _ = require(65);
 var StatusConstants = require(8);
 
@@ -3859,33 +3858,15 @@ function when(handlers, parentContext) {
     WhenContext.prototype = parentContext;
   }
 
-  try {
-    switch (this.status) {
-      case StatusConstants.PENDING.toString():
-        return handler.call(new WhenContext());
-      case StatusConstants.FAILED.toString():
-        return handler.call(new WhenContext(), this.error);
-      case StatusConstants.DONE.toString():
-        return handler.call(new WhenContext(), this.result);
-      default:
-        throw new Error("Unknown fetch result status");
-    }
-  } catch (e) {
-    var errorMessage = "An error occurred when handling the DONE state of ";
-
-    if (this.id) {
-      errorMessage += "the fetch '" + this.id + "'";
-    } else {
-      errorMessage += "a fetch";
-    }
-
-    if (this.store) {
-      errorMessage += " from the store " + this.store;
-    }
-
-    log.error(errorMessage, e);
-
-    throw e;
+  switch (this.status) {
+    case StatusConstants.PENDING.toString():
+      return handler.call(new WhenContext());
+    case StatusConstants.FAILED.toString():
+      return handler.call(new WhenContext(), this.error);
+    case StatusConstants.DONE.toString():
+      return handler.call(new WhenContext(), this.result);
+    default:
+      throw new Error("Unknown fetch result status");
   }
 
   function WhenContext() {
@@ -3963,7 +3944,7 @@ function aggregateStatus(fetchResults) {
 module.exports = when;
 /* fetchResults, handlers */
 
-},{"28":28,"65":65,"8":8}],59:[function(require,module,exports){
+},{"65":65,"8":8}],59:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () {
@@ -10563,7 +10544,7 @@ function createInstance() {
   return _.extend({
     logger: logger,
     dispose: dispose,
-    version: "0.9.15",
+    version: "0.9.16",
     warnings: warnings,
     dispatcher: Dispatcher,
     diagnostics: Diagnostics,
