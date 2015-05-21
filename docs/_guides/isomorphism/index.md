@@ -75,6 +75,8 @@ Marty.renderToString({
     context: Marty.createContext()
 }).then(function (render) {
     res.send(render.html).end();
+},function(err) {
+    res.send("<html><body>"+ err.stack + "</body></html>").end();
 });
 {% endhighlight %}
 
