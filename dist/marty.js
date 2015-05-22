@@ -2180,12 +2180,6 @@ module.exports = function (React) {
 
     var Container = React.createClass(_.extend({
       contextTypes: contextTypes,
-      childContextTypes: {
-        app: React.PropTypes.object
-      },
-      getChildContext: function getChildContext() {
-        return { app: this.props.app };
-      },
       componentDidMount: function componentDidMount() {
         var component = {
           id: id,
@@ -10250,7 +10244,7 @@ require(3);
 require(1).polyfill();
 
 var Marty = require(31);
-var marty = new Marty("0.10.0-beta", react());
+var marty = new Marty("0.10.0-beta", require("react/addons"));
 
 marty.use(require(28));
 marty.use(require(15));
@@ -10269,16 +10263,6 @@ marty.use(require(57));
 marty.use(require(59));
 
 module.exports = marty;
-
-// Due to [NPM peer dependency issues](https://github.com/npm/npm/issues/5875)
-// we need to try resolving react from the parent if its not present locally
-function react() {
-  try {
-    return module.parent.require("react/addons");
-  } catch (e) {
-    return require("react/addons");
-  }
-}
 
 },{"1":1,"12":12,"15":15,"18":18,"20":20,"28":28,"3":3,"31":31,"54":54,"55":55,"57":57,"59":59,"61":61,"65":65,"67":67,"7":7,"70":70,"77":77,"undefined":undefined}]},{},[])("/marty.js")
 });
