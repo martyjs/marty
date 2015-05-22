@@ -26,8 +26,8 @@ module.exports = marty;
 // we need to try resolving react from the parent if its not present locally
 function react() {
   try {
-    return require('react');
+    return module.parent.require('react/addons');
   } catch (e) {
-    return module.parent.require('react');
+    return require('react/addons');
   }
 }
