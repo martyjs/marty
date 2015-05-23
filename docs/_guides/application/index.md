@@ -60,9 +60,11 @@ var app = new Application();
 React.render(<User id={123} app={app} />, document.getElementById('app'));
 {% endsample %}
 
-To tell the application about all the types in the system you use `register`. The two things you must specify are an Id (string) and a type (e.g. a `Store` or an `ActionCreator`). Internally `register` will create an instance of that type, passing the application instance into the constructor and then making it accessible on the application object.
+You use `register` to tell the application about all the different types in your application. The two things you must specify are an Id (string) and a type (e.g. a `Store` or an `ActionCreator`). Internally `register` will create an instance of that type, passing the application instance into the constructor and then making it accessible on the application object.
 
 You can also pass in an object literal to `register`, allowing you to register multiple types at once as well. If the object values are themselves objects then their Id's will be the path to the leaf node joined by `.`'s.
+
+Having to remember to register types when you create them can become a bit of a chore. If you're using [webpack](http://webpack.github.io/) or [browserify](http://browserify.org) you can [automate the registration process]({% url /guides/application/automatic-registration.html %})!
 
 {% sample %}
 classic
@@ -143,3 +145,4 @@ var app = new Application();
 
 React.render(<User app={app} />, document.getElementById('app'));
 {% endsample %}
+

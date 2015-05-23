@@ -46,7 +46,7 @@ class UserQueries extends Marty.Queries {
   }
 }
 
-export default Marty.register(UserQueries);
+module.exports = UserQueries;
 {% endsample %}
 
 ##Why have Queries at all?
