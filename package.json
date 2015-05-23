@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.10.0-beta.3",
+  "version": "0.10.0-beta.5",
   "description": "A Javascript library for state management in React applications",
   "main": "marty.js",
   "directories": {
@@ -21,7 +21,7 @@
   "dependencies": {
     "es6-promise": "^2.0.0",
     "isomorphic-fetch": "^2.0.0",
-    "marty-lib": "^0.10.0-beta.2"
+    "marty-lib": "^0.10.0-beta.5"
   },
   "devDependencies": {
     "babel": "^5.0.0",

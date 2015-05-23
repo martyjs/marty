@@ -16,7 +16,7 @@ release:
 
 build:
 	@rm -rf dist && mkdir -p dist
-	@$(BIN)/browserify --bare  --transform babelify --plugin bundle-collapser/plugin --require ./marty.js --exclude react --standalone Marty > dist/marty.js
+	@$(BIN)/browserify --bare  --transform babelify --plugin bundle-collapser/plugin --require ./marty.js --exclude react/addons --standalone Marty > dist/marty.js
 	@cat dist/marty.js | $(BIN)/uglifyjs -m -c "comparisons=false,keep_fargs=true,unsafe=true,unsafe_comps=true,warnings=false" -b "ascii_only=true,beautify=false" -o dist/marty.min.js
 	@gzip --best dist/marty.min.js -c > dist/marty.min.js.gz
 
