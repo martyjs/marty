@@ -222,16 +222,15 @@ var User = React.createClass({
   updateEmail: function (e) {
     var email = e.target.value;
 
-    this.userActionCreators.updateUserEmail(this.props.userId, email);
+    this.app.userActionCreators.updateUserEmail(this.props.userId, email);
   }
 });
 
 module.exports = Marty.createContainer(User, {
   listenTo: 'userStore',
-  inject: 'userActionCreators',
   fetch: {
     user() {
-      return this.userStore.getUser(this.props.userId)
+      return this.app.userStore.getUser(this.props.userId)
     }
   }
 });
@@ -250,16 +249,15 @@ class User extends React.Component {
   updateEmail(e) {
     var email = e.target.value;
 
-    this.userActionCreators.updateUserEmail(this.props.userId, email);
+    this.app.userActionCreators.updateUserEmail(this.props.userId, email);
   }
 }
 
 module.exports = Marty.createContainer(User, {
   listenTo: 'userStore',
-  inject: 'userActionCreators',
   fetch: {
     user() {
-      return this.userStore.getUser(this.props.userId)
+      return this.app.userStore.getUser(this.props.userId)
     }
   }
 });

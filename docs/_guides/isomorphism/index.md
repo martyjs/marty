@@ -60,7 +60,7 @@ module.exports = Marty.createContainer(User, {
     listenTo: 'userStore',
     fetch: {
         user() {
-            return this.userStore.getUser(this.props.id)
+            return this.app.userStore.getUser(this.props.id)
         }
     },
     failed(errors) {
@@ -69,8 +69,6 @@ module.exports = Marty.createContainer(User, {
 })
 
 // renderToString.js
-
-var User = app.bindTo(require('./components/user'));
 
 app.renderToString(<User id={123} />)
    .then(render => res.send(render.html).end());

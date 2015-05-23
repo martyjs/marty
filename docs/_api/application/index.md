@@ -40,22 +40,6 @@ app.register({
 console.log(app.bar.baz);
 {% endhighlight %}
 
-<h3 id="bindTo">bindTo(Component)</h3>
-
-Makes the application available to the component and child components via contexts. To do this it wraps the component with a component.
-
-{% highlight js %}
-class User extends React.Component {
-  contextTypes: { app: React.PropTypes.object.isRequired } // or Marty.contextTypes
-  saveUser() {
-    this.context.app.userActions.saveUser();
-  }
-}
-
-var UserWithApp = app.bindTo(User);
-...
-{% endhighlight %}
-
 <h3 id="replaceState">replaceState(stores)</h3>
 
 Replaces ([Store#replaceState]({% url /api/stores/index.html#replaceState %})) the state of all stores with the values passed in. The key within the ``stores`` object literal must be the Id of the store.
@@ -96,11 +80,11 @@ Given some dehyrdated state, it will call [Store#rehydrate]({% url /api/stores/i
 
 <h3 id="renderToString">renderToString(Component, options)</h3>
 
-[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given component type with the given props to string, waits for all fetches to complete and then re-renders component. Returns a promise which resolves once component is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**).
+[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given element to a string, waits for all fetches to complete and then re-renders element. Returns a promise which resolves once element is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**).
 
 {% highlight js %}
 var app = new Application();
-var User = app.bindTo(require('./views/user'));
+var User = require('./views/user');
 
 app.renderToString(<User id={123} />, { timeout: 2000}).then(function (res) {
   console.log('Rendered html', res.html);

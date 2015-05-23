@@ -20,8 +20,8 @@ var UserState = Marty.createStateMixin({
   listenTo: ['userStore', 'friendsStore'],
   getState: function () {
     return {
-      users: this.userStore.getUser(this.props.userId),
-      friends: this.friendsStores.getFriends(this.props.userId)
+      users: this.app.userStore.getUser(this.props.userId),
+      friends: this.app.friendsStores.getFriends(this.props.userId)
     };
   }
 });

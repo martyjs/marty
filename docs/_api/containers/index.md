@@ -15,10 +15,10 @@ module.exports = Marty.createContainer(User, {
   listenTo: 'userStore',
   fetch: {
     user() {
-      return this.userStore.getUser(this.props.id);
+      return this.app.userStore.getUser(this.props.id);
     },
     friends() {
-      return this.userStore.getFriends(this.props.id);
+      return this.app.userStore.getFriends(this.props.id);
     }
   },
   failed(errors) {
@@ -39,22 +39,6 @@ module.exports = Marty.createContainer(User, {
 
 Must be either a [store]({% url /api/stores/index.html %}) or an array of [stores]({% url /api/stores/index.html %}). When the store changes then all state is re-fetched and passed to inner component.
 
-<h3 id="inject">inject</h3>
-
-Accepts an array of application dependency Ids (or a single dependency Id) and makes the dependencies available in the container and inner component. Anything you [listenTo](#listenTo) is automatically injected in.
-
-{% highlight js %}
-class User extends React.Component {
-  saveUser() {
-    this.userActions.saveUser(this.state.user);
-  }
-}
-
-module.exports = Marty.createContainer(User, {
-  inject: ['userActions']
-});
-{% endhighlight %}
-
 <h3 id="fetch">fetch</h3>
 
 ``fetch`` is an object hash. The value is a function which is invoked and the result is passed to the inner component as a prop. The prop key is determined by the key in the hash.
@@ -66,7 +50,7 @@ module.exports = Marty.createContainer(User, {
   listenTo: ['userStore'],
   fetch() {
     return {
-      user: this.userStore.getUser(this.props.id);
+      user: this.app.userStore.getUser(this.props.id);
     }
   }
 });
@@ -90,10 +74,10 @@ Invoked when any of the fetches have failed. An object hash is passed in where t
 
 {% highlight js %}
 module.exports = Marty.createContainer(User, {
-  inject: 'userStore'
+  listenTo: 'userStore'
   fetch() {
     return {
-      user: this.userStore.getUser(this.props.id);
+      user: this.app.userStore.getUser(this.props.id);
     }
   },
   failed(errors) {
