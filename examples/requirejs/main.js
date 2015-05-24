@@ -1,6 +1,6 @@
 require.config({
   paths: {
-    marty: '../../dist/browser/marty',
+    marty: '../../dist/marty',
     react: '../../node_modules/react/dist/react'
   },
   shim: {
@@ -11,26 +11,41 @@ require.config({
 });
 
 require(['react', 'marty'], function (React, Marty) {
-  var Store = Marty.createStore({
-    id: 'Store',
+  var FooStore = Marty.createStore({
     getInitialState: function () {
       return {
         1: { displayName: 'Foo' },
         2: { displayName: 'Bar' }
       };
+    },
+    getFoo: function (id) {
+      return this.state[id];
     }
   });
 
-  var App = React.createClass({
-    mixins: [Marty.createStateMixin(Store)],
+  var Application = Marty.createApplication(function () {
+    this.register('fooStore', FooStore);
+  });
+
+  var Foo = React.createClass({
     render: function () {
-      return React.createElement("ul", null,
-        Object.keys(this.state).map(function (id) {
-          return React.createElement("li", null, this.state[id].displayName);
-        }, this)
-      );
+      return React.createElement("div", null, this.props.foo.displayName);
     }
   });
 
-  React.render(React.createElement(App), document.getElementById('app'));
+  var FooContainer = Marty.createContainer(Foo, {
+    listenTo: 'fooStore',
+    fetch: {
+      foo: function () {
+        return this.app.fooStore.getFoo(this.props.id);
+      }
+    }
+  })
+
+  var element = React.createElement(FooContainer, {
+    id: 1,
+    app: new Application()
+  });
+
+  React.render(element, document.getElementById('app'));
 });

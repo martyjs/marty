@@ -20,17 +20,17 @@
   ],
   "dependencies": {
     "es6-promise": "^2.0.0",
-    "isomorphic-fetch": "^2.0.0",
+    "isomorphic-fetch": "^2.1.0",
     "marty-lib": "^0.10.0-beta.5"
   },
   "devDependencies": {
     "babel": "^5.0.0",
     "babelify": "^6.0.0",
-    "browserify": "^9.0.0",
-    "browserify-shim": "^3.7.0",
-    "bundle-collapser": "^1.0.0",
+    "browserify": "^10.0.0",
+    "bundle-collapser": "^1.2.0",
+    "react": "^0.13.3",
     "semver": "^4.2.0",
-    "uglify-js": "^2.4.20"
+    "uglify-js": "^2.4.23"
   },
   "peerDependencies": {
     "react": "0.13.x"

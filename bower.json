@@ -24,5 +24,6 @@
     "cookies-js": "^1.2.1",
     "isomorphic-fetch": "1.6.0",
     "lodash": "^3.5.0"
-  }
+  },
+  "version": "0.10.0-beta.5"
 }

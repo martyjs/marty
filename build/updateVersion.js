@@ -20,7 +20,7 @@ function updateDocs() {
 
 function updateMarty() {
   var marty = read('../marty.js');
-  marty = marty.replace(/new Marty('.*'/, util.format("new Marty('%s'", version));
+  marty = marty.replace(/new Marty\('.*'/, util.format("new Marty('%s'", version));
   write('../marty.js', marty);
 }
 

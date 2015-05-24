@@ -1,8 +1,13 @@
-require('isomorphic-fetch');
+// Need to define global for lodash
+if (typeof global === "undefined" && typeof window !== "undefined") {
+  window.global = window;
+}
+
 require('es6-promise').polyfill();
+require('isomorphic-fetch');
 
 var Marty = require('marty-lib/modules/core/marty');
-var marty = new Marty('0.10.0-beta', require('react/addons'));
+var marty = new Marty('0.10.0', react());
 
 marty.use(require('marty-lib/modules/core'));
 marty.use(require('marty-lib/modules/constants'));
@@ -11,7 +16,7 @@ marty.use(require('marty-lib/modules/store'));
 marty.use(require('marty-lib/modules/action-creators'));
 marty.use(require('marty-lib/modules/queries'));
 marty.use(require('marty-lib/modules/state-mixin'));
-marty.use(require('marty-lib/modules/inject-mixin'));
+marty.use(require('marty-lib/modules/app-mixin'));
 marty.use(require('marty-lib/modules/container'));
 marty.use(require('marty-lib/modules/http-state-source'));
 marty.use(require('marty-lib/modules/cookie-state-source'));
@@ -21,3 +26,19 @@ marty.use(require('marty-lib/modules/json-storage-state-source'));
 marty.use(require('marty-lib/modules/local-storage-state-source'));
 
 module.exports = marty;
+
+function react() {
+  try {
+    return module.parent.require("react");
+  } catch (e) {
+    try {
+      return require("react");
+    } catch (e) {
+      if (window.React) {
+        return window.React;
+      }
+    }
+  }
+
+  throw new Error('Could not find React');
+}
