@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>marty.js v0.10</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/v/0.10.0-beta.6/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="/v/0.10.0-beta.6/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.0-beta.6/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.0-beta.6/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.0-beta.6/css/syntax.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.0-beta.6/css/docs.css">
+
+  <script type="text/javascript" src="/v/0.10.0-beta.6/js/codemirror.js"></script>
+</head>
+<body>
+
+  
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/v/0.10.0-beta.6/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="/v/0.10.0-beta.6/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/flux/index.html">
+                    Flux
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.10.0-beta.6/api/top-level-api">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/app-mixin/index.html">
+                    App Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.0-beta.6/api/test-utils/index.html">
+                    Test Utils
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.10.0-beta.6/support">Support</a>
+          </li>
+          <li>
+            <a href="/v/0.10.0-beta.6/devtools">Developer Tools</a>
+          </li>
+          <li class="active">
+            
+
+            <a href="/v/0.10.0-beta.6/blog/2015/05/14/marty-v0.10.html">Blog</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/martyjs/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+        <li class="nav-section">
+          <a  class="active" href="/v/0.10.0-beta.6/blog/2015/05/14/marty-v0.10.html">marty.js v0.10</a>
+        </li>
+      
+        <li class="nav-section">
+          <a  href="/v/0.10.0-beta.6/blog/2015/03/24/marty-v0.9.html">marty.js v0.9</a>
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    <h1 class="page-title">
+      marty.js v0.10
+
+
+      <span class="meta">by <a href="http://github.com/jhollingworth">James Hollingworth</a> <span class="hidden-xs">on May 14, 2015</span></span>
+    </h1>
+    <div class="content">
+      <h3>New features</h3>
+
+<ul>
+<li>Support react-native (<a href="https://github.com/martyjs/marty/issues/230">#230</a>)</li>
+<li>No singleton (<a href="https://github.com/martyjs/marty/issues/261">#261</a>)</li>
+</ul>
+
+<h3>Deprecations</h3>
+
+<ul>
+<li>Due to API incompatibility issues  <code>parseJSON</code> will be removed by default in future versions</li>
+</ul>
+
+<h3>Removed</h3>
+
+<ul>
+<li><code>Marty.register()</code> is no longer needed, just return the type</li>
+<li>You will no longer be able to pass in a store or an object hash of stores into <code>Marty.createStateMixin</code></li>
+<li><a href="http://martyjs.org/v/0.9.0/api/stores/index.html#rollback">Rollbacks</a> have been removed entirely</li>
+<li><a href="http://martyjs.org/api/stores/#handlers">Store handler values</a> can only be either a string or an array of strings. You cannot do complex object queries any more.</li>
+<li><code>Marty.registry</code> is no longer supported. Use applications instead.</li>
+<li><code>Marty.createContext()</code> is no longer supported. Use applications instead.</li>
+<li><code>Marty.renderToString()</code> is no longer supported. Use <code>Application#renderToString()</code> instead</li>
+<li><code>Store#rollback()</code> is no longer supported. You should instead dispatch an error action.</li>
+<li><code>.for(this)</code> has been removed. Use applications instead.</li>
+<li>You no longer to specify <code>id</code>&#39;s in the type. Instead define the Id on the <code>Application#register()</code></li>
+<li><code>require(&#39;marty&#39;).Dispatcher</code> is no longer supported. Create an application and access the <a href="http://martyjs.org/api/application/index.html#dispatcher">dispatcher</a>.</li>
+<li><code>require(&#39;marty/http/hooks&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).hooks</code> instead</li>
+<li><code>require(&#39;marty/environment&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).environment</code></li>
+<li><code>require(&#39;marty/fetch&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).fetch</code></li>
+<li><code>require(&#39;marty/when&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).when</code></li>
+<li><code>require(&#39;marty/autoDispatch&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).autoDispatch</code></li>
+<li><code>require(&#39;marty&#39;).Diagnostics</code> is no longer supported. Use <code>require(&#39;marty&#39;).diagnostics</code></li>
+</ul>
+
+    </div>
+
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES * * */
+        var disqus_shortname = 'martyjs';
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+  </div>
+</div>
+
+<script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES * * */
+  var disqus_shortname = 'martyjs';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+      var s = document.createElement('script'); s.async = true;
+      s.type = 'text/javascript';
+      s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+      (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+  }());
+</script>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.10.0-beta.6</li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/v/0.10.0-beta.6/js/style.js"></script>
+  <script type="text/javascript" src="/v/0.10.0-beta.6/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>
