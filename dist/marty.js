@@ -3528,7 +3528,6 @@ var HttpStateSource = (function (_StateSource) {
   return HttpStateSource;
 })(StateSource);
 
-HttpStateSource.addHook(require(52));
 HttpStateSource.addHook(require(53));
 HttpStateSource.addHook(require(50));
 
@@ -3636,7 +3635,7 @@ function getHooks(func) {
   }
 }
 
-},{"32":32,"37":37,"50":50,"52":52,"53":53,"63":63}],56:[function(require,module,exports){
+},{"32":32,"37":37,"50":50,"53":53,"63":63}],56:[function(require,module,exports){
 'use strict';
 
 var HttpStateSource = require(55);
@@ -10077,10 +10076,11 @@ module.exports = property;
 }.call(this));
 
 },{}],"/marty.js":[function(require,module,exports){
-// Need to define global for lodash
 "use strict";
 
-if (typeof global === "undefined" && typeof window !== "undefined") {
+var windowDefined = typeof window !== "undefined";
+
+if (typeof global === "undefined" && windowDefined) {
   window.global = window;
 }
 
@@ -10115,7 +10115,7 @@ function react() {
     try {
       return require("react");
     } catch (e) {
-      if (window.React) {
+      if (windowDefined && window.React) {
         return window.React;
       }
     }

@@ -18,7 +18,8 @@ npm install --save-dev bulk-require bulkify
 Then all you need to do is call `bulk-require` from within your application
 
 {% highlight js %}
-var bulk = require('bulk-require');
+let { each } = require('lodash');
+let bulk = require('bulk-require');
 
 class Application extends Marty.Application {
   constructor(options) {
@@ -31,7 +32,7 @@ class Application extends Marty.Application {
       'sources/*.js'
     ]);
 
-    dependencies.forEach((dep) => this.register(dep));
+    each(dependencies, dep => this.register(dep));
 }
 {% endhighlight %}
 
@@ -41,7 +42,7 @@ Thanks to [webpack's dynamic require](http://webpack.github.io/docs/context.html
 
 {% highlight js %}
 // Dynamically require in everything within the 'actions', 'queries', 'sources' and 'stores' folders
-var context = require.context("./", true, /(actions|queries|sources|stores)/);
+let context = require.context("./", true, /(actions|queries|sources|stores)/);
 
 class Application extends Marty.Application {
   constructor(options) {
@@ -51,7 +52,7 @@ class Application extends Marty.Application {
     context.keys().forEach((key) =>  {
       if (!/\.js/.test(key)) {
         // Generate an Id based on directory structure.
-        var id = key.replace('./', '').replace(/\//g, '.');
+        let id = key.replace('./', '').replace(/\//g, '.');
 
         this.register(id, context(key));
       }

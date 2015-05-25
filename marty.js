@@ -1,5 +1,6 @@
-// Need to define global for lodash
-if (typeof global === "undefined" && typeof window !== "undefined") {
+var windowDefined = typeof window !== "undefined";
+
+if (typeof global === "undefined" && windowDefined) {
   window.global = window;
 }
 
@@ -34,7 +35,7 @@ function react() {
     try {
       return require("react");
     } catch (e) {
-      if (window.React) {
+      if (windowDefined && window.React) {
         return window.React;
       }
     }
