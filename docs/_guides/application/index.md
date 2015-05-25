@@ -29,8 +29,13 @@ module.exports = Marty.createContainer(User, {
 
 // main.js
 var app = new Application();
+var ApplicationContainer = require('marty').ApplicationContainer;
 
-React.render(<User id={123} app={app} />, document.getElementById('app'));
+React.render((
+    <ApplicationContainer app={app}>
+        <User id={123} />
+    </ApplicationContainer>
+), document.body);
 es6
 ===
 // application.js
@@ -56,8 +61,13 @@ module.exports = Marty.createContainer(User, {
 
 // main.js
 var app = new Application();
+var { ApplicationContainer }  = require('marty');
 
-React.render(<User id={123} app={app} />, document.getElementById('app'));
+React.render((
+    <ApplicationContainer app={app}>
+        <User id={123} />
+    </ApplicationContainer>
+), document.body);
 {% endsample %}
 
 You use `register` to tell the application about all the different types in your application. The two things you must specify are an Id (string) and a type (e.g. a `Store` or an `ActionCreator`). Internally `register` will create an instance of that type, passing the application instance into the constructor and then making it accessible on the application object.
@@ -105,7 +115,7 @@ console.log(app.foo.bar.baz.id, 'foo.bar.baz');
 
 {% endsample %}
 
-Once you have an instance of an application you need to make accessible to  your components. To do this you must first either wrap your component in a [container]({% url /guides/containers/index.html %}) or use the [state mixin]({% url /guides/state-mixin/index.html %})/[app mixin]({% url /api/app-mixin/index.html %}). Once you've done that you can pass the application instance to your root element via the prop `app` which makes it accessible to that component and any children (Internally we pass the application instance down through the [context](https://www.tildedave.com/2014/11/15/introduction-to-contexts-in-react-js.html)).
+Once you have an instance of an application you need to make accessible to  your components. To do this you wrap your root component in an `ApplicationContainer` which you must pass the application instance to via the `app` prop. The `ApplicationContainer` will make the available to any children via [contexts](https://www.tildedave.com/2014/11/15/introduction-to-contexts-in-react-js.html)).
 
 You can access the application instance by calling `this.app` in Stores, Action Creators, Queries, and State sources. This is also true for components as long as its wrapped in a container or you're using the [state mixin]({% url /guides/state-mixin/index.html %})/[app mixin]({% url /api/app-mixin/index.html %}).
 
@@ -125,8 +135,13 @@ module.exports = Marty.createContainer(User);
 
 //main.js
 var app = new Application();
+var ApplicationContainer = require('marty').ApplicationContainer;
 
-React.render(<User app={app} />, document.getElementById('app'));
+React.render((
+    <ApplicationContainer app={app}>
+        <User />
+    </ApplicationContainer>
+), document.body);
 es6
 ===
 //views/user.js
@@ -142,7 +157,12 @@ module.exports = Marty.createContainer(User);
 
 //main.js
 var app = new Application();
+var { ApplicationContainer }  = require('marty');
 
-React.render(<User app={app} />, document.getElementById('app'));
+React.render((
+    <ApplicationContainer app={app}>
+        <User />
+    </ApplicationContainer>
+), document.body);
 {% endsample %}
 
