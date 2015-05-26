@@ -83,6 +83,33 @@ describeStyles('Marty#renderToString', function (styles) {
     });
   });
 
+  describe('when you want to render the individual parts', function () {
+    var body, state;
+
+    beforeEach(function () {
+      fixture.MessageStore.for(context).addMessage(expectedId, { text: 'local' });
+
+      var renderOptions = {
+        context: context,
+        type: fixture.Message,
+        props: { id: expectedId }
+      };
+
+      return Marty.renderToString(renderOptions).then(function (res) {
+        body = cheerio.load(res.htmlBody);
+        state = cheerio.load(res.htmlState);
+      });
+    });
+
+    it('should get the state', function () {
+      expect(body('.text').text()).to.equal('local');
+    });
+
+    it('should include the serialized state', function () {
+      expect(state('#' + MARTY_STATE_ID).html()).to.equal(Marty.dehydrate(context).toString());
+    });
+  });
+
   describe('when it needs to wait for state to come from a remote source', function () {
     beforeEach(function () {
       return renderToString();
