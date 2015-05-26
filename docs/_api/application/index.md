@@ -80,14 +80,15 @@ Given some dehyrdated state, it will call [Store#rehydrate]({% url /api/stores/i
 
 <h3 id="renderToString">renderToString(Component, options)</h3>
 
-[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given element to a string, waits for all fetches to complete and then re-renders element. Returns a promise which resolves once element is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**).
+[Renders](http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring) the given element to a string, waits for all fetches to complete and then re-renders element. Returns a promise which resolves once element is re-rendered. Result of render is an object containing the html body and the state as a script tag. ``timeout`` allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default **1000ms**).
 
 {% highlight js %}
 var app = new Application();
 var User = require('./views/user');
 
 app.renderToString(<User id={123} />, { timeout: 2000}).then(function (res) {
-  console.log('Rendered html', res.html);
+  console.log('HTML body', res.htmlBody);
+  console.log('HTML state', res.htmlState);
   console.log('Diagnostics', res.diagnostics);
 });
 {% endhighlight %}
