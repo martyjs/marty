@@ -13,7 +13,13 @@ classic
 var UsersAPI = Marty.createStateSource({
   type: 'http',
   createUser: function (user) {
-    return this.post({ url: '/users', body: user });
+    return this.post({ url: '/users', body: user }).then(function (res) {
+      if (res.ok) {
+        return res.json();
+      }
+
+      throw new Error('Failed to create user', res);
+    });
   }
 });
 
@@ -21,7 +27,13 @@ es6
 ===
 class UsersAPI extends Marty.HttpStateSource {
   createUser(user) {
-    return this.post({ url: '/users', body: user });
+    return this.post({ url: '/users', body: user }).then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+
+      throw new Error('Failed to create user', res);
+    });
   }
 }
 {% endsample %}

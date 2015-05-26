@@ -14,10 +14,22 @@ var UserAPI = Marty.createStateSource({
   type: 'http',
   baseUrl: 'http://foo.com',
   getUsers: function () {
-    return this.get('/users');
+    return this.get('/users').then(function (res) {
+      if (res.ok) {
+        return res.json();
+      }
+
+      throw new Error('Failed to get user', res);
+    });
   },
   createUser: function (user) {
-    return this.post('/users', { body: user });
+    return this.post('/users', { body: user }).then(function (res) {
+      if (res.ok) {
+        return res.json();
+      }
+
+      throw new Error('Failed to create user', res);
+    });
   }
 });
 es6
@@ -28,10 +40,22 @@ class UserAPI extends Marty.HttpStateSource {
     this.baseUrl = 'http://foo.com';
   }
   getUsers() {
-    return this.get('/users');
+    return this.get('/users').then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+
+      throw new Error('Failed to get user', res);
+    });
   }
   createUser(user) {
-    return this.post('/users', { body: user });
+    return this.post('/users', { body: user }).then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+
+      throw new Error('Failed to create user', res);
+    });
   }
 }
 {% endsample %}
