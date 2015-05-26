@@ -5,7 +5,7 @@ id: top-level
 section: Test Utils
 ---
 
-Marty's test utils are available by requiring `marty/test-utils`.
+Marty's test utils are available by requiring `marty/test-utils`. For full examples see [marty-test-examples](https://github.com/martyjs/marty-test-examples).
 
 {% highlight js %}
 var TestUtils = require('marty/test-utils');
