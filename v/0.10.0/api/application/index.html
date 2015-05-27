@@ -834,13 +834,14 @@
 
 <h3 id="renderToString">renderToString(Component, options)</h3>
 
-<p><a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">Renders</a> the given element to a string, waits for all fetches to complete and then re-renders element. Returns a promise which resolves once element is re-rendered. Result of render is an object containing the rendered string and an object detailing what fetches occurred. <code>timeout</code> allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default <strong>1000ms</strong>).</p>
+<p><a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">Renders</a> the given element to a string, waits for all fetches to complete and then re-renders element. Returns a promise which resolves once element is re-rendered. Result of render is an object containing the html body and the state as a script tag. <code>timeout</code> allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default <strong>1000ms</strong>).</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">();</span>
 <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./views/user'</span><span class="p">);</span>
 
 <span class="nx">app</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">User</span> <span class="nx">id</span><span class="o">=</span><span class="p">{</span><span class="mi">123</span><span class="p">}</span> <span class="sr">/&gt;, { timeout: 2000}</span><span class="se">)</span><span class="sr">.then</span><span class="se">(</span><span class="sr">function </span><span class="se">(</span><span class="sr">res</span><span class="se">)</span><span class="sr"> </span><span class="err">{
-</span>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">html</span><span class="p">);</span>
+</span>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'HTML body'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlBody</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'HTML state'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlState</span><span class="p">);</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Diagnostics'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
 <span class="p">});</span></code></pre></div>
 
