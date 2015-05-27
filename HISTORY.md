@@ -1,3 +1,50 @@
+0.10.0 / 2015-05-27
+===================
+**New features**
+
+- [marty-native](https://github.com/martyjs/marty/issues/230)
+- [No singleton](https://github.com/martyjs/marty/issues/261)
+- [ES7 features](https://github.com/martyjs/marty-lib/pull/3)
+- [Improved testing](https://github.com/martyjs/marty/issues/19)
+- DevTools supports marty-native
+
+**Deprecations**
+
+- Due to API incompatibility issues  `parseJSON` will be removed by default in future versions. Instead you should call `this.json()` from within your state source.
+
+**Removed**
+
+- `Marty.register()` is no longer needed, just return the type
+- You will no longer be able to pass in a store or an object hash of stores into `Marty.createStateMixin`
+- [Rollbacks](http://martyjs.org/v/0.9.0/api/stores/index.html#rollback) have been removed entirely
+- [Store handler values](http://martyjs.org/api/stores/#handlers) can only be either a string or an array of strings. You cannot do complex object queries any more.
+- `Marty.registry` is no longer supported. Use applications instead.
+- `Marty.createContext()` is no longer supported. Use applications instead.
+- `Marty.renderToString()` is no longer supported. Use `Application#renderToString()` instead
+- `Store#rollback()` is no longer supported. You should instead dispatch an error action.
+- `.for(this)` has been removed. Use applications instead.
+- You no longer to specify `id`'s in the type. Instead define the Id on the `Application#register()`
+- `require('marty').Dispatcher` is no longer supported. Create an application and access the [dispatcher](http://martyjs.org/api/application/index.html#dispatcher).
+- `require('marty/http/hooks')` is no longer supported. Use `require('marty').hooks` instead
+- `require('marty/environment')` is no longer supported. Use `require('marty').environment`
+- `require('marty/fetch')` is no longer supported. Use `require('marty').fetch`
+- `require('marty/when')` is no longer supported. Use `require('marty').when`
+- `require('marty/autoDispatch')` is no longer supported. Use `require('marty').autoDispatch`
+- `require('marty').Diagnostics` is no longer supported. Use `require('marty').diagnostics`
+
+0.9.17 / 2015-05-26
+===================
+- Return individual parts of html `htmlBody` and `htmlState` to solve [#288](https://github.com/martyjs/marty/issues/288)
+
+0.9.16 / 2015-05-21
+===================
+- Remove try/catch around when to improve stack traces [#313](https://github.com/martyjs/marty/issues/313).
+- Make HTTP methods upper case to conform to Fetch spec [#318](https://github.com/martyjs/marty/issues/318)
+
+0.9.15 / 2015-05-17
+===================
+- Update Marty.renderToString so that it will continue re-rendering until no new fetches are made. Resolves [#314](https://github.com/martyjs/marty/issues/314).
+
 0.9.14 / 2015-05-14
 ===================
 - Updated isomorphic-fetch to v2.0.0
@@ -92,6 +139,7 @@
 - dependsOn doesn't update when dependent store updates [#113](https://github.com/jhollingworth/marty/issues/113)
 - Don't auto set content-type if using FormData [#140](https://github.com/jhollingworth/marty/issues/140)
 - Fetch API compatibility [#133](https://github.com/jhollingworth/marty/issues/133)
+
 
 0.8.15 / 2015-03-06
 ===================
