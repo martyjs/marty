@@ -22,9 +22,6 @@ class UserActionCreators extends Marty.ActionCreators {
 }
 {% endsample %}
 
-<h2 id="displayName">displayName</h2>
-
-An optional display name for the action creator. Used for richer debugging.  If you're using ES6 classes, displayName will be the name of the class by default.
 
 <h2 id="dispatch">dispatch(type, [...])</h2>
 

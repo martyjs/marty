@@ -39,10 +39,6 @@ class UsersStore extends Marty.Store {
 
 {% endsample %}
 
-<h2 id="displayName">displayName</h2>
-
-An optional display name for the stores. Used for richer debugging.  If you're using ES6 classes, displayName will be the name of the class by default.
-
 <h2 id="handlers">handlers</h2>
 
 The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is either a single constant or an array of constants.
@@ -166,7 +162,7 @@ addChangeListener will return a disposable object. If you want to stop listening
 {% highlight js %}
 var listener = UserStore.addChangeListener(function (state, store) {
   console.log('state', state);
-  console.log('from', store.displayName);
+  console.log('from', store.id);
 }, this);
 
 listener.dispose();

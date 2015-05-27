@@ -38,10 +38,6 @@ class UserQueries extends Marty.Queries {
 }
 {% endsample %}
 
-<h2 id="displayName">displayName</h2>
-
-An optional display name for the queries. Used for richer debugging. If you're using ES6 classes, displayName will be the name of the class by default.
-
 <h2 id="dispatch">dispatch(type, [...])</h2>
 
 Dispatches an action payload with the given type. Any [action handlers]({% url /api/stores/index.html#handleAction %}) will be invoked with the given action handlers.

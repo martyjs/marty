@@ -5721,8 +5721,8 @@ var baseDifference = require(118),
     restParam = require(105);
 
 /**
- * Creates an array excluding all values of the provided arrays using
- * [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+ * Creates an array of unique `array` values not included in the other
+ * provided arrays using [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
  * for equality comparisons.
  *
  * @static
@@ -5923,8 +5923,8 @@ var baseFlatten = require(123),
     restParam = require(105);
 
 /**
- * Creates an array of unique values, in order, of the provided arrays using
- * [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+ * Creates an array of unique values, in order, from all of the provided arrays
+ * using [`SameValueZero`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
  * for equality comparisons.
  *
  * @static
@@ -7125,7 +7125,8 @@ module.exports = baseIndexOf;
 
 },{"161":161}],130:[function(require,module,exports){
 var baseIsEqualDeep = require(131),
-    isObject = require(181);
+    isObject = require(181),
+    isObjectLike = require(168);
 
 /**
  * The base implementation of `_.isEqual` without support for `this` binding
@@ -7144,7 +7145,7 @@ function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
   if (value === other) {
     return true;
   }
-  if (value == null || other == null || (!isObject(value) && !isObject(other))) {
+  if (value == null || other == null || (!isObject(value) && !isObjectLike(other))) {
     return value !== value && other !== other;
   }
   return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
@@ -7152,7 +7153,7 @@ function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"131":131,"181":181}],131:[function(require,module,exports){
+},{"131":131,"168":168,"181":181}],131:[function(require,module,exports){
 var equalArrays = require(155),
     equalByTag = require(156),
     equalObjects = require(157),
@@ -7396,8 +7397,7 @@ var baseGet = require(128),
     toPath = require(174);
 
 /**
- * The base implementation of `_.matchesProperty` which does not which does
- * not clone `value`.
+ * The base implementation of `_.matchesProperty` which does not clone `srcValue`.
  *
  * @private
  * @param {string} path The path of the property to get.
@@ -8231,6 +8231,9 @@ function isArrayLike(value) {
 module.exports = isArrayLike;
 
 },{"158":158,"167":167}],164:[function(require,module,exports){
+/** Used to detect unsigned integer values. */
+var reIsUint = /^\d+$/;
+
 /**
  * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
  * of an array-like value.
@@ -8246,7 +8249,7 @@ var MAX_SAFE_INTEGER = 9007199254740991;
  * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
  */
 function isIndex(value, length) {
-  value = typeof value == 'number' ? value : parseFloat(value);
+  value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
   length = length == null ? MAX_SAFE_INTEGER : length;
   return value > -1 && value % 1 == 0 && value < length;
 }
@@ -9549,7 +9552,7 @@ module.exports = identity;
 
 },{}],200:[function(require,module,exports){
 /**
- * A no-operation function which returns `undefined` regardless of the
+ * A no-operation function that returns `undefined` regardless of the
  * arguments it receives.
  *
  * @static
@@ -9574,7 +9577,7 @@ var baseProperty = require(137),
     isKey = require(166);
 
 /**
- * Creates a function which returns the property value at `path` on a
+ * Creates a function that returns the property value at `path` on a
  * given object.
  *
  * @static
@@ -10088,7 +10091,7 @@ require(1).polyfill();
 require(3);
 
 var Marty = require(33);
-var marty = new Marty("0.10.0-beta.6", react());
+var marty = new Marty("0.10.0", react());
 
 marty.use(require(31));
 marty.use(require(17));

@@ -105,12 +105,6 @@ class UsersAPI extends Marty.HttpStateSource {
      <td>http headers</td>
    </tr>
    <tr>
-     <td>body</td>
-     <td>string | object</td>
-     <td></td>
-     <td>entity body for `PATCH`, `POST` and `PUT` requests.</td>
-   </tr>
-   <tr>
      <td>contentType</td>
      <td>string</td>
      <td>application/json</td>
