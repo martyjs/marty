@@ -1,3 +1,9 @@
+0.10.1 / 2015-05-28
+===================
+
+- Add a temporary fix for react-hot-loader issue (Will properly be fixed when https://github.com/gaearon/react-hot-api/pull/16 is merged)
+- Re-added htmlBody/htmlState, parseJSON and specification (Resolves [martyjs/marty-express#10](https://github.com/martyjs/marty-express/issues/10))
+
 0.10.0 / 2015-05-27
 ===================
 **New features**

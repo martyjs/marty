@@ -2008,11 +2008,13 @@ function renderToString(app, render, createElement, options) {
     function dehydrateAndRenderHtml(diagnostics) {
       app.fetch(function () {
         try {
-          var html = render(element);
-          html += dehydratedState();
+          var htmlBody = render(element);
+          var htmlState = dehydratedState();
           resolve({
-            html: html,
-            diagnostics: diagnostics.toJSON()
+            diagnostics: diagnostics.toJSON(),
+            html: htmlBody + htmlState,
+            htmlBody: htmlBody,
+            htmlState: htmlState
           });
         } catch (e) {
           reject(e);
@@ -2134,7 +2136,7 @@ var appProperty = require(24);
 var StoreObserver = require(39);
 var getClassName = require(41);
 
-var RESERVED_FUNCTIONS = ['contextTypes', 'componentDidMount', 'onStoreChanged', 'componentWillUnmount', 'getInitialState', 'getState', 'render'];
+var RESERVED_FUNCTIONS = ['contextTypes', 'componentDidMount', 'componentWillReceiveProps', 'onStoreChanged', 'componentWillUnmount', 'getInitialState', 'getState', 'render'];
 
 module.exports = function (React) {
   var DEFAULT_CONTEXT_TYPES = {
@@ -2155,7 +2157,7 @@ module.exports = function (React) {
 
     appProperty(InnerComponent.prototype);
 
-    var Container = React.createClass(_.extend({
+    var specification = _.extend({
       contextTypes: contextTypes,
       childContextTypes: DEFAULT_CONTEXT_TYPES,
       getChildContext: function getChildContext() {
@@ -2173,33 +2175,10 @@ module.exports = function (React) {
           stores: this.listenTo,
           onStoreChanged: this.onStoreChanged
         });
-
-        if (_.isFunction(config.componentDidMount)) {
-          config.componentDidMount.call(this);
-        }
-      },
-      componentWillMount: function componentWillMount() {
-        if (_.isFunction(config.componentWillMount)) {
-          config.componentWillMount.call(this);
-        }
       },
       componentWillReceiveProps: function componentWillReceiveProps(props) {
         this.props = props;
         this.setState(this.getState(props));
-
-        if (_.isFunction(config.componentWillReceiveProps)) {
-          config.componentWillReceiveProps.call(this, props);
-        }
-      },
-      componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
-        if (_.isFunction(config.componentWillUpdate)) {
-          config.componentWillUpdate.call(this, nextProps, nextState);
-        }
-      },
-      componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
-        if (_.isFunction(config.componentDidUpdate)) {
-          config.componentDidUpdate.call(this, prevProps, prevState);
-        }
       },
       onStoreChanged: function onStoreChanged() {
         this.setState(this.getState());
@@ -2207,10 +2186,6 @@ module.exports = function (React) {
       componentWillUnmount: function componentWillUnmount() {
         if (this.observer) {
           this.observer.dispose();
-        }
-
-        if (_.isFunction(config.componentWillUnmount)) {
-          config.componentWillUnmount.call(this);
         }
       },
       getInitialState: function getInitialState() {
@@ -2256,12 +2231,44 @@ module.exports = function (React) {
           }
         });
       }
-    }, _.omit(config, RESERVED_FUNCTIONS)));
+    }, _.omit(config, RESERVED_FUNCTIONS));
+
+    // Include lifecycle methods if specified in config. We don't need to
+    // explicitly handle the ones that aren't in RESERVED_FUNCTIONS.
+    specification.componentDidMount = callBoth(specification.componentDidMount, config.componentDidMount);
+
+    specification.componentWillReceiveProps = callBothWithProps(specification.componentWillReceiveProps, config.componentWillReceiveProps);
+
+    specification.componentWillUnmount = callBoth(specification.componentWillUnmount, config.componentWillUnmount);
+
+    var Container = React.createClass(specification);
 
     Container.InnerComponent = InnerComponent;
     Container.displayName = innerComponentDisplayName + 'Container';
 
     return Container;
+
+    function callBoth(func1, func2) {
+      if (_.isFunction(func2)) {
+        return function () {
+          func1.call(this);
+          func2.call(this);
+        };
+      } else {
+        return func1;
+      }
+    }
+
+    function callBothWithProps(func1, func2) {
+      if (_.isFunction(func2)) {
+        return function (props) {
+          func1.call(this, props);
+          func2.call(this, props);
+        };
+      } else {
+        return func1;
+      }
+    }
   };
 };
 
@@ -2551,12 +2558,15 @@ function appProperty(obj) {
     Object.defineProperty(obj, 'app', {
       get: function get() {
         return findApp(this);
-      }
+      },
+      set: function set() {}
     });
   }
 }
 
 module.exports = appProperty;
+
+// Do nothing until https://github.com/gaearon/react-hot-api/pull/16 is resolves
 
 },{"30":30}],25:[function(require,module,exports){
 'use strict';
@@ -3174,6 +3184,7 @@ var _ = require(63);
 var warnings = {
   without: without,
   reservedFunction: true,
+  parseJSONDeprecated: true,
   stateIsNullOrUndefined: true,
   superNotCalledWithOptions: true,
   fetchDoneRenamedFetchFailed: true,
@@ -3515,7 +3526,11 @@ var HttpStateSource = (function (_StateSource) {
     key: 'removeHook',
     value: function removeHook(hook) {
       if (hook) {
-        delete hooks[hook.id];
+        if (_.isString(hook)) {
+          delete hooks[hook];
+        } else if (_.isString(hook.id)) {
+          delete hooks[hook.id];
+        }
       }
     }
   }, {
@@ -3528,6 +3543,7 @@ var HttpStateSource = (function (_StateSource) {
   return HttpStateSource;
 })(StateSource);
 
+HttpStateSource.addHook(require(52));
 HttpStateSource.addHook(require(53));
 HttpStateSource.addHook(require(50));
 
@@ -3635,7 +3651,7 @@ function getHooks(func) {
   }
 }
 
-},{"32":32,"37":37,"50":50,"53":53,"63":63}],56:[function(require,module,exports){
+},{"32":32,"37":37,"50":50,"52":52,"53":53,"63":63}],56:[function(require,module,exports){
 'use strict';
 
 var HttpStateSource = require(55);
