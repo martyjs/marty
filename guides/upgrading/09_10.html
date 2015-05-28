@@ -1381,7 +1381,9 @@ Next you need to create a new <a href="/guides/application/index.html">Applicati
 <span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">();</span>
 
 <span class="nx">app</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Foo</span> <span class="nx">bar</span><span class="o">=</span><span class="s1">'baz'</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="p">{</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">2000</span> <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">html</span><span class="p">);</span>
+  <span class="c1">// We've had to split the html body and html state variables out to resolve https://github.com/martyjs/marty/issues/288.</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html body'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlBody</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html state'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlState</span><span class="p">);</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Diagnostics'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
 <span class="p">});</span></code></pre></div>
 
@@ -1444,7 +1446,7 @@ Next you need to create a new <a href="/guides/application/index.html">Applicati
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.10.0</li>
+        <li>v0.10.1</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>

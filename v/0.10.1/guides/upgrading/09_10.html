@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Upgrading from Marty 0.9 to 0.10</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/v/0.10.1/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="/v/0.10.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.1/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.1/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.1/css/syntax.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.1/css/docs.css">
+
+  <script type="text/javascript" src="/v/0.10.1/js/codemirror.js"></script>
+</head>
+<body>
+
+  
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/v/0.10.1/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li class="active">
+            <a href="/v/0.10.1/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/flux/index.html">
+                    Flux
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/marty-native/index.html">
+                    Marty Native
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li  class="active">
+                  
+
+                  <a  href="/v/0.10.1/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.10.1/api/top-level-api">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/app-mixin/index.html">
+                    App Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.1/api/test-utils/index.html">
+                    Test Utils
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.10.1/support">Support</a>
+          </li>
+          <li>
+            <a href="/v/0.10.1/devtools">Developer Tools</a>
+          </li>
+          <li>
+            
+
+            <a href="/v/0.10.1/blog/2015/05/27/marty-v0.10.html">Blog</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/martyjs/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+      
+      
+
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/getting-started/index.html">
+              Getting Started
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/flux/index.html">
+              Flux
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/marty-native/index.html">
+              Marty Native
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/application/index.html">
+              Application
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/application/automatic-registration.html">Automatically register dependencies</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/stores/index.html">
+              Stores
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/stores/immutable-data-collections.html">Immutable data collections</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/fetching-state/index.html">
+              Fetching state
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/action-creators/index.html">
+              Action Creators
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/action-creators/actions-vs-action-creators.html">Actions vs. Action Creators</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/action-creators/handling-errors.html">Handling Errors</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/action-creators/migrating-from-v8.html">Migrating from Marty v0.8</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/queries/index.html">
+              Queries
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/containers/index.html">
+              Containers
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/state-mixin/index.html">
+              State Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/state-sources/index.html">
+              State Sources
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/isomorphism/index.html">
+              Isomorphism
+          </a>
+          
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/isomorphism/marty-express.html">marty-express</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/developer-tools/index.html">
+              Developer Tools
+          </a>
+          
+            <ul class="nav">
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/isomorphism/marty-express.html">marty-express</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/constants/index.html">
+              Constants
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/dispatcher/index.html">
+              Dispatcher
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  href="/v/0.10.1/guides/upgrading/index.html">
+              Upgrading
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.1/guides/upgrading/08_09.html">Upgrading from Marty 0.8 to 0.9</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a  class="active"
+                      href="/v/0.10.1/guides/upgrading/09_10.html">Upgrading from Marty 0.9 to 0.10</a>
+                </li>
+              
+            
+              
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.1/guides/further-reading/index.html">
+              Further reading
+          </a>
+          
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    
+      <h1 class="page-title">Upgrading from Marty 0.9 to 0.10</h1>
+    
+    <div class="content">
+      <p>If you&#39;ve got any questions about upgrading you can ask the team in <a href="https://gitter.im/martyjs/marty">Marty&#39;s Gitter chatroom</a>.</p>
+
+<h2 id="singleton">Singleton to Application</h2>
+
+<p>Firstly, if you&#39;re using ES6 you will need to remove all references to <code>Marty.register(...)</code> and just return the original type.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Instead of</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="nx">UserStore</span><span class="p">);</span>
+
+<span class="c1">// You just export the type</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">UserStore</span><span class="p">;</span></code></pre></div>
+
+
+Next you need to create a new <a href="/v/0.10.1/guides/application/index.html">Application</a> instance and tell it about all of your types. If you're using webpack or browserify this process is significantly easier if you implement <a href="/v/0.10.1/guides/application/automatic-registration.html">automatic registration</a>.
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">Application</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createApplication</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">'userStore'</span><span class="p">,</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./stores/userStore'</span><span class="p">));</span>
+    <span class="p">...</span>
+<span class="p">});</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Application</span><span class="p">;</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">Application</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Application</span> <span class="p">{</span>
+    <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kr">super</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">'userStore'</span><span class="p">,</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./stores/userStore'</span><span class="p">));</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Application</span><span class="p">;</span></code></pre></div>
+</div>
+
+<p>Next, when calling <code>React.render</code> you must wrap the element you are about to render with an <code>ApplicationContainer</code>, passing an instance of your application in via the props.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">();</span>
+<span class="kd">var</span> <span class="p">{</span> <span class="nx">ApplicationContainer</span> <span class="p">}</span>  <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
+
+<span class="nx">React</span><span class="p">.</span><span class="nx">render</span><span class="p">((</span>
+    <span class="o">&lt;</span><span class="nx">ApplicationContainer</span> <span class="nx">app</span><span class="o">=</span><span class="p">{</span><span class="nx">app</span><span class="p">}</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">User</span> <span class="nx">id</span><span class="o">=</span><span class="p">{</span><span class="mi">123</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="sr">/ApplicationContainer</span><span class="err">&gt;
+</span><span class="p">),</span> <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span></code></pre></div>
+
+<p>Now that we&#39;re returning types instead of instances we need to update all references within our application. This largely means that, instead of require&#39;ing your dependency, you must instead call <code>this.app.{dependencyId}</code>. e.g.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Instead of</span>
+<span class="kd">var</span> <span class="nx">UserAPI</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../sources/userAPI'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">UserActions</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">ActionCreators</span> <span class="p">{</span>
+    <span class="nx">deleteUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">UserAPI</span><span class="p">.</span><span class="k">for</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">deleteUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Assuming you had registered UserAPI with the id 'userAPI'</span>
+<span class="kr">class</span> <span class="nx">UserActions</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">ActionCreators</span> <span class="p">{</span>
+    <span class="nx">deleteUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userAPI</span><span class="p">.</span><span class="nx">deleteUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>This is largely the same from with React components. The only requirement is that the component is either wrapped in a <a href="/v/0.10.1/guides/containers/index.html">container</a> or is using the <a href="/v/0.10.1/guides/state-mixin/index.html">state mixin</a>. There are times when neither are appropriate so we&#39;ve introduced the <a href="/v/0.10.1/api/app-mixin/index.html">app mixin</a> which simply injects <code>app</code> into your component.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">User</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+    <span class="nx">saveUser</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userActionCreators</span><span class="p">.</span><span class="nx">saveUser</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">User</span><span class="p">);</span></code></pre></div>
+
+<p>For the <code>listenTo</code> property in <a href="/v/0.10.1/api/containers/index.html#listenTo">containers</a> and <a href="/v/0.10.1/api/state-mixin/index.html#listenTo">state mixins</a> you need to replace type references with their dependency Id&#39;s. The <code>listenTo</code> behavior is identical otherwise.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">export</span> <span class="k">default</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">User</span><span class="p">,</span> <span class="p">{</span>
+    <span class="c1">// instead of</span>
+    <span class="na">listenTo</span><span class="p">:</span> <span class="p">[</span>
+        <span class="nx">UserStore</span><span class="p">,</span>
+        <span class="nx">FriendsStore</span>
+    <span class="p">],</span>
+
+    <span class="c1">// Use strings</span>
+    <span class="na">listenTo</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">'userStore'</span><span class="p">,</span>
+        <span class="s1">'friends.store'</span> <span class="c1">// To access app.friends.store</span>
+    <span class="p">],</span>
+
+    <span class="nx">fetch</span> <span class="p">{</span>
+        <span class="nx">user</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<p>To update your tests, we recommend you look at our <a href="https://github.com/martyjs/marty-test-examples">test examples</a> and <a href="/v/0.10.1/api/test-utils/index.html">test utils</a>.</p>
+
+<h3 id="isomorphism">Isomorphism</h3>
+
+<p><a href="http://martyjs.org/v/0.9.16/api/context/index.html">Contexts</a> have been completely removed and most functions that were previously on <code>Marty</code>, e.g. <a href="http://martyjs.org/v/0.9.16/api/top-level-api/#replaceState"><code>Marty.replaceState</code></a>, <a href="http://martyjs.org/v/0.9.16/api/top-level-api/#clearState"><code>Marty.clearState</code></a>, <a href="http://martyjs.org/v/0.9.16/api/top-level-api/#dehydrate"><code>Marty.dehydrate</code></a> and <a href="http://martyjs.org/v/0.9.16/api/top-level-api/#rehydrate"><code>Marty.rehydrate</code></a>  have been moved to to the <a href="/v/0.10.1/api/application/index.html">application</a>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Instead of</span>
+<span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContext</span><span class="p">();</span>
+
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">({</span> <span class="p">...</span> <span class="p">},</span> <span class="nx">context</span><span class="p">);</span>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">clearState</span><span class="p">(</span><span class="nx">context</span><span class="p">);</span>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">dehyrdate</span><span class="p">(</span><span class="nx">context</span><span class="p">);</span>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">rehydrate</span><span class="p">({</span> <span class="p">...</span> <span class="p">},</span> <span class="nx">context</span><span class="p">);</span>
+
+<span class="c1">// You do</span>
+<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">();</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">({</span> <span class="p">...</span> <span class="p">});</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">clearState</span><span class="p">();</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">dehyrdate</span><span class="p">();</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">rehydrate</span><span class="p">({</span> <span class="p">...</span> <span class="p">});</span></code></pre></div>
+
+<p><a href="http://martyjs.org/v/0.9.16/api/top-level-api/#renderToString"><code>Marty.renderToString</code></a> has also been moved to the application and has simpler signature.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// Instead of</span>
+<span class="kd">var</span> <span class="nx">context</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContext</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">type</span><span class="p">:</span> <span class="nx">Foo</span><span class="p">,</span>
+  <span class="na">timeout</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+  <span class="na">context</span><span class="p">:</span> <span class="nx">context</span><span class="p">,</span>
+  <span class="na">props</span><span class="p">:</span> <span class="p">{</span> <span class="na">bar</span><span class="p">:</span> <span class="s1">'baz'</span> <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">(</span><span class="nx">options</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">html</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Diagnostics'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// You do</span>
+<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">();</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Foo</span> <span class="nx">bar</span><span class="o">=</span><span class="s1">'baz'</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="p">{</span> <span class="na">timeout</span><span class="p">:</span> <span class="mi">2000</span> <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// We've had to split the html body and html state variables out to resolve https://github.com/martyjs/marty/issues/288.</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html body'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlBody</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Rendered html state'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlState</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Diagnostics'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
+<span class="p">});</span></code></pre></div>
+
+<h2 id="parseJSON">parseJSON</h2>
+
+<p>The HttpStateSource internally uses <a href="https://fetch.spec.whatwg.org/"><code>fetch</code></a> to make HTTP calls for you. If the response contains JSON you need to <a href="https://github.com/github/fetch#json">call <code>res.json()</code></a> to get the actual JSON. We thought we&#39;d be helpful and do this for you automatically, assigning the JSON to <code>res.body</code>. Unfortunately we did this before we knew <code>fetch</code> was also going to use the <code>body</code> property for other purposes which has <a href="https://github.com/martyjs/marty/issues/268">caused issues</a>. We therefore need to depreciate this feature. For v0.10 you will get warnings and in v0.11 we will turn feature off by default.</p>
+
+<p>To get rid of the warnings you first need to remove the HTTP hook</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">).</span><span class="nx">HttpStateSource</span><span class="p">.</span><span class="nx">removeHook</span><span class="p">(</span><span class="s1">'parseJSON'</span><span class="p">);</span></code></pre></div>
+
+<p>Next you will need to update all references to <code>res.body</code>. We recommend putting all of this logic in your HTTP state source</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kr">class</span> <span class="nx">UserAPI</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">HttpStateSource</span> <span class="p">{</span>
+    <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="err">`</span><span class="o">/</span><span class="nx">users</span><span class="o">/</span><span class="nx">$</span><span class="p">{</span><span class="nx">id</span><span class="p">}</span><span class="err">`</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+            <span class="p">}</span>
+
+            <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'Failed to get user'</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<h2 id="state-mixin">State mixin's</h2>
+
+<p>We warned when we released v0.9 we would be depreciating the state mixin. We&#39;ve decided to keep them around for v0.10 however we&#39;ve removed the ability to <a href="http://martyjs.org/v/0.9.16/api/state-mixin/index.html#stores">create a state mixin by passing in a store</a> or <a href="http://martyjs.org/v/0.9.16/api/state-mixin/index.html#stores">by passing in an object hash of stores</a>.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// No longer possible</span>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">(</span><span class="nx">UserStore</span><span class="p">)</span>
+<span class="nx">Marty</span><span class="p">.</span><span class="nx">createStateMixin</span><span class="p">({</span>
+    <span class="na">users</span><span class="p">:</span> <span class="nx">UserStore</span><span class="p">,</span>
+    <span class="na">friends</span><span class="p">:</span> <span class="nx">FriendsStore</span>
+<span class="p">});</span></code></pre></div>
+
+<h2 id="rollbacks">Rollbacks</h2>
+
+<p><a href="http://martyjs.org/v/0.9.16/api/stores/index.html#rollback">Rollbacks</a> are no longer supported. We recommend you look at our <a href="/v/0.10.1/guides/action-creators/handling-errors.html">suggested approach to handling errors</a>.</p>
+
+<h2 id="other">Other Depreciations</h2>
+
+<ul>
+<li>You no longer need to declare Id&#39;s or displayName&#39;s on the type. An instances Id will be populated from from <code>Application#register(id, type)</code>.</li>
+<li><code>Marty.registry</code> no longer exists. If you want to get all instances of a given type you can call <a href="/v/0.10.1/api/application/index.html#getAll"><code>Application#getAll(type)</code></a></li>
+<li><code>require(&#39;marty&#39;).Dispatcher</code> is no longer supported. Create an application and access the <a href="http://martyjs.org/api/application/index.html#dispatcher">dispatcher</a>.</li>
+<li><code>require(&#39;marty/http/hooks&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).hooks</code> instead</li>
+<li><code>require(&#39;marty/environment&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).environment</code></li>
+<li><code>require(&#39;marty/fetch&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).fetch</code></li>
+<li><code>require(&#39;marty/when&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).when</code></li>
+<li><code>require(&#39;marty/autoDispatch&#39;)</code> is no longer supported. Use <code>require(&#39;marty&#39;).autoDispatch</code></li>
+<li><code>require(&#39;marty&#39;).Diagnostics</code> is no longer supported. Use <code>require(&#39;marty&#39;).diagnostics</code></li>
+</ul>
+
+    </div>
+  </div>
+</div>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.10.1</li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/v/0.10.1/js/style.js"></script>
+  <script type="text/javascript" src="/v/0.10.1/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>
