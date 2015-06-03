@@ -21,7 +21,7 @@
   "dependencies": {
     "es6-promise": "^2.0.0",
     "isomorphic-fetch": "^2.1.0",
-    "marty-lib": "^0.10.1"
+    "marty-lib": "^0.10.2"
   },
   "devDependencies": {
     "babel": "^5.0.0",
@@ -36,6 +36,7 @@
     "react": "0.13.x"
   },
   "author": "James Hollingworth",
+  "license": "MIT",
   "licenses": [
     {
       "type": "MIT",

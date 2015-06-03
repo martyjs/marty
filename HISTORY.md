@@ -1,3 +1,9 @@
+0.10.2 / 2015-06-03
+===================
+
+- Fix stack overflow in Application.register [#14](https://github.com/martyjs/marty-lib/pull/14)
+- Support deeply nested stores in listenTo [#11](https://github.com/martyjs/marty-lib/pull/11)
+
 0.10.1 / 2015-05-28
 ===================
 
