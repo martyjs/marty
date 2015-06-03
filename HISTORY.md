@@ -1,3 +1,7 @@
+0.10.3 / 2015-06-03
+===================
+- Was an idiot. Forgot to re-build - see https://github.com/martyjs/marty-lib/issues/15
+
 0.10.2 / 2015-06-03
 ===================
 
