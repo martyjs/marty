@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Stores API</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/v/0.10.3/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="/v/0.10.3/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.3/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.3/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.3/css/syntax.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.3/css/docs.css">
+
+  <script type="text/javascript" src="/v/0.10.3/js/codemirror.js"></script>
+</head>
+<body>
+
+  
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/v/0.10.3/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="/v/0.10.3/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/flux/index.html">
+                    Flux
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/marty-native/index.html">
+                    Marty Native
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li class="active">
+            <a href="/v/0.10.3/api/top-level-api">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li  class="active">
+                  
+
+                  <a  class="active" href="/v/0.10.3/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/app-mixin/index.html">
+                    App Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.3/api/test-utils/index.html">
+                    Test Utils
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.10.3/support">Support</a>
+          </li>
+          <li>
+            <a href="/v/0.10.3/devtools">Developer Tools</a>
+          </li>
+          <li>
+            
+
+            <a href="/v/0.10.3/blog/2015/05/27/marty-v0.10.html">Blog</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/martyjs/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+      
+      
+
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/top-level-api/index.html">
+              Top-Level API
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/application/index.html">
+              Application
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  class="active" href="/v/0.10.3/api/stores/index.html">
+              Stores
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/action-creators/index.html">
+              Action Creators
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/queries/index.html">
+              Queries
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/containers/index.html">
+              Containers
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/state-mixin/index.html">
+              State Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/app-mixin/index.html">
+              App Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/state-sources/index.html">
+              State Sources
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.3/api/state-sources/cookie.html">Cookie State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.3/api/state-sources/http.html">HTTP State Source</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.3/api/state-sources/json-storage.html">JSON Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.3/api/state-sources/local-storage.html">Local Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.3/api/state-sources/location.html">Location State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.3/api/state-sources/session-storage.html">Session Storage State Source</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/constants/index.html">
+              Constants
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.3/api/test-utils/index.html">
+              Test Utils
+          </a>
+          
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    
+      <h1 class="page-title">Stores API</h1>
+    
+    <div class="content">
+      <div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[];</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+  <span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="handlers">handlers</h2>
+
+<p>The <code>handlers</code> property is used to define which handlers should be called when an action is dispatched. The key is the name of the handler and value is either a single constant or an array of constants.</p>
+
+<p>When invoked the handlers arguments are <a href="/v/0.10.3/api/action-creators/index.html#dispatch">the arguments passed to the dispatcher</a>. The original action is available by calling <code>this.action</code>.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="p">[</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">CREATE_USER</span><span class="p">],</span>
+    <span class="na">removeUser</span><span class="p">:</span> <span class="p">[</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">REMOVE_USER</span><span class="p">]</span>
+  <span class="p">},</span>
+  <span class="na">getInitialState</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{};</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">action</span><span class="p">)</span> <span class="c1">// { type: 'RECEIVE_USER', arguments: [{ name: ...}] }</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">addUser</span><span class="p">:</span> <span class="p">[</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span><span class="p">,</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">CREATE_USER</span><span class="p">],</span>
+      <span class="na">removeUser</span><span class="p">:</span> <span class="p">[</span><span class="nx">Constants</span><span class="p">.</span><span class="nx">REMOVE_USER</span><span class="p">]</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+  <span class="nl">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">action</span><span class="p">)</span> <span class="c1">// { type: 'RECEIVE_USER', arguments: [{ name: ...}] }</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="getInitialState">getInitialState()</h2>
+
+<h3>Classic</h3>
+
+<p><code>getInitialState</code> (<i>required</i>) is called when the store is first instantiated. It expects you to pass an object back which represents the stores state. The value you return will subsequently be available from the <a href="#state">state</a> property.</p>
+
+<h3>ES6</h3>
+
+<p><code>getInitialState</code> is no longer necessary, instead you should set the state in the constructor.</p>
+
+<h2 id="state">state</h2>
+
+<p>The state property holds the current state of the store. You can get the state by calling <code>this.state</code> or <code>this.getState()</code>.</p>
+
+<p>If you want to change the state to a new instance (or if you are using <a href="/v/0.10.3/guides/stores/immutable-data-collections.html">immutable data collections</a>) you can set the states value.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="nx">addUsers</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">users</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="nx">addUsers</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">users</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<p>If the new state does not equal the current state then <a href="#hasChanged">hasChanged</a> will be called after updating the stores state.</p>
+
+<h2 id="replaceState">replaceState(nextState)</h2>
+
+<p>Replace the nextState with the current state. Same as setting <code>this.state</code>. Triggers <a href="#hasChanged">hasChanged</a> if the new state is different.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="nx">addUsers</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">users</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">));</span>
+<span class="p">}</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="nx">addUsers</span><span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">users</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">));</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="setState">setState(nextState)</h2>
+
+<p>Merges nextState with the current state. Triggers <a href="#hasChanged">hasChanged</a>.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="nx">addUser</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">nextState</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="nx">nextState</span><span class="p">[</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">user</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">nextState</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+    <span class="p">[</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">]:</span> <span class="nx">user</span>
+  <span class="p">});</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="addChangeListener">addChangeListener(callback, [context])</h2>
+
+<p>If you want to be notified of changes to a store, you can register a callback by calling <code>Store.addChangeListener</code>. You can optionally pass the functions context as a second argument.</p>
+
+<p>Once registered, the store will invoke your callback anytime the store changes passing the state and the store as the two arguments.</p>
+
+<p>addChangeListener will return a disposable object. If you want to stop listening to the store, you can call <code>dispose</code> on the object.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">listener</span> <span class="o">=</span> <span class="nx">UserStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">state</span><span class="p">,</span> <span class="nx">store</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'state'</span><span class="p">,</span> <span class="nx">state</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'from'</span><span class="p">,</span> <span class="nx">store</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+<span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+
+<span class="nx">listener</span><span class="p">.</span><span class="nx">dispose</span><span class="p">();</span></code></pre></div>
+
+
+<h2 id="hasChanged">hasChanged()</h2>
+
+Calls any [registered callbacks](#addChangeListener). To improve performance listeners will only be notified once for each dispatched action.
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+  <span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="fetch">fetch(options)</h2>
+
+<p>When requesting data from a store we should assume that it might require an async operation. <code>Store#fetch</code> provides a simple syntax that allows you to encapsulate that asynchronicity in a flux way. The <code>fetch</code> function allows you to specify how to get the state locally and remotely and returns a <a href="#fetch-result">fetch result</a> which represents the current state of the fetch.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">api</span><span class="o">-</span><span class="nx">id</span><span class="p">,</span>
+      <span class="na">locally</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+      <span class="p">},</span>
+      <span class="na">remotely</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">UsersStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="mi">123</span><span class="p">).</span><span class="nx">when</span><span class="p">({</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"pending"</span><span class="o">/&gt;</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">failed</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"error"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="na">done</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">({</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">id</span><span class="p">,</span>
+      <span class="nx">locally</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+      <span class="p">},</span>
+      <span class="nx">remotely</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">UsersStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="mi">123</span><span class="p">).</span><span class="nx">when</span><span class="p">({</span>
+  <span class="nx">pending</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"pending"</span><span class="o">/&gt;</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="nx">failed</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"error"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">done</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+</div>
+
+<p>If you need to wait for multiple fetch results to be finished, you can use <code>when.all()</code>. You pass in an array of fetch results and it will execute the appropriate handler (e.g. if any of the handlers failed then it will execute the failed handler).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">when</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/when'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">fooStore</span><span class="p">.</span><span class="nx">getFoo</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">bar</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">barStore</span><span class="p">.</span><span class="nx">getBar</span><span class="p">(</span><span class="mi">456</span><span class="p">);</span>
+
+<span class="nx">when</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">],</span> <span class="p">{</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"pending"</span><span class="o">/&gt;</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">failed</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"error"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+
+<h3>Options</h3>
+
+<table class="table table-bordered table-striped">
+  <thead>
+   <tr>
+     <th style="width: 100px;">Name</th>
+     <th style="width: 100px;">type</th>
+     <th style="width: 50px;">required</th>
+     <th>description</th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+     <td>id</td>
+     <td>number | string | object</td>
+     <td>true</td>
+     <td>Uniquely identifies the bit of state you are fetching. Only one request for a given Id can be in progress at any time. If another request is in progress then a pending fetch result is returned</td>
+   </tr>
+   <tr>
+     <td>locally</td>
+     <td>function</td>
+     <td>true</td>
+     <td>Should try and fetch from the local state. If it returns a value then an done fetch result will be returned immediately. If it returns undefined then the remotely function will be called. If it returns null then it will return a not found fetch result.</td>
+   </tr>
+   <tr>
+     <td>remotely</td>
+     <td>function</td>
+     <td>false</td>
+     <td>
+     If ``locally`` returned undefined then ``remotely`` is invoked. When ``remotely`` has finished then ``locally`` will be reinvoked and should contain now contain the state. If ``remotely`` returns a promise then ``locally`` will be called if the promise is fulfilled</td>
+   </tr>
+   <tr>
+     <td>dependsOn</td>
+     <td>fetch result | array of fetch results</td>
+     <td>false</td>
+     <td>If a fetch depends on some other state being there already you can pass in their fetch results. It will only try and start fetching the data when all dependencies are done.</td>
+   </tr>
+   <tr>
+     <td>cacheError</td>
+     <td>boolean</td>
+     <td>false</td>
+     <td>If true (default) then if an error is thrown at any point during a fetch then that error is cached and returned immediately instead.</td>
+   </tr>
+  </tbody>
+</table>
+
+Often you're only concerned with fetching locally and remotely so you use the second function signature ``fetch(id, locally, remotely)``:
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">getUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span>
+      <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+      <span class="p">},</span>
+      <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">[</span><span class="nx">id</span><span class="p">],</span>
+      <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userQueries</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+</div>
+
+<h3 id="fetch-result">Fetch Result</h3>
+
+<p>Fetch returns a result object that represents the current state of the fetch. It has a status which can be either <strong>PENDING</strong>, <strong>DONE</strong> OR <strong>FAILED</strong>. You can get the status by accessing <code>fetch.status</code> or with the helpers <code>fetch.pending</code>, <code>fetch.failed</code> or <code>fetch.done</code>.</p>
+
+<div class="alert alert-info" id="fetch-not-promise">
+A fetch result is <b>not a promise</b>. It is an object literal that represents the fetch at the point the fetch was invoked. If the state of the fetch changes you will have to re-invoke <code>fetch</code> to get the updated state (e.g. After a store changes).
+</div>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">userStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span> <span class="c1">// =&gt; PENDING</span></code></pre></div>
+
+
+If the fetch has an error, then the error is accessible at ``result#error``
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">if</span> <span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">failed</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'failed to get user'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+
+
+If the fetch is done, then the result is accessible at ``result#result``
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="k">if</span> <span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'got user'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
+
+
+If you start a new fetch then the store will notify any listeners when the fetch's status has changed.
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">app</span><span class="p">.</span><span class="nx">userStore</span><span class="p">.</span><span class="nx">addChangeListener</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">userStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+
+
+<h4 id="when">when(handlers, [context])</h4>
+
+<code>when</code> is a helper function that makes it easier to map the various states a fetch result can be in. You can pass in an optional context as the second argument which the handlers inherit from (allowing you to call other handlers or anything on the passed in context).
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">component</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">when</span><span class="p">({</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">Loading</span> <span class="o">/&gt;</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">failed</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">ErrorPage</span> <span class="nx">error</span><span class="o">=</span><span class="p">{</span><span class="nx">error</span><span class="p">}</span> <span class="sr">/&gt;</span><span class="err">;
+</span>  <span class="p">},</span>
+  <span class="nx">done</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user"</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">},</span> <span class="k">this</span><span class="p">);</span></code></pre></div>
+
+
+
+<h4 id="when.all">when.all([fetchResult*], handlers, [context])</h4>
+
+<code>when.all</code> will wait for all fetch results to be done before invoked the <code>done</code> status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">when</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/when'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">);</span>
+
+<span class="nx">when</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">),</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">)],</span> <span class="p">{</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"pending"</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="na">done</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"all done"</span><span class="p">,</span> <span class="nx">results</span><span class="p">);</span> <span class="c1">// foo, bar</span>
+  <span class="p">},</span>
+  <span class="na">failed</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"failed"</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span> <span class="c1">// first error</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+
+<h4 id="when.join">when.join(fetchResult*, handlers, [context])</h4>
+
+<code>when.join</code> will wait for all fetch results to be done before invoked the <code>done</code> status handler. If any fetch result is pending or failed then the pending or failed status handlers will be invoked instead. If all fetch results are done then their results are passed to the done handler in an array. If any fetch result has failed then the error of the first failed fetch result will be passed to the failed status handler.
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">when</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/when'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">);</span>
+
+<span class="nx">when</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"foo"</span><span class="p">),</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="s2">"bar"</span><span class="p">),</span> <span class="p">{</span>
+  <span class="na">pending</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"pending"</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="na">done</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"all done"</span><span class="p">,</span> <span class="nx">results</span><span class="p">);</span> <span class="c1">// foo, bar</span>
+  <span class="p">},</span>
+  <span class="na">failed</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"failed"</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span> <span class="c1">// first error</span>
+  <span class="p">}</span>
+<span class="p">})</span></code></pre></div>
+
+
+<h4 id="fetch-result-toPromise">toPromise()</h4>
+
+Converts a fetch result into a promise. Useful when you want to use a store outside of a React component.
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">getUser</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">userStore</span><span class="p">.</span><span class="nx">getUser</span><span class="p">().</span><span class="nx">toPromise</span><span class="p">();</span>
+
+<span class="nx">getUser</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">user</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">))</span>
+  <span class="p">.</span><span class="k">catch</span><span class="p">((</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">));</span></code></pre></div>
+
+
+<h2 id="fetch_pending">fetch.pending()</h2>
+
+Returns a pending fetch result
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">pending</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span> <span class="c1">// PENDING</span></code></pre></div>
+
+
+<h2 id="fetch_done">fetch.done(result)</h2>
+
+Returns a done fetch result
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">done</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">result</span><span class="p">)</span> <span class="c1">// DONE, { ... }</span></code></pre></div>
+
+
+<h2 id="fetch_failed">fetch.failed(error)</h2>
+
+Returns a failed fetch result
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">failed</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { ... }</span></code></pre></div>
+
+
+<h2 id="fetch_notFound">fetch.notFound()</h2>
+
+Returns a failed fetch result with a NotFound error
+
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">fetch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty/fetch'</span><span class="p">).</span><span class="nx">notFound</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">failed</span><span class="p">,</span> <span class="nx">fetch</span><span class="p">.</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// FAILED, { status: 404 }</span></code></pre></div>
+
+
+<h2 id="hasAlreadyFetched">hasAlreadyFetched(fetchId)</h2>
+
+For when you want to know if you have already tried fetching something. Given a fetch Id it will return true or false depending on whether you have previously tried a fetch for that Id (Irrelevant of whether it was successful or not). Useful if you want to distinguish between an empty collection and needing to fetch state from a remote source.
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">getUsers</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span>
+  
+      <span class="na">locally</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hasAlreadyFetched</span><span class="p">(</span><span class="s1">'users'</span><span class="p">))</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">remotely</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userQueries</span><span class="p">.</span><span class="nx">getAll</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">getUsers</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span>
+  
+      <span class="nx">locally</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">hasAlreadyFetched</span><span class="p">(</span><span class="s1">'users'</span><span class="p">))</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nx">remotely</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userQueries</span><span class="p">.</span><span class="nx">getAll</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="dehydrate">dehydrate()</h2>
+
+<p>Should return the state of your store in a form that can be serialised to JSON. Used in conjunction with <a href="#rehydrate">rehydrate</a> for synchronising the state of a store on the server with its browser counterpart. If not implemented then Marty will attempt to serialise <code>this.state</code>.</p>
+
+<h2 id="rehydrate">rehydrate(dehydratedState)</h2>
+
+<p>Expects the store to deserialize the dehydrated state and initialise the store. Used in conjunction with <a href="#dehydrate">dehydrate</a> for synchronising the state of a store on the server with its browser counterpart. If not implemented then Marty will call <code>this.replaceState(dehydratedState)</code>.</p>
+
+<h2 id="waitFor">waitFor(*stores)</h2>
+
+<p>If an action handler is dependent on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.</p>
+
+<p>You can also pass an array of dispatch tokens to waitFor.</p>
+
+<div class="sample">    <div class="btn-group zero-clipboard" role="group"> <button type="button" data-style="classic" class="btn btn-default classic">classic</button> <button type="button" data-style="es6" class="btn btn-default es6">es6</button> </div><div class="highlight" data-style="classic"><pre><code data-lang="js" class="language-js"><span class="kd">var</span> <span class="nx">UsersStore</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">handlers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+  <span class="p">},</span>
+  <span class="na">addUser</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">waitFor</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">fooStore</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">barStore</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div><div class="highlight" data-style="es6"><pre><code data-lang="js" class="language-js"><span class="kr">class</span> <span class="nx">UsersStore</span> <span class="kr">extends</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">handlers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">addUser</span><span class="p">:</span> <span class="nx">Constants</span><span class="p">.</span><span class="nx">RECEIVE_USER</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+  <span class="nx">addUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">waitFor</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">fooStore</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">barStore</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hasChanged</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+</div>
+
+<h2 id="#dispatchToken">dispatchToken</h2>
+
+<p>Dispatch token that is returned from <a href="http://facebook.github.io/flux/docs/dispatcher.html#api"><code>Dispatcher.register()</code></a>. Used by <a href="#waitFor"><code>waitFor()</code></a>.</p>
+
+<h2 id="app">app</h2>
+
+<p>Returns the instance&#39;s <a href="/v/0.10.3/api/application/index.html">application</a>.</p>
+
+    </div>
+  </div>
+</div>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.10.3</li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/v/0.10.3/js/style.js"></script>
+  <script type="text/javascript" src="/v/0.10.3/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>
