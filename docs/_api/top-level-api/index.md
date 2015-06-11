@@ -47,7 +47,7 @@ True if the current process is being executed within a browser.
 
 <h3 id="warnings">Marty.warnings</h3>
 
-Configurable list of warnings that Marty emits. Setting the key to false will stop the warning from happening. We will warn you when a feature is being depreciated so disabling warnings can make upgrading difficult in the future.
+Configurable list of warnings that Marty emits. Setting the key to false will stop the warning from happening. We will warn you when a feature is being deprecated so disabling warnings can make upgrading difficult in the future.
 
 {% highlight js %}
 Marty.warnings.reservedFunction = false;

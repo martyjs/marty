@@ -5,7 +5,7 @@ id: migrating-action-creators-0.8
 section: Action Creators
 ---
 
-In Marty v0.8 and below we had a different way of defining an action creators type which has now been depreciated:
+In Marty v0.8 and below we had a different way of defining an action creators type which has now been deprecated:
 
 {% highlight js %}
 var UserActionCreators = Marty.createActionCreators({
@@ -16,7 +16,7 @@ var UserActionCreators = Marty.createActionCreators({
 });
 {% endhighlight %}
 
-##Why was it depreciated?
+##Why was it deprecated?
 
 There were 3 reasons:
 1. Automatic error handling made debugging really difficult ([#127](https://github.com/martyjs/marty/issues/127)).
