@@ -4,6 +4,7 @@
 - Action Creators
 - Queries
 - Containers
+- Inject App
 - State Mixin
 - App Mixin
 - State Sources
