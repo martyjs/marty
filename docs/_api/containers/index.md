@@ -35,6 +35,10 @@ module.exports = Marty.createContainer(User, {
 });
 {% endhighlight %}
 
+<h2 id="createContainer-options" class="page-title">
+  createContainer options
+</h2>
+
 <h3 id="listenTo">listenTo</h3>
 
 Must be either a [store]({% url /api/stores/index.html %}) or an array of [stores]({% url /api/stores/index.html %}). When the store changes then all state is re-fetched and passed to inner component.
@@ -85,6 +89,22 @@ module.exports = Marty.createContainer(User, {
   }
 });
 {% endhighlight %}
+
+<h3 id="statics">statics</h3>
+
+``statics`` is an object hash. The values are defined as static methods on the container component class.
+
+{% highlight js %}
+module.exports = Marty.createContainer(UserView, {
+  statics: {
+    willTransitionTo: UserView.willTransitionTo
+  }
+});
+{% endhighlight %}
+
+<h2 id="container-properties" class="page-title">
+  Container properties
+</h2>
 
 <h3 id="getInnerComponent">getInnerComponent()</h3>
 
