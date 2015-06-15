@@ -56,7 +56,7 @@ var app = new Marty.Application();
 
 app.register('userStore', UserStore);
 
-var listener = app.userStore..addChangeListener(function () {
+var listener = app.userStore.addChangeListener(function () {
   console.log('Users store changed');
   listener.dispose();
 });
