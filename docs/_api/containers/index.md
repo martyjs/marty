@@ -90,14 +90,22 @@ module.exports = Marty.createContainer(User, {
 });
 {% endhighlight %}
 
-<h3 id="statics">statics</h3>
+<h3 id="other-options">Lifecycle methods, accessors, and statics</h3>
 
-``statics`` is an object hash. The values are defined as static methods on the container component class.
+Other options passed in to `createContainer` are passed down to `React.createClass`. These can be used to specify additional lifecycle hooks (which will be combined with the ones for listening to stores as needed), public accessor methods, and statics.
 
 {% highlight js %}
 module.exports = Marty.createContainer(UserView, {
   statics: {
     willTransitionTo: UserView.willTransitionTo
+  },
+
+  componentWillMount() {
+    this.app.userQueries.subscribe(this.props.userId);
+  },
+
+  getCustomValue() {
+    return this.getInnerComponent().getCustomValue();
   }
 });
 {% endhighlight %}
