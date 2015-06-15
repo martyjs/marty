@@ -285,7 +285,7 @@ when.all([foo, bar], {
 });
 {% endhighlight %}
 
-<h3>Options</h3>
+<h3 id="fetch-options">Options</h3>
 
 <table class="table table-bordered table-striped">
   <thead>
@@ -314,7 +314,7 @@ when.all([foo, bar], {
      <td>function</td>
      <td>false</td>
      <td>
-     If ``locally`` returned undefined then ``remotely`` is invoked. When ``remotely`` has finished then ``locally`` will be reinvoked and should contain now contain the state. If ``remotely`` returns a promise then ``locally`` will be called if the promise is fulfilled</td>
+     If <code>locally</code> returned undefined then <code>remotely</code> is invoked. When <code>remotely</code> has finished then <code>locally</code> will be reinvoked and should contain now contain the state. If <code>remotely</code> returns a promise then <code>locally</code> will be called if the promise is fulfilled</td>
    </tr>
    <tr>
      <td>dependsOn</td>
@@ -570,7 +570,7 @@ Should return the state of your store in a form that can be serialised to JSON. 
 
 Expects the store to deserialize the dehydrated state and initialise the store. Used in conjunction with <a href="#dehydrate">dehydrate</a> for synchronising the state of a store on the server with its browser counterpart. If not implemented then Marty will call <code>this.replaceState(dehydratedState)</code>.
 
-<h2 id="waitFor">waitFor(*stores)</h2>
+<h2 id="waitFor">waitFor(...stores)</h2>
 
 If an action handler is dependent on another store having already processed the action they can wait for those stores to finish processing by calling <code>waitFor</code>. If you call <code>waitFor</code> with the stores you wish to wait for (or pass an array), it will stop execution of the current action handler, process all dependent action handlers and then continue execution of the original action handler.
 
@@ -607,7 +607,11 @@ class UsersStore extends Marty.Store {
 }
 {% endsample %}
 
-<h2 id="#dispatchToken">dispatchToken</h2>
+<h2 id="clear">clear([newState])</h2>
+
+Clears all state in the store, including fetch history and errors. By default, replaces state with initial state. If ``newState`` is specified, then it is used as the new state instead.
+
+<h2 id="dispatchToken">dispatchToken</h2>
 
 Dispatch token that is returned from [<code>Dispatcher.register()</code>](http://facebook.github.io/flux/docs/dispatcher.html#api). Used by [<code>waitFor()</code>](#waitFor).
 
