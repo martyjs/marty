@@ -6619,9 +6619,16 @@ var RESERVED_FUNCTIONS = ['contextTypes', 'componentDidMount', 'componentWillRec
 
 module.exports = function (React) {
   var DEFAULT_CONTEXT_TYPES = {
-    app: React.PropTypes.object };
+    app: React.PropTypes.object
+  };
 
-  return function createContainer(InnerComponent, config) {
+  function injectApp(Component) {
+    Component.contextTypes = _.extend({}, DEFAULT_CONTEXT_TYPES, Component.contextTypes);
+
+    appProperty(Component.prototype);
+  }
+
+  function createContainer(InnerComponent, config) {
     config = config || {};
 
     if (!InnerComponent) {
@@ -6632,9 +6639,7 @@ module.exports = function (React) {
     var innerComponentDisplayName = InnerComponent.displayName || getClassName(InnerComponent);
     var contextTypes = _.extend({}, DEFAULT_CONTEXT_TYPES, config.contextTypes);
 
-    InnerComponent.contextTypes = _.extend({}, DEFAULT_CONTEXT_TYPES, InnerComponent.contextTypes);
-
-    appProperty(InnerComponent.prototype);
+    injectApp(InnerComponent);
 
     var specification = _.extend({
       contextTypes: contextTypes,
@@ -6721,11 +6726,10 @@ module.exports = function (React) {
     specification.componentWillUnmount = callBoth(specification.componentWillUnmount, config.componentWillUnmount);
 
     var Container = React.createClass(specification);
-
-    Container.InnerComponent = InnerComponent;
-    Container.displayName = innerComponentDisplayName + 'Container';
-
-    return Container;
+    return _.extend(Container, config.statics, {
+      InnerComponent: InnerComponent,
+      displayName: '' + innerComponentDisplayName + 'Container'
+    });
 
     function callBoth(func1, func2) {
       if (_.isFunction(func2)) {
@@ -6748,7 +6752,9 @@ module.exports = function (React) {
         return func1;
       }
     }
-  };
+  }
+
+  return { injectApp: injectApp, createContainer: createContainer };
 };
 
 },{"137":137,"142":142,"148":148,"157":157,"159":159,"161":161,"181":181}],137:[function(require,module,exports){
@@ -6830,11 +6836,13 @@ module.exports = getFetchResult;
 },{"150":150,"181":181,"190":190}],138:[function(require,module,exports){
 'use strict';
 
+var _ = require(181);
+
 module.exports = function (marty, React) {
-  marty.createContainer = require(136)(React);
+  _.extend(marty, require(136)(React));
 };
 
-},{"136":136}],139:[function(require,module,exports){
+},{"136":136,"181":181}],139:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () {
@@ -7045,7 +7053,7 @@ function appProperty(obj) {
 
 module.exports = appProperty;
 
-// Do nothing until https://github.com/gaearon/react-hot-api/pull/16 is resolves
+/* Do nothing until https://github.com/gaearon/react-hot-api/pull/16 is resolves */
 
 },{"148":148}],143:[function(require,module,exports){
 'use strict';

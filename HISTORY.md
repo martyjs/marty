@@ -1,3 +1,8 @@
+0.10.4 / 2015-06-15
+===================
+- Container improvements [#20](https://github.com/martyjs/marty-lib/pull/20)
+- Fix Unexpected end of input in react native apps [#18](https://github.com/martyjs/marty-lib/pull/18)
+
 0.10.3 / 2015-06-03
 ===================
 - Was an idiot. Forgot to re-build - see https://github.com/martyjs/marty-lib/issues/15
