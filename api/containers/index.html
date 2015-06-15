@@ -232,6 +232,14 @@
                 <li >
                   
 
+                  <a  href="/api/inject-app/index.html">
+                    Inject App
+                  </a>
+                </li>
+              
+                <li >
+                  
+
                   <a  href="/api/state-mixin/index.html">
                     State Mixin
                   </a>
@@ -328,6 +336,8 @@
           
         
           
+        
+          
             
           
         
@@ -368,6 +378,8 @@
         
           
         
+          
+        
 
         <li  class="nav-section" >
           
@@ -380,6 +392,8 @@
       
         
 
+        
+          
         
           
         
@@ -442,6 +456,8 @@
         
           
         
+          
+        
 
         <li  class="nav-section" >
           
@@ -454,6 +470,8 @@
       
         
 
+        
+          
         
           
         
@@ -514,6 +532,8 @@
         
           
         
+          
+        
 
         <li  class="nav-section" >
           
@@ -526,6 +546,47 @@
       
         
 
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/api/inject-app/index.html">
+              Inject App
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
         
           
         
@@ -588,6 +649,8 @@
         
           
         
+          
+        
 
         <li  class="nav-section" >
           
@@ -600,6 +663,8 @@
       
         
 
+        
+          
         
           
         
@@ -711,6 +776,8 @@
         
           
         
+          
+        
 
         <li  class="nav-section" >
           
@@ -723,6 +790,8 @@
       
         
 
+        
+          
         
           
         
@@ -794,6 +863,10 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
+<h2 id="createContainer-options" class="page-title">
+  createContainer options
+</h2>
+
 <h3 id="listenTo">listenTo</h3>
 
 <p>Must be either a <a href="/api/stores/index.html">store</a> or an array of <a href="/api/stores/index.html">stores</a>. When the store changes then all state is re-fetched and passed to inner component.</p>
@@ -841,6 +914,28 @@
   <span class="p">}</span>
 <span class="p">});</span></code></pre></div>
 
+<h3 id="other-options">Lifecycle methods, accessors, and statics</h3>
+
+<p>Other options passed in to <code>createContainer</code> are passed down to <code>React.createClass</code>. These can be used to specify additional lifecycle hooks (which will be combined with the ones for listening to stores as needed), public accessor methods, and statics.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">createContainer</span><span class="p">(</span><span class="nx">UserView</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">statics</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">willTransitionTo</span><span class="p">:</span> <span class="nx">UserView</span><span class="p">.</span><span class="nx">willTransitionTo</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentWillMount</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">userQueries</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">userId</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">getCustomValue</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">getInnerComponent</span><span class="p">().</span><span class="nx">getCustomValue</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
+
+<h2 id="container-properties" class="page-title">
+  Container properties
+</h2>
+
 <h3 id="getInnerComponent">getInnerComponent()</h3>
 
 <p>Returns the inner component.</p>
@@ -857,7 +952,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.10.3</li>
+        <li>v0.10.4</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>

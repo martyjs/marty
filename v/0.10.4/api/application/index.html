@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Application API</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="shortcut icon" href="/v/0.10.4/favicon.ico?v=1" type="image/x-icon">
+
+  <link rel="stylesheet" type="text/css" href="/v/0.10.4/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.4/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.4/css/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.4/css/syntax.css">
+  <link rel="stylesheet" type="text/css" href="/v/0.10.4/css/docs.css">
+
+  <script type="text/javascript" src="/v/0.10.4/js/codemirror.js"></script>
+</head>
+<body>
+
+  
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+    <div class="container">
+      <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="/v/0.10.4/" class="navbar-brand">marty.js</a>
+      </div>
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="/v/0.10.4/guides/getting-started">Guides</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/getting-started/index.html">
+                    Getting Started
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/flux/index.html">
+                    Flux
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/marty-native/index.html">
+                    Marty Native
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/fetching-state/index.html">
+                    Fetching state
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/isomorphism/index.html">
+                    Isomorphism
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/developer-tools/index.html">
+                    Developer Tools
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/dispatcher/index.html">
+                    Dispatcher
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/upgrading/index.html">
+                    Upgrading
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/guides/further-reading/index.html">
+                    Further reading
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li class="active">
+            <a href="/v/0.10.4/api/top-level-api">API</a>
+            <ul class="nav sub-nav visible-xs-block">
+              
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/top-level-api/index.html">
+                    Top-Level API
+                  </a>
+                </li>
+              
+                <li  class="active">
+                  
+
+                  <a  class="active" href="/v/0.10.4/api/application/index.html">
+                    Application
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/stores/index.html">
+                    Stores
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/action-creators/index.html">
+                    Action Creators
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/queries/index.html">
+                    Queries
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/containers/index.html">
+                    Containers
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/inject-app/index.html">
+                    Inject App
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/state-mixin/index.html">
+                    State Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/app-mixin/index.html">
+                    App Mixin
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/state-sources/index.html">
+                    State Sources
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/constants/index.html">
+                    Constants
+                  </a>
+                </li>
+              
+                <li >
+                  
+
+                  <a  href="/v/0.10.4/api/test-utils/index.html">
+                    Test Utils
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+          <li>
+            <a href="/v/0.10.4/support">Support</a>
+          </li>
+          <li>
+            <a href="/v/0.10.4/devtools">Developer Tools</a>
+          </li>
+          <li>
+            
+
+            <a href="/v/0.10.4/blog/2015/05/27/marty-v0.10.html">Blog</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="http://github.com/martyjs/marty">
+              <i class="fa fa-github"></i>
+              Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+<div class="container bs-docs-container">
+  <div class="bs-docs-sidebar hidden-print col-md-2 hidden-xs col-xs-2">
+    <ul class="sections-nav nav" role="navigation">
+      
+      
+      
+
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/top-level-api/index.html">
+              Top-Level API
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section active">
+          
+
+          <a  class="active" href="/v/0.10.4/api/application/index.html">
+              Application
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/stores/index.html">
+              Stores
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/action-creators/index.html">
+              Action Creators
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/queries/index.html">
+              Queries
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/containers/index.html">
+              Containers
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/inject-app/index.html">
+              Inject App
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/state-mixin/index.html">
+              State Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/app-mixin/index.html">
+              App Mixin
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/state-sources/index.html">
+              State Sources
+          </a>
+          
+            <ul class="nav">
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.4/api/state-sources/cookie.html">Cookie State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.4/api/state-sources/http.html">HTTP State Source</a>
+                </li>
+              
+            
+              
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.4/api/state-sources/json-storage.html">JSON Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.4/api/state-sources/local-storage.html">Local Storage State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.4/api/state-sources/location.html">Location State Source</a>
+                </li>
+              
+            
+              
+                <li>
+                  <a 
+                      href="/v/0.10.4/api/state-sources/session-storage.html">Session Storage State Source</a>
+                </li>
+              
+            
+            </ul>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/constants/index.html">
+              Constants
+          </a>
+          
+        </li>
+      
+        
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+          
+        
+          
+        
+
+        <li  class="nav-section" >
+          
+
+          <a  href="/v/0.10.4/api/test-utils/index.html">
+              Test Utils
+          </a>
+          
+        </li>
+      
+    </ul>
+  </div>
+  <div class="bs-docs-content col-md-10 col-s-10 col-xs-10" role="main">
+    
+      <h1 class="page-title">Application API</h1>
+    
+    <div class="content">
+      <h3 id="dispatcher">dispatcher</h3>
+
+<p>The application will create an instance of <a href="/v/0.10.4/guides/dispatcher/index.html">dispatcher</a> when first created.</p>
+
+<h3 id="register">register(id, type)</h3>
+
+<p>Creates an instance of the given type, passing the id and application into the types constructor. The instance will then be accessible on the application object with the given Id.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">Foo</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">app</span><span class="p">);</span> <span class="c1">// foo, Application(...)</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Application</span><span class="p">();</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="nx">Foo</span><span class="p">);</span></code></pre></div>
+
+<h3 id="registerObject">register(registrations)</h3>
+
+<p>Same as <a href="#register">register</a> except you pass in an object literal where the keys are the Ids and the value is the type. If the value is an object literal when the instance will be accessible on the app within a child object.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Application</span><span class="p">();</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span>
+  <span class="na">foo</span><span class="p">:</span> <span class="nx">Foo</span><span class="p">,</span>
+  <span class="na">bar</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">baz</span><span class="p">:</span> <span class="nx">Baz</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">app</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span></code></pre></div>
+
+<h3 id="replaceState">replaceState(stores)</h3>
+
+<p>Replaces (<a href="/v/0.10.4/api/stores/index.html#replaceState">Store#replaceState</a>) the state of all stores with the values passed in. The key within the <code>stores</code> object literal must be the Id of the store.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Marty</span><span class="p">.</span><span class="nx">Application</span><span class="p">();</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">'fooStore'</span><span class="p">,</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./stores/fooStore'</span><span class="p">));</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">register</span><span class="p">(</span><span class="s1">'barStore'</span><span class="p">,</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./stores/barStore'</span><span class="p">));</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">replaceState</span><span class="p">({</span>
+  <span class="na">fooStore</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">state</span><span class="p">:</span> <span class="p">{</span>
+      <span class="p">[</span><span class="mi">123</span><span class="p">]:</span> <span class="p">{</span> <span class="nl">id</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Foo'</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="na">barStore</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">state</span><span class="p">:</span> <span class="p">{</span>
+      <span class="p">[</span><span class="mi">456</span><span class="p">]:</span> <span class="p">{</span> <span class="nl">id</span><span class="p">:</span> <span class="mi">456</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="s1">'Foo'</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">fooStore</span><span class="p">.</span><span class="nx">getFoo</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span> <span class="c1">// { id: 123, name: 'Foo' }</span></code></pre></div>
+
+<h3 id="clearState">clearState()</h3>
+
+<p>Calls <a href="/v/0.10.4/api/stores/index.html#clear">Store#clear</a> on all registered stores.</p>
+
+<h3 id="dehydrate">dehydrate()</h3>
+
+<p>Calls <a href="/v/0.10.4/api/stores/index.html#dehydrate">Store#dehydrate</a> if present or <a href="/v/0.10.4/api/stores/index.html#getState">Store#getState</a> on all registered stores. Returning all states as a serializable object literal where they key is the Id of the store.</p>
+
+<h3 id="rehydrate">rehydrate([states])</h3>
+
+<p>Given some dehyrdated state, it will call <a href="/v/0.10.4/api/stores/index.html#rehydrate">Store#rehydrate</a> if present or <a href="/v/0.10.4/api/stores/index.html#replaceState">Store#replaceState</a> on all registered stores passing in the dehyrdated state. The key of the states must match the Id of the store. If you don&#39;t pass in states then it will look at the <code>window.__marty.state</code>.</p>
+
+<h3 id="renderToString">renderToString(Component, options)</h3>
+
+<p><a href="http://facebook.github.io/react/docs/top-level-api.html#react.rendertostring">Renders</a> the given element to a string, waits for all fetches to complete and then re-renders element. Returns a promise which resolves once element is re-rendered. Result of render is an object containing the html body and the state as a script tag. <code>timeout</code> allows you to configure how long to wait for a fetch to finish before re-rendering the component (Default <strong>1000ms</strong>).</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./views/user'</span><span class="p">);</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">renderToString</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">User</span> <span class="nx">id</span><span class="o">=</span><span class="p">{</span><span class="mi">123</span><span class="p">}</span> <span class="sr">/&gt;, { timeout: 2000}</span><span class="se">)</span><span class="sr">.then</span><span class="se">(</span><span class="sr">function </span><span class="se">(</span><span class="sr">res</span><span class="se">)</span><span class="sr"> </span><span class="err">{
+</span>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'HTML body'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlBody</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'HTML state'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">htmlState</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Diagnostics'</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
+<span class="p">});</span></code></pre></div>
+
+<h3 id="renderToStaticMarkup">renderToStaticMarkup(Component, options)</h3>
+
+<p>Same as <a href="#renderToString">renderToString</a> except using <a href="https://facebook.github.io/react/docs/top-level-api.html#react.rendertostaticmarkup">React.renderToStaticMarkup</a>.</p>
+
+<h3 id="getAll">getAll(type)</h3>
+
+<p>Get all instances of the given type. Result is an object literal where the keys is the instance id and the value is the instance.</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">app</span><span class="p">.</span><span class="nx">register</span><span class="p">({</span>
+  <span class="na">fooStore</span><span class="p">:</span> <span class="nx">FooStore</span><span class="p">,</span>
+  <span class="na">barStore</span><span class="p">:</span> <span class="p">{</span> <span class="na">store</span><span class="p">:</span> <span class="nx">BarStore</span> <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">getAll</span><span class="p">(</span><span class="s1">'Store'</span><span class="p">)</span> <span class="c1">// =&gt; { 'fooStore': ..., 'bar.store': ...  }</span></code></pre></div>
+
+    </div>
+  </div>
+</div>
+
+  <footer class="bs-docs-footer" role="contentinfo">
+    <div class="container">
+      <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+      <ul class="bs-docs-footer-links muted">
+        <li>v0.10.4</li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/issues">Issues</a></li>
+        <li>·</li>
+        <li><a href="https://github.com/martyjs/marty/releases">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56575082-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/v/0.10.4/js/style.js"></script>
+  <script type="text/javascript" src="/v/0.10.4/js/headings.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+</body>
+</html>
