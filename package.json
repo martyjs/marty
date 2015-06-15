@@ -1,6 +1,6 @@
 {
   "name": "marty",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "description": "A Javascript library for state management in React applications",
   "main": "marty.js",
   "directories": {
