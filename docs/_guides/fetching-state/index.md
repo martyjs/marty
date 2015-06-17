@@ -24,7 +24,7 @@ var UserStore = Marty.createStore({
         return this.state[userId];
       },
       remotely: function () {
-        return this.app.userAPI.getUser(userId)
+        return this.app.userQueries.getUser(userId)
       }
     });
   }
@@ -40,7 +40,7 @@ class UserStore extends Marty.Store {
         return this.state[userId];
       },
       remotely() {
-        return this.app.userAPI.getUser(userId)
+        return this.app.userQueries.getUser(userId)
       }
     });
   }
