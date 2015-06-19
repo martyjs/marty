@@ -51,5 +51,8 @@
       "babelify"
     ]
   },
-  "homepage": "https://martyjs.org"
+  "homepage": "https://martyjs.org",
+  "typescript": {
+    "definition": "marty.d.ts"
+  }
 }
