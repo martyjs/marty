@@ -19,6 +19,10 @@ make release inc={inc} # specify what to version part to increment (major, prema
 make release-docs      # builds documentation and copies into ../marty-gh-pages
 ```
 
+## TypeScript
+
+A TypeScript definition is available at `marty.d.ts`. Please note that it requires the React definition from [DefinitelyTyped](https://github.com/borisyankov/DefinitelyTyped/blob/master/react/react.d.ts).
+
 ## Git Commit Messages
 
 * Use the present tense ("Add feature" not "Added feature")
