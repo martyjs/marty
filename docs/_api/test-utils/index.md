@@ -55,7 +55,7 @@ var app = TestUtils.createApplication(Application, {
      <td>Will only create instances with Ids that are in this array</td>
    </tr>
    <tr>
-     <td>include</td>
+     <td>exclude</td>
      <td>string array</td>
      <td>Will only create instances with Ids that are not in this array</td>
    </tr>
