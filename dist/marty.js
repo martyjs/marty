@@ -10206,7 +10206,7 @@ require(1).polyfill();
 require(2);
 
 var Marty = require(33);
-var marty = new Marty('0.10.4', react());
+var marty = new Marty('0.10.5', react());
 
 marty.use(require(31));
 marty.use(require(17));
