@@ -288,7 +288,7 @@
           <li>
             
 
-            <a href="/blog/2015/05/27/marty-v0.10.html">Blog</a>
+            <a href="/blog/2015/08/02/marty-last.html">Blog</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -1257,7 +1257,7 @@
     <div class="content">
       <p>The dispatcher is the central hub in which all application data flows throw. When a store is created it <a href="http://facebook.github.io/flux/docs/dispatcher.html#api">registers</a> a callback with the dispatcher. Whenever an <a href="/guides/action-creators/index.html">action creator</a> creates an action and you call <code>this.dispatch()</code>, the action will be passed to the dispatcher, which passes it to any registered stores. The dispatcher will call each registered callback synchronously. Any actions that are dispatched during this process will be queued until all callbacks are called.</p>
 
-<p>Marty uses the internally. Whenever you create a new <a href="/guides/application/index.html">application</a> instance we will create a dispatcher (We use <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>) which is accessible at <code>Application#dispatcher</code> and passed down to all registered types.</p>
+<p>Marty uses the dispatcher internally. Whenever you create a new <a href="/guides/application/index.html">application</a> instance we will create a dispatcher (We use <a href="https://github.com/facebook/flux/">facebook&#39;s dispatcher</a>) which is accessible at <code>Application#dispatcher</code> and passed down to all registered types.</p>
 
 <div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">Marty</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marty'</span><span class="p">);</span>
 
@@ -1277,7 +1277,7 @@
     <div class="container">
       <p>Code licensed under <a href="https://github.com/martyjs/marty/blob/master/LICENSE" target="_blank">MIT</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
       <ul class="bs-docs-footer-links muted">
-        <li>v0.10.4</li>
+        <li>v0.10.5</li>
         <li>·</li>
         <li><a href="https://github.com/martyjs/marty">GitHub</a></li>
         <li>·</li>
