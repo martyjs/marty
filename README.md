@@ -1,5 +1,5 @@
 
-### Marty v10.0 will be the last major release. Use [Alt](http://alt.js.org) or [Redux](https://github.com/gaearon/redux) instead. [More info](http://martyjs.org/blog/2015/08/02/marty-last.html)
+### Marty is no longer actively maintained. Use [Alt](http://alt.js.org) or [Redux](https://github.com/gaearon/redux) instead. [More info](http://martyjs.org/blog/2015/08/02/marty-last.html).
 
 
 [Marty](http://martyjs.org) is a Javascript library for state management in React applications. It is an implementation of the [Flux architecture](http://facebook.github.io/flux/docs/overview.html).
