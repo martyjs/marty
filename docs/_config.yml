@@ -45,4 +45,4 @@ collections:
   devtools:
     title: Developer Tools
     output: true
-current_version: 0.10.5
+current_version: 0.11.0

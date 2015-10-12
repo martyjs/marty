@@ -25,5 +25,5 @@
     "isomorphic-fetch": "1.6.0",
     "lodash": "^3.5.0"
   },
-  "version": "0.10.5"
+  "version": "0.11.0"
 }
