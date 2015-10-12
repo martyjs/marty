@@ -8,7 +8,7 @@ require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
 var Marty = require('marty-lib/modules/core/marty');
-var marty = new Marty('0.10.5', react());
+var marty = new Marty('0.10.5', react(), reactDomServer());
 
 marty.use(require('marty-lib/modules/core'));
 marty.use(require('marty-lib/modules/constants'));
@@ -42,4 +42,25 @@ function react() {
   }
 
   throw new Error('Could not find React');
+}
+
+function reactDomServer() {
+  try {
+    return module.parent.require("react-dom/server");
+  } catch (e) {
+    try {
+      return require("react-dom/server");
+    } catch (e) {
+      if (windowDefined) {
+        if (!window.ReactDOMServer) {
+          // Don't require ReactDOMServer in browser.
+          return {};
+        }
+
+        return window.ReactDOMServer;
+      }
+    }
+  }
+
+  throw new Error('Could not find ReactDOMServer');
 }
