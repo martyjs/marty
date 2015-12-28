@@ -174,7 +174,7 @@ class UserStore extends Marty.Store {
 }
 {% endsample %}
 
-The result of the fetch function is a [fetch result]({% url /api/stores/index.html#fetch-result %}) which represents the current state of the fetch. A fetch can either be **PENDING**, **FAILED** or **DONE** (``fetch.status``). If a fetch has failed then the result will have the error (``fetch.error``) and if done it will have the result (``fetch.result``). The best way to use a fetch result within your views is with a [container]({% url /guides/container/index.html %})
+The result of the fetch function is a [fetch result]({% url /api/stores/index.html#fetch-result %}) which represents the current state of the fetch. A fetch can either be **PENDING**, **FAILED** or **DONE** (``fetch.status``). If a fetch has failed then the result will have the error (``fetch.error``) and if done it will have the result (``fetch.result``). The best way to use a fetch result within your views is with a [container]({% url /guides/containers/index.html %})
 
 {% sample %}
 classic
